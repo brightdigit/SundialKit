@@ -11,6 +11,20 @@ import SwiftUI
 import WatchConnectivity
 
 class WCObject: NSObject, WCSessionDelegate, ObservableObject {
+  struct NotSupportedError : Error {}
+  
+  public func forceActivate () {
+    try! self.activate()
+  }
+  public func activate () throws {
+    guard WCSession.isSupported() else {
+      throw NotSupportedError()
+    }
+        let session = WCSession.default
+        session.delegate = self
+        session.activate()
+    
+  }
     override init() {
         super.init()
 
