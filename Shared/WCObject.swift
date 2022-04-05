@@ -33,6 +33,15 @@ class WCObject: NSObject, WCSessionDelegate, ObservableObject {
       let isCompanionAppInstalledPublisher = isiPhoneAppInstalledSubject.map(\.isCompanionAppInstalled)
     #endif
     isCompanionAppInstalledPublisher.receive(on: DispatchQueue.main).assign(to: &$isCompanionAppInstalled)
+
+    lastErrorSubject.receive(on: DispatchQueue.main).assign(to: &$lastError)
+
+    lastColorSentSubject.share().receive(on: DispatchQueue.main).assign(to: &$lastColorSent)
+
+    lastColorSentSubject.share().map { _ in Error?.none }.assign(to: &$lastError)
+
+    lastColorReceivedSubject.receive(on: DispatchQueue.main).assign(to: &$lastColorReceived)
+    lastColorReceivedSubject.share().map { _ in Error?.none }.assign(to: &$lastError)
   }
 
   var _session: WCSession?
@@ -51,14 +60,18 @@ class WCObject: NSObject, WCSessionDelegate, ObservableObject {
     let isiPhoneAppInstalledSubject = PassthroughSubject<WCSession, Never>()
   #endif
 
+  let lastErrorSubject = PassthroughSubject<Error?, Never>()
+  let lastColorSentSubject = PassthroughSubject<Color, Never>()
+  let lastColorReceivedSubject = PassthroughSubject<Color, Never>()
+
   #if os(iOS)
     @Published var isPaired = false
   #endif
   @Published var isReachable = false
   @Published var isCompanionAppInstalled = false
   @Published var activationState = WCSessionActivationState.notActivated
-  @Published var lastColorReceived: Color?
-  @Published var lastColorSent: Color?
+  @Published var lastColorReceived: Color = .secondary
+  @Published var lastColorSent: Color = .secondary
   @Published var lastError: Error?
 
   #if os(iOS)
@@ -107,30 +120,45 @@ class WCObject: NSObject, WCSessionDelegate, ObservableObject {
         self.lastColorSent = color
       }
     #else
-      actualSession.sendMessage(["colorValue": color.value!]) { reply in
-        if let colorValue = reply["colorValue"] as? Int {
-          let color = Color(colorValue)
-          DispatchQueue.main.async {
-            [weak self] in
-              self?.lastColorSent = color
+      let message = ["colorValue": color.value!]
+      if isReachable {
+        actualSession.sendMessage(message) { [weak self] reply in
+          if let colorValue = reply["colorValue"] as? Int {
+            let color = Color(colorValue)
+            print("Sent Updated: \(String(colorValue, radix: 16, uppercase: true))")
+            self?.lastColorSentSubject.send(color)
           }
+        } errorHandler: { [weak self] error in
+          self?.lastErrorSubject.send(error)
         }
-      } errorHandler: { [weak self] error in
-        DispatchQueue.main.async {
-          self?.lastError = error
+      } else if isCompanionAppInstalled {
+        do {
+          try actualSession.updateApplicationContext(message)
+        } catch {
+          lastErrorSubject.send(error)
+
+          return
         }
+        lastColorSentSubject.send(color)
+        print("Sent Updated: \(String(color.value!, radix: 16, uppercase: true))")
       }
     #endif
   }
 
-  func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
+  func receivedMessage(_ message: [String: Any], _ replyHandler: (([String: Any]) -> Void)?) {
     if let colorValue = message["colorValue"] as? Int {
       let color = Color(colorValue)
-      replyHandler(message)
-      DispatchQueue.main.async {
-        [weak self] in
-          self?.lastColorReceived = color
-      }
+      replyHandler?(message)
+      print("Recv Updated: \(String(colorValue, radix: 16, uppercase: true))")
+      lastColorReceivedSubject.send(color)
     }
+  }
+
+  func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
+    receivedMessage(message, replyHandler)
+  }
+
+  func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+    receivedMessage(applicationContext, nil)
   }
 }

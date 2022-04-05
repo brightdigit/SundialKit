@@ -33,10 +33,10 @@ struct ContentView: View {
     VStack {
       HStack {
         VStack {
-          Rectangle().fill(object.lastColorReceived ?? Color.secondary).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit)
+          Rectangle().fill(object.lastColorReceived).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit)
         }
         VStack {
-          Rectangle().fill(object.lastColorSent ?? Color.secondary).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit)
+          Rectangle().fill(object.lastColorSent).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit)
         }
       }
       HStack {
@@ -60,7 +60,7 @@ struct ContentView: View {
             object.sendColor(Self.colors[index])
           } label: {
             Text("   ")
-          }.padding(Self.padding).background(Self.colors[index]).cornerRadius(4.0)
+          }.padding(Self.padding).background(Self.colors[index]).cornerRadius(4.0).disabled(!self.object.isCompanionAppInstalled)
         }
       }.padding()
     }
@@ -72,7 +72,7 @@ struct ContentView: View {
         HStack {
           List {
             VStack {
-              Rectangle().fill(object.lastColorReceived ?? Color.secondary).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit)
+              Rectangle().fill(object.lastColorReceived).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit)
               HStack {
                 Image(systemName: "applewatch.radiowaves.left.and.right")
                 Text("Received").font(.system(size: 12.0))
@@ -80,7 +80,7 @@ struct ContentView: View {
               }
             }
             VStack {
-              Rectangle().fill(object.lastColorSent ?? Color.secondary).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit)
+              Rectangle().fill(object.lastColorSent).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit)
               HStack {
                 Image(systemName: "iphone.radiowaves.left.and.right")
                 Text("Sent").font(.system(size: 12.0))
@@ -120,13 +120,12 @@ struct ContentView: View {
       Section(header: Text("send color")) {
         HStack {
           ForEach(0 ..< 6) { index in
-            Button {
+            Rectangle().fill(Self.colors[index]).aspectRatio(contentMode: .fit).cornerRadius(4.0).onTapGesture {
+              print("Tapd Updated: \(String(Self.colors[index].value!, radix: 16, uppercase: true))")
               object.sendColor(Self.colors[index])
-            } label: {
-              Text("   ")
-            }.padding(Self.padding).background(Self.colors[index]).cornerRadius(4.0)
+            }
           }
-        }.padding()
+        }.buttonStyle(BorderlessButtonStyle()).padding()
       }
     }
   }
