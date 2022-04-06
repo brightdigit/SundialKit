@@ -1,0 +1,1 @@
+typealias WCMessageResult = (WCMessage, WCSendMessageResult)

@@ -2,7 +2,7 @@ import SwiftUI
 import WatchConnectivity
 
 struct ContentView: View {
-  @EnvironmentObject var object: WCObject
+  @EnvironmentObject var object: SundailObject
   #if os(iOS)
     static let padding = 20.0
   #else
@@ -133,6 +133,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
-    ContentView().environmentObject(WCObject())
+    ContentView().environmentObject(SundailObject())
   }
 }

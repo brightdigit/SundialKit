@@ -1,0 +1,1 @@
+typealias WCMessageAcceptance = (WCMessage, WCMessageContext)
