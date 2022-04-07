@@ -1,0 +1,7 @@
+{
+  "set" : "../Catalogs/Application/Assets.xcassets/AppIcon.appiconset",
+  "remove-alpha" : true,
+  "source" : "sundial.svg",
+  "geometry" : null,
+  "background" : "#FFFFFFFF"
+}

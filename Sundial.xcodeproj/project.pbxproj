@@ -1,0 +1,712 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 51;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		192982334AC145BD61685F1C /* Publisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DD8287345DD91E17C36D043 /* Publisher.swift */; };
+		1C1FDB2C5FF6E5AC9A9115D1 /* WCMessage.Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E2CDEFF249330B9FFDE1E72 /* WCMessage.Color.swift */; };
+		3A9F2F23A81E9F5F3953511D /* SundialKit in Frameworks */ = {isa = PBXBuildFile; productRef = A7FF2E380ACD1D3F7DCCACCF /* SundialKit */; };
+		3D19631AC532AF13540EAF02 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EC9F2E0EC1B730F902774F1 /* ContentView.swift */; };
+		47A09E889C0CF57402975721 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6EC5415BE8ACDCEC749841A /* Color.swift */; };
+		4AAEDA5E70B118000FEF16B9 /* SundailObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = C246DD13F8E09CE52FDEDF0E /* SundailObject.swift */; };
+		54A944DC0519A689D55DFA30 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EC9F2E0EC1B730F902774F1 /* ContentView.swift */; };
+		7BC65EDEFD5EE1B68B8FEB21 /* WatchConnectivityTestApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B93B54B64BAB7468A01A9F /* WatchConnectivityTestApp.swift */; };
+		8FB61886F0B7D5F73ED149AA /* MissingCompanionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C26D3D7E66CD698CE4654A /* MissingCompanionError.swift */; };
+		9468F8A83028C606108A4660 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0A0B27AB09016D5AB8419A30 /* Assets.xcassets */; };
+		B04BCC66DD7DB09C442AFAB3 /* Publisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DD8287345DD91E17C36D043 /* Publisher.swift */; };
+		B41E8C8E0AAFDE711E78B233 /* PreviewContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E718094DD65F78717D61FD /* PreviewContentView.swift */; };
+		BC2BA78C117E34049E2F7251 /* MissingCompanionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C26D3D7E66CD698CE4654A /* MissingCompanionError.swift */; };
+		C0991191BEB2F8C08502BA5C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 048FC4C09CE488F61D01B4CF /* Assets.xcassets */; };
+		C5CDEBF2F8430658C034C9E1 /* Sundial.watchkitapp.watchkitextension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = D267AFFB41BB399B325D5FE2 /* Sundial.watchkitapp.watchkitextension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		D80326BAD4634C78208FB05F /* WCMessage.Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E2CDEFF249330B9FFDE1E72 /* WCMessage.Color.swift */; };
+		DD780FBF1854C6F4B0C9E789 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0A0B27AB09016D5AB8419A30 /* Assets.xcassets */; };
+		E5E91D1525002EDAFE27524B /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6EC5415BE8ACDCEC749841A /* Color.swift */; };
+		E745520BAEDFB9E3E9E8CE1B /* PreviewContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E718094DD65F78717D61FD /* PreviewContentView.swift */; };
+		EE028065BD437BFDFA802CC7 /* SundialKit in Frameworks */ = {isa = PBXBuildFile; productRef = F40F006CF443CF9D072F071B /* SundialKit */; };
+		F05B8D7CB65BDBCC1E7BE4A8 /* Sundial.watchkitapp.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = AFED2F5198697D3CF3A7C6B9 /* Sundial.watchkitapp.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F72D61F76EABE47E9B81E91B /* SundailObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = C246DD13F8E09CE52FDEDF0E /* SundailObject.swift */; };
+		F738095C1261B67A1AA5FF5B /* WatchConnectivityTestApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B93B54B64BAB7468A01A9F /* WatchConnectivityTestApp.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3436437718D95AF3E4EE92D6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D876D68250FAF9DBD350179C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 919DCEA681F99AC52D79CE9B;
+			remoteInfo = Sundial.watchkitapp;
+		};
+		529E7F90664E83AD373A837A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D876D68250FAF9DBD350179C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EAECCEA6AB361790E395CF06;
+			remoteInfo = Sundial.watchkitapp.watchkitextension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9A8D5039F1DEB5ECF3EE5756 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				C5CDEBF2F8430658C034C9E1 /* Sundial.watchkitapp.watchkitextension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E826C605C94CCAA6ECF69925 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				F05B8D7CB65BDBCC1E7BE4A8 /* Sundial.watchkitapp.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		048FC4C09CE488F61D01B4CF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0A0B27AB09016D5AB8419A30 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0BEF625B41466F029A48E67D /* SundialKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SundialKit; path = Packages/SundialKit; sourceTree = SOURCE_ROOT; };
+		31E718094DD65F78717D61FD /* PreviewContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewContentView.swift; sourceTree = "<group>"; };
+		3DD8287345DD91E17C36D043 /* Publisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Publisher.swift; sourceTree = "<group>"; };
+		4EC9F2E0EC1B730F902774F1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		5766B3DFF4A0547BDD66DBAB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		6E2CDEFF249330B9FFDE1E72 /* WCMessage.Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WCMessage.Color.swift; sourceTree = "<group>"; };
+		89DF610D16B313DB17E17719 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		A6EC5415BE8ACDCEC749841A /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
+		AF802F84AF4D4A7E0B2239F7 /* Sundial.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Sundial.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AFED2F5198697D3CF3A7C6B9 /* Sundial.watchkitapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sundial.watchkitapp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B8B93B54B64BAB7468A01A9F /* WatchConnectivityTestApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectivityTestApp.swift; sourceTree = "<group>"; };
+		C246DD13F8E09CE52FDEDF0E /* SundailObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundailObject.swift; sourceTree = "<group>"; };
+		C5C26D3D7E66CD698CE4654A /* MissingCompanionError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissingCompanionError.swift; sourceTree = "<group>"; };
+		D267AFFB41BB399B325D5FE2 /* Sundial.watchkitapp.watchkitextension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Sundial.watchkitapp.watchkitextension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		D796AF5E91A089CA82A5A725 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5D32684A1BCAFAAA20EE5863 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EE028065BD437BFDFA802CC7 /* SundialKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F6888A613EC51DFF92BC7D59 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3A9F2F23A81E9F5F3953511D /* SundialKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0DB58D439E98ACD045CFDCEE /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				0A0B27AB09016D5AB8419A30 /* Assets.xcassets */,
+			);
+			name = Application;
+			path = Catalogs/Application;
+			sourceTree = "<group>";
+		};
+		137B4DDDF245794F569546D0 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				D7BE7B356AA43C884E23C43A /* iOS */,
+				B9262E19E20B773F9C270347 /* watchOS */,
+			);
+			name = Support;
+			sourceTree = "<group>";
+		};
+		1BB750822D52B40661E707E7 /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				5766B3DFF4A0547BDD66DBAB /* Info.plist */,
+			);
+			name = Application;
+			path = PLists/iOS/Application;
+			sourceTree = "<group>";
+		};
+		4C9369AA5540196E300A04F6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AF802F84AF4D4A7E0B2239F7 /* Sundial.app */,
+				AFED2F5198697D3CF3A7C6B9 /* Sundial.watchkitapp.app */,
+				D267AFFB41BB399B325D5FE2 /* Sundial.watchkitapp.watchkitextension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5A94F3EDD9166273BFFC6675 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				048FC4C09CE488F61D01B4CF /* Assets.xcassets */,
+			);
+			name = Extension;
+			path = Catalogs/Extension;
+			sourceTree = "<group>";
+		};
+		7FCA9D1D0C3AF41D42B2791E /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				D796AF5E91A089CA82A5A725 /* Info.plist */,
+			);
+			name = Application;
+			path = PLists/watchOS/Application;
+			sourceTree = "<group>";
+		};
+		8253BEA9A33496E7DCFCC9A6 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				0DB58D439E98ACD045CFDCEE /* Application */,
+				5A94F3EDD9166273BFFC6675 /* Extension */,
+			);
+			path = Assets;
+			sourceTree = "<group>";
+		};
+		B4CA0001CCEEB12F3824D898 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				A6EC5415BE8ACDCEC749841A /* Color.swift */,
+				4EC9F2E0EC1B730F902774F1 /* ContentView.swift */,
+				C5C26D3D7E66CD698CE4654A /* MissingCompanionError.swift */,
+				31E718094DD65F78717D61FD /* PreviewContentView.swift */,
+				3DD8287345DD91E17C36D043 /* Publisher.swift */,
+				C246DD13F8E09CE52FDEDF0E /* SundailObject.swift */,
+				B8B93B54B64BAB7468A01A9F /* WatchConnectivityTestApp.swift */,
+				6E2CDEFF249330B9FFDE1E72 /* WCMessage.Color.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		B9262E19E20B773F9C270347 /* watchOS */ = {
+			isa = PBXGroup;
+			children = (
+				7FCA9D1D0C3AF41D42B2791E /* Application */,
+				CBBE0E1C49B3732C98389059 /* Extension */,
+			);
+			name = watchOS;
+			sourceTree = "<group>";
+		};
+		CBBE0E1C49B3732C98389059 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				89DF610D16B313DB17E17719 /* Info.plist */,
+			);
+			name = Extension;
+			path = PLists/watchOS/Extension;
+			sourceTree = "<group>";
+		};
+		D7BE7B356AA43C884E23C43A /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				1BB750822D52B40661E707E7 /* Application */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		E6BA6F5CB066751D0EF9D92A /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				0BEF625B41466F029A48E67D /* SundialKit */,
+			);
+			name = Packages;
+			sourceTree = SOURCE_ROOT;
+		};
+		E9BDFC4A18333819CDDADCB2 = {
+			isa = PBXGroup;
+			children = (
+				8253BEA9A33496E7DCFCC9A6 /* Assets */,
+				E6BA6F5CB066751D0EF9D92A /* Packages */,
+				B4CA0001CCEEB12F3824D898 /* Sources */,
+				137B4DDDF245794F569546D0 /* Support */,
+				4C9369AA5540196E300A04F6 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		919DCEA681F99AC52D79CE9B /* Sundial.watchkitapp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4EC03EEA60308487B6A01A5F /* Build configuration list for PBXNativeTarget "Sundial.watchkitapp" */;
+			buildPhases = (
+				2AA3F1EBB2639245A4883E42 /* Sources */,
+				97AF0E3961BFA7FFC931EB11 /* Resources */,
+				9A8D5039F1DEB5ECF3EE5756 /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				318B980E9920FA82FE28B0FB /* PBXTargetDependency */,
+			);
+			name = Sundial.watchkitapp;
+			productName = Sundial.watchkitapp;
+			productReference = AFED2F5198697D3CF3A7C6B9 /* Sundial.watchkitapp.app */;
+			productType = "com.apple.product-type.application.watchapp2";
+		};
+		A5A6ADE2F26EB1E46E601918 /* Sundial */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C9315F2869F1F222AB3A3FB2 /* Build configuration list for PBXNativeTarget "Sundial" */;
+			buildPhases = (
+				5E833F794E3E303BD7AB4A39 /* Sources */,
+				D2770A6F6BAAC465A01ACE4F /* Resources */,
+				5D32684A1BCAFAAA20EE5863 /* Frameworks */,
+				E826C605C94CCAA6ECF69925 /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F4CC09FFF6F2057A6146B65E /* PBXTargetDependency */,
+			);
+			name = Sundial;
+			packageProductDependencies = (
+				F40F006CF443CF9D072F071B /* SundialKit */,
+			);
+			productName = Sundial;
+			productReference = AF802F84AF4D4A7E0B2239F7 /* Sundial.app */;
+			productType = "com.apple.product-type.application";
+		};
+		EAECCEA6AB361790E395CF06 /* Sundial.watchkitapp.watchkitextension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D2EC886CB4644E37035D69E8 /* Build configuration list for PBXNativeTarget "Sundial.watchkitapp.watchkitextension" */;
+			buildPhases = (
+				42D17F31C153100078139C93 /* Sources */,
+				93E135ECFC922E58EE7DD90C /* Resources */,
+				F6888A613EC51DFF92BC7D59 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Sundial.watchkitapp.watchkitextension;
+			packageProductDependencies = (
+				A7FF2E380ACD1D3F7DCCACCF /* SundialKit */,
+			);
+			productName = Sundial.watchkitapp.watchkitextension;
+			productReference = D267AFFB41BB399B325D5FE2 /* Sundial.watchkitapp.watchkitextension.appex */;
+			productType = "com.apple.product-type.watchkit2-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D876D68250FAF9DBD350179C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1200;
+				TargetAttributes = {
+					919DCEA681F99AC52D79CE9B = {
+						DevelopmentTeam = MLT7M394S7;
+						ProvisioningStyle = Manual;
+					};
+					A5A6ADE2F26EB1E46E601918 = {
+						DevelopmentTeam = MLT7M394S7;
+						ProvisioningStyle = Manual;
+					};
+					EAECCEA6AB361790E395CF06 = {
+						DevelopmentTeam = MLT7M394S7;
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = 9421296BF18E8A7FDE720770 /* Build configuration list for PBXProject "Sundial" */;
+			compatibilityVersion = "Xcode 10.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = E9BDFC4A18333819CDDADCB2;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A5A6ADE2F26EB1E46E601918 /* Sundial */,
+				919DCEA681F99AC52D79CE9B /* Sundial.watchkitapp */,
+				EAECCEA6AB361790E395CF06 /* Sundial.watchkitapp.watchkitextension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		93E135ECFC922E58EE7DD90C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0991191BEB2F8C08502BA5C /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		97AF0E3961BFA7FFC931EB11 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9468F8A83028C606108A4660 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D2770A6F6BAAC465A01ACE4F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD780FBF1854C6F4B0C9E789 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2AA3F1EBB2639245A4883E42 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		42D17F31C153100078139C93 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				47A09E889C0CF57402975721 /* Color.swift in Sources */,
+				3D19631AC532AF13540EAF02 /* ContentView.swift in Sources */,
+				BC2BA78C117E34049E2F7251 /* MissingCompanionError.swift in Sources */,
+				E745520BAEDFB9E3E9E8CE1B /* PreviewContentView.swift in Sources */,
+				B04BCC66DD7DB09C442AFAB3 /* Publisher.swift in Sources */,
+				4AAEDA5E70B118000FEF16B9 /* SundailObject.swift in Sources */,
+				1C1FDB2C5FF6E5AC9A9115D1 /* WCMessage.Color.swift in Sources */,
+				F738095C1261B67A1AA5FF5B /* WatchConnectivityTestApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5E833F794E3E303BD7AB4A39 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E5E91D1525002EDAFE27524B /* Color.swift in Sources */,
+				54A944DC0519A689D55DFA30 /* ContentView.swift in Sources */,
+				8FB61886F0B7D5F73ED149AA /* MissingCompanionError.swift in Sources */,
+				B41E8C8E0AAFDE711E78B233 /* PreviewContentView.swift in Sources */,
+				192982334AC145BD61685F1C /* Publisher.swift in Sources */,
+				F72D61F76EABE47E9B81E91B /* SundailObject.swift in Sources */,
+				D80326BAD4634C78208FB05F /* WCMessage.Color.swift in Sources */,
+				7BC65EDEFD5EE1B68B8FEB21 /* WatchConnectivityTestApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		318B980E9920FA82FE28B0FB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EAECCEA6AB361790E395CF06 /* Sundial.watchkitapp.watchkitextension */;
+			targetProxy = 529E7F90664E83AD373A837A /* PBXContainerItemProxy */;
+		};
+		F4CC09FFF6F2057A6146B65E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 919DCEA681F99AC52D79CE9B /* Sundial.watchkitapp */;
+			targetProxy = 3436437718D95AF3E4EE92D6 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0913C21DAE39E41738BAEEAE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				INFOPLIST_FILE = PLists/watchOS/Extension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.brightdigit.Sundial.watchkitapp.watchkitextension;
+				PRODUCT_NAME = Sundial;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Release;
+		};
+		1098CCF9052C1100A780A39D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = MLT7M394S7;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.8;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				WATCHOS_DEPLOYMENT_TARGET = 7.4;
+			};
+			name = Debug;
+		};
+		1F240253F4BEFB8AD4D9038A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = PLists/iOS/Application/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.brightdigit.Sundial;
+				PRODUCT_NAME = Sundial;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		282CF81BD7BEDEB7DF07AB6A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = PLists/iOS/Application/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.brightdigit.Sundial;
+				PRODUCT_NAME = Sundial;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		658ABC39D42DD91C6BF98FB2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				IBSC_MODULE = Sundial_watchkitapp_watchkitextension;
+				INFOPLIST_FILE = PLists/watchOS/Application/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brightdigit.Sundial.watchkitapp;
+				PRODUCT_MODULE_NAME = Sundial_watchkitapp_watchkitextension;
+				PRODUCT_NAME = Sundial;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Debug;
+		};
+		B2D5B70B39A51C338AFDF507 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				IBSC_MODULE = Sundial_watchkitapp_watchkitextension;
+				INFOPLIST_FILE = PLists/watchOS/Application/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brightdigit.Sundial.watchkitapp;
+				PRODUCT_MODULE_NAME = Sundial_watchkitapp_watchkitextension;
+				PRODUCT_NAME = Sundial;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Release;
+		};
+		BDF802EE3A21DCEA76E39258 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = MLT7M394S7;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.8;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				WATCHOS_DEPLOYMENT_TARGET = 7.4;
+			};
+			name = Release;
+		};
+		EBA522F973D96EDA11FBF2E2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				INFOPLIST_FILE = PLists/watchOS/Extension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.brightdigit.Sundial.watchkitapp.watchkitextension;
+				PRODUCT_NAME = Sundial;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4EC03EEA60308487B6A01A5F /* Build configuration list for PBXNativeTarget "Sundial.watchkitapp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				658ABC39D42DD91C6BF98FB2 /* Debug */,
+				B2D5B70B39A51C338AFDF507 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9421296BF18E8A7FDE720770 /* Build configuration list for PBXProject "Sundial" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1098CCF9052C1100A780A39D /* Debug */,
+				BDF802EE3A21DCEA76E39258 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C9315F2869F1F222AB3A3FB2 /* Build configuration list for PBXNativeTarget "Sundial" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				282CF81BD7BEDEB7DF07AB6A /* Debug */,
+				1F240253F4BEFB8AD4D9038A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D2EC886CB4644E37035D69E8 /* Build configuration list for PBXNativeTarget "Sundial.watchkitapp.watchkitextension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EBA522F973D96EDA11FBF2E2 /* Debug */,
+				0913C21DAE39E41738BAEEAE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A7FF2E380ACD1D3F7DCCACCF /* SundialKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SundialKit;
+		};
+		F40F006CF443CF9D072F071B /* SundialKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SundialKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = D876D68250FAF9DBD350179C /* Project object */;
+}

@@ -1,1 +1,0 @@
-typealias WCMessage = [String: Any]

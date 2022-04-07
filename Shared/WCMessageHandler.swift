@@ -1,1 +1,0 @@
-typealias WCMessageHandler = (WCMessage) -> Void
