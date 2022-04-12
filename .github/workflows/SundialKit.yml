@@ -37,7 +37,7 @@ jobs:
       - name: Run iOS target tests
         run: xcodebuild test -scheme SundialKit -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 13,OS=${{ matrix.iOSVersion }}' 
       - name: Run watchOS target tests
-        run: xcodebuild test -scheme SundialKit -sdk iphonesimulator -destination 'platform=watchOS Simulator,name=Apple Watch Series 7 - 41mm,OS=${{ matrix.watchOSVersion }}' 
+        run: xcodebuild test -scheme SundialKit -sdk watchsimulator -destination 'platform=watchOS Simulator,name=Apple Watch Series 7 - 41mm,OS=${{ matrix.watchOSVersion }}' 
       #- name: Prepare Code Coverage
       #  run: xcrun llvm-cov export -format="lcov" .build/debug/${{ env.PACKAGE_NAME }}PackageTests.xctest/Contents/MacOS/${{ env.PACKAGE_NAME }}PackageTests -instr-profile .build/debug/codecov/default.profdata > info.lcov
       # - name: Upload to CodeCov.io
