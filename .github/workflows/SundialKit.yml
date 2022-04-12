@@ -34,10 +34,28 @@ jobs:
         run: swift run swiftformat --lint . && swift run swiftlint
       - name: Run Swift Package tests
         run: swift test -v --enable-code-coverage
+      - name: Upload SPM coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true
+          flags: spm
+          verbose: true  
       - name: Run iOS target tests
         run: xcodebuild test -scheme SundialKit -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 13,OS=${{ matrix.iOSVersion }}' 
+      - name: Upload iOS coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true
+          flags: iOS,iOS-${{ matrix.iOSVersion }}
+          verbose: true        
       - name: Run watchOS target tests
-        run: xcodebuild test -scheme SundialKit -sdk watchsimulator -destination 'platform=watchOS Simulator,name=Apple Watch Series 7 - 41mm,OS=${{ matrix.watchOSVersion }}' 
+        run: xcodebuild test -scheme SundialKit -sdk watchsimulator -destination 'platform=watchOS Simulator,name=Apple Watch Series 7 - 41mm,OS=${{ matrix.watchOSVersion }}'         
+      - name: Upload watchOS coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true
+          flags: watchOS,watchOS${{ matrix.watchOSVersion }}
+          verbose: true
       #- name: Prepare Code Coverage
       #  run: xcrun llvm-cov export -format="lcov" .build/debug/${{ env.PACKAGE_NAME }}PackageTests.xctest/Contents/MacOS/${{ env.PACKAGE_NAME }}PackageTests -instr-profile .build/debug/codecov/default.profdata > info.lcov
       # - name: Upload to CodeCov.io
