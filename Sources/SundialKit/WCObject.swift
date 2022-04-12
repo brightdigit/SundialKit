@@ -21,9 +21,10 @@ public class WCObject: NSObject, WCSessionDelegate, ObservableObject {
     cancellable = sendingMessageSubject.sink(receiveValue: sendMessage(_:))
   }
 
+  // swiftlint:disable:next identifier_name
   var _session: WCSession?
 
-  var actualSession: WCSession {
+  var session: WCSession {
     _session ?? WCSession.default
   }
 
@@ -48,7 +49,9 @@ public class WCObject: NSObject, WCSessionDelegate, ObservableObject {
   }
 
   public var isPairedAppInstalledPublisher: AnyPublisher<Bool, Never> {
-    isPairedAppInstalledSubject.anyPublisher(for: WCSession.isCompanionAppInstalledKeyPath)
+    isPairedAppInstalledSubject.anyPublisher(
+      for: WCSession.isCompanionAppInstalledKeyPath
+    )
   }
 
   public var messageReceivedPublisher: AnyPublisher<WCMessageAcceptance, Never> {
@@ -89,7 +92,9 @@ public class WCObject: NSObject, WCSessionDelegate, ObservableObject {
     }
   #endif
 
-  public func session(_ session: WCSession, activationDidCompleteWith _: WCSessionActivationState, error _: Error?) {
+  public func session(_ session: WCSession,
+                      activationDidCompleteWith _: WCSessionActivationState,
+                      error _: Error?) {
     _session = session
     DispatchQueue.main.async {
       self.activationStateSubject.send(session)
@@ -109,15 +114,15 @@ public class WCObject: NSObject, WCSessionDelegate, ObservableObject {
   }
 
   fileprivate func sendMessage(_ message: WCMessage) {
-    if actualSession.isReachable {
-      actualSession.sendMessage(message) { reply in
+    if session.isReachable {
+      session.sendMessage(message) { reply in
         self.replyMessageSubject.send((message, .reply(reply)))
       } errorHandler: { error in
         self.replyMessageSubject.send((message, .failure(error)))
       }
-    } else if actualSession.isPairedAppInstalled {
+    } else if session.isPairedAppInstalled {
       do {
-        try actualSession.updateApplicationContext(message)
+        try session.updateApplicationContext(message)
       } catch {
         replyMessageSubject.send((message, .failure(error)))
 
@@ -129,11 +134,14 @@ public class WCObject: NSObject, WCSessionDelegate, ObservableObject {
     }
   }
 
-  public func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
+  public func session(_: WCSession,
+                      didReceiveMessage message: [String: Any],
+                      replyHandler: @escaping ([String: Any]) -> Void) {
     messageReceivedSubject.send((message, .replyWith(replyHandler)))
   }
 
-  public func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+  public func session(_: WCSession,
+                      didReceiveApplicationContext applicationContext: [String: Any]) {
     messageReceivedSubject.send((applicationContext, .applicationContext))
   }
 }
