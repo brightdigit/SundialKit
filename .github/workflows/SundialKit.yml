@@ -33,7 +33,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') != true
         run: swift run swiftformat --lint . && swift run swiftlint
       - name: Run iOS target tests
-        run: xcodebuild test -scheme SundialKit -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 13,OS=${{ matrix.iOSVersion }}' 
+        run: xcodebuild test -scheme SundialKit -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 13,OS=${{ matrix.iOSVersion }}' -enableCodeCoverage YES
       - name: Upload iOS coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
@@ -41,7 +41,7 @@ jobs:
           flags: iOS,iOS-${{ matrix.iOSVersion }}
           verbose: true        
       - name: Run watchOS target tests
-        run: xcodebuild test -scheme SundialKit -sdk watchsimulator -destination 'platform=watchOS Simulator,name=Apple Watch Series 7 - 41mm,OS=${{ matrix.watchOSVersion }}'         
+        run: xcodebuild test -scheme SundialKit -sdk watchsimulator -destination 'platform=watchOS Simulator,name=Apple Watch Series 7 - 41mm,OS=${{ matrix.watchOSVersion }}' -enableCodeCoverage YES
       - name: Upload watchOS coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
