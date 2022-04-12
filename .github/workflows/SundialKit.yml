@@ -38,6 +38,8 @@ jobs:
           fail_ci_if_error: true
           flags: spm
           verbose: true
+      - name: Clean up spm build directory
+        run: rm -rf .build
       - name: Lint
         if: startsWith(github.ref, 'refs/tags/') != true
         run: swift run swiftformat --lint . && swift run swiftlint
