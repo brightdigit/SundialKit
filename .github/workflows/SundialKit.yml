@@ -40,7 +40,7 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: true
-          flags: spm,${RELEASE_NAME},${SWIFT_VER}
+          flags: spm,${{ env.RELEASE_NAME }},${{ env.SWIFT_VER }}
           verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
   build-macos:
