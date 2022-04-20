@@ -13,7 +13,7 @@ public protocol WCSessionableDelegate: AnyObject {
 
   func sessionDidDeactivate(_ session: WCSessionable)
 
-  func sessionWatchStateDidChange(_ session: WCSessionable)
+  func sessionCompanionStateDidChange(_ session: WCSessionable)
 
   func sessionReachabilityDidChange(_ session: WCSessionable)
 
@@ -113,15 +113,9 @@ public class WCObject: NSObject, WCSessionableDelegate, ObservableObject {
     activationStateSubject.send(session)
   }
 
-  public func sessionWatchStateDidChange(_ session: WCSessionable) {
+  public func sessionCompanionStateDidChange(_ session: WCSessionable) {
     DispatchQueue.main.async {
       self.isPairedSubject.send(session)
-      self.isPairedAppInstalledSubject.send(session)
-    }
-  }
-
-  public func sessionCompanionAppInstalledDidChange(_ session: WCSessionable) {
-    DispatchQueue.main.async {
       self.isPairedAppInstalledSubject.send(session)
     }
   }
@@ -254,7 +248,13 @@ public class WCObject: NSObject, WCSessionableDelegate, ObservableObject {
       }
 
       func sessionWatchStateDidChange(_: WCSession) {
-        delegate?.sessionWatchStateDidChange(self)
+        delegate?.sessionCompanionStateDidChange(self)
+      }
+
+    #elseif os(watchOS)
+
+      public func sessionCompanionAppInstalledDidChange(_: WCSession) {
+        delegate?.sessionCompanionStateDidChange(self)
       }
     #endif
 
