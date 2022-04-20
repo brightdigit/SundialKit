@@ -4,48 +4,6 @@ import SundialKit
 import SwiftUI
 import XCTest
 
-public class MockSession: WCSessionable {
-  public var isPaired = false {
-    didSet {
-      delegate?.sessionCompanionStateDidChange(self)
-    }
-  }
-
-  public var delegate: WCSessionableDelegate?
-
-  public func activate() throws {}
-
-  public var isReachable = false {
-    didSet {
-      delegate?.sessionReachabilityDidChange(self)
-    }
-  }
-
-  public var isPairedAppInstalled = false {
-    didSet {
-      delegate?.sessionCompanionStateDidChange(self)
-    }
-  }
-
-  public var activationState: ActivationState = .notActivated {
-    didSet {
-      delegate?.session(self, activationDidCompleteWith: activationState, error: nil)
-    }
-  }
-
-  public func updateApplicationContext(_ context: WCMessage) throws {
-    delegate?.session(self, didReceiveApplicationContext: context, error: nil)
-  }
-
-  public func sendMessage(_: WCMessage,
-                          _: @escaping (Result<WCMessage, Error>) -> Void) {}
-
-  func receiveMessage(_ message: WCMessage,
-                      withReplyHandler replyHandler: @escaping WCMessageHandler) {
-    delegate?.session(self, didReceiveMessage: message, replyHandler: replyHandler)
-  }
-}
-
 public class WCObjectTest: XCTestCase {
   public func testActivate() throws {
     let session = MockSession()
@@ -183,11 +141,86 @@ public class WCObjectTest: XCTestCase {
     }
   }
 
-  public func testSendMessage() {
-    XCTFail()
+  public func testSendMessageReachable() {
+    let expectation = expectation(description: "Message Sent Received")
+    let session = MockSession()
+
+    let key = UUID().uuidString
+    let value = UUID()
+    let newState: WCMessage = [key: value]
+    let wcObject = WCObject(session: session)
+    let replyKey = UUID().uuidString
+    let replyValue = UUID()
+    let replyMessage = [replyKey: replyValue]
+    session.isReachable = true
+    session.nextReplyResult = .success(replyMessage)
+    let replyCancellable = wcObject.replyMessagePublisher.sink { message, result in
+      XCTAssertEqual(message[key] as? UUID, value)
+
+      guard case let .reply(actual) = result else {
+        XCTFail()
+        return
+      }
+      XCTAssertEqual(actual[replyKey] as? UUID, replyValue)
+
+      expectation.fulfill()
+    }
+    wcObject.sendingMessageSubject.send(newState)
+    waitForExpectations(timeout: 5.0) { error in
+      XCTAssertNil(error)
+      XCTAssertEqual(session.lastMessageSent?[key] as? UUID, value)
+
+      replyCancellable.cancel()
+    }
+  }
+
+  public func testSendMessageAppInstalled() {
+    let expectation = expectation(description: "Message Sent Received")
+    let session = MockSession()
+
+    let key = UUID().uuidString
+    let value = UUID()
+    let newState: WCMessage = [key: value]
+    let wcObject = WCObject(session: session)
+    let replyKey = UUID().uuidString
+    let replyValue = UUID()
+    let replyMessage = [replyKey: replyValue]
+    session.isPairedAppInstalled = true
+    session.nextReplyResult = .success(replyMessage)
+    let replyCancellable = wcObject.replyMessagePublisher.sink { message, result in
+      XCTAssertEqual(message[key] as? UUID, value)
+
+      guard case .applicationContext = result else {
+        XCTFail()
+        return
+      }
+
+      expectation.fulfill()
+    }
+    wcObject.sendingMessageSubject.send(newState)
+    waitForExpectations(timeout: 5.0) { error in
+      XCTAssertNil(error)
+      XCTAssertEqual(session.lastAppContext?[key] as? UUID, value)
+
+      replyCancellable.cancel()
+    }
   }
 
   public func testIsPairedPublisher() {
-    XCTFail()
+    let expectation = expectation(description: "Installed Changed")
+    let session = MockSession()
+
+    let newState = true
+    let wcObject = WCObject(session: session)
+
+    let cancellable = wcObject.isPairedPublisher.sink { state in
+      XCTAssertEqual(state, newState)
+      expectation.fulfill()
+    }
+    session.isPaired = newState
+    waitForExpectations(timeout: 1.0) { error in
+      XCTAssertNil(error)
+      cancellable.cancel()
+    }
   }
 }
