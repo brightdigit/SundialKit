@@ -116,37 +116,33 @@ public class WCObjectPropertyTests: XCTestCase {
     #endif
   }
 
-  fileprivate func extractedFunc() throws {
-    let actExpectation = expectation(description: "State Change Called to Activate")
-    let notExpectation = expectation(
-      description: "State Change Called to Not Activated"
-    )
-    let session = MockSession()
-
-    let wcObject = WCObject(session: session)
-    let cancellable = wcObject.activationStatePublisher.sink { state in
-      switch state {
-      case .activated:
-        session.activationState = .notActivated
-        actExpectation.fulfill()
-
-      case .notActivated:
-        notExpectation.fulfill()
-
-      default:
-        XCTFail()
-      }
-    }
-    try session.activate()
-    waitForExpectations(timeout: 1.0) { error in
-      XCTAssertNil(error)
-      cancellable.cancel()
-    }
-  }
-
   public func testSessionDidDeactivate() throws {
     #if canImport(Combine)
-      try extractedFunc()
+      let actExpectation = expectation(description: "State Change Called to Activate")
+      let notExpectation = expectation(
+        description: "State Change Called to Not Activated"
+      )
+      let session = MockSession()
+
+      let wcObject = WCObject(session: session)
+      let cancellable = wcObject.activationStatePublisher.sink { state in
+        switch state {
+        case .activated:
+          session.activationState = .notActivated
+          actExpectation.fulfill()
+
+        case .notActivated:
+          notExpectation.fulfill()
+
+        default:
+          XCTFail()
+        }
+      }
+      try session.activate()
+      waitForExpectations(timeout: 1.0) { error in
+        XCTAssertNil(error)
+        cancellable.cancel()
+      }
     #else
       throw XCTSkip("OS doesn't support Combine.")
     #endif
