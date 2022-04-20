@@ -1,51 +1,7 @@
-// swiftlint:disable file_length
 import Combine
 import Foundation
-import SwiftUI
 
-struct NotSupportedError: Error {}
-public protocol WCSessionableDelegate: AnyObject {
-  func session(_ session: WCSessionable,
-               activationDidCompleteWith activationState: WCSessionActivationState,
-               error: Error?)
-
-  func sessionDidBecomeInactive(_ session: WCSessionable)
-
-  func sessionDidDeactivate(_ session: WCSessionable)
-
-  func sessionCompanionStateDidChange(_ session: WCSessionable)
-
-  func sessionReachabilityDidChange(_ session: WCSessionable)
-
-  func session(_ session: WCSessionable,
-               didReceiveMessage message: WCMessage,
-               replyHandler: @escaping WCMessageHandler)
-
-  func session(_ session: WCSessionable,
-               didReceiveApplicationContext applicationContext: WCMessage,
-               error: Error?)
-}
-
-public protocol WCSessionable: AnyObject {
-  var delegate: WCSessionableDelegate? { get set }
-  func activate() throws
-  var isReachable: Bool { get }
-
-  #if os(iOS)
-    var isPaired: Bool { get }
-  #endif
-  var isCompanionAppInstalled: Bool { get }
-  var activationState: WCSessionActivationState { get }
-
-  func updateApplicationContext(_ context: WCMessage) throws
-  func sendMessage(_ message: WCMessage,
-                   _ completion: @escaping (Result<WCMessage, Error>) -> Void)
-}
-
-#if canImport(WatchConnectivity)
-  import WatchConnectivity
-#endif
-
+@available(macOS 10.15, *)
 public class WCObject: NSObject, WCSessionableDelegate, ObservableObject {
   public init(session: WCSessionable) {
     self.session = session
@@ -60,9 +16,13 @@ public class WCObject: NSObject, WCSessionableDelegate, ObservableObject {
     try session.activate()
   }
 
-  override public convenience init() {
-    self.init(session: WatchConnectivitySession())
-  }
+  #if canImport(WatchConnectivity)
+
+    override public convenience init() {
+      self.init(session: WatchConnectivitySession())
+    }
+
+  #endif
 
   let session: WCSessionable
 
@@ -77,7 +37,7 @@ public class WCObject: NSObject, WCSessionableDelegate, ObservableObject {
   public let sendingMessageSubject = PassthroughSubject<WCMessage, Never>()
   let replyMessageSubject = PassthroughSubject<WCMessageResult, Never>()
 
-  public var activationStatePublisher: AnyPublisher<WCSessionActivationState, Never> {
+  public var activationStatePublisher: AnyPublisher<ActivationState, Never> {
     activationStateSubject.anyPublisher(for: \.activationState)
   }
 
@@ -87,7 +47,7 @@ public class WCObject: NSObject, WCSessionableDelegate, ObservableObject {
 
   public var isPairedAppInstalledPublisher: AnyPublisher<Bool, Never> {
     isPairedAppInstalledSubject.anyPublisher(
-      for: \.isCompanionAppInstalled
+      for: \.isPairedAppInstalled
     )
   }
 
@@ -121,7 +81,7 @@ public class WCObject: NSObject, WCSessionableDelegate, ObservableObject {
   }
 
   public func session(_ session: WCSessionable,
-                      activationDidCompleteWith _: WCSessionActivationState,
+                      activationDidCompleteWith _: ActivationState,
                       error _: Error?) {
     DispatchQueue.main.async {
       self.activationStateSubject.send(session)
@@ -145,7 +105,7 @@ public class WCObject: NSObject, WCSessionableDelegate, ObservableObject {
       session.sendMessage(message) { result in
         self.replyMessageSubject.send((message, .init(result)))
       }
-    } else if session.isCompanionAppInstalled {
+    } else if session.isPairedAppInstalled {
       do {
         try session.updateApplicationContext(message)
       } catch {
@@ -155,7 +115,7 @@ public class WCObject: NSObject, WCSessionableDelegate, ObservableObject {
       }
       replyMessageSubject.send((message, .applicationContext))
     } else {
-      replyMessageSubject.send((message, .noCompanion))
+      replyMessageSubject.send((message, .failure(SundialError.missingCompanion)))
     }
   }
 
@@ -176,111 +136,3 @@ public class WCObject: NSObject, WCSessionableDelegate, ObservableObject {
     messageReceivedSubject.send((applicationContext, .applicationContext))
   }
 }
-
-#if canImport(WatchConnectivity)
-
-  class WatchConnectivitySession: NSObject, WCSessionable, WCSessionDelegate {
-    var isReachable: Bool {
-      session.isReachable
-    }
-
-    @available(watchOS, unavailable)
-    var isPaired: Bool {
-      session.isPaired
-    }
-
-    var isCompanionAppInstalled: Bool {
-      session.isPairedAppInstalled
-    }
-
-    var activationState: WCSessionActivationState {
-      session.activationState
-    }
-
-    func updateApplicationContext(_ context: WCMessage) throws {
-      try session.updateApplicationContext(context)
-    }
-
-    func sendMessage(_ message: WCMessage,
-                     _ completion: @escaping (Result<WCMessage, Error>) -> Void) {
-      session.sendMessage(message) { message in
-        completion(.success(message))
-      } errorHandler: { error in
-        completion(.failure(error))
-      }
-    }
-
-    internal init(session: WCSession) {
-      self.session = session
-      super.init()
-      session.delegate = self
-    }
-
-    override convenience init() {
-      self.init(session: .default)
-    }
-
-    let session: WCSession
-
-    var delegate: WCSessionableDelegate?
-
-    func activate() throws {
-      guard WCSession.isSupported() else {
-        throw NotSupportedError()
-      }
-      session.activate()
-    }
-
-    func session(_: WCSession,
-                 activationDidCompleteWith activationState: WCSessionActivationState,
-                 error: Error?) {
-      delegate?.session(self, activationDidCompleteWith: activationState, error: error)
-    }
-
-    #if os(iOS)
-
-      func sessionDidBecomeInactive(_: WCSession) {
-        delegate?.sessionDidBecomeInactive(self)
-      }
-
-      func sessionDidDeactivate(_: WCSession) {
-        delegate?.sessionDidDeactivate(self)
-      }
-
-      func sessionWatchStateDidChange(_: WCSession) {
-        delegate?.sessionCompanionStateDidChange(self)
-      }
-
-    #elseif os(watchOS)
-
-      public func sessionCompanionAppInstalledDidChange(_: WCSession) {
-        delegate?.sessionCompanionStateDidChange(self)
-      }
-    #endif
-
-    func sessionReachabilityDidChange(_: WCSession) {
-      delegate?.sessionReachabilityDidChange(self)
-    }
-
-    func session(_: WCSession,
-                 didReceiveMessage message: [String: Any],
-                 replyHandler: @escaping ([String: Any]) -> Void) {
-      delegate?.session(self, didReceiveMessage: message, replyHandler: replyHandler)
-    }
-
-    func session(_: WCSession,
-                 didReceiveApplicationContext applicationContext: [String: Any]) {
-      delegate?.session(self,
-                        didReceiveApplicationContext: applicationContext, error: nil)
-    }
-
-    func session(_: WCSession,
-                 didReceiveApplicationContext applicationContext: [String: Any],
-                 error: Error?) {
-      delegate?.session(self,
-                        didReceiveApplicationContext: applicationContext,
-                        error: error)
-    }
-  }
-
-#endif

@@ -1,12 +1,8 @@
-
-  import WatchConnectivity
+import WatchConnectivity
 import XCTest
 
 public class WCSessionTests: XCTestCase {
-    func testIsPairedAppInstalled (){
-    }
+  func testIsPairedAppInstalled() {}
 
-  func testIsCompanionAppInstalledKeyPath () {
-    
-  }
-  }
+  func testIsCompanionAppInstalledKeyPath() {}
+}

@@ -1,8 +1,8 @@
 import Combine
 import XCTest
 
-class PassthroughSubject : XCTestCase {
-  func testAnyPublisher () {
+class PassthroughSubject: XCTestCase {
+  func testAnyPublisher() {
     XCTFail()
   }
 }
