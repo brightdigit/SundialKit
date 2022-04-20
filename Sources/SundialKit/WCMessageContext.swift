@@ -8,4 +8,11 @@ public enum WCMessageContext {
     }
     return handler
   }
+
+  public var isApplicationContext: Bool {
+    guard case .applicationContext = self else {
+      return false
+    }
+    return true
+  }
 }

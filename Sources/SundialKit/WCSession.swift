@@ -9,13 +9,5 @@
         return isCompanionAppInstalled
       #endif
     }
-
-    #if os(iOS)
-      static let isCompanionAppInstalledKeyPath: KeyPath<WCSession, Bool>
-        = \.isWatchAppInstalled
-    #elseif os(watchOS)
-      static let isCompanionAppInstalledKeyPath: KeyPath<WCSession, Bool>
-        = \.isCompanionAppInstalled
-    #endif
   }
 #endif
