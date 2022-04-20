@@ -4,6 +4,7 @@ public class MockSession: WCSessionable {
   var lastMessageSent: WCMessage?
   var lastAppContext: WCMessage?
   var nextReplyResult: Result<WCMessage, Error>!
+  var nextApplicationContextError: Error?
   public var isPaired = false {
     didSet {
       delegate?.sessionCompanionStateDidChange(self)
@@ -12,7 +13,9 @@ public class MockSession: WCSessionable {
 
   public var delegate: WCSessionableDelegate?
 
-  public func activate() throws {}
+  public func activate() throws {
+    activationState = .activated
+  }
 
   public var isReachable = false {
     didSet {
@@ -28,11 +31,23 @@ public class MockSession: WCSessionable {
 
   public var activationState: ActivationState = .notActivated {
     didSet {
-      delegate?.session(self, activationDidCompleteWith: activationState, error: nil)
+      switch activationState {
+      case .activated:
+        delegate?.session(self, activationDidCompleteWith: activationState, error: nil)
+
+      case .inactive:
+        delegate?.sessionDidBecomeInactive(self)
+
+      case .notActivated:
+        delegate?.sessionDidDeactivate(self)
+      }
     }
   }
 
   public func updateApplicationContext(_ context: WCMessage) throws {
+    if let nextApplicationContextError = nextApplicationContextError {
+      throw nextApplicationContextError
+    }
     lastAppContext = context
     delegate?.session(self, didReceiveApplicationContext: context, error: nil)
   }

@@ -41,10 +41,10 @@ let package = Package(
       ]],
     "komondor": [
       "pre-push": [
-        // "swift test --enable-code-coverage"
+        "swift test --enable-code-coverage"
       ],
       "pre-commit": [
-        // "swift test --enable-code-coverage",
+        "swift test --enable-code-coverage",
         "swift run swiftformat .",
         "swift run swiftlint autocorrect",
         "git add .",

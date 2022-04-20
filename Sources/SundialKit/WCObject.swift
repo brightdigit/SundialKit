@@ -131,9 +131,4 @@ public class WCObject: NSObject, WCSessionableDelegate, ObservableObject {
                       error _: Error?) {
     messageReceivedSubject.send((applicationContext, .applicationContext))
   }
-
-//  public func session(_: WCSessionable,
-//                      didReceiveMessage applicationContext: [String: Any]) {
-//    messageReceivedSubject.send((applicationContext, .applicationContext))
-//  }
 }
