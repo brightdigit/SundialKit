@@ -6,6 +6,7 @@ public class WCObject: NSObject, WCSessionableDelegate, ObservableObject {
   public init(session: WCSessionable) {
     self.session = session
     super.init()
+    session.delegate = self
     cancellable = sendingMessageSubject.sink(receiveValue: sendMessage(_:))
   }
 
@@ -131,8 +132,8 @@ public class WCObject: NSObject, WCSessionableDelegate, ObservableObject {
     messageReceivedSubject.send((applicationContext, .applicationContext))
   }
 
-  public func session(_: WCSessionable,
-                      didReceiveMessage applicationContext: [String: Any]) {
-    messageReceivedSubject.send((applicationContext, .applicationContext))
-  }
+//  public func session(_: WCSessionable,
+//                      didReceiveMessage applicationContext: [String: Any]) {
+//    messageReceivedSubject.send((applicationContext, .applicationContext))
+//  }
 }
