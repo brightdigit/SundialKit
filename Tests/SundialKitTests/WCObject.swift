@@ -2,27 +2,18 @@ import Combine
 import Foundation
 import SwiftUI
 
-public protocol WCSessionableDelegate : AnyObject {
-  
-}
-public protocol WCSessionable : AnyObject {
-  static var isSupported: Bool { get }
-  static var `default` : Self { get }
-  var delegate : WCSessionableDelegate? { get set }
-  func activate ()
-}
 #if canImport(WatchConnectivity)
   import WatchConnectivity
 
-public class WCObject<WCSessionType : WCSessionable>: NSObject, WCSessionableDelegate, ObservableObject {
+  public class WCObject: NSObject, WCSessionDelegate, ObservableObject {
     struct NotSupportedError: Error {}
     var cancellable: AnyCancellable!
 
     public func activate() throws {
-      guard WCSessionType.isSupported else {
+      guard WCSession.isSupported() else {
         throw NotSupportedError()
       }
-      let session = WCSessionType.default
+      let session = WCSession.default
       session.delegate = self
       session.activate()
     }
@@ -35,7 +26,7 @@ public class WCObject<WCSessionType : WCSessionable>: NSObject, WCSessionableDel
     // swiftlint:disable:next identifier_name
     var _session: WCSession?
 
-    public var session: WCSession {
+    var session: WCSession {
       _session ?? WCSession.default
     }
 
