@@ -1,8 +1,8 @@
 @testable import SundialKit
 import XCTest
 
-class WCSendMessageResultTests: XCTestCase {
-  func testResult() {
+internal class WCSendMessageResultTests: XCTestCase {
+  internal func testResult() {
     guard case .reply = WCSendMessageResult(.success(.init())) else {
       XCTFail()
       return

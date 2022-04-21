@@ -1,5 +1,5 @@
 // swift-tools-version: 5.5
-
+// swiftlint:disable explicit_top_level_acl explicit_acl
 import PackageDescription
 
 let package = Package(
@@ -35,10 +35,12 @@ let package = Package(
   let requiredCoverage: Int = 0
 
   let config = PackageConfiguration([
-    "rocket": ["steps":
-      [
-        "hide_dev_dependencies"
-      ]],
+    "rocket": [
+      "steps":
+        [
+          "hide_dev_dependencies"
+        ]
+    ],
     "komondor": [
       "pre-push": [
         "swift test --enable-code-coverage"
@@ -49,7 +51,7 @@ let package = Package(
         "swift run swiftlint autocorrect",
         "git add .",
         "swift run swiftformat --lint .",
-        "swift run swiftlint"
+        "swift run swiftlint lint"
       ]
     ]
   ]).write()

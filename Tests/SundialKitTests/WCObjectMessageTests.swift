@@ -18,9 +18,9 @@ public class WCObjectMessageTests: XCTestCase {
         XCTAssertEqual(state.0[key] as? UUID, value)
         expectation.fulfill()
       }
-      session.receiveMessage(newState, withReplyHandler: { item in
+      session.receiveMessage(newState) { item in
         print(item)
-      })
+      }
       waitForExpectations(timeout: 5.0) { error in
         XCTAssertNil(error)
         cancellable.cancel()
@@ -105,12 +105,12 @@ public class WCObjectMessageTests: XCTestCase {
       let replyMessage = [replyKey: replyValue]
       let cancellable = wcObject.messageReceivedPublisher.sink { message, reply in
         XCTAssertEqual(message[key] as? UUID, value)
-        reply.replyHandler!(replyMessage)
+        reply.replyHandler?(replyMessage)
       }
-      session.receiveMessage(newState, withReplyHandler: { item in
+      session.receiveMessage(newState) { item in
         XCTAssertEqual(item[replyKey] as? UUID, replyValue)
         expectation.fulfill()
-      })
+      }
       waitForExpectations(timeout: 5.0) { error in
         XCTAssertNil(error)
         cancellable.cancel()
@@ -121,7 +121,7 @@ public class WCObjectMessageTests: XCTestCase {
   }
 
   #if canImport(Combine)
-    fileprivate func combineTestSendMessageReachable() {
+    private func combineTestSendMessageReachable() {
       let expectation = expectation(description: "Message Sent Received")
       let session = MockSession()
 
@@ -164,7 +164,7 @@ public class WCObjectMessageTests: XCTestCase {
   }
 
   #if canImport(Combine)
-    fileprivate func combineSendMessageAppInstalled() {
+    private func combineSendMessageAppInstalled() {
       let expectation = expectation(description: "Message Sent Received")
       let session = MockSession()
 

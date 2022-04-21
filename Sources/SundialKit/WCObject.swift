@@ -4,40 +4,16 @@
 
   @available(macOS 10.15, *)
   public class WCObject: NSObject, WCSessionableDelegate, ObservableObject {
-    public init(session: WCSessionable) {
-      self.session = session
-      super.init()
-      session.delegate = self
-      cancellable = sendingMessageSubject.sink(receiveValue: sendMessage(_:))
-    }
-
-    var cancellable: AnyCancellable!
-
-    public func activate() throws {
-      session.delegate = self
-      try session.activate()
-    }
-
-    #if canImport(WatchConnectivity)
-
-      override public convenience init() {
-        self.init(session: WatchConnectivitySession())
-      }
-
-    #endif
-
-    let session: WCSessionable
-
-    let activationStateSubject = PassthroughSubject<WCSessionable, Never>()
-    let isReachableSubject = PassthroughSubject<WCSessionable, Never>()
-
-    let isPairedAppInstalledSubject = PassthroughSubject<WCSessionable, Never>()
-
-    let isPairedSubject = PassthroughSubject<WCSessionable, Never>()
-
-    let messageReceivedSubject = PassthroughSubject<WCMessageAcceptance, Never>()
+    // swiftlint:disable:next implicitly_unwrapped_optional
+    private var cancellable: AnyCancellable!
+    private let session: WCSessionable
+    private let activationStateSubject = PassthroughSubject<WCSessionable, Never>()
+    private let isReachableSubject = PassthroughSubject<WCSessionable, Never>()
+    private let isPairedAppInstalledSubject = PassthroughSubject<WCSessionable, Never>()
+    private let isPairedSubject = PassthroughSubject<WCSessionable, Never>()
+    private let messageReceivedSubject = PassthroughSubject<WCMessageAcceptance, Never>()
     public let sendingMessageSubject = PassthroughSubject<WCMessage, Never>()
-    let replyMessageSubject = PassthroughSubject<WCMessageResult, Never>()
+    private let replyMessageSubject = PassthroughSubject<WCMessageResult, Never>()
 
     public var activationStatePublisher: AnyPublisher<ActivationState, Never> {
       activationStateSubject.anyPublisher(for: \.activationState)
@@ -67,6 +43,26 @@
       }
     #endif
 
+    public init(session: WCSessionable) {
+      self.session = session
+      super.init()
+      session.delegate = self
+      cancellable = sendingMessageSubject.sink(receiveValue: sendMessage(_:))
+    }
+
+    #if canImport(WatchConnectivity)
+
+      override public convenience init() {
+        self.init(session: WatchConnectivitySession())
+      }
+
+    #endif
+
+    public func activate() throws {
+      session.delegate = self
+      try session.activate()
+    }
+
     public func sessionDidBecomeInactive(_ session: WCSessionable) {
       activationStateSubject.send(session)
     }
@@ -82,9 +78,11 @@
       }
     }
 
-    public func session(_ session: WCSessionable,
-                        activationDidCompleteWith _: ActivationState,
-                        error _: Error?) {
+    public func session(
+      _ session: WCSessionable,
+      activationDidCompleteWith _: ActivationState,
+      error _: Error?
+    ) {
       DispatchQueue.main.async {
         self.activationStateSubject.send(session)
 
@@ -102,7 +100,7 @@
       }
     }
 
-    fileprivate func sendMessage(_ message: WCMessage) {
+    private func sendMessage(_ message: WCMessage) {
       if session.isReachable {
         session.sendMessage(message) { result in
           self.replyMessageSubject.send((message, .init(result)))
@@ -121,15 +119,19 @@
       }
     }
 
-    public func session(_: WCSessionable,
-                        didReceiveMessage message: [String: Any],
-                        replyHandler: @escaping ([String: Any]) -> Void) {
+    public func session(
+      _: WCSessionable,
+      didReceiveMessage message: [String: Any],
+      replyHandler: @escaping ([String: Any]) -> Void
+    ) {
       messageReceivedSubject.send((message, .replyWith(replyHandler)))
     }
 
-    public func session(_: WCSessionable,
-                        didReceiveApplicationContext applicationContext: WCMessage,
-                        error _: Error?) {
+    public func session(
+      _: WCSessionable,
+      didReceiveApplicationContext applicationContext: WCMessage,
+      error _: Error?
+    ) {
       messageReceivedSubject.send((applicationContext, .applicationContext))
     }
   }
