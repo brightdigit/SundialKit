@@ -38,7 +38,13 @@ let package = Package(
     "rocket": [
       "steps":
         [
-          "hide_dev_dependencies"
+          "hide_dev_dependencies",
+          "git_add",
+          ["commit": ["no_verify": true]],
+          "tag",
+          "unhide_dev_dependencies",
+          "git_add",
+          ["commit": ["message": "Unhide dev dependencies"]]
         ]
     ],
     "komondor": [
