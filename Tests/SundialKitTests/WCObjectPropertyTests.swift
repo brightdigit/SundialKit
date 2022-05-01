@@ -135,7 +135,7 @@ public class WCObjectPropertyTests: XCTestCase {
           notExpectation.fulfill()
 
         default:
-          XCTFail()
+          XCTFail("Incorrect activation state.")
         }
       }
       try session.activate()
