@@ -5,12 +5,13 @@
 @testable import SundialKit
 import XCTest
 
-class PassthroughSubjectTests: XCTestCase {
-  struct MockStruct {
-    let id: UUID
+internal class PassthroughSubjectTests: XCTestCase {
+  private struct MockStruct {
+    // swiftlint:disable:next strict_fileprivate
+    fileprivate let id: UUID
   }
 
-  func testAnyPublisher() throws {
+  internal func testAnyPublisher() throws {
     #if canImport(Combine)
       let expected = UUID()
       var actual: UUID?

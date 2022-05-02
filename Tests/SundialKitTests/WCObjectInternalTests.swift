@@ -3,8 +3,8 @@ import Foundation
 
 import XCTest
 
-public class WCObjectInternalTests: XCTestCase {
-  func testInit() throws {
+internal class WCObjectInternalTests: XCTestCase {
+  internal func testInit() throws {
     #if canImport(WatchConnectivity)
       let object = WCObject()
       XCTAssert(object.session is WatchConnectivitySession)

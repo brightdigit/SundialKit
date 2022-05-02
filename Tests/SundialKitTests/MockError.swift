@@ -1,3 +1,3 @@
-enum MockError<T: Equatable>: Error, Equatable {
+internal enum MockError<T: Equatable>: Error, Equatable {
   case value(T)
 }

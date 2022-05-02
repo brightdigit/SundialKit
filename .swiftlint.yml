@@ -120,3 +120,5 @@ excluded:
   - Tests/LinuxMain.swift
 indentation_width:
   indentation_width: 2
+file_name:
+  suffix_pattern: "\\..+"

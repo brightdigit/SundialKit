@@ -1,17 +1,17 @@
 @testable import SundialKit
 import XCTest
 
-class WCSendMessageResultTests: XCTestCase {
-  func testResult() {
+internal class WCSendMessageResultTests: XCTestCase {
+  internal func testResult() {
     guard case .reply = WCSendMessageResult(.success(.init())) else {
-      XCTFail()
+      XCTFail("Missing Reply")
       return
     }
 
     guard case .failure = WCSendMessageResult(
       .failure(SundialError.sessionNotSupported)
     ) else {
-      XCTFail()
+      XCTFail("Should be a failure")
       return
     }
   }

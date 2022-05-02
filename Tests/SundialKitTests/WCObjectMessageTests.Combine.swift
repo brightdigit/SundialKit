@@ -3,8 +3,8 @@ import SundialKit
 
 import XCTest
 
-public class WCObjectMessageTests: XCTestCase {
-  #if canImport(Combine)
+#if canImport(Combine)
+  extension WCObjectMessageTests {
     private func combineTestSendMessageReachable() {
       let expectation = expectation(description: "Message Sent Received")
       let session = MockSession()
@@ -37,9 +37,7 @@ public class WCObjectMessageTests: XCTestCase {
         replyCancellable.cancel()
       }
     }
-  #endif
 
-  #if canImport(Combine)
     private func combineSendMessageAppInstalled() {
       let expectation = expectation(description: "Message Sent Received")
       let session = MockSession()
@@ -71,5 +69,5 @@ public class WCObjectMessageTests: XCTestCase {
         replyCancellable.cancel()
       }
     }
-  #endif
-}
+  }
+#endif
