@@ -4,15 +4,16 @@
 
   @available(macOS 10.15, *)
   public class WCObject: NSObject, WCSessionableDelegate, ObservableObject {
+    public let session: WCSessionable
+    public let sendingMessageSubject = PassthroughSubject<WCMessage, Never>()
+
     // swiftlint:disable:next implicitly_unwrapped_optional
     private var cancellable: AnyCancellable!
-    private let session: WCSessionable
     private let activationStateSubject = PassthroughSubject<WCSessionable, Never>()
     private let isReachableSubject = PassthroughSubject<WCSessionable, Never>()
     private let isPairedAppInstalledSubject = PassthroughSubject<WCSessionable, Never>()
     private let isPairedSubject = PassthroughSubject<WCSessionable, Never>()
     private let messageReceivedSubject = PassthroughSubject<WCMessageAcceptance, Never>()
-    public let sendingMessageSubject = PassthroughSubject<WCMessage, Never>()
     private let replyMessageSubject = PassthroughSubject<WCMessageResult, Never>()
 
     public var activationStatePublisher: AnyPublisher<ActivationState, Never> {
