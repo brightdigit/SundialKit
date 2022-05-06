@@ -18,7 +18,7 @@ class SundailObject: ObservableObject {
 
   @Published var isReachable = false
   @Published var isCompanionAppInstalled = false
-  @Published var activationState = WCSessionActivationState.notActivated
+  @Published var activationState = ActivationState.notActivated
   @Published var lastError: Error?
 
   var cancellables = [AnyCancellable]()
@@ -67,9 +67,6 @@ class SundailObject: ObservableObject {
 
     case let .failure(error):
       throw error
-
-    case .noCompanion:
-      throw MissingCompanionError()
     }
     guard let sentColor = sent.color else {
       return nil
