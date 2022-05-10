@@ -79,7 +79,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		002A22957137FD141B49F540 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		002A22957137FD141B49F540 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		048FC4C09CE488F61D01B4CF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0A0B27AB09016D5AB8419A30 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0BEF625B41466F029A48E67D /* SundialKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SundialKit; path = Packages/SundialKit; sourceTree = SOURCE_ROOT; };
@@ -88,8 +88,8 @@
 		4EC9F2E0EC1B730F902774F1 /* WCView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WCView.swift; sourceTree = "<group>"; };
 		5766B3DFF4A0547BDD66DBAB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		6E2CDEFF249330B9FFDE1E72 /* WCMessage.Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WCMessage.Color.swift; sourceTree = "<group>"; };
-		76E0C34FF6D7A04267D94B35 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
-		7AD5DE2D04088201CDA3C2E7 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		76E0C34FF6D7A04267D94B35 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		7AD5DE2D04088201CDA3C2E7 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		89DF610D16B313DB17E17719 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		A6EC5415BE8ACDCEC749841A /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		AF802F84AF4D4A7E0B2239F7 /* Sundial.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Sundial.app; sourceTree = BUILT_PRODUCTS_DIR; };
