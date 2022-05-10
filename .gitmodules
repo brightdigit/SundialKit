@@ -1,4 +1,0 @@
-[submodule "Packages/SundialKit"]
-	path = Packages/SundialKit
-	url = git@github.com:brightdigit/SundialKit.git
-	branch = 0.1.0
