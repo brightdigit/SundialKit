@@ -1,7 +1,7 @@
 import SwiftUI
 import WatchConnectivity
 
-struct ContentView: View {
+struct WCView: View {
   @EnvironmentObject var object: SundailObject
   #if os(iOS)
     static let padding = 20.0
@@ -24,8 +24,10 @@ struct ContentView: View {
   var body: some View {
     #if os(watchOS)
       watchOSBody.onAppear(perform: self.object.forceActivate)
-    #else
+    #elseif os(iOS)
       iOSBody.onAppear(perform: self.object.forceActivate)
+    #else
+      Never()
     #endif
   }
 
@@ -53,6 +55,7 @@ struct ContentView: View {
     }
   }
 
+  #if os(watchOS)
   var watchOSBody: some View {
     VStack {
       HStack {
@@ -89,7 +92,9 @@ struct ContentView: View {
       }.padding()
     }
   }
+  #endif
 
+  #if os(iOS)
   var iOSBody: some View {
     Form {
       Section(header: Text("Color Status")) {
@@ -114,7 +119,6 @@ struct ContentView: View {
           }
         }.padding()
       }
-      #if os(iOS)
         Section(header: Text("Communication Status")) {
           List {
             HStack {
@@ -140,7 +144,6 @@ struct ContentView: View {
             }.opacity(self.object.lastError != nil ? 1.0 : 0.2)
           }
         }
-      #endif
       Section(header: Text("send color")) {
         HStack {
           ForEach(0 ..< 6) { index in
@@ -152,11 +155,13 @@ struct ContentView: View {
         }.buttonStyle(self.borderlessButtonStyle()).padding()
       }
     }
+    
   }
+#endif
 }
 
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
-    ContentView().environmentObject(SundailObject())
+    WCView().environmentObject(SundailObject())
   }
 }

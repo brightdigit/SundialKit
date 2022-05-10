@@ -3,7 +3,7 @@ import SwiftUI
 
 struct PreviewContentView: View {
   var body: some View {
-    ContentView().environmentObject(WCObject())
+    WCView().environmentObject(WCObject())
   }
 }
 
