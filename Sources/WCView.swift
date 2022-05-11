@@ -63,7 +63,10 @@ struct WCView: View {
           Rectangle().fill(object.lastColorReceived).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit)
         }
         VStack {
-          Rectangle().fill(object.lastColorSent).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit)
+            ZStack{
+              Rectangle().fill(object.lastColorSentWaiting).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit)
+              Rectangle().fill(object.lastColorSentReplied).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit).padding(16.0)
+            }
         }
       }
       HStack {
@@ -109,7 +112,10 @@ struct WCView: View {
               }
             }
             VStack {
-              Rectangle().fill(object.lastColorSent).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit)
+              ZStack{
+                Rectangle().fill(object.lastColorSentWaiting).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit)
+                Rectangle().fill(object.lastColorSentReplied).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit).padding(25.0)
+              }
               HStack {
                 Image(systemName: "iphone.radiowaves.left.and.right")
                 Text("Sent").font(.system(size: 12.0))
@@ -148,7 +154,6 @@ struct WCView: View {
         HStack {
           ForEach(0 ..< 6) { index in
             Rectangle().fill(Self.colors[index]).aspectRatio(contentMode: .fit).cornerRadius(4.0).onTapGesture {
-              print("Tapd Updated: \(String(Self.colors[index].value!, radix: 16, uppercase: true))")
               object.sendColor(Self.colors[index])
             }
           }

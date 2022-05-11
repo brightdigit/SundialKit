@@ -24,7 +24,8 @@ class SundailObject: ObservableObject {
   let lastColorSendingSubject = PassthroughSubject<Color, Never>()
 
   @Published var lastColorReceived: Color = .secondary
-  @Published var lastColorSent: Color = .secondary
+  @Published var lastColorSentWaiting: Color = .secondary
+  @Published var lastColorSentReplied: Color = .secondary
   @Published var lastColorReply: Color = .secondary
   @Published var wcObject = WCObject()
   @Published var nwObject = NWObject<NWPathMonitor, NeverPing>(monitor: NWPathMonitor(), ping: nil)
@@ -64,6 +65,8 @@ class SundailObject: ObservableObject {
     #endif
 
     lastColorSendingSubject.share().compactMap(WCMessage.message(fromColor:)).subscribe(wcObject.sendingMessageSubject).store(in: &cancellables)
+    
+    lastColorSendingSubject.assignOnMain(to: &self.$lastColorSentWaiting)
 
     wcObject.messageReceivedPublisher.compactMap(receivedMessage(_:)).assignOnMain(to: &$lastColorReceived)
     
@@ -92,7 +95,7 @@ class SundailObject: ObservableObject {
 
     replyReceivedError.map { $0 as Error? }.assignOnMain(to: &$lastError)
 
-    replyReceivedValue.share().map { $0.0 }.assignOnMain(to: &$lastColorSent)
+    replyReceivedValue.share().map { $0.0 }.assignOnMain(to: &$lastColorSentReplied)
     replyReceivedValue.share().compactMap { $0.1 }.assignOnMain(to: &$lastColorReply)
   }
 

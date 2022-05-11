@@ -20,6 +20,8 @@
 		B04BCC66DD7DB09C442AFAB3 /* Publisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DD8287345DD91E17C36D043 /* Publisher.swift */; };
 		B30B815E282B1037004D3648 /* SundialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30B815D282B1037004D3648 /* SundialView.swift */; };
 		B30B815F282B1037004D3648 /* SundialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30B815D282B1037004D3648 /* SundialView.swift */; };
+		B3EABCFA282B394300F79E94 /* NWView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3EABCF9282B394300F79E94 /* NWView.swift */; };
+		B3EABCFB282B394300F79E94 /* NWView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3EABCF9282B394300F79E94 /* NWView.swift */; };
 		B41E8C8E0AAFDE711E78B233 /* PreviewContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E718094DD65F78717D61FD /* PreviewContentView.swift */; };
 		BC2BA78C117E34049E2F7251 /* MissingCompanionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C26D3D7E66CD698CE4654A /* MissingCompanionError.swift */; };
 		C0991191BEB2F8C08502BA5C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 048FC4C09CE488F61D01B4CF /* Assets.xcassets */; };
@@ -93,6 +95,7 @@
 		AF802F84AF4D4A7E0B2239F7 /* Sundial.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Sundial.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AFED2F5198697D3CF3A7C6B9 /* Sundial.watchkitapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Sundial.watchkitapp.app; path = Sundial.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B30B815D282B1037004D3648 /* SundialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundialView.swift; sourceTree = "<group>"; };
+		B3EABCF9282B394300F79E94 /* NWView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NWView.swift; sourceTree = "<group>"; };
 		B8B93B54B64BAB7468A01A9F /* SundialApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundialApp.swift; sourceTree = "<group>"; };
 		C246DD13F8E09CE52FDEDF0E /* SundailObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundailObject.swift; sourceTree = "<group>"; };
 		C5C26D3D7E66CD698CE4654A /* MissingCompanionError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissingCompanionError.swift; sourceTree = "<group>"; };
@@ -198,6 +201,7 @@
 				B8B93B54B64BAB7468A01A9F /* SundialApp.swift */,
 				6E2CDEFF249330B9FFDE1E72 /* WCMessage.Color.swift */,
 				B30B815D282B1037004D3648 /* SundialView.swift */,
+				B3EABCF9282B394300F79E94 /* NWView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -400,6 +404,7 @@
 				4AAEDA5E70B118000FEF16B9 /* SundailObject.swift in Sources */,
 				1C1FDB2C5FF6E5AC9A9115D1 /* WCMessage.Color.swift in Sources */,
 				F738095C1261B67A1AA5FF5B /* SundialApp.swift in Sources */,
+				B3EABCFB282B394300F79E94 /* NWView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -416,6 +421,7 @@
 				F72D61F76EABE47E9B81E91B /* SundailObject.swift in Sources */,
 				D80326BAD4634C78208FB05F /* WCMessage.Color.swift in Sources */,
 				7BC65EDEFD5EE1B68B8FEB21 /* SundialApp.swift in Sources */,
+				B3EABCFA282B394300F79E94 /* NWView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

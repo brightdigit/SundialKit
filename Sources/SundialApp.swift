@@ -4,7 +4,7 @@ import SwiftUI
 struct SundialApp: App {
   var body: some Scene {
     WindowGroup {
-      SundialView().environmentObject(SundailObject())
+      SundialView()
     }
   }
 }
