@@ -20,6 +20,85 @@ struct NeverPing : NetworkPing {
   
 }
 
+enum InterfaceItem : Int, CaseIterable, Identifiable  {
+      case cellular
+      case wifi
+      case wiredEthernet
+      case other
+      case loopback
+  
+  var id: Int {
+    return self.rawValue
+  }
+  
+  var systemName : String {
+    switch self {
+      
+    case .cellular:
+      return "antenna.radiowaves.left.and.right"
+    case .wifi:
+      return "wifi"
+    case .wiredEthernet:
+      return "cable.connector"
+    case .other:
+      return "questionmark"
+    case .loopback:
+      return "circle"
+    }
+  }
+  
+  static var allCases: [InterfaceItem] {
+    [.wiredEthernet, .wifi, .cellular, .loopback, .other]
+  }
+}
+//  public struct Interface: OptionSet {
+//    public var rawValue: Int
+//
+//    public init(rawValue: RawValue) {
+//      self.rawValue = rawValue
+//    }
+//
+//    public typealias RawValue = Int
+//
+//    public static let cellular: Self = .init(rawValue: 1)
+//    public static let wifi: Self = .init(rawValue: 2)
+//    public static let wiredEthernet: Self = .init(rawValue: 4)
+//    public static let other: Self = .init(rawValue: 8)
+//    public static let loopback: Self = .init(rawValue: 16)
+//  }
+
+extension NWPathStatus  {
+  var message : String {
+    switch self {
+      
+    case .unsatisfied(_):
+      
+        return "Unsatisified"
+    case .satisfied(_):
+      return "Satisified"
+    case .requiresConnection:
+      return "Requires Connection"
+    case .unknown:
+      return "Unknown"
+    }
+  }
+}
+
+extension Set where Element == InterfaceItem {
+  init (interface: NWPathStatus.Interface?) {
+    guard let interface = interface else {
+      self.init()
+      return
+    }
+
+    let items = InterfaceItem.allCases.filter { item in
+      item.rawValue & interface.rawValue != 0
+    }
+    
+    self.init(items)
+  }
+}
+
 class SundailObject: ObservableObject {
   let lastColorSendingSubject = PassthroughSubject<Color, Never>()
 
@@ -38,7 +117,7 @@ class SundailObject: ObservableObject {
   @Published var activationState = ActivationState.notActivated
   @Published var lastError: Error?
   
-  @Published var interface: NWPathStatus.Interface? = nil
+  @Published var interfaceItems: Set<InterfaceItem> = .init()
   @Published var unsatisfiedReason : NWPathStatus.UnsatisfiedReason? = nil
   @Published var isConstrained : Bool = false
   @Published var isExpensive : Bool = false
@@ -80,7 +159,7 @@ class SundailObject: ObservableObject {
         return nil
       }
       return interface
-    }.assignOnMain(to: &self.$interface)
+    }.map(Set.init).assignOnMain(to: &self.$interfaceItems)
     
     $pathStatus.share().map{ status -> NWPathStatus.UnsatisfiedReason? in
       guard case let .unsatisfied(reason) = status else {
