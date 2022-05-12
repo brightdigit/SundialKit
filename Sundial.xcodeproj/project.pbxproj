@@ -25,13 +25,13 @@
 		B41E8C8E0AAFDE711E78B233 /* PreviewContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E718094DD65F78717D61FD /* PreviewContentView.swift */; };
 		BC2BA78C117E34049E2F7251 /* MissingCompanionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C26D3D7E66CD698CE4654A /* MissingCompanionError.swift */; };
 		C0991191BEB2F8C08502BA5C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 048FC4C09CE488F61D01B4CF /* Assets.xcassets */; };
-		C5CDEBF2F8430658C034C9E1 /* Sundial.watchkitapp.watchkitextension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = D267AFFB41BB399B325D5FE2 /* Sundial.watchkitapp.watchkitextension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C5CDEBF2F8430658C034C9E1 /* Sundial.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = D267AFFB41BB399B325D5FE2 /* Sundial.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		D80326BAD4634C78208FB05F /* WCMessage.Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E2CDEFF249330B9FFDE1E72 /* WCMessage.Color.swift */; };
 		DD780FBF1854C6F4B0C9E789 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0A0B27AB09016D5AB8419A30 /* Assets.xcassets */; };
 		E5E91D1525002EDAFE27524B /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6EC5415BE8ACDCEC749841A /* Color.swift */; };
 		E745520BAEDFB9E3E9E8CE1B /* PreviewContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E718094DD65F78717D61FD /* PreviewContentView.swift */; };
 		EE028065BD437BFDFA802CC7 /* SundialKit in Frameworks */ = {isa = PBXBuildFile; productRef = F40F006CF443CF9D072F071B /* SundialKit */; };
-		F05B8D7CB65BDBCC1E7BE4A8 /* Sundial.watchkitapp.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = AFED2F5198697D3CF3A7C6B9 /* Sundial.watchkitapp.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F05B8D7CB65BDBCC1E7BE4A8 /* Sundial.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = AFED2F5198697D3CF3A7C6B9 /* Sundial.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F72D61F76EABE47E9B81E91B /* SundailObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = C246DD13F8E09CE52FDEDF0E /* SundailObject.swift */; };
 		F738095C1261B67A1AA5FF5B /* SundialApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B93B54B64BAB7468A01A9F /* SundialApp.swift */; };
 /* End PBXBuildFile section */
@@ -60,7 +60,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				C5CDEBF2F8430658C034C9E1 /* Sundial.watchkitapp.watchkitextension.appex in Embed App Extensions */,
+				C5CDEBF2F8430658C034C9E1 /* Sundial.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -71,7 +71,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				F05B8D7CB65BDBCC1E7BE4A8 /* Sundial.watchkitapp.app in Embed Watch Content */,
+				F05B8D7CB65BDBCC1E7BE4A8 /* Sundial.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -92,14 +92,14 @@
 		7AD5DE2D04088201CDA3C2E7 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		89DF610D16B313DB17E17719 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		A6EC5415BE8ACDCEC749841A /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
-		AF802F84AF4D4A7E0B2239F7 /* Sundial.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Sundial.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		AFED2F5198697D3CF3A7C6B9 /* Sundial.watchkitapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Sundial.watchkitapp.app; path = Sundial.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF802F84AF4D4A7E0B2239F7 /* Sundial.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sundial.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AFED2F5198697D3CF3A7C6B9 /* Sundial.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sundial.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B30B815D282B1037004D3648 /* SundialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundialView.swift; sourceTree = "<group>"; };
 		B3EABCF9282B394300F79E94 /* NWView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NWView.swift; sourceTree = "<group>"; };
 		B8B93B54B64BAB7468A01A9F /* SundialApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundialApp.swift; sourceTree = "<group>"; };
 		C246DD13F8E09CE52FDEDF0E /* SundailObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundailObject.swift; sourceTree = "<group>"; };
 		C5C26D3D7E66CD698CE4654A /* MissingCompanionError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissingCompanionError.swift; sourceTree = "<group>"; };
-		D267AFFB41BB399B325D5FE2 /* Sundial.watchkitapp.watchkitextension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; name = Sundial.watchkitapp.watchkitextension.appex; path = Sundial.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		D267AFFB41BB399B325D5FE2 /* Sundial.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Sundial.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		D796AF5E91A089CA82A5A725 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -155,8 +155,8 @@
 			isa = PBXGroup;
 			children = (
 				AF802F84AF4D4A7E0B2239F7 /* Sundial.app */,
-				AFED2F5198697D3CF3A7C6B9 /* Sundial.watchkitapp.app */,
-				D267AFFB41BB399B325D5FE2 /* Sundial.watchkitapp.watchkitextension.appex */,
+				AFED2F5198697D3CF3A7C6B9 /* Sundial.app */,
+				D267AFFB41BB399B325D5FE2 /* Sundial.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -270,7 +270,7 @@
 			);
 			name = Sundial.watchkitapp;
 			productName = Sundial.watchkitapp;
-			productReference = AFED2F5198697D3CF3A7C6B9 /* Sundial.watchkitapp.app */;
+			productReference = AFED2F5198697D3CF3A7C6B9 /* Sundial.app */;
 			productType = "com.apple.product-type.application.watchapp2";
 		};
 		A5A6ADE2F26EB1E46E601918 /* Sundial */ = {
@@ -312,7 +312,7 @@
 				A7FF2E380ACD1D3F7DCCACCF /* SundialKit */,
 			);
 			productName = Sundial.watchkitapp.watchkitextension;
-			productReference = D267AFFB41BB399B325D5FE2 /* Sundial.watchkitapp.watchkitextension.appex */;
+			productReference = D267AFFB41BB399B325D5FE2 /* Sundial.appex */;
 			productType = "com.apple.product-type.watchkit2-extension";
 		};
 /* End PBXNativeTarget section */
@@ -325,15 +325,12 @@
 				TargetAttributes = {
 					919DCEA681F99AC52D79CE9B = {
 						DevelopmentTeam = MLT7M394S7;
-						ProvisioningStyle = Manual;
 					};
 					A5A6ADE2F26EB1E46E601918 = {
 						DevelopmentTeam = MLT7M394S7;
-						ProvisioningStyle = Manual;
 					};
 					EAECCEA6AB361790E395CF06 = {
 						DevelopmentTeam = MLT7M394S7;
-						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -445,6 +442,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = PLists/watchOS/Extension/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -453,6 +453,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.brightdigit.Sundial.watchkitapp.watchkitextension;
 				PRODUCT_NAME = Sundial;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
@@ -495,7 +496,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEAD_CODE_STRIPPING = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = MLT7M394S7;
@@ -533,7 +534,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = PLists/iOS/Application/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -541,6 +544,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.brightdigit.Sundial;
 				PRODUCT_NAME = Sundial;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -550,7 +554,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = PLists/iOS/Application/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -558,6 +564,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.brightdigit.Sundial;
 				PRODUCT_NAME = Sundial;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -567,11 +574,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				IBSC_MODULE = Sundial_watchkitapp_watchkitextension;
 				INFOPLIST_FILE = PLists/watchOS/Application/Info.plist;
 				PRODUCT_BUNDLE_IDENTIFIER = com.brightdigit.Sundial.watchkitapp;
 				PRODUCT_MODULE_NAME = Sundial_watchkitapp_watchkitextension;
 				PRODUCT_NAME = Sundial;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
@@ -582,11 +593,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				IBSC_MODULE = Sundial_watchkitapp_watchkitextension;
 				INFOPLIST_FILE = PLists/watchOS/Application/Info.plist;
 				PRODUCT_BUNDLE_IDENTIFIER = com.brightdigit.Sundial.watchkitapp;
 				PRODUCT_MODULE_NAME = Sundial_watchkitapp_watchkitextension;
 				PRODUCT_NAME = Sundial;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
@@ -629,7 +644,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEAD_CODE_STRIPPING = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = MLT7M394S7;
@@ -660,6 +675,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = PLists/watchOS/Extension/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -668,6 +686,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.brightdigit.Sundial.watchkitapp.watchkitextension;
 				PRODUCT_NAME = Sundial;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
