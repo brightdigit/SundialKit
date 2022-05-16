@@ -5,6 +5,19 @@
   @available(watchOS 7.1, *)
   @available(macOS 11.0, *)
   public class NWObject<MonitorType: NWPathMonitorable, PingType: NetworkPing> {
+    let ping: PingType?
+    let monitor: MonitorType
+
+    let pathSubject = PassthroughSubject<MonitorType.PathType, Never>()
+    var pingCancellable: AnyCancellable?
+    var timerCancellable: Cancellable?
+    var otherCancellables = [AnyCancellable]()
+
+    let pathStatusSubject = PassthroughSubject<NWPathStatus, Never>()
+    let isExpensiveSubject = PassthroughSubject<Bool, Never>()
+    let isConstrainedSubject = PassthroughSubject<Bool, Never>()
+    let pingStatusSubject = PassthroughSubject<PingType.StatusType?, Never>()
+
     public init(monitor: MonitorType, ping: PingType?) {
       self.monitor = monitor
       self.ping = ping
@@ -15,30 +28,23 @@
       pathSubject.map(\.isConstrained).subscribe(isConstrainedSubject).store(in: &otherCancellables)
       // swiftlint:enable line_length
 
-      if let ping = ping {
-        let timerPublisher = Timer.publish(
-          every: ping.timeInterval,
-          on: .current,
-          in: .common
-        )
-
-        pingCancellable = Publishers.CombineLatest(timerPublisher, pathStatusSubject)
-          .compactMap { _, status in
-            status.isSatisfied ? () : nil
-          }.flatMap {
-            Future(ping.onPing)
-          }.map { $0 as PingType.StatusType? }.subscribe(pingStatusSubject)
-        self.timerPublisher = timerPublisher
-      } else {
-        timerPublisher = nil
-      }
       monitor.onPathUpdate(onUpdate(path:))
     }
 
     public func start(queue: DispatchQueue) {
-      if let timerPublisher = timerPublisher {
-        let cancellable = timerPublisher.connect()
-        timerCancellable = cancellable
+      timerCancellable = ping.map { ping in
+        let timerPublisher = Timer.publish(
+          every: ping.timeInterval,
+          on: .current,
+          in: .common
+        ).autoconnect()
+
+        return Publishers.CombineLatest(timerPublisher, pathStatusSubject)
+          .compactMap { _, status in
+            status.isSatisfied ? () : nil
+          }.flatMap {
+            Future(ping.onPingForFuture(_:))
+          }.map { $0 as PingType.StatusType? }.subscribe(pingStatusSubject)
       }
       monitor.start(queue: queue)
       pingStatusSubject.send(nil)
@@ -52,19 +58,6 @@
 
       monitor.cancel()
     }
-
-    let timerPublisher: Timer.TimerPublisher?
-    let ping: PingType?
-    let monitor: MonitorType
-    let pathSubject = PassthroughSubject<MonitorType.PathType, Never>()
-    var pingCancellable: AnyCancellable?
-    var timerCancellable: Cancellable?
-    var otherCancellables = [AnyCancellable]()
-
-    let pathStatusSubject = PassthroughSubject<NWPathStatus, Never>()
-    let isExpensiveSubject = PassthroughSubject<Bool, Never>()
-    let isConstrainedSubject = PassthroughSubject<Bool, Never>()
-    let pingStatusSubject = PassthroughSubject<PingType.StatusType?, Never>()
 
     public var pathStatusPublisher: AnyPublisher<NWPathStatus, Never> {
       pathStatusSubject.eraseToAnyPublisher()
