@@ -60,6 +60,10 @@ jobs:
             xcode: "/Applications/Xcode_13.3.app"
             iOSVersion: 15.4
             watchOSVersion: 8.5
+          - runs-on: macos-12
+            xcode: "/Applications/Xcode_13.4.app"
+            iOSVersion: 15.5
+            watchOSVersion: 8.5
     steps:
       - uses: actions/checkout@v2
       - name: Set Xcode Name
