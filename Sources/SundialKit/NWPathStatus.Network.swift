@@ -5,13 +5,6 @@
   @available(iOS 14.2, *)
   @available(macOS 11.0, *)
   public extension NWPathStatus {
-    var isSatisfied: Bool {
-      guard case .satisfied = self else {
-        return false
-      }
-      return true
-    }
-
     init(
       _ status: NWPath.Status,
       reason: NWPath.UnsatisfiedReason,

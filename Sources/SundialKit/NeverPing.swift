@@ -6,6 +6,10 @@ public struct NeverPing: NetworkPing {
     .nan
   }
 
+  public func shouldPing(onStatus _: NWPathStatus) -> Bool {
+    false
+  }
+
   public func onPing(_: @escaping (Never) -> Void) {}
 
   public typealias StatusType = Never

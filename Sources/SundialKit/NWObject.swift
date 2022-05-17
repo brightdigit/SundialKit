@@ -41,7 +41,7 @@
 
         return Publishers.CombineLatest(timerPublisher, pathStatusSubject)
           .compactMap { _, status in
-            status.isSatisfied ? () : nil
+            ping.shouldPing(onStatus: status) ? () : nil
           }.flatMap {
             Future(ping.onPingForFuture(_:))
           }.map { $0 as PingType.StatusType? }.subscribe(pingStatusSubject)
