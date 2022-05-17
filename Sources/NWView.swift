@@ -29,14 +29,22 @@ struct Bar {
 }
 struct NWView: View {
   @EnvironmentObject var object: SundailObject
+  
+  func opacityAtIndex(_ index: Int) -> Double {
+    let value : Double = Double(index) / Double(17.0)
+    return self.object.nwQuality >= value ? 1.0 : 0.2
+  }
     var body: some View {
       VStack{
       HStack(alignment: .bottom){
         ForEach(0..<18) { index in
-          Rectangle().fill(Bar.all[index].color).scaleEffect(.init(width: 1.0, height: Bar.heightScale(atIndex: index, total: 17, start: 0.10)), anchor: .bottom)
+          Rectangle().fill(Bar.all[index].color).scaleEffect(.init(width: 1.0, height: Bar.heightScale(atIndex: index, total: 17, start: 0.10)), anchor: .bottom).opacity(self.opacityAtIndex(index))
         }
       }.frame(height: 450.0, alignment: .top).padding(40.0)
-        Text(object.pathStatus.message)
+        HStack{
+          Text(object.pathStatus.message)
+          Text("\(object.nwQuality * 100)")
+        }
         VStack(spacing: 8.0){
           HStack{
             Image(systemName: "power.dotted")
@@ -48,6 +56,13 @@ struct NWView: View {
             Text("Network Demand is Constrained")
             Spacer()
           }.opacity(self.object.isConstrained ? 1.0 : 0.2)
+          self.object.nwDate.map{ date in
+          HStack{
+            Image(systemName: "clock")
+            Text("Last Update at \(date)")
+            Spacer()
+          }
+          }
         }.padding(.horizontal, 40)
         HStack(spacing: 16.0){
           ForEach(InterfaceItem.allCases) { item in

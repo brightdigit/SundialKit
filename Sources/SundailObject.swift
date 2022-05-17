@@ -5,17 +5,20 @@ import SwiftUI
 import WatchConnectivity
 import Network
 
-struct NeverPing : NetworkPing {
-  private init () {}
-  var timeInterval: TimeInterval {
-    .nan
+
+struct IpifyPing : NetworkPing {
+  let session: URLSession
+  let timeInterval: TimeInterval
+  
+  static let url : URL = .init(string: "https://api.ipify.org")!
+  
+  func onPing(_ closure: @escaping (String?) -> Void) {
+    session.dataTask(with: IpifyPing.url) { data, _, _ in
+      closure(data.flatMap{String(data: $0, encoding: .utf8)})
+    }.resume()
   }
   
-  func onPing(_ closure: @escaping (Result<Never, Never>) -> Void) {
-    
-  }
-  
-  typealias StatusType = Never
+  typealias StatusType = String?
   
   
 }
@@ -51,21 +54,6 @@ enum InterfaceItem : Int, CaseIterable, Identifiable  {
     [.wiredEthernet, .wifi, .cellular, .loopback, .other]
   }
 }
-//  public struct Interface: OptionSet {
-//    public var rawValue: Int
-//
-//    public init(rawValue: RawValue) {
-//      self.rawValue = rawValue
-//    }
-//
-//    public typealias RawValue = Int
-//
-//    public static let cellular: Self = .init(rawValue: 1)
-//    public static let wifi: Self = .init(rawValue: 2)
-//    public static let wiredEthernet: Self = .init(rawValue: 4)
-//    public static let other: Self = .init(rawValue: 8)
-//    public static let loopback: Self = .init(rawValue: 16)
-//  }
 
 extension NWPathStatus  {
   var message : String {
@@ -99,6 +87,8 @@ extension Set where Element == InterfaceItem {
   }
 }
 
+
+
 class SundailObject: ObservableObject {
   let lastColorSendingSubject = PassthroughSubject<Color, Never>()
 
@@ -107,7 +97,7 @@ class SundailObject: ObservableObject {
   @Published var lastColorSentReplied: Color = .secondary
   @Published var lastColorReply: Color = .secondary
   @Published var wcObject = WCObject()
-  @Published var nwObject = NWObject<NWPathMonitor, NeverPing>(monitor: NWPathMonitor(), ping: nil)
+  @Published var nwObject = NWObject<NWPathMonitor, IpifyPing>(monitor: NWPathMonitor(), ping: IpifyPing(session: .shared, timeInterval: 10.0))
   #if os(iOS)
     @Published var isPaired = false
   #endif
@@ -122,15 +112,46 @@ class SundailObject: ObservableObject {
   @Published var isConstrained : Bool = false
   @Published var isExpensive : Bool = false
   @Published var pathStatus : NWPathStatus = .unknown
+  @Published var pingStatus : Bool? = nil
+  @Published var nwDate : Date? = nil
+  @Published var nwQuality : Double = 0
 
   var cancellables = [AnyCancellable]()
 
   public func forceActivate() {
+    nwObject.start(queue: .global())
     try! wcObject.activate()
   }
 
   func sendColor(_ color: Color) {
     lastColorSendingSubject.send(color)
+  }
+  
+  static func qualityScore(pathStatus: NWPathStatus,pingStatus: Bool?,  isConstrained: Bool, isExpensive: Bool) -> Double {
+    var value = 1.0
+    switch pathStatus {
+    case .unsatisfied(_), .unknown:
+      return 0
+    case .satisfied(let interface):
+      if !interface.contains(.wiredEthernet) && !interface.contains(.wifi) {
+        value *= 0.75
+      }
+    case .requiresConnection:
+      value *= 0.5
+    }
+    
+    if pingStatus != true {
+      value *= 0.9
+    }
+    
+    if isConstrained {
+      value *= 0.5
+    }
+    
+    if isExpensive {
+      value *= 0.5
+    }
+    return value
   }
 
   init() {
@@ -153,6 +174,8 @@ class SundailObject: ObservableObject {
     nwObject.isConstrainedPublisher.assignOnMain(to: &self.$isConstrained)
     nwObject.isExpensivePublisher.assignOnMain(to: &self.$isExpensive)
     nwObject.pathStatusPublisher.assignOnMain(to: &self.$pathStatus)
+    nwObject.pingStatusPublisher.map{ $0 != nil }.assignOnMain(to: &self.$pingStatus)
+    
     
     $pathStatus.share().map{ status -> NWPathStatus.Interface? in
       guard case let .satisfied(interface) = status else {
@@ -167,6 +190,17 @@ class SundailObject: ObservableObject {
       }
       return reason
     }.assignOnMain(to: &self.$unsatisfiedReason)
+    
+    
+    Publishers.CombineLatest4(
+      $pathStatus.share(),
+      $pingStatus.share(),
+      $isConstrained.share(),
+      $isExpensive.share()
+    ).map(Self.qualityScore)
+      .assignOnMain(to: &$nwQuality)
+    
+    $pathStatus.share().combineLatest(self.$pingStatus.share()).map{ _ in Date() as Date? }.assignOnMain(to: &self.$nwDate)
 
     let replyReceived = wcObject.replyMessagePublisher.tryCompactMap(receivedReply(_:))
 
