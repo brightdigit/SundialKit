@@ -7,6 +7,15 @@ import Network
 
 
 struct IpifyPing : NetworkPing {
+  public func shouldPing(onStatus status: NWPathStatus) -> Bool {
+    switch status {
+    case .unknown, .unsatisfied:
+      return false
+    case .requiresConnection, .satisfied:
+      return true
+    }
+  }
+  
   let session: URLSession
   let timeInterval: TimeInterval
   
