@@ -1,4 +1,4 @@
-public enum NWPathStatus: Equatable {
+public enum PathStatus: Equatable {
   public enum UnsatisfiedReason: Equatable {
     case cellularDenied
     case localNetworkDenied

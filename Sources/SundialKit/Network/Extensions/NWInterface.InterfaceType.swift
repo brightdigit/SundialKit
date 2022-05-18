@@ -6,19 +6,19 @@
     var value: Int {
       switch self {
       case .other:
-        return NWPathStatus.Interface.other.rawValue
+        return PathStatus.Interface.other.rawValue
 
       case .wifi:
-        return NWPathStatus.Interface.wifi.rawValue
+        return PathStatus.Interface.wifi.rawValue
 
       case .cellular:
-        return NWPathStatus.Interface.cellular.rawValue
+        return PathStatus.Interface.cellular.rawValue
 
       case .wiredEthernet:
-        return NWPathStatus.Interface.wiredEthernet.rawValue
+        return PathStatus.Interface.wiredEthernet.rawValue
 
       case .loopback:
-        return NWPathStatus.Interface.loopback.rawValue
+        return PathStatus.Interface.loopback.rawValue
       @unknown default:
         return 0
       }

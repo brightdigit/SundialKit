@@ -4,7 +4,7 @@
   @available(iOS 14.2, *)
   @available(watchOS 7.1, *)
   @available(macOS 11.0, *)
-  public class NWObject<MonitorType: NWPathMonitorable, PingType: NetworkPing> {
+  public class NetworkObject<MonitorType: PathMonitor, PingType: NetworkPing> {
     let ping: PingType?
     let monitor: MonitorType
 
@@ -13,7 +13,7 @@
     var timerCancellable: Cancellable?
     var otherCancellables = [AnyCancellable]()
 
-    let pathStatusSubject = PassthroughSubject<NWPathStatus, Never>()
+    let pathStatusSubject = PassthroughSubject<PathStatus, Never>()
     let isExpensiveSubject = PassthroughSubject<Bool, Never>()
     let isConstrainedSubject = PassthroughSubject<Bool, Never>()
     let pingStatusSubject = PassthroughSubject<PingType.StatusType?, Never>()
@@ -59,7 +59,7 @@
       monitor.cancel()
     }
 
-    public var pathStatusPublisher: AnyPublisher<NWPathStatus, Never> {
+    public var pathStatusPublisher: AnyPublisher<PathStatus, Never> {
       pathStatusSubject.eraseToAnyPublisher()
     }
 

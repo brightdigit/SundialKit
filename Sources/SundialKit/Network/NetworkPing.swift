@@ -2,7 +2,7 @@ import Foundation
 public protocol NetworkPing {
   associatedtype StatusType
   var timeInterval: TimeInterval { get }
-  func shouldPing(onStatus status: NWPathStatus) -> Bool
+  func shouldPing(onStatus status: PathStatus) -> Bool
   func onPing(_ closure: @escaping (StatusType) -> Void)
 }
 

@@ -1,5 +1,5 @@
-public protocol NWPathable {
+public protocol NetworkPath {
   var isConstrained: Bool { get }
   var isExpensive: Bool { get }
-  var pathStatus: NWPathStatus { get }
+  var pathStatus: PathStatus { get }
 }

@@ -6,7 +6,7 @@ public struct NeverPing: NetworkPing {
     .nan
   }
 
-  public func shouldPing(onStatus _: NWPathStatus) -> Bool {
+  public func shouldPing(onStatus _: PathStatus) -> Bool {
     false
   }
 

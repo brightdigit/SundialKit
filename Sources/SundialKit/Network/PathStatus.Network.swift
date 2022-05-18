@@ -4,7 +4,7 @@
   @available(watchOS 7.1, *)
   @available(iOS 14.2, *)
   @available(macOS 11.0, *)
-  public extension NWPathStatus {
+  public extension PathStatus {
     init(
       _ status: NWPath.Status,
       reason: NWPath.UnsatisfiedReason,
@@ -12,7 +12,7 @@
     ) {
       switch (status, reason) {
       case (.satisfied, _):
-        self = .satisfied(NWPathStatus.Interface(interfaces: interfaces))
+        self = .satisfied(PathStatus.Interface(interfaces: interfaces))
 
       case (.unsatisfied, .cellularDenied):
         self = .unsatisfied(.cellularDenied)
