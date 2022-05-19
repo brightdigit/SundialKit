@@ -3,7 +3,47 @@ import SundialKit
 
 import XCTest
 
-public class NetworkObserverTests: XCTestCase {}
+public class NetworkObserverTests: XCTestCase {
+  func testStart() {
+    //      timerCancellable = ping.map { ping in
+    //        let timerPublisher = Timer.publish(
+    //          every: ping.timeInterval,
+    //          on: .current,
+    //          in: .common
+    //        ).autoconnect()
+    //
+    //        return Publishers.CombineLatest(timerPublisher, pathStatusSubject)
+    //          .compactMap { _, status in
+    //            ping.shouldPing(onStatus: status) ? () : nil
+    //          }.flatMap {
+    //            Future(ping.onPingForFuture(_:))
+    //          }.map { $0 as PingType.StatusType? }.subscribe(pingStatusSubject)
+    //      }
+    //      monitor.start(queue: queue)
+    //      pingStatusSubject.send(nil)
+  }
+
+  func testCancel() {}
+
+  public func testPathStatusPublisher() {}
+
+  public func testIsExpensivePublisher() {}
+
+  public func testIsConstrainedPublisher() {}
+
+  public func testPingStatusPublisher() {}
+
+  public func testOnUpdate() {}
+
+  func testInit() {
+    let observer = NetworkObserver(
+      monitor: MockPathMonitor(),
+      ping: MockNetworkPing(timeInterval: 2.0)
+    )
+  }
+
+  func testInitNever() {}
+}
 
 // #if canImport(Combine)
 //  import Combine
@@ -37,22 +77,7 @@ public class NetworkObserverTests: XCTestCase {}
 //    }
 //
 //    public func start(queue: DispatchQueue) {
-//      timerCancellable = ping.map { ping in
-//        let timerPublisher = Timer.publish(
-//          every: ping.timeInterval,
-//          on: .current,
-//          in: .common
-//        ).autoconnect()
-//
-//        return Publishers.CombineLatest(timerPublisher, pathStatusSubject)
-//          .compactMap { _, status in
-//            ping.shouldPing(onStatus: status) ? () : nil
-//          }.flatMap {
-//            Future(ping.onPingForFuture(_:))
-//          }.map { $0 as PingType.StatusType? }.subscribe(pingStatusSubject)
-//      }
-//      monitor.start(queue: queue)
-//      pingStatusSubject.send(nil)
+
 //    }
 //
 //    public func cancel() {
