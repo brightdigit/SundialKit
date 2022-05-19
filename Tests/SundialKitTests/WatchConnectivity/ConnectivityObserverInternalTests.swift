@@ -3,7 +3,7 @@ import Foundation
 
 import XCTest
 
-internal class ConnectivityObserverInternalTests: XCTestCase {
+public class ConnectivityObserverInternalTests: XCTestCase {
   internal func testInit() throws {
     #if canImport(WatchConnectivity)
       let object = ConnectivityObserver()
