@@ -3,14 +3,14 @@ import XCTest
 
 public class WCMessageContextTests: XCTestCase {
   public func testReplyHandler() {
-    XCTAssertNil(WCMessageContext.applicationContext.replyHandler)
-    XCTAssertNotNil(WCMessageContext.replyWith { _ in
+    XCTAssertNil(ConnectivityReceiveContext.applicationContext.replyHandler)
+    XCTAssertNotNil(ConnectivityReceiveContext.replyWith { _ in
     }.replyHandler)
   }
 
   public func testIsApplicationContext() {
-    XCTAssertTrue(WCMessageContext.applicationContext.isApplicationContext)
-    XCTAssertFalse(WCMessageContext.replyWith { _ in
+    XCTAssertTrue(ConnectivityReceiveContext.applicationContext.isApplicationContext)
+    XCTAssertFalse(ConnectivityReceiveContext.replyWith { _ in
     }.isApplicationContext)
   }
 }

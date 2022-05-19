@@ -1,10 +1,8 @@
 #if canImport(Combine)
   import Combine
   import Foundation
-  @available(iOS 14.2, *)
-  @available(watchOS 7.1, *)
-  @available(macOS 11.0, *)
-  public class NetworkObject<MonitorType: PathMonitor, PingType: NetworkPing> {
+  @available(iOS 14.2, watchOS 7.1, macOS 11.0, *)
+  public class NetworkObserver<MonitorType: PathMonitor, PingType: NetworkPing> {
     let ping: PingType?
     let monitor: MonitorType
 
@@ -18,9 +16,9 @@
     let isConstrainedSubject = PassthroughSubject<Bool, Never>()
     let pingStatusSubject = PassthroughSubject<PingType.StatusType?, Never>()
 
-    public init(monitor: MonitorType, ping: PingType?) {
+    internal init(monitor: MonitorType, pingOrNil: PingType?) {
       self.monitor = monitor
-      self.ping = ping
+      ping = pingOrNil
 
       // swiftlint:disable line_length
       pathSubject.map(\.pathStatus).subscribe(pathStatusSubject).store(in: &otherCancellables)
@@ -77,6 +75,17 @@
 
     public func onUpdate(path: MonitorType.PathType) {
       pathSubject.send(path)
+    }
+  }
+
+  @available(iOS 14.2, watchOS 7.1, macOS 11.0, *)
+  public extension NetworkObserver {
+    convenience init(monitor: MonitorType) where PingType == NeverPing {
+      self.init(monitor: monitor, pingOrNil: nil)
+    }
+
+    convenience init(monitor: MonitorType, ping: PingType) {
+      self.init(monitor: monitor, pingOrNil: ping)
     }
   }
 #endif

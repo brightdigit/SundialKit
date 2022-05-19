@@ -10,7 +10,7 @@ public class WCObjectPropertyTests: XCTestCase {
       let session = MockSession()
 
       let newState = true
-      let wcObject = WCObject(session: session)
+      let wcObject = ConnectivityObserver(session: session)
 
       let cancellable = wcObject.isReachablePublisher.sink { state in
         XCTAssertEqual(state, newState)
@@ -32,7 +32,7 @@ public class WCObjectPropertyTests: XCTestCase {
       let session = MockSession()
 
       let newState = true
-      let wcObject = WCObject(session: session)
+      let wcObject = ConnectivityObserver(session: session)
 
       let cancellable = wcObject.isPairedAppInstalledPublisher.sink { state in
         XCTAssertEqual(state, newState)
@@ -55,7 +55,7 @@ public class WCObjectPropertyTests: XCTestCase {
         let session = MockSession()
 
         let newState = true
-        let wcObject = WCObject(session: session)
+        let wcObject = ConnectivityObserver(session: session)
 
         let cancellable = wcObject.isPairedPublisher.sink { state in
           XCTAssertEqual(state, newState)
@@ -80,7 +80,7 @@ public class WCObjectPropertyTests: XCTestCase {
       let session = MockSession()
 
       let newState: ActivationState = .activated
-      let wcObject = WCObject(session: session)
+      let wcObject = ConnectivityObserver(session: session)
       let cancellable = wcObject.activationStatePublisher.sink { state in
         XCTAssertEqual(state, newState)
         expectation.fulfill()
@@ -101,7 +101,7 @@ public class WCObjectPropertyTests: XCTestCase {
       let session = MockSession()
 
       let newState: ActivationState = .inactive
-      let wcObject = WCObject(session: session)
+      let wcObject = ConnectivityObserver(session: session)
       let cancellable = wcObject.activationStatePublisher.sink { state in
         XCTAssertEqual(state, newState)
         expectation.fulfill()
@@ -124,7 +124,7 @@ public class WCObjectPropertyTests: XCTestCase {
       )
       let session = MockSession()
 
-      let wcObject = WCObject(session: session)
+      let wcObject = ConnectivityObserver(session: session)
       let cancellable = wcObject.activationStatePublisher.sink { state in
         switch state {
         case .activated:

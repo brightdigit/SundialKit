@@ -1,7 +1,7 @@
 public struct MessageDecoder {
   let messagableTypes: [String: Messagable.Type]
 
-  func decode(_ message: WCMessage) -> Messagable? {
+  func decode(_ message: ConnectivityMessage) -> Messagable? {
     guard let typeKey = message[MessagableKeys.typeKey] as? String else {
       return nil
     }

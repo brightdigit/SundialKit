@@ -1,9 +1,11 @@
 #if canImport(WatchConnectivity)
   import WatchConnectivity
-  internal class WatchConnectivitySession: NSObject, WCSessionable, WCSessionDelegate {
+
+  typealias WatchConnectivitySessionProtocol = ConnectivitySession & WCSessionDelegate
+  internal class WatchConnectivitySession: NSObject, WatchConnectivitySessionProtocol {
     private let session: WCSession
 
-    internal var delegate: WCSessionableDelegate?
+    internal var delegate: ConnectivitySessionDelegate?
 
     internal var isReachable: Bool {
       session.isReachable
@@ -36,13 +38,13 @@
       self.init(session: .default)
     }
 
-    internal func updateApplicationContext(_ context: WCMessage) throws {
+    internal func updateApplicationContext(_ context: ConnectivityMessage) throws {
       try session.updateApplicationContext(context)
     }
 
     internal func sendMessage(
-      _ message: WCMessage,
-      _ completion: @escaping (Result<WCMessage, Error>) -> Void
+      _ message: ConnectivityMessage,
+      _ completion: @escaping (Result<ConnectivityMessage, Error>) -> Void
     ) {
       session.sendMessage(
         message

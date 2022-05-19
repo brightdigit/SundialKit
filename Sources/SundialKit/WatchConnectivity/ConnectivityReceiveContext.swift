@@ -1,12 +1,12 @@
 /// Context of the message received
-public enum WCMessageContext {
+public enum ConnectivityReceiveContext {
   /// received as a sent message with a reploy handler
-  case replyWith(WCMessageHandler)
+  case replyWith(ConnectivityHandler)
   /// received as application context.
   case applicationContext
 
   /// The reply handler if it contains one.
-  public var replyHandler: WCMessageHandler? {
+  public var replyHandler: ConnectivityHandler? {
     guard case let .replyWith(handler) = self else {
       return nil
     }

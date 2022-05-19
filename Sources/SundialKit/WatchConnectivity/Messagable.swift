@@ -5,7 +5,7 @@ public protocol Messagable {
 }
 
 public extension Messagable {
-  func message() -> WCMessage {
+  func message() -> ConnectivityMessage {
     [
       MessagableKeys.typeKey: Self.key,
       MessagableKeys.parametersKey: parameters()

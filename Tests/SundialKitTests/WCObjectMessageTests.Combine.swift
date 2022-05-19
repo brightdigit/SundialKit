@@ -11,8 +11,8 @@ import XCTest
 
       let key = UUID().uuidString
       let value = UUID()
-      let newState: WCMessage = [key: value]
-      let wcObject = WCObject(session: session)
+      let newState: ConnectivityMessage = [key: value]
+      let wcObject = ConnectivityObserver(session: session)
       let replyKey = UUID().uuidString
       let replyValue = UUID()
       let replyMessage = [replyKey: replyValue]
@@ -44,8 +44,8 @@ import XCTest
 
       let key = UUID().uuidString
       let value = UUID()
-      let newState: WCMessage = [key: value]
-      let wcObject = WCObject(session: session)
+      let newState: ConnectivityMessage = [key: value]
+      let wcObject = ConnectivityObserver(session: session)
       let replyKey = UUID().uuidString
       let replyValue = UUID()
       let replyMessage = [replyKey: replyValue]

@@ -1,16 +1,16 @@
 /// Result from sending a message
-public enum WCSendMessageResult {
+public enum ConnectivitySendContext {
   /// Sent via application context
   case applicationContext
   /// Sent via message with reply received
-  case reply(WCMessage)
+  case reply(ConnectivityMessage)
   /// Failure
   case failure(Error)
 }
 
-extension WCSendMessageResult {
+extension ConnectivitySendContext {
   // swiftlint:disable:next explicit_acl
-  init(_ result: Result<WCMessage, Error>) {
+  init(_ result: Result<ConnectivityMessage, Error>) {
     switch result {
     case let .success(message):
       self = .reply(message)

@@ -3,18 +3,22 @@
   import Foundation
 
   @available(macOS 10.15, *)
-  public class WCObject: NSObject, WCSessionableDelegate, ObservableObject {
-    public let session: WCSessionable
-    public let sendingMessageSubject = PassthroughSubject<WCMessage, Never>()
+  public typealias SuccessfulSubject<Output> = Combine.PassthroughSubject<Output, Never>
+
+  @available(macOS 10.15, *)
+  public class ConnectivityObserver: NSObject, ConnectivitySessionDelegate {
+    public let session: ConnectivitySession
+    public let sendingMessageSubject = SuccessfulSubject<ConnectivityMessage>()
 
     // swiftlint:disable:next implicitly_unwrapped_optional
     private var cancellable: AnyCancellable!
-    private let activationStateSubject = PassthroughSubject<WCSessionable, Never>()
-    private let isReachableSubject = PassthroughSubject<WCSessionable, Never>()
-    private let isPairedAppInstalledSubject = PassthroughSubject<WCSessionable, Never>()
-    private let isPairedSubject = PassthroughSubject<WCSessionable, Never>()
-    private let messageReceivedSubject = PassthroughSubject<WCMessageAcceptance, Never>()
-    private let replyMessageSubject = PassthroughSubject<WCMessageResult, Never>()
+
+    private let activationStateSubject = SuccessfulSubject<ConnectivitySession>()
+    private let isReachableSubject = SuccessfulSubject<ConnectivitySession>()
+    private let isPairedAppInstalledSubject = SuccessfulSubject<ConnectivitySession>()
+    private let isPairedSubject = SuccessfulSubject<ConnectivitySession>()
+    private let messageReceivedSubject = SuccessfulSubject<ConnectivityReceiveResult>()
+    private let replyMessageSubject = SuccessfulSubject<ConnectivitySendResult>()
 
     public var activationStatePublisher: AnyPublisher<ActivationState, Never> {
       activationStateSubject.anyPublisher(for: \.activationState)
@@ -30,11 +34,11 @@
       )
     }
 
-    public var messageReceivedPublisher: AnyPublisher<WCMessageAcceptance, Never> {
+    public var messageReceivedPublisher: AnyPublisher<ConnectivityReceiveResult, Never> {
       messageReceivedSubject.eraseToAnyPublisher()
     }
 
-    public var replyMessagePublisher: AnyPublisher<WCMessageResult, Never> {
+    public var replyMessagePublisher: AnyPublisher<ConnectivitySendResult, Never> {
       replyMessageSubject.eraseToAnyPublisher()
     }
 
@@ -44,7 +48,7 @@
       }
     #endif
 
-    public init(session: WCSessionable) {
+    public init(session: ConnectivitySession) {
       self.session = session
       super.init()
       session.delegate = self
@@ -64,15 +68,15 @@
       try session.activate()
     }
 
-    public func sessionDidBecomeInactive(_ session: WCSessionable) {
+    public func sessionDidBecomeInactive(_ session: ConnectivitySession) {
       activationStateSubject.send(session)
     }
 
-    public func sessionDidDeactivate(_ session: WCSessionable) {
+    public func sessionDidDeactivate(_ session: ConnectivitySession) {
       activationStateSubject.send(session)
     }
 
-    public func sessionCompanionStateDidChange(_ session: WCSessionable) {
+    public func sessionCompanionStateDidChange(_ session: ConnectivitySession) {
       DispatchQueue.main.async {
         self.isPairedSubject.send(session)
         self.isPairedAppInstalledSubject.send(session)
@@ -80,7 +84,7 @@
     }
 
     public func session(
-      _ session: WCSessionable,
+      _ session: ConnectivitySession,
       activationDidCompleteWith _: ActivationState,
       error _: Error?
     ) {
@@ -95,13 +99,13 @@
       }
     }
 
-    public func sessionReachabilityDidChange(_ session: WCSessionable) {
+    public func sessionReachabilityDidChange(_ session: ConnectivitySession) {
       DispatchQueue.main.async {
         self.isReachableSubject.send(session)
       }
     }
 
-    private func sendMessage(_ message: WCMessage) {
+    private func sendMessage(_ message: ConnectivityMessage) {
       if session.isReachable {
         session.sendMessage(message) { result in
           self.replyMessageSubject.send((message, .init(result)))
@@ -121,7 +125,7 @@
     }
 
     public func session(
-      _: WCSessionable,
+      _: ConnectivitySession,
       didReceiveMessage message: [String: Any],
       replyHandler: @escaping ([String: Any]) -> Void
     ) {
@@ -129,8 +133,8 @@
     }
 
     public func session(
-      _: WCSessionable,
-      didReceiveApplicationContext applicationContext: WCMessage,
+      _: ConnectivitySession,
+      didReceiveApplicationContext applicationContext: ConnectivityMessage,
       error _: Error?
     ) {
       messageReceivedSubject.send((applicationContext, .applicationContext))
