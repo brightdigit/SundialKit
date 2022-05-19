@@ -15,10 +15,19 @@ struct MockPath: NetworkPath {
   var pathStatus: PathStatus
 }
 
-struct MockPathMonitor: PathMonitor {
+class MockPathMonitor: PathMonitor {
+  
+  var dispatchQueueLabel : String? = nil
+  internal init(id: UUID) {
+    self.id = id
+  }
+  
+  let id : UUID
   func onPathUpdate(_: @escaping (MockPath) -> Void) {}
 
-  func start(queue _: DispatchQueue) {}
+  func start(queue: DispatchQueue) {
+    self.dispatchQueueLabel = queue.label
+  }
 
   func cancel() {}
 

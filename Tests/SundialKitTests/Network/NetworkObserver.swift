@@ -1,10 +1,37 @@
 import Foundation
-import SundialKit
+@testable import SundialKit
 
 import XCTest
 
 public class NetworkObserverTests: XCTestCase {
   func testStart() {
+    let monitor = MockPathMonitor(id: UUID())
+    let ping = MockNetworkPing(id: UUID(), timeInterval: 1.0)
+    let observer = NetworkObserver(
+      monitor: monitor,
+      ping: ping
+    )
+    var statuses = [MockNetworkPing.StatusType?]()
+    let pingStatusExpectaion = expectation(description: "ping status received")
+    
+    let cancellable = observer.pingStatusPublisher.sink { status in
+      statuses.append(status)
+      if statuses.count > 1 {
+        pingStatusExpectaion.fulfill()
+      }
+    }
+    
+    let dispatchQueueLabel = UUID().uuidString
+    observer.start(queue: .init(label: dispatchQueueLabel))
+    
+    XCTAssertEqual(monitor.dispatchQueueLabel, dispatchQueueLabel)
+    
+    waitForExpectations(timeout: 5.0) { error in
+      XCTAssertNil(error)
+      XCTAssertNil(statuses[0])
+      XCTAssertNotNil(statuses[1])
+    }
+    
     //      timerCancellable = ping.map { ping in
     //        let timerPublisher = Timer.publish(
     //          every: ping.timeInterval,
@@ -35,14 +62,27 @@ public class NetworkObserverTests: XCTestCase {
 
   public func testOnUpdate() {}
 
-  func testInit() {
-    let observer = NetworkObserver(
-      monitor: MockPathMonitor(),
-      ping: MockNetworkPing(timeInterval: 2.0)
-    )
+  func testInit()  {
+    let monitorID = UUID()
+    let pingID = UUID()
+      let observer = NetworkObserver(
+        monitor: MockPathMonitor(id: monitorID),
+        ping: MockNetworkPing(id: pingID, timeInterval: 2.0)
+      )
+   
+    XCTAssertEqual(monitorID, observer.monitor.id)
+    XCTAssertEqual(pingID, observer.ping?.id)
   }
 
-  func testInitNever() {}
+  func testInitNever() {
+    
+      let monitorID = UUID()
+      let observer = NetworkObserver(
+        monitor: MockPathMonitor(id: monitorID)
+      )
+      XCTAssertEqual(monitorID, observer.monitor.id)
+      XCTAssertNil(observer.ping)
+  }
 }
 
 // #if canImport(Combine)
