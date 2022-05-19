@@ -1,7 +1,7 @@
 @testable import SundialKit
 import XCTest
 
-internal class WCSendMessageResultTests: XCTestCase {
+internal class ConnectivitySendContextTests: XCTestCase {
   internal func testResult() {
     guard case .reply = ConnectivitySendContext(.success(.init())) else {
       XCTFail("Missing Reply")

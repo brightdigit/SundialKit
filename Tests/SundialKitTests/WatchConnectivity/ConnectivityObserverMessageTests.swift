@@ -3,9 +3,9 @@ import SundialKit
 
 import XCTest
 
-#if canImport(Combine)
-  extension WCObjectMessageTests {
-    private func combineTestSendMessageReachable() {
+public class ConnectivityObserverMessageTests: XCTestCase {
+  internal func testCombineSendMessageReachable() {
+    #if canImport(Combine)
       let expectation = expectation(description: "Message Sent Received")
       let session = MockSession()
 
@@ -36,9 +36,13 @@ import XCTest
 
         replyCancellable.cancel()
       }
-    }
+    #else
+      throw XCTSkip("OS doesn't support Combine.")
+    #endif
+  }
 
-    private func combineSendMessageAppInstalled() {
+  internal func testCombineSendMessageAppInstalled() {
+    #if canImport(Combine)
       let expectation = expectation(description: "Message Sent Received")
       let session = MockSession()
 
@@ -68,6 +72,9 @@ import XCTest
 
         replyCancellable.cancel()
       }
-    }
+
+    #else
+      throw XCTSkip("OS doesn't support Combine.")
+    #endif
   }
-#endif
+}
