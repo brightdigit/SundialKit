@@ -17,7 +17,7 @@ public class NWInterfaceTests: XCTestCase {
     }
   #endif
 
-  func testValue() {
+  func testValue() throws {
     #if canImport(Network)
 
       rawValue(of: .wifi, interfaceType: .wifi)

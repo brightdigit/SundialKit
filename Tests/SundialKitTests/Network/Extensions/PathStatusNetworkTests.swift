@@ -17,7 +17,7 @@ public class PathStatusNetworkTests: XCTestCase {
       XCTAssertEqual(actual, expected)
     }
   #endif
-  public func testInit() {
+  public func testInit() throws {
     #if canImport(Network)
       assertStatus(
         .satisfied, reason: .cellularDenied, interfaces: [.loopback, .cellular],

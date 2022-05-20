@@ -4,7 +4,7 @@ import SundialKit
 import XCTest
 
 public class ConnectivityObserverMessageTests: XCTestCase {
-  internal func testCombineSendMessageReachable() {
+  internal func testCombineSendMessageReachable() throws {
     #if canImport(Combine)
       let expectation = expectation(description: "Message Sent Received")
       let session = MockSession()

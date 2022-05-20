@@ -7,7 +7,7 @@ import SundialKit
 import XCTest
 
 public class NWPathMonitorTests: XCTestCase {
-  func testPathUpdate() {
+  func testPathUpdate() throws {
     #if canImport(Network)
       let monitor = NWPathMonitor()
       XCTAssertNil(monitor.pathUpdateHandler)
