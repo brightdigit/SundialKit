@@ -9,7 +9,7 @@ import XCTest
 
 public class NWInterfaceTests: XCTestCase {
   #if canImport(Network)
-    func rawValue(
+    public func rawValue(
       of interface: PathStatus.Interface,
       interfaceType: NWInterface.InterfaceType
     ) {
@@ -17,7 +17,7 @@ public class NWInterfaceTests: XCTestCase {
     }
   #endif
 
-  func testValue() throws {
+  public func testValue() throws {
     #if canImport(Network)
 
       rawValue(of: .wifi, interfaceType: .wifi)

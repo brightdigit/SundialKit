@@ -1,4 +1,9 @@
 import Foundation
+
+#if canImport(Combine)
+  import Combine
+#endif
+
 public protocol NetworkPing {
   associatedtype StatusType
   var timeInterval: TimeInterval { get }
@@ -13,3 +18,32 @@ public extension NetworkPing {
     }
   }
 }
+
+#if canImport(Combine)
+  @available(macOS 10.15, *)
+  public extension NetworkPing {
+    func publish<PathStatusPublisher: Publisher>(
+      with pathStatusPublisher: PathStatusPublisher
+    ) -> AnyPublisher<StatusType, Never>
+      where
+      PathStatusPublisher.Output == PathStatus,
+      PathStatusPublisher.Failure == Never {
+      let timerPublisher = Timer
+        .publish(
+          every: timeInterval,
+          on: .current,
+          in: .common
+        )
+        .autoconnect()
+
+      return Publishers.CombineLatest(timerPublisher, pathStatusPublisher)
+        .compactMap { _, status in
+          self.shouldPing(onStatus: status) ? () : nil
+        }
+        .flatMap {
+          Future(self.onPingForFuture(_:))
+        }
+        .eraseToAnyPublisher()
+    }
+  }
+#endif

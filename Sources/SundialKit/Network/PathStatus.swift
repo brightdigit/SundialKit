@@ -14,11 +14,9 @@ public enum PathStatus: Equatable {
 
     public var rawValue: Int
 
-    public init(rawValue: RawValue) {
+    public init(rawValue: Int) {
       self.rawValue = rawValue
     }
-
-    public typealias RawValue = Int
 
     public static let cellular: Self = .init(rawValue: 1)
     public static let wifi: Self = .init(rawValue: 2)

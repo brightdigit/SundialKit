@@ -1,3 +1,4 @@
+// swiftlint:disable function_body_length cyclomatic_complexity
 #if canImport(Network)
   import Network
 

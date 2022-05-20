@@ -4,7 +4,7 @@ import Foundation
 import XCTest
 
 public class NetworkObserverTests: XCTestCase {
-  func testStart() throws {
+  public func testStart() throws {
     #if canImport(Combine)
       let monitor = MockPathMonitor(id: UUID())
       let ping = MockNetworkPing(id: UUID(), timeInterval: 1.0)
@@ -38,7 +38,7 @@ public class NetworkObserverTests: XCTestCase {
     #endif
   }
 
-  func testCancel() throws {
+  public func testCancel() throws {
     #if canImport(Combine)
       let monitor = MockPathMonitor(id: UUID())
       let ping = MockNetworkPing(id: UUID(), timeInterval: 1.0)

@@ -31,19 +31,10 @@
     }
 
     public func start(queue: DispatchQueue) {
-      timerCancellable = ping.map { ping in
-        let timerPublisher = Timer.publish(
-          every: ping.timeInterval,
-          on: .current,
-          in: .common
-        ).autoconnect()
-
-        return Publishers.CombineLatest(timerPublisher, pathStatusSubject)
-          .compactMap { _, status in
-            ping.shouldPing(onStatus: status) ? () : nil
-          }.flatMap {
-            Future(ping.onPingForFuture(_:))
-          }.map { $0 as PingType.StatusType? }.subscribe(pingStatusSubject)
+      timerCancellable = ping.map {
+        $0.publish(with: self.pathStatusSubject)
+          .map { $0 as PingType.StatusType? }
+          .subscribe(self.pingStatusSubject)
       }
       monitor.start(queue: queue)
       pingStatusSubject.send(nil)
