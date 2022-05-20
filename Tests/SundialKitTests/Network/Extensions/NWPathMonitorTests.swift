@@ -9,13 +9,16 @@ import XCTest
 public class NWPathMonitorTests: XCTestCase {
   func testPathUpdate() throws {
     #if canImport(Network)
-      let monitor = NWPathMonitor()
-      XCTAssertNil(monitor.pathUpdateHandler)
-      monitor.onPathUpdate { _ in
+      if #available(macOS 11.0, iOS 14.2, watchOS 7.1, tvOS 14.2, *) {
+        let monitor = NWPathMonitor()
+        XCTAssertNil(monitor.pathUpdateHandler)
+        monitor.onPathUpdate { _ in
+        }
+        XCTAssertNotNil(monitor.pathUpdateHandler)
+        return
       }
-      XCTAssertNotNil(monitor.pathUpdateHandler)
-    #else
-      throw XCTSkip("OS doesn't support Network.")
     #endif
+
+    throw XCTSkip("OS doesn't support Network.")
   }
 }
