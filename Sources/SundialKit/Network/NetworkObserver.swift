@@ -74,7 +74,7 @@
       pingStatusSubject.eraseToAnyPublisher()
     }
 
-    public func onUpdate(path: MonitorType.PathType) {
+    func onUpdate(path: MonitorType.PathType) {
       pathSubject.send(path)
     }
   }

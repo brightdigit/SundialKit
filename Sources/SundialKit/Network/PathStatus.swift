@@ -7,7 +7,11 @@ public enum PathStatus: Equatable {
     case unknown
   }
 
-  public struct Interface: OptionSet {
+  public struct Interface: OptionSet, Interfaceable {
+    public var typeValue: Int {
+      rawValue
+    }
+
     public var rawValue: Int
 
     public init(rawValue: RawValue) {

@@ -8,7 +8,7 @@
     init(
       _ status: NWPath.Status,
       reason: NWPath.UnsatisfiedReason,
-      interfaces: [NWInterface]
+      interfaces: [Interfaceable]
     ) {
       switch (status, reason) {
       case (.satisfied, _):

@@ -24,4 +24,11 @@
       }
     }
   }
+
+  @available(macOS 10.14, *)
+  extension NWInterface: Interfaceable {
+    public var typeValue: Int {
+      type.value
+    }
+  }
 #endif
