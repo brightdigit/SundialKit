@@ -41,7 +41,7 @@ public class ConnectivityObserverMessageTests: XCTestCase {
     #endif
   }
 
-  internal func testCombineSendMessageAppInstalled() {
+  internal func testCombineSendMessageAppInstalled() throws {
     #if canImport(Combine)
       let expectation = expectation(description: "Message Sent Received")
       let session = MockSession()
