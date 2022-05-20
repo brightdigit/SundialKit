@@ -1,7 +1,8 @@
 #if canImport(Combine)
   import Combine
   import Foundation
-  //@available(iOS 14.2, watchOS 7.1, macOS 11.0, *)
+  // @available(iOS 14.2, watchOS 7.1, macOS 11.0, *)
+  @available(macOS 10.15, *)
   public class NetworkObserver<MonitorType: PathMonitor, PingType: NetworkPing> {
     let ping: PingType?
     let monitor: MonitorType
@@ -78,7 +79,8 @@
     }
   }
 
-  //@available(iOS 14.2, watchOS 7.1, macOS 11.0, *)
+  // @available(iOS 14.2, watchOS 7.1, macOS 11.0, *)
+  @available(macOS 10.15, *)
   public extension NetworkObserver {
     convenience init(monitor: MonitorType) where PingType == NeverPing {
       self.init(monitor: monitor, pingOrNil: nil)

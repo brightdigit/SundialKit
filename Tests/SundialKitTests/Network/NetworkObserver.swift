@@ -13,75 +13,115 @@ public class NetworkObserverTests: XCTestCase {
     )
     var statuses = [MockNetworkPing.StatusType?]()
     let pingStatusExpectaion = expectation(description: "ping status received")
-    
+
     let cancellable = observer.pingStatusPublisher.sink { status in
       statuses.append(status)
       if statuses.count > 1 {
         pingStatusExpectaion.fulfill()
       }
     }
-    
+
     let dispatchQueueLabel = UUID().uuidString
     observer.start(queue: .init(label: dispatchQueueLabel))
-    
+
     XCTAssertEqual(monitor.dispatchQueueLabel, dispatchQueueLabel)
-    
-    waitForExpectations(timeout: 5.0) { error in
+
+    waitForExpectations(timeout: 10.0) { error in
       XCTAssertNil(error)
       XCTAssertNil(statuses[0])
       XCTAssertNotNil(statuses[1])
+      cancellable.cancel()
     }
-    
-    //      timerCancellable = ping.map { ping in
-    //        let timerPublisher = Timer.publish(
-    //          every: ping.timeInterval,
-    //          on: .current,
-    //          in: .common
-    //        ).autoconnect()
-    //
-    //        return Publishers.CombineLatest(timerPublisher, pathStatusSubject)
-    //          .compactMap { _, status in
-    //            ping.shouldPing(onStatus: status) ? () : nil
-    //          }.flatMap {
-    //            Future(ping.onPingForFuture(_:))
-    //          }.map { $0 as PingType.StatusType? }.subscribe(pingStatusSubject)
-    //      }
-    //      monitor.start(queue: queue)
-    //      pingStatusSubject.send(nil)
   }
 
-  func testCancel() {}
+  func testCancel() {
+    let monitor = MockPathMonitor(id: UUID())
+    let ping = MockNetworkPing(id: UUID(), timeInterval: 1.0)
+    let observer = NetworkObserver(
+      monitor: monitor,
+      ping: ping
+    )
+    observer.start(queue: .init(label: UUID().uuidString))
+    XCTAssertNotNil(observer.timerCancellable)
+    observer.cancel()
+    XCTAssertNil(observer.timerCancellable)
+    XCTAssertTrue(monitor.isCancelled)
+  }
 
-  public func testPathStatusPublisher() {}
+  public func testPathStatusPublisher() {
+    let monitor = MockPathMonitor(id: UUID())
+    let ping = MockNetworkPing(id: UUID(), timeInterval: 1.0)
+    let observer = NetworkObserver(
+      monitor: monitor,
+      ping: ping
+    )
 
-  public func testIsExpensivePublisher() {}
+    var pathStatus: PathStatus?
+    let cancellable = observer.pathStatusPublisher.sink {
+      pathStatus = $0
+    }
+    monitor.sendPath(.init(pathStatus: .requiresConnection))
+    XCTAssertEqual(pathStatus, .requiresConnection)
+    cancellable.cancel()
+  }
 
-  public func testIsConstrainedPublisher() {}
+  public func testIsExpensivePublisher() {
+    let monitor = MockPathMonitor(id: UUID())
+    let ping = MockNetworkPing(id: UUID(), timeInterval: 1.0)
+    let observer = NetworkObserver(
+      monitor: monitor,
+      ping: ping
+    )
+    let expectedIsExpensive: Bool = .random()
+    var actualIsExpensive: Bool?
+    let cancellable = observer.isExpensivePublisher.sink {
+      actualIsExpensive = $0
+    }
+    monitor.sendPath(.init(isExpensive: expectedIsExpensive))
+    XCTAssertEqual(expectedIsExpensive, actualIsExpensive)
+    cancellable.cancel()
+  }
+
+  public func testIsConstrainedPublisher() {
+    let monitor = MockPathMonitor(id: UUID())
+    let ping = MockNetworkPing(id: UUID(), timeInterval: 1.0)
+    let observer = NetworkObserver(
+      monitor: monitor,
+      ping: ping
+    )
+    let expectedIsConstrained: Bool = .random()
+    var actualIsConstrained: Bool?
+    let cancellable = observer.isConstrainedPublisher.sink {
+      actualIsConstrained = $0
+    }
+    monitor.sendPath(.init(isConstrained: expectedIsConstrained))
+    XCTAssertEqual(expectedIsConstrained, actualIsConstrained)
+    cancellable.cancel()
+  }
 
   public func testPingStatusPublisher() {}
 
   public func testOnUpdate() {}
 
-  func testInit()  {
+  func testInit() {
     let monitorID = UUID()
     let pingID = UUID()
-      let observer = NetworkObserver(
-        monitor: MockPathMonitor(id: monitorID),
-        ping: MockNetworkPing(id: pingID, timeInterval: 2.0)
-      )
-   
+    let observer = NetworkObserver(
+      monitor: MockPathMonitor(id: monitorID),
+      ping: MockNetworkPing(id: pingID, timeInterval: 2.0)
+    )
+
     XCTAssertEqual(monitorID, observer.monitor.id)
     XCTAssertEqual(pingID, observer.ping?.id)
   }
 
   func testInitNever() {
-    
-      let monitorID = UUID()
-      let observer = NetworkObserver(
-        monitor: MockPathMonitor(id: monitorID)
-      )
-      XCTAssertEqual(monitorID, observer.monitor.id)
-      XCTAssertNil(observer.ping)
+    let monitorID = UUID()
+    let observer = NetworkObserver(
+      monitor: MockPathMonitor(id: monitorID)
+    )
+    XCTAssertEqual(monitorID, observer.monitor.id)
+    XCTAssertNil(observer.ping)
   }
 }
 

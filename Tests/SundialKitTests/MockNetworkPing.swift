@@ -16,13 +16,13 @@ class MockNetworkPing: NetworkPing {
   }
 
   public private(set) var lastShoundPingStatus: StatusType?
-  let id : UUID
+  let id: UUID
   let timeInterval: TimeInterval
 
   func shouldPing(onStatus _: PathStatus) -> Bool {
-    true 
+    true
   }
-  
+
   func onPing(_ closure: @escaping (StatusType) -> Void) {
     closure(.init())
   }
