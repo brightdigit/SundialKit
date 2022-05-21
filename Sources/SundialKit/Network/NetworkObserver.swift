@@ -17,6 +17,30 @@
     private let isConstrainedSubject = PassthroughSubject<Bool, Never>()
     private let pingStatusSubject = PassthroughSubject<PingType.StatusType?, Never>()
 
+    internal var isPingActive: Bool {
+      timerCancellable != nil
+    }
+
+    internal var hasNetworkPing: Bool {
+      ping != nil
+    }
+
+    public var pathStatusPublisher: AnyPublisher<PathStatus, Never> {
+      pathStatusSubject.eraseToAnyPublisher()
+    }
+
+    public var isExpensivePublisher: AnyPublisher<Bool, Never> {
+      isExpensiveSubject.eraseToAnyPublisher()
+    }
+
+    public var isConstrainedPublisher: AnyPublisher<Bool, Never> {
+      isConstrainedSubject.eraseToAnyPublisher()
+    }
+
+    public var pingStatusPublisher: AnyPublisher<PingType.StatusType?, Never> {
+      pingStatusSubject.eraseToAnyPublisher()
+    }
+
     internal init(monitor: MonitorType, pingOrNil: PingType?) {
       self.monitor = monitor
       ping = pingOrNil
@@ -49,32 +73,8 @@
       monitor.cancel()
     }
 
-    public var pathStatusPublisher: AnyPublisher<PathStatus, Never> {
-      pathStatusSubject.eraseToAnyPublisher()
-    }
-
-    public var isExpensivePublisher: AnyPublisher<Bool, Never> {
-      isExpensiveSubject.eraseToAnyPublisher()
-    }
-
-    public var isConstrainedPublisher: AnyPublisher<Bool, Never> {
-      isConstrainedSubject.eraseToAnyPublisher()
-    }
-
-    public var pingStatusPublisher: AnyPublisher<PingType.StatusType?, Never> {
-      pingStatusSubject.eraseToAnyPublisher()
-    }
-
     internal func onUpdate(path: MonitorType.PathType) {
       pathSubject.send(path)
-    }
-
-    internal var isPingActive: Bool {
-      timerCancellable != nil
-    }
-
-    internal var hasNetworkPing: Bool {
-      ping != nil
     }
   }
 

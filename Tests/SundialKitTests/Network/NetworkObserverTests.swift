@@ -1,3 +1,4 @@
+// swiftlint:disable discouraged_optional_boolean
 import Foundation
 @testable import SundialKit
 

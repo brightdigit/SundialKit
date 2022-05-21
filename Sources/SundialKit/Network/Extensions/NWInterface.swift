@@ -1,4 +1,4 @@
-// swiftlint:disabble file_types_order
+// swiftlint:disable file_types_order
 #if canImport(Network)
 
   import Network

@@ -1,4 +1,9 @@
 public enum PathStatus: Equatable {
+  case unsatisfied(UnsatisfiedReason)
+  case satisfied(Interface)
+  case requiresConnection
+  case unknown
+
   public enum UnsatisfiedReason: Equatable {
     case cellularDenied
     case localNetworkDenied
@@ -24,9 +29,4 @@ public enum PathStatus: Equatable {
     public static let other: Self = .init(rawValue: 8)
     public static let loopback: Self = .init(rawValue: 16)
   }
-
-  case unsatisfied(UnsatisfiedReason)
-  case satisfied(Interface)
-  case requiresConnection
-  case unknown
 }
