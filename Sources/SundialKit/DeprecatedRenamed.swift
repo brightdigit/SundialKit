@@ -1,4 +1,4 @@
-// swiftlint:disable file_name
+// swiftlint:disable missing_docs
 import Foundation
 
 #if canImport(Combine)

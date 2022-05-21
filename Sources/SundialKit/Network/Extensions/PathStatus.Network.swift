@@ -6,6 +6,11 @@
   @available(iOS 14.2, *)
   @available(macOS 11.0, *)
   public extension PathStatus {
+    /// Creates a `PathStatus`.
+    /// - Parameters:
+    ///   - status: The `NWPath.Status`
+    ///   - reason: The `NWPath.UnsatisfiedReason`
+    ///   - interfaces: The `Interfacable` objects.
     init(
       _ status: NWPath.Status,
       reason: NWPath.UnsatisfiedReason,

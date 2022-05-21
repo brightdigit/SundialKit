@@ -1,4 +1,4 @@
-import SundialKit
+@testable import SundialKit
 import XCTest
 
 public class MessageDecoderTests: XCTestCase {

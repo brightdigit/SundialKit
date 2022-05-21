@@ -2,8 +2,9 @@
   import Combine
   import Foundation
 
+  /// `typealias` for `PassthroughSubject` without a `Failure`.
   @available(macOS 10.15, *)
-  public typealias SuccessfulSubject<Output> = Combine.PassthroughSubject<Output, Never>
+  public typealias SuccessfulSubject<Output> = PassthroughSubject<Output, Never>
 
   @available(macOS 10.15, *)
   public class ConnectivityObserver: NSObject, ConnectivitySessionDelegate {

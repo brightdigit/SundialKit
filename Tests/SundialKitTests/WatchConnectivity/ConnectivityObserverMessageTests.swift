@@ -4,6 +4,7 @@ import SundialKit
 import XCTest
 
 public class ConnectivityObserverMessageTests: XCTestCase {
+  // swiftlint:disable:next function_body_length
   internal func testCombineSendMessageReachable() throws {
     #if canImport(Combine)
       let expectation = expectation(description: "Message Sent Received")
@@ -41,6 +42,7 @@ public class ConnectivityObserverMessageTests: XCTestCase {
     #endif
   }
 
+  // swiftlint:disable:next function_body_length
   internal func testCombineSendMessageAppInstalled() throws {
     #if canImport(Combine)
       let expectation = expectation(description: "Message Sent Received")
