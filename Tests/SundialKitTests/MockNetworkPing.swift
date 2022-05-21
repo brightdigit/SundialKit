@@ -7,25 +7,22 @@
 import Foundation
 import SundialKit
 
-struct MockNetworkStatus {}
+internal class MockNetworkPing: NetworkPing {
+  internal struct StatusType {}
+  internal private(set) var lastShoundPingStatus: StatusType?
+  internal let id: UUID
+  internal let timeInterval: TimeInterval
 
-class MockNetworkPing: NetworkPing {
   internal init(id: UUID, timeInterval: TimeInterval) {
     self.id = id
     self.timeInterval = timeInterval
   }
 
-  public private(set) var lastShoundPingStatus: StatusType?
-  let id: UUID
-  let timeInterval: TimeInterval
-
-  func shouldPing(onStatus _: PathStatus) -> Bool {
+  internal func shouldPing(onStatus _: PathStatus) -> Bool {
     true
   }
 
-  func onPing(_ closure: @escaping (StatusType) -> Void) {
+  internal func onPing(_ closure: @escaping (StatusType) -> Void) {
     closure(.init())
   }
-
-  struct StatusType {}
 }

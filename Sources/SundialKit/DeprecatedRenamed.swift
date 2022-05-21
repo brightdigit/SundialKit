@@ -1,3 +1,4 @@
+// swiftlint:disable missing_docs
 import Foundation
 
 #if canImport(Combine)

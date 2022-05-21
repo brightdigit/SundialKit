@@ -1,10 +1,11 @@
+// swiftlint:disable discouraged_optional_boolean
 import Foundation
 @testable import SundialKit
 
 import XCTest
 
 public class NetworkObserverTests: XCTestCase {
-  func testStart() throws {
+  public func testStart() throws {
     #if canImport(Combine)
       let monitor = MockPathMonitor(id: UUID())
       let ping = MockNetworkPing(id: UUID(), timeInterval: 1.0)
@@ -38,7 +39,7 @@ public class NetworkObserverTests: XCTestCase {
     #endif
   }
 
-  func testCancel() throws {
+  public func testCancel() throws {
     #if canImport(Combine)
       let monitor = MockPathMonitor(id: UUID())
       let ping = MockNetworkPing(id: UUID(), timeInterval: 1.0)
@@ -47,9 +48,10 @@ public class NetworkObserverTests: XCTestCase {
         ping: ping
       )
       observer.start(queue: .init(label: UUID().uuidString))
-      XCTAssertNotNil(observer.timerCancellable)
+      XCTAssertTrue(observer.isPingActive)
+
       observer.cancel()
-      XCTAssertNil(observer.timerCancellable)
+      XCTAssertFalse(observer.isPingActive)
       XCTAssertTrue(monitor.isCancelled)
     #else
       throw XCTSkip("Combine is not supported by this OS.")
@@ -119,7 +121,7 @@ public class NetworkObserverTests: XCTestCase {
     #endif
   }
 
-  func testInit() throws {
+  public func testInit() throws {
     #if canImport(Combine)
       let monitorID = UUID()
       let pingID = UUID()
@@ -127,22 +129,19 @@ public class NetworkObserverTests: XCTestCase {
         monitor: MockPathMonitor(id: monitorID),
         ping: MockNetworkPing(id: pingID, timeInterval: 2.0)
       )
-
-      XCTAssertEqual(monitorID, observer.monitor.id)
-      XCTAssertEqual(pingID, observer.ping?.id)
+      XCTAssertTrue(observer.hasNetworkPing)
     #else
       throw XCTSkip("Combine is not supported by this OS.")
     #endif
   }
 
-  func testInitNever() throws {
+  public func testInitNever() throws {
     #if canImport(Combine)
       let monitorID = UUID()
       let observer = NetworkObserver(
         monitor: MockPathMonitor(id: monitorID)
       )
-      XCTAssertEqual(monitorID, observer.monitor.id)
-      XCTAssertNil(observer.ping)
+      XCTAssertFalse(observer.hasNetworkPing)
     #else
       throw XCTSkip("Combine is not supported by this OS.")
     #endif

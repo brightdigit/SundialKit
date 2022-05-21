@@ -7,39 +7,22 @@
 import Foundation
 import SundialKit
 
-struct MockPath: NetworkPath {
-  internal init(
-    isConstrained: Bool = false,
-    isExpensive: Bool = false,
-    pathStatus: PathStatus = .unknown
-  ) {
-    self.isConstrained = isConstrained
-    self.isExpensive = isExpensive
-    self.pathStatus = pathStatus
-  }
+internal class MockPathMonitor: PathMonitor {
+  internal typealias PathType = MockPath
 
-  let isConstrained: Bool
-
-  let isExpensive: Bool
-
-  let pathStatus: PathStatus
-}
-
-class MockPathMonitor: PathMonitor {
-  public private(set) var pathUpdate: ((MockPath) -> Void)?
-  public private(set) var dispatchQueueLabel: String?
-  public private(set) var isCancelled = false
+  internal let id: UUID
+  internal private(set) var pathUpdate: ((MockPath) -> Void)?
+  internal private(set) var dispatchQueueLabel: String?
+  internal private(set) var isCancelled = false
   internal init(id: UUID) {
     self.id = id
   }
 
-  let id: UUID
-
-  func onPathUpdate(_ handler: @escaping (MockPath) -> Void) {
+  internal func onPathUpdate(_ handler: @escaping (MockPath) -> Void) {
     pathUpdate = handler
   }
 
-  func start(queue: DispatchQueue) {
+  internal func start(queue: DispatchQueue) {
     dispatchQueueLabel = queue.label
     pathUpdate?(
       .init(
@@ -50,13 +33,11 @@ class MockPathMonitor: PathMonitor {
     )
   }
 
-  func cancel() {
+  internal func cancel() {
     isCancelled = true
   }
 
-  func sendPath(_ path: MockPath) {
+  internal func sendPath(_ path: MockPath) {
     pathUpdate?(path)
   }
-
-  typealias PathType = MockPath
 }

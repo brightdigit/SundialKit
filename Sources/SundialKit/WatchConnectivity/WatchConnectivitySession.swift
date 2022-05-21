@@ -1,7 +1,9 @@
 #if canImport(WatchConnectivity)
   import WatchConnectivity
 
-  typealias WatchConnectivitySessionProtocol = ConnectivitySession & WCSessionDelegate
+  internal typealias WatchConnectivitySessionProtocol =
+    ConnectivitySession & WCSessionDelegate
+
   internal class WatchConnectivitySession: NSObject, WatchConnectivitySessionProtocol {
     private let session: WCSession
 

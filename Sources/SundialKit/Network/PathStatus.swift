@@ -1,4 +1,9 @@
 public enum PathStatus: Equatable {
+  case unsatisfied(UnsatisfiedReason)
+  case satisfied(Interface)
+  case requiresConnection
+  case unknown
+
   public enum UnsatisfiedReason: Equatable {
     case cellularDenied
     case localNetworkDenied
@@ -14,11 +19,16 @@ public enum PathStatus: Equatable {
 
     public var rawValue: Int
 
-    public init(rawValue: RawValue) {
+    public init(rawValue: Int) {
       self.rawValue = rawValue
     }
 
-    public typealias RawValue = Int
+    /// Converts a group of `Interfaceable` objects into a `PathStatus.Interface`
+    /// - Parameter interfaces: A list of `PathStatus.Interface` object.
+    public init(interfaces: [Interfaceable]) {
+      let rawValue = Set(interfaces.map(\.typeValue)).reduce(0, +)
+      self.init(rawValue: rawValue)
+    }
 
     public static let cellular: Self = .init(rawValue: 1)
     public static let wifi: Self = .init(rawValue: 2)
@@ -26,9 +36,4 @@ public enum PathStatus: Equatable {
     public static let other: Self = .init(rawValue: 8)
     public static let loopback: Self = .init(rawValue: 16)
   }
-
-  case unsatisfied(UnsatisfiedReason)
-  case satisfied(Interface)
-  case requiresConnection
-  case unknown
 }

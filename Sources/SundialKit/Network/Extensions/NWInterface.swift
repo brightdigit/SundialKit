@@ -2,7 +2,9 @@
 
   import Network
   @available(macOS 10.14, *)
-  public extension NWInterface.InterfaceType {
+  // swiftlint:disable:next file_types_order
+  internal extension NWInterface.InterfaceType {
+    // swiftlint:disable:next explicit_acl
     var value: Int {
       switch self {
       case .other:

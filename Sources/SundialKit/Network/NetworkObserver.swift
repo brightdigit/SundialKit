@@ -2,20 +2,49 @@
   import Combine
   import Foundation
 
+  /// Observes the status of network connectivity
   @available(macOS 10.15, *)
   public class NetworkObserver<MonitorType: PathMonitor, PingType: NetworkPing> {
-    let ping: PingType?
-    let monitor: MonitorType
+    private let ping: PingType?
+    private let monitor: MonitorType
 
-    let pathSubject = PassthroughSubject<MonitorType.PathType, Never>()
-    var pingCancellable: AnyCancellable?
-    var timerCancellable: Cancellable?
-    var otherCancellables = [AnyCancellable]()
+    private let pathSubject = PassthroughSubject<MonitorType.PathType, Never>()
+    private var pingCancellable: AnyCancellable?
+    private var timerCancellable: Cancellable?
+    private var otherCancellables = [AnyCancellable]()
 
-    let pathStatusSubject = PassthroughSubject<PathStatus, Never>()
-    let isExpensiveSubject = PassthroughSubject<Bool, Never>()
-    let isConstrainedSubject = PassthroughSubject<Bool, Never>()
-    let pingStatusSubject = PassthroughSubject<PingType.StatusType?, Never>()
+    private let pathStatusSubject = PassthroughSubject<PathStatus, Never>()
+    private let isExpensiveSubject = PassthroughSubject<Bool, Never>()
+    private let isConstrainedSubject = PassthroughSubject<Bool, Never>()
+    private let pingStatusSubject = PassthroughSubject<PingType.StatusType?, Never>()
+
+    internal var isPingActive: Bool {
+      timerCancellable != nil
+    }
+
+    internal var hasNetworkPing: Bool {
+      ping != nil
+    }
+
+    /// Publishes updates to the `PathStatus`
+    public var pathStatusPublisher: AnyPublisher<PathStatus, Never> {
+      pathStatusSubject.eraseToAnyPublisher()
+    }
+
+    /// Publishes updates to whether the network connection is expensive.
+    public var isExpensivePublisher: AnyPublisher<Bool, Never> {
+      isExpensiveSubject.eraseToAnyPublisher()
+    }
+
+    /// Publishes updates to whether the network connection is constrained.
+    public var isConstrainedPublisher: AnyPublisher<Bool, Never> {
+      isConstrainedSubject.eraseToAnyPublisher()
+    }
+
+    /// Publishes updates to the `PingType.StatusType`
+    public var pingStatusPublisher: AnyPublisher<PingType.StatusType?, Never> {
+      pingStatusSubject.eraseToAnyPublisher()
+    }
 
     internal init(monitor: MonitorType, pingOrNil: PingType?) {
       self.monitor = monitor
@@ -30,25 +59,19 @@
       monitor.onPathUpdate(onUpdate(path:))
     }
 
+    /// Starts the monitor.
+    /// - Parameter queue: The `DispatchQueue` to start the `PathMonitor` on.
     public func start(queue: DispatchQueue) {
-      timerCancellable = ping.map { ping in
-        let timerPublisher = Timer.publish(
-          every: ping.timeInterval,
-          on: .current,
-          in: .common
-        ).autoconnect()
-
-        return Publishers.CombineLatest(timerPublisher, pathStatusSubject)
-          .compactMap { _, status in
-            ping.shouldPing(onStatus: status) ? () : nil
-          }.flatMap {
-            Future(ping.onPingForFuture(_:))
-          }.map { $0 as PingType.StatusType? }.subscribe(pingStatusSubject)
+      timerCancellable = ping.map {
+        $0.publish(with: self.pathStatusSubject)
+          .map { $0 as PingType.StatusType? }
+          .subscribe(self.pingStatusSubject)
       }
       monitor.start(queue: queue)
       pingStatusSubject.send(nil)
     }
 
+    /// Cancels the montor.
     public func cancel() {
       if let timerCancellable = timerCancellable {
         timerCancellable.cancel()
@@ -58,33 +81,23 @@
       monitor.cancel()
     }
 
-    public var pathStatusPublisher: AnyPublisher<PathStatus, Never> {
-      pathStatusSubject.eraseToAnyPublisher()
-    }
-
-    public var isExpensivePublisher: AnyPublisher<Bool, Never> {
-      isExpensiveSubject.eraseToAnyPublisher()
-    }
-
-    public var isConstrainedPublisher: AnyPublisher<Bool, Never> {
-      isConstrainedSubject.eraseToAnyPublisher()
-    }
-
-    public var pingStatusPublisher: AnyPublisher<PingType.StatusType?, Never> {
-      pingStatusSubject.eraseToAnyPublisher()
-    }
-
-    func onUpdate(path: MonitorType.PathType) {
+    internal func onUpdate(path: MonitorType.PathType) {
       pathSubject.send(path)
     }
   }
 
   @available(macOS 10.15, *)
   public extension NetworkObserver {
+    /// Creates `NetworkObserver` without a `NetworkPing` object.
+    /// - Parameter monitor: The `PathMonitor` to monitor the network .
     convenience init(monitor: MonitorType) where PingType == NeverPing {
       self.init(monitor: monitor, pingOrNil: nil)
     }
 
+    /// Creates `NetworkObserver` with a `NetworkPing` object.
+    /// - Parameters:
+    ///   - monitor: The `PathMonitor` to monitor the network .
+    ///   - ping: The `NetworkPing` to ping periodically.
     convenience init(monitor: MonitorType, ping: PingType) {
       self.init(monitor: monitor, pingOrNil: ping)
     }
