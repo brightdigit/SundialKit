@@ -4,18 +4,18 @@
 
   @available(macOS 10.15, *)
   public class NetworkObserver<MonitorType: PathMonitor, PingType: NetworkPing> {
-    let ping: PingType?
-    let monitor: MonitorType
+    private let ping: PingType?
+    private let monitor: MonitorType
 
-    let pathSubject = PassthroughSubject<MonitorType.PathType, Never>()
-    var pingCancellable: AnyCancellable?
-    var timerCancellable: Cancellable?
-    var otherCancellables = [AnyCancellable]()
+    private let pathSubject = PassthroughSubject<MonitorType.PathType, Never>()
+    private var pingCancellable: AnyCancellable?
+    private var timerCancellable: Cancellable?
+    private var otherCancellables = [AnyCancellable]()
 
-    let pathStatusSubject = PassthroughSubject<PathStatus, Never>()
-    let isExpensiveSubject = PassthroughSubject<Bool, Never>()
-    let isConstrainedSubject = PassthroughSubject<Bool, Never>()
-    let pingStatusSubject = PassthroughSubject<PingType.StatusType?, Never>()
+    private let pathStatusSubject = PassthroughSubject<PathStatus, Never>()
+    private let isExpensiveSubject = PassthroughSubject<Bool, Never>()
+    private let isConstrainedSubject = PassthroughSubject<Bool, Never>()
+    private let pingStatusSubject = PassthroughSubject<PingType.StatusType?, Never>()
 
     internal init(monitor: MonitorType, pingOrNil: PingType?) {
       self.monitor = monitor
@@ -65,8 +65,16 @@
       pingStatusSubject.eraseToAnyPublisher()
     }
 
-    func onUpdate(path: MonitorType.PathType) {
+    internal func onUpdate(path: MonitorType.PathType) {
       pathSubject.send(path)
+    }
+
+    internal var isPingActive: Bool {
+      timerCancellable != nil
+    }
+
+    internal var hasNetworkPing: Bool {
+      ping != nil
     }
   }
 

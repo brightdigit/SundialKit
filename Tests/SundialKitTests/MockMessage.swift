@@ -27,8 +27,8 @@ public struct MockMessage: Messagable, Equatable {
   }
 
   public static let key: String = UUID().uuidString
-  let key: String
-  let value: UUID
+  internal let key: String
+  internal let value: UUID
   public func parameters() -> [String: Any] {
     [key: value]
   }
