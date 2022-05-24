@@ -42,6 +42,7 @@ internal extension NetworkPing {
           in: .common
         )
         .autoconnect()
+        .prepend(.init())
 
       return Publishers.CombineLatest(timerPublisher, pathStatusPublisher)
         .compactMap { _, status in
