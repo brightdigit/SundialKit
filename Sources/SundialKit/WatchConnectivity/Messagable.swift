@@ -12,8 +12,10 @@ public protocol Messagable {
   func parameters() -> [String: Any]
 }
 
-internal extension Messagable {
-  // swiftlint:disable:next explicit_acl
+public extension Messagable {
+  /// Converts the object into a usable `ConnectivityMessage` for
+  /// `WatchConnectivity`
+  /// - Returns: `ConnectivityMessage` i.e. `[String:Any]` for sending.
   func message() -> ConnectivityMessage {
     [
       MessagableKeys.typeKey: Self.key,
