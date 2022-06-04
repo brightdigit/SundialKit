@@ -2,7 +2,7 @@
 import Foundation
 
 #if canImport(Combine)
-  @available(iOS 14.2, watchOS 7.1, macOS 11.0, *)
+  @available(iOS 14.0, watchOS 7.0, macOS 10.15, *)
   @available(*, deprecated, renamed: "NetworkObject")
   public typealias NWObject = NetworkObserver
 
