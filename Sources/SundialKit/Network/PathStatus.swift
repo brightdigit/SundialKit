@@ -1,5 +1,5 @@
 public enum PathStatus: Equatable {
-  case unsatisfied(UnsatisfiedReason)
+  case unsatisfied(UnsatisfiedReason?)
   case satisfied(Interface)
   case requiresConnection
   case unknown
@@ -10,6 +10,7 @@ public enum PathStatus: Equatable {
     case notAvailable
     case wifiDenied
     case unknown
+    case unsupported
   }
 
   public struct Interface: OptionSet, Interfaceable {
