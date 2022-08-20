@@ -10,7 +10,7 @@ import XCTest
 public class PathStatusNetworkTests: XCTestCase {
   #if canImport(Network)
 
-    @available(iOS 14.2, *)
+    @available(macOS 11.0, iOS 14.2, watchOS 7.1, tvOS 14.2, *)
     public func assertStatus(
       _ status: NWPath.Status,
       reason: NWPath.UnsatisfiedReason,
