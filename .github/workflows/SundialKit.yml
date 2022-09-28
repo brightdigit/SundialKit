@@ -66,8 +66,8 @@ jobs:
             watchOSVersion: 8.5          
           - runs-on: macos-12
             xcode: "/Applications/Xcode_14.0.app"
-            iOSVersion: 16.0
-            watchOSVersion: 9.0
+            iOSVersion: "16.0"
+            watchOSVersion: "9.0"
     steps:
       - uses: actions/checkout@v2
       - name: Set Xcode Name
