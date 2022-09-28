@@ -102,7 +102,7 @@ jobs:
           verbose: true        
           token: ${{ secrets.CODECOV_TOKEN }}          
       - name: Run watchOS target tests
-        run: xcodebuild test -scheme SundialKit -sdk watchsimulator -destination 'platform=watchOS Simulator,name=Apple Watch Series 7 - 41mm,OS=${{ matrix.watchOSVersion }}' -enableCodeCoverage YES build test
+        run: xcodebuild test -scheme SundialKit -sdk watchsimulator -destination 'platform=watchOS Simulator,name=Apple Watch Series 7 (41mm),OS=${{ matrix.watchOSVersion }}' -enableCodeCoverage YES build test
       - uses: sersoft-gmbh/swift-coverage-action@v2
       - name: Upload watchOS coverage to Codecov
         uses: codecov/codecov-action@v2
