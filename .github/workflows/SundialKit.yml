@@ -61,11 +61,7 @@ jobs:
             xcode: "/Applications/Xcode_13.3.app"
             iOSVersion: 15.4
             watchOSVersion: 8.5
-<<<<<<< HEAD
             watchName: "Apple Watch Series 7 - 41mm"
-=======
-            watchName: "Apple Watch Series 7 - 41mm"            
->>>>>>> 61b8209 (Update SundialKit.yml (#15))
           - runs-on: macos-12
             xcode: "/Applications/Xcode_13.4.1.app"
             iOSVersion: 15.5
