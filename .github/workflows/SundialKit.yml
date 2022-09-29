@@ -104,7 +104,9 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') != true
         run: swift run swiftformat --lint . && swift run swiftlint
       - name: Dump PIF
-        run: swift package dump-pif
+        run: |
+          swift package dump-pif > /dev/null
+          xcodebuild clean -scheme SundialKit -destination 'generic/platform=iOS' > /dev/null
         if: matrix.xcode == '/Applications/Xcode_14.1.app'
       - name: Run iOS target tests
         run: xcodebuild test -scheme SundialKit -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 13,OS=${{ matrix.iOSVersion }}' -enableCodeCoverage YES build test
