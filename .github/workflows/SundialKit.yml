@@ -18,7 +18,7 @@ jobs:
         include:
           - runs-on: ubuntu-22.04
             swift-version: 5.7
-    steps:    
+    steps:
       - uses: actions/checkout@v2
       - name: Set Ubuntu Release DOT
         run: echo "RELEASE_DOT=$(lsb_release -sr)" >> $GITHUB_ENV
