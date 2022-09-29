@@ -14,7 +14,10 @@ jobs:
     strategy:
       matrix:
         runs-on: [ubuntu-18.04, ubuntu-20.04]
-        swift-version: [5.5.2, 5.6.2]
+        swift-version: [5.5.2, 5.6.2, 5.7]
+        include:
+          - runs-on: ubuntu-22.04
+            swift-version: 5.7
     steps:
       - uses: actions/checkout@v2
         with:
@@ -68,10 +71,15 @@ jobs:
             watchOSVersion: 8.5  
             watchName: "Apple Watch Series 7 - 41mm"
           - runs-on: macos-12
-            xcode: "/Applications/Xcode_14.0.app"
+            xcode: "/Applications/Xcode_14.0.1.app"
             iOSVersion: "16.0"
             watchOSVersion: "9.0"
-            watchName: "Apple Watch Series 7 (41mm)"
+            watchName: "Apple Watch Series 8 (41mm)"
+          - runs-on: macos-12
+            xcode: "/Applications/Xcode_14.1.app"
+            iOSVersion: "16.1"
+            watchOSVersion: "9.1"
+            watchName: "Apple Watch Ultra (49mm)"
     steps:
       - uses: actions/checkout@v2
       - name: Set Xcode Name
