@@ -20,7 +20,7 @@ public class PathStatusNetworkTests: XCTestCase {
       let actual: PathStatus = .init(status, reason: reason, interfaces: interfaces)
       XCTAssertEqual(actual, expected)
     }
-  #endif  
+  #endif
   // swiftlint:disable:next function_body_length
   public func testInit() throws {
     if #available(macOS 11.0, iOS 14.2, watchOS 7.1, tvOS 14.2, *) {
