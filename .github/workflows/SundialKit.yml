@@ -105,7 +105,7 @@ jobs:
         run: swift run swiftformat --lint . && swift run swiftlint
       - name: Dump PIF
         run: swift package dump-pif
-        if: matrix.xcode == "/Applications/Xcode_14.1.app"
+        if: matrix.xcode == '/Applications/Xcode_14.1.app'
       - name: Run iOS target tests
         run: xcodebuild test -scheme SundialKit -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 13,OS=${{ matrix.iOSVersion }}' -enableCodeCoverage YES build test
       - uses: sersoft-gmbh/swift-coverage-action@v2
