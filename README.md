@@ -26,6 +26,14 @@ Communications library across Apple platforms.
 ![Demonstration of SundialKit via Command-Line App `mistdemoc`](Assets/SundialKitDemo.gif)
 
 
+https://user-images.githubusercontent.com/1036388/193472621-da899afb-a201-4209-a900-a3854a716e71.mov
+
+
+
+https://user-images.githubusercontent.com/1036388/193472629-2bb2ee3e-73b4-4cd5-9a27-481aa8aada6f.mov
+
+
+
 # Table of Contents
 
    * [**Introduction**](#introduction)
