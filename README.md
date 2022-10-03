@@ -23,14 +23,11 @@ Communications library across Apple platforms.
 [![Code Climate issues](https://img.shields.io/codeclimate/issues/brightdigit/SundialKit)](https://codeclimate.com/github/brightdigit/SundialKit)
 [![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
-https://user-images.githubusercontent.com/1036388/193472621-da899afb-a201-4209-a900-a3854a716e71.mov
 
-<video src="Assets/Reachable-Sundial.mov" loop></video>
+![](Assets/Readme-Sundial.gif)
 
-https://user-images.githubusercontent.com/1036388/193472629-2bb2ee3e-73b4-4cd5-9a27-481aa8aada6f.mov
+![](Assets/Reachable-Sundial.gif)
 
-
-<video src="Assets/Readme-Sundial.mov" loop></video>
 
 
 # Table of Contents
