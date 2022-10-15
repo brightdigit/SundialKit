@@ -1,5 +1,6 @@
 import Foundation
 
+/// `NetworkPing` which is never called and used for a `NetworkObserver` that doesn't need a continuous ping.
 public struct NeverPing: NetworkPing {
   public typealias StatusType = Never
 

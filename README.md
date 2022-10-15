@@ -67,15 +67,12 @@ _why should you use_
 
 Here's what's currently implemented with this library:
 
-- [x] Composing Web Service Requests
-- [x] Modifying Records (records/modify)
-- [x] Fetching Records Using a Query (records/query)
-- [x] Fetching Records by Record Name (records/lookup)
-- [x] Fetching Current User Identity (users/caller)
+- [x] Monitor network connectivity and quality
+- [x] Communicate between iPhone and Apple Watch
 
 # Installation
 
-Swift Package Manager is Apple's decentralized dependency manager to integrate libraries to your Swift projects. It is now fully integrated with Xcode 11.
+Swift Package Manager is Apple's decentralized dependency manager to integrate libraries to your Swift projects. It is now fully integrated with Xcode 13.
 
 To integrate **SundialKit** into your project using SPM, specify it in your Package.swift file:
 
@@ -96,9 +93,9 @@ let package = Package(
 
 # Usage 
 
-## Composing Web Service Requests
+## Listening to Networking Changes
 
-## Further Code Documentation
+## Communication between iPhone and Apple Watch
 
 [Documentation Here](/Documentation/Reference/README.md)
 

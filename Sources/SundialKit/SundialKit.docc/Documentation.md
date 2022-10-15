@@ -1,65 +1,62 @@
 # ``SundialKit``
 
-Swift Package for Decoding RSS Feeds.
+Communications library across Apple platforms.
 
 ## Overview
 
-![SyndiKit Logo](logo.png)
+![SundialKit Logo](logo.jpg)
 
-Built on top of [XMLCoder by Max Desiatov](https://github.com/MaxDesiatov/XMLCoder), **SyndiKit** provides models and utilities for decoding RSS feeds of various formats and extensions.
+**SundialKit** provides a reactive SwiftUI-friendly interface into various communication APIs.
 
 ### Features
 
-* Import of RSS 2.0, Atom, and JSONFeed formats
-* Extensions for various formats such as:
-  * iTunes-compatabile podcasts
-  * YouTube channels
-  * WordPress export data
-* User-friendly errors 
-* Abstractions for format-agnostic parsing 
+* Monitor network connectivity and quality
+* Communicate between iPhone and Apple Watch
 
 ### Requirements 
 
 **Apple Platforms**
 
-- Xcode 11.4.1 or later
-- Swift 5.2.4 or later
-- iOS 9.0 / watchOS 2.0 / tvOS 9.0 / macOS 10.10 or later deployment targets
+- watchOS(.v6), .iOS(.v13)
+- Xcode 13.2.1 or later
+- Swift 5.5.2 or later
+- iOS 13.0 / watchOS 6.0 / tvOS 13.0 / macOS 11 or later deployment targets
 
 **Linux**
 
 - Ubuntu 18.04 or later
-- Swift 5.2.4 or later
+- Swift 5.5.2 or later
 
 ### Installation
 
-Swift Package Manager is Apple's decentralized dependency manager to integrate libraries to your Swift projects. It is now fully integrated with Xcode 11.
+Swift Package Manager is Apple's decentralized dependency manager to integrate libraries to your Swift projects. It is now fully integrated with Xcode 13.
 
-To integrate **SyndiKit** into your project using SPM, specify it in your Package.swift file:
+To integrate **SundialKit** into your project using SPM, specify it in your Package.swift file:
 
 ```swift    
 let package = Package(
   ...
   dependencies: [
-    .package(url: "https://github.com/brightdigit/SyndiKit", from: "0.1.0")
+    .package(url: "https://github.com/brightdigit/SundialKit", from: "0.2.0")
   ],
   targets: [
       .target(
           name: "YourTarget",
-          dependencies: ["SyndiKit", ...]),
+          dependencies: ["SundialKit", ...]),
       ...
   ]
 )
 ```
 
-If this is for an Xcode project simply import the [Github repository](https://github.com/brightdigit/SyndiKit) at:
+If this is for an Xcode project simply import the [Github repository](https://github.com/brightdigit/SundialKit) at:
 
 ```
-https://github.com/brightdigit/SyndiKit
+https://github.com/brightdigit/SundialKit
 ```
 
-### Decoding Your First Feed
+### Listening to Networking Changes
 
+<!--
 You can get started decoding your feed by creating your first ``SynDecoder``. Once you've created you decoder you can decode using ``SynDecoder/decode(_:)``:
 
 ```swift
@@ -67,9 +64,13 @@ let decoder = SynDecoder()
 let empowerAppsData = Data(contentsOf: "empowerapps-show.xml")!
 let empowerAppsRSSFeed = try decoder.decode(empowerAppsData)
 ```
+-->
+Lorem Ipsum
 
-### Working with Abstractions
+### Communication between iPhone and Apple Watch
 
+Lorem Ipsum
+<!--
 Rather than working directly with the various formats, **SyndiKit** abstracts many of the common properties of the various formats. This enables developers to be agnostic regarding the specific format.
 
 ```swift
@@ -99,171 +100,39 @@ Feedable | RSS 2.0 ``RSSFeed/channel`` | Atom ``AtomFeed`` | JSONFeed ``JSONFeed
 ``Feedable/image`` | ``RSSImage/url`` | ``AtomFeed/links``.`first` | `nil`
 ``Feedable/children`` | ``RSSChannel/items`` | ``AtomFeed/entries``| ``JSONFeed/items``
 
-### Specifying Formats 
-
-If you wish to access properties of specific formats, you can attempt to cast the objects to see if they match:
-
-```swift
-let empowerAppsRSSFeed = try decoder.decode(empowerAppsData)
-if let rssFeed = empowerAppsRSSFeed as? RSSFeed {
-  print(rssFeed.channel.title) // Prints "Empower Apps"
-}
-
-let kiloLocoAtomFeed = try decoder.decode(kiloLocoData)
-if let atomFeed = kiloLocoAtomFeed as? AtomFeed {
-  print(atomFeed.title) // Prints "Kilo Loco"
-}
-```
-
-### Accessing Extensions
-
-In addition to supporting RSS, Atom, and JSONFeed, **SyndiKit** also supports various RSS extensions for specific media including: YouTube, iTunes, and WordPress.
-
-You can access these properties via their specific feed formats or via the ``Entryable/media`` property on ``Entryable``. 
-
-```swift
-let empowerAppsRSSFeed = try decoder.decode(empowerAppsData)
-switch empowerAppsRSSFeed.children.last?.media {
-  case .podcast(let podcast):
-    print(podcast.title) // print "WWDC 2018 - What Does It Mean For Businesses?"
-  default:
-    print("Not a Podcast! 🤷‍♂️")
-}
-
-let kiloLocoAtomFeed = try decoder.decode(kiloLocoData)
-switch kiloLocoAtomFeed.children.last?.media {
-  case .video(.youtube(let youtube):
-    print(youtube.videoID) // print "SBJFl-3wqx8"
-    print(youtube.channelID) // print "UCv75sKQFFIenWHrprnrR9aA"
-  default:
-    print("Not a Youtube Video! 🤷‍♂️")
-}
-```
-
-``MediaContent`` | Actual Property
---- | ---
-``PodcastEpisode/title`` | ``RSSItem/itunesTitle``
-``PodcastEpisode/episode`` | ``RSSItem/itunesEpisode``
-``PodcastEpisode/author`` | ``RSSItem/itunesAuthor``
-``PodcastEpisode/subtitle`` | ``RSSItem/itunesSubtitle``
-``PodcastEpisode/summary`` | ``RSSItem/itunesSummary``
-``PodcastEpisode/explicit`` | ``RSSItem/itunesExplicit``
-``PodcastEpisode/duration`` | ``RSSItem/itunesDuration``
-``PodcastEpisode/image`` | ``RSSItem/itunesImage``
-``YouTubeID/channelID`` | ``AtomEntry/youtubeChannelID``
-``YouTubeID/videoID`` | ``AtomEntry/youtubeVideoID``
-
+!-->
 
 ### License 
 
-This code is distributed under the MIT license. See the [LICENSE](https://github.com/brightdigit/SyndiKit/LICENSE) file for more info.
+This code is distributed under the MIT license. See the [LICENSE](https://github.com/brightdigit/SundialKit/LICENSE) file for more info.
 
 ## Topics
 
-### Decoding an RSS Feed
+### Listening to Networking Changes
 
-- ``SynDecoder``
+- ``Interfaceable``
+- ``NetworkObserver``
+- ``NetworkPath``
+- ``NetworkPing``
+- ``NeverPing``
+- ``PathMonitor``
+- ``PathStatus``
 
-### Basic Feeds
+### Communication between iPhone and Apple Watch
 
 The basic types used by **SyndiKit** for traversing the feed in abstract manner without needing the specific properties from the various feed formats. 
 
-- ``Feedable``
-- ``Entryable``
-- ``Author``
-- ``EntryCategory``
-- ``EntryID``
-
-### Abstract Media Types
-
-Abstract media types which can be pulled for the various ``Entryable`` objects.
-
-- ``PodcastEpisode``
-- ``MediaContent``
-- ``Video``
-
-
-### XML Primitive Types
-
-In many cases, types are encoded in non-matching types but are intended to strong-typed for various formats. These primitives are setup to make XML decoding easier while retaining their intended strong-type.
-
-- ``CData``
-- ``XMLStringInt``
-
-### Syndication Updates
-
-Properties from the RDF Site Summary Syndication Module concerning how often it is updated a feed is updated. 
-
-- ``SyndicationUpdate``
-- ``SyndicationUpdatePeriod``
-- ``SyndicationUpdateFrequency``
-
-### Atom Feed Format
-
-Specific properties related to the Atom format.
-
-- ``AtomFeed``
-- ``AtomEntry``
-- ``AtomCategory``
-- ``AtomMedia``
-- ``Link``
-
-### JSON Feed Format
-
-Specific properties related to the JSON Feed format.
-
-- ``JSONFeed``
-- ``JSONItem``
-
-### RSS Feed Format
-
-Specific properties related to the RSS Feed format.
-
-- ``RSSFeed``
-- ``RSSChannel``
-- ``RSSImage``
-- ``RSSItem``
-- ``RSSItemCategory``
-- ``Enclosure``
-
-### WordPress Extensions
-
-Specific extension properties provided by WordPress.
-
-- ``WordPressElements``
-- ``WordPressPost``
-
-### YouTube Extensions
-
-Specific type abstracting the id properties a YouTube RSS Feed.
-
-- ``YouTubeID``
-
-### iTunes Extensions 
-
-Specific extension properties provided by iTunes regarding mostly podcasts and their episodes.
-
-- ``iTunesImage``
-- ``iTunesOwner``
-- ``iTunesEpisode``
-- ``iTunesDuration``
-
-### Site Directories
-
-Types related to the format used by the [iOS Dev Directory](https://iosdevdirectory.com). 
-
-- ``SiteDirectory``
-- ``SiteCollectionDirectory``
-- ``SiteDirectoryBuilder``
-- ``CategoryDescriptor``
-- ``CategoryLanguage``
-- ``Site``
-- ``SiteCategory``
-- ``SiteCollectionDirectoryBuilder``
-- ``SiteLanguage``
-- ``SiteLanguageCategory``
-- ``SiteLanguageContent``
-- ``SiteCategoryType``
-- ``SiteCollection``
-- ``SiteLanguageType``
-- ``SiteStub``
+- ``ActivationState``
+- ``ConnectivityHandler``
+- ``ConnectivityMessage``
+- ``ConnectivityObserver``
+- ``ConnectivityReceiveContext``
+- ``ConnectivityReceiveResult``
+- ``ConnectivitySendContext``
+- ``ConnectivitySendResult``
+- ``ConnectivitySession``
+- ``ConnectivitySessionDelegate``
+- ``Messagable``
+- ``MessagableKeys``
+- ``MessageDecoder``
+- ``WatchConnectivitySession``
