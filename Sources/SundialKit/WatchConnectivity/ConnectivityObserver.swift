@@ -2,12 +2,13 @@
   import Combine
   import Foundation
 
-  /// `typealias` for `PassthroughSubject` without a `Failure`.
-  @available(macOS 10.15, *)
-  public typealias SuccessfulSubject<Output> = PassthroughSubject<Output, Never>
 
   @available(macOS 10.15, *)
   public class ConnectivityObserver: NSObject, ConnectivitySessionDelegate {
+    /// `typealias` for `PassthroughSubject` without a `Failure`.
+    @available(macOS 10.15, *)
+    public typealias SuccessfulSubject<Output> = PassthroughSubject<Output, Never>
+    
     let session: ConnectivitySession
     public let sendingMessageSubject = SuccessfulSubject<ConnectivityMessage>()
 
