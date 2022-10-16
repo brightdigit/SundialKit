@@ -7,7 +7,7 @@ import Network
 
 
 struct IpifyPing : NetworkPing {
-  public func shouldPing(onStatus status: NWPathStatus) -> Bool {
+  public func shouldPing(onStatus status: PathStatus) -> Bool {
     switch status {
     case .unknown, .unsatisfied:
       return false
@@ -64,7 +64,7 @@ enum InterfaceItem : Int, CaseIterable, Identifiable  {
   }
 }
 
-extension NWPathStatus  {
+extension PathStatus  {
   var message : String {
     switch self {
       
@@ -82,7 +82,7 @@ extension NWPathStatus  {
 }
 
 extension Set where Element == InterfaceItem {
-  init (interface: NWPathStatus.Interface?) {
+  init (interface: PathStatus.Interface?) {
     guard let interface = interface else {
       self.init()
       return
@@ -105,8 +105,8 @@ class SundailObject: ObservableObject {
   @Published var lastColorSentWaiting: Color = .secondary
   @Published var lastColorSentReplied: Color = .secondary
   @Published var lastColorReply: Color = .secondary
-  @Published var wcObject = WCObject()
-  @Published var nwObject = NWObject<NWPathMonitor, IpifyPing>(monitor: NWPathMonitor(), ping: IpifyPing(session: .shared, timeInterval: 10.0))
+  @Published var wcObject = ConnectivityObserver()
+  @Published var nwObject = NetworkObserver<NWPathMonitor, IpifyPing>(monitor: NWPathMonitor(), ping: IpifyPing(session: .shared, timeInterval: 10.0))
   #if os(iOS)
     @Published var isPaired = false
   #endif
@@ -117,10 +117,10 @@ class SundailObject: ObservableObject {
   @Published var lastError: Error?
   
   @Published var interfaceItems: Set<InterfaceItem> = .init()
-  @Published var unsatisfiedReason : NWPathStatus.UnsatisfiedReason? = nil
+  @Published var unsatisfiedReason : PathStatus.UnsatisfiedReason? = nil
   @Published var isConstrained : Bool = false
   @Published var isExpensive : Bool = false
-  @Published var pathStatus : NWPathStatus = .unknown
+  @Published var pathStatus : PathStatus = .unknown
   @Published var pingStatus : Bool? = nil
   @Published var nwDate : Date? = nil
   @Published var nwQuality : Double = 0
@@ -136,7 +136,7 @@ class SundailObject: ObservableObject {
     lastColorSendingSubject.send(color)
   }
   
-  static func qualityScore(pathStatus: NWPathStatus,pingStatus: Bool?,  isConstrained: Bool, isExpensive: Bool) -> Double {
+  static func qualityScore(pathStatus: PathStatus,pingStatus: Bool?,  isConstrained: Bool, isExpensive: Bool) -> Double {
     var value = 1.0
     switch pathStatus {
     case .unsatisfied(_), .unknown:
@@ -173,7 +173,7 @@ class SundailObject: ObservableObject {
       wcObject.isPairedPublisher.assignOnMain(to: &$isPaired)
     #endif
 
-    lastColorSendingSubject.share().compactMap(WCMessage.message(fromColor:)).subscribe(wcObject.sendingMessageSubject).store(in: &cancellables)
+    lastColorSendingSubject.share().compactMap(ConnectivityMessage.message(fromColor:)).subscribe(wcObject.sendingMessageSubject).store(in: &cancellables)
     
     lastColorSendingSubject.assignOnMain(to: &self.$lastColorSentWaiting)
 
@@ -186,14 +186,14 @@ class SundailObject: ObservableObject {
     nwObject.pingStatusPublisher.map{ $0 != nil }.assignOnMain(to: &self.$pingStatus)
     
     
-    $pathStatus.share().map{ status -> NWPathStatus.Interface? in
+    $pathStatus.share().map{ status -> PathStatus.Interface? in
       guard case let .satisfied(interface) = status else {
         return nil
       }
       return interface
     }.map(Set.init).assignOnMain(to: &self.$interfaceItems)
     
-    $pathStatus.share().map{ status -> NWPathStatus.UnsatisfiedReason? in
+    $pathStatus.share().map{ status -> PathStatus.UnsatisfiedReason? in
       guard case let .unsatisfied(reason) = status else {
         return nil
       }
@@ -221,9 +221,9 @@ class SundailObject: ObservableObject {
     replyReceivedValue.share().compactMap { $0.1 }.assignOnMain(to: &$lastColorReply)
   }
 
-  func receivedReply(_ messageResult: WCMessageResult) throws -> (Color, Color?)? {
+  func receivedReply(_ messageResult: ConnectivitySendResult) throws -> (Color, Color?)? {
     let (sent, context) = messageResult
-    let reply: WCMessage?
+    let reply: ConnectivityMessage?
     switch context {
     case .applicationContext:
       reply = nil
@@ -242,15 +242,13 @@ class SundailObject: ObservableObject {
     return (sentColor, replyColor)
   }
 
-  func receivedMessage(_ messageAcceptance: WCMessageAcceptance) -> Color? {
+  func receivedMessage(_ messageAcceptance: ConnectivityReceiveResult) -> Color? {
     let (message, context) = messageAcceptance
     let replyHandler = context.replyHandler
     guard let color = message.color else {
       return nil
     }
     replyHandler?(message)
-    // print("Recv Updated: \(String(colorValue, radix: 16, uppercase: true))")
-    // lastColorReceivedSubject.send(color)
     return color
   }
 }

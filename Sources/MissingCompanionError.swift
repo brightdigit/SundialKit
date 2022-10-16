@@ -1,1 +1,0 @@
-struct MissingCompanionError: Error {}
