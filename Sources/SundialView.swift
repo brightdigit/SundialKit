@@ -27,7 +27,7 @@ struct SundialView: View {
           Text("Network")
         }
         #else
-        WatchConnectivityDemoView().tabItem {
+        WatchMessagableDemoView().tabItem {
           Image(systemName: "applewatch.radiowaves.left.and.right")
           Text("Connectivity")
         }
