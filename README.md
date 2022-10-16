@@ -95,25 +95,59 @@ let package = Package(
 
 ## Listening to Networking Changes
 
+```swift
+import SwiftUI
+import SundialKit
+
+class NetworkConnectivityObject : ObservableObject {
+  let connectivityObserver = NetworkObserver()
+  
+  @Published var pathStatus : PathStatus = .unknown
+  init () {
+    connectivityObserver.pathStatusPublisher.receive(on: DispatchQueue.main).assign(to: &self.$pathStatus)
+  }
+  
+  func start () {
+    self.connectivityObserver.start(queue: .global())
+  }
+}
+
+struct NetworkObserverView: View {
+  @StateObject var connectivityObject = NetworkConnectivityObject()
+    var body: some View {
+      Text(self.connectivityObject.pathStatus.message).onAppear{
+        self.connectivityObject.start()
+      }
+    }
+}
+```
+
 ## Communication between iPhone and Apple Watch
 
-[Documentation Here](/Documentation/Reference/README.md)
+```swift
+import SwiftUI
+import SundialKit
 
-# Roadmap
+class WatchConnectivityObject : ObservableObject {
+  let connectivityObserver = ConnectivityObserver()
+  
+  @Published var isReachable : Bool = false
+  init () {
+    connectivityObserver.isReachablePublisher.receive(on: DispatchQueue.main).assign(to: &self.$isReachable)
+  }
+  
+  func activate () {
+    try! self.connectivityObserver.activate()
+  }
+}
 
-<!-- https://developer.apple.com/library/archive/documentation/DataManagement/Conceptual/CloudKitWebServicesReference/index.html#//apple_ref/doc/uid/TP40015240-CH41-SW1 -->
+struct WatchConnectivityView: View {
+  @StateObject var connectivityObject = WatchConnectivityObject()
+  var body: some View {
+    Text(connectivityObject.isReachable ? "Reachable" : "Not Reachable").onAppear{
+      self.connectivityObject.activate()
+    }
+  }
+}
+```
 
-## 0.1.0
-
-- [x] Composing Web Service Requests
-- [x] Modifying Records (records/modify)
-- [x] Fetching Records Using a Query (records/query)
-- [x] Fetching Records by Record Name (records/lookup)
-- [x] Fetching Current User Identity (users/caller)
-
-## 0.2.0 
-
-- [x] Vapor Token Client
-- [x] Vapor Token Storage
-- [x] Vapor URL Client
-- [x] Swift NIO URL Client

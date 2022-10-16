@@ -8,7 +8,7 @@
 
   @available(macOS 10.15, *)
   public class ConnectivityObserver: NSObject, ConnectivitySessionDelegate {
-    public let session: ConnectivitySession
+    let session: ConnectivitySession
     public let sendingMessageSubject = SuccessfulSubject<ConnectivityMessage>()
 
     // swiftlint:disable:next implicitly_unwrapped_optional
@@ -49,7 +49,7 @@
       }
     #endif
 
-    public init(session: ConnectivitySession) {
+    init(session: ConnectivitySession) {
       self.session = session
       super.init()
       session.delegate = self
@@ -64,27 +64,31 @@
 
     #endif
 
+    
+    /// Sessions are always available on Apple Watch. They are also available on iPhones that support pairing with an Apple Watch. For all other devices, this will throw ``SundialError/sessionNotSupported``.
+    ///
+    /// - Throws: `SundialError.sessionNotSupported` if session is not supported.
     public func activate() throws {
       session.delegate = self
       try session.activate()
     }
 
-    public func sessionDidBecomeInactive(_ session: ConnectivitySession) {
+    func sessionDidBecomeInactive(_ session: ConnectivitySession) {
       activationStateSubject.send(session)
     }
 
-    public func sessionDidDeactivate(_ session: ConnectivitySession) {
+    func sessionDidDeactivate(_ session: ConnectivitySession) {
       activationStateSubject.send(session)
     }
 
-    public func sessionCompanionStateDidChange(_ session: ConnectivitySession) {
+    func sessionCompanionStateDidChange(_ session: ConnectivitySession) {
       DispatchQueue.main.async {
         self.isPairedSubject.send(session)
         self.isPairedAppInstalledSubject.send(session)
       }
     }
 
-    public func session(
+    func session(
       _ session: ConnectivitySession,
       activationDidCompleteWith _: ActivationState,
       error _: Error?
@@ -100,7 +104,7 @@
       }
     }
 
-    public func sessionReachabilityDidChange(_ session: ConnectivitySession) {
+    func sessionReachabilityDidChange(_ session: ConnectivitySession) {
       DispatchQueue.main.async {
         self.isReachableSubject.send(session)
       }
@@ -125,7 +129,7 @@
       }
     }
 
-    public func session(
+    func session(
       _: ConnectivitySession,
       didReceiveMessage message: [String: Any],
       replyHandler: @escaping ([String: Any]) -> Void
@@ -133,7 +137,7 @@
       messageReceivedSubject.send((message, .replyWith(replyHandler)))
     }
 
-    public func session(
+    func session(
       _: ConnectivitySession,
       didReceiveApplicationContext applicationContext: ConnectivityMessage,
       error _: Error?

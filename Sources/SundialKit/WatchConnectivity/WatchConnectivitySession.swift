@@ -58,7 +58,7 @@
       }
     }
 
-    internal func activate() throws {
+    internal func activate() throws {      
       guard WCSession.isSupported() else {
         throw SundialError.sessionNotSupported
       }

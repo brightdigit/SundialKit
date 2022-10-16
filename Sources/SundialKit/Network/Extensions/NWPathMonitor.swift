@@ -8,4 +8,18 @@
     }
   }
 
+
+@available(macOS 10.15, *)
+public extension NetworkObserver {
+  convenience init() where MonitorType == NWPathMonitor, PingType == NeverPing {
+    let monitor = NWPathMonitor()
+    self.init(monitor: monitor)
+  }
+  
+  convenience init(ping: PingType) where MonitorType == NWPathMonitor  {
+    let monitor = NWPathMonitor()
+    self.init(monitor: monitor, ping: ping)
+  }
+}
+
 #endif

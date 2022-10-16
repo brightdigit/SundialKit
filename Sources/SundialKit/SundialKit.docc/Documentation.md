@@ -56,6 +56,35 @@ https://github.com/brightdigit/SundialKit
 
 ### Listening to Networking Changes
 
+Lorem Ipsum
+
+```swift
+import SwiftUI
+import SundialKit
+
+class NetworkConnectivityObject : ObservableObject {
+  let connectivityObserver = NetworkObserver()
+  
+  @Published var pathStatus : PathStatus = .unknown
+  init () {
+    connectivityObserver.pathStatusPublisher.receive(on: DispatchQueue.main).assign(to: &self.$pathStatus)
+  }
+  
+  func start () {
+    self.connectivityObserver.start(queue: .global())
+  }
+}
+
+struct NetworkObserverView: View {
+  @StateObject var connectivityObject = NetworkConnectivityObject()
+    var body: some View {
+      Text(self.connectivityObject.pathStatus.message).onAppear{
+        self.connectivityObject.start()
+      }
+    }
+}
+```
+
 <!--
 You can get started decoding your feed by creating your first ``SynDecoder``. Once you've created you decoder you can decode using ``SynDecoder/decode(_:)``:
 
@@ -65,11 +94,37 @@ let empowerAppsData = Data(contentsOf: "empowerapps-show.xml")!
 let empowerAppsRSSFeed = try decoder.decode(empowerAppsData)
 ```
 -->
-Lorem Ipsum
 
 ### Communication between iPhone and Apple Watch
 
 Lorem Ipsum
+
+```swift
+import SwiftUI
+import SundialKit
+
+class WatchConnectivityObject : ObservableObject {
+  let connectivityObserver = ConnectivityObserver()
+  
+  @Published var isReachable : Bool = false
+  init () {
+    connectivityObserver.isReachablePublisher.receive(on: DispatchQueue.main).assign(to: &self.$isReachable)
+  }
+  
+  func activate () {
+    try! self.connectivityObserver.activate()
+  }
+}
+
+struct WatchConnectivityDemoView: View {
+  @StateObject var connectivityObject = WatchConnectivityObject()
+  var body: some View {
+    Text(connectivityObject.isReachable ? "Reachable" : "Not Reachable").onAppear{
+      self.connectivityObject.activate()
+    }
+  }
+}
+```
 <!--
 Rather than working directly with the various formats, **SyndiKit** abstracts many of the common properties of the various formats. This enables developers to be agnostic regarding the specific format.
 
@@ -130,9 +185,9 @@ The basic types used by **SyndiKit** for traversing the feed in abstract manner 
 - ``ConnectivityReceiveResult``
 - ``ConnectivitySendContext``
 - ``ConnectivitySendResult``
-- ``ConnectivitySession``
-- ``ConnectivitySessionDelegate``
 - ``Messagable``
-- ``MessagableKeys``
 - ``MessageDecoder``
-- ``WatchConnectivitySession``
+
+### Error Handling
+
+- ``SundialError``

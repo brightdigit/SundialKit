@@ -1,4 +1,4 @@
-public protocol ConnectivitySessionDelegate: AnyObject {
+protocol ConnectivitySessionDelegate: AnyObject {
   func session(
     _ session: ConnectivitySession,
     activationDidCompleteWith activationState: ActivationState,
