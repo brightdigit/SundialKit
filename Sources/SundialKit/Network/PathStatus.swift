@@ -32,7 +32,7 @@ public enum PathStatus: Equatable {
 
     /// Converts a group of `Interfaceable` objects into a `PathStatus.Interface`
     /// - Parameter interfaces: A list of `PathStatus.Interface` object.
-    public init(interfaces: [Interfaceable]) {
+    internal init(interfaces: [Interfaceable]) {
       let rawValue = Set(interfaces.map(\.typeValue)).reduce(0, +)
       self.init(rawValue: rawValue)
     }
