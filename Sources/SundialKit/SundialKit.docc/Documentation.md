@@ -278,24 +278,31 @@ This code is distributed under the MIT license. See the [LICENSE](https://github
 ### Listening to Networking Changes
 
 - ``NetworkObserver``
+- ``PathMonitor``
+- ``PathStatus``
 - ``NetworkPath``
 - ``NetworkPing``
 - ``NeverPing``
-- ``PathMonitor``
-- ``PathStatus``
 
 ### Communication between iPhone and Apple Watch
 
-The basic types used by **SyndiKit** for traversing the feed in abstract manner without needing the specific properties from the various feed formats. 
+- ``ConnectivityObserver``
+
+#### Connection Status
 
 - ``ActivationState``
+
+#### Communicating Messages between iPhone and Apple Watch
+
 - ``ConnectivityHandler``
 - ``ConnectivityMessage``
-- ``ConnectivityObserver``
 - ``ConnectivityReceiveContext``
 - ``ConnectivityReceiveResult``
 - ``ConnectivitySendContext``
 - ``ConnectivitySendResult``
+
+#### Abstracting WatchConnectivity Messages
+
 - ``Messagable``
 - ``MessageDecoder``
 

@@ -27,7 +27,6 @@
     
     /// Creates a publisher for changes to the
     /// [`activationState`](../watchconnectivity/wcsession/1615663-activationstate)
-    ///
     public var activationStatePublisher: AnyPublisher<ActivationState, Never> {
       activationStateSubject.anyPublisher(for: \.activationState)
     }
@@ -45,23 +44,25 @@
       )
     }
 
+    /// Creates a publisher for messages received through WatchConnectivity.
     public var messageReceivedPublisher: AnyPublisher<ConnectivityReceiveResult, Never> {
       messageReceivedSubject.eraseToAnyPublisher()
     }
 
+    /// Creates a publisher for replies from send messages received through WatchConnectivity.
     public var replyMessagePublisher: AnyPublisher<ConnectivitySendResult, Never> {
       replyMessageSubject.eraseToAnyPublisher()
     }
 
     @available(watchOS, unavailable)
     /// Creates a publisher for changes to the [`isPaired`](../watchconnectivity/wcsession/1615665-ispaired) .
-      public var isPairedPublisher: AnyPublisher<Bool, Never> {
-        #if os(iOS)
-        return isPairedSubject.anyPublisher(for: \.isPaired)
-        #else
-        return Empty(outputType: Bool.self, failureType: Never.self).eraseToAnyPublisher()
-        #endif
-      }
+    public var isPairedPublisher: AnyPublisher<Bool, Never> {
+      #if os(iOS)
+      return isPairedSubject.anyPublisher(for: \.isPaired)
+      #else
+      return Empty(outputType: Bool.self, failureType: Never.self).eraseToAnyPublisher()
+      #endif
+    }
 
     init(session: ConnectivitySession) {
       self.session = session
@@ -72,13 +73,14 @@
 
     @available(macOS, unavailable)
     @available(tvOS, unavailable)
-      override public convenience init() {
-        #if canImport(WatchConnectivity)
-        self.init(session: WatchConnectivitySession())
-        #else
-        self.init(session: NeverConnectivitySession())
-        #endif
-      }
+    /// Creates a `ConnectivityObserver` which uses [WatchConnectivity](../watchconnectivity).
+    override public convenience init() {
+      #if canImport(WatchConnectivity)
+      self.init(session: WatchConnectivitySession())
+      #else
+      self.init(session: NeverConnectivitySession())
+      #endif
+    }
 
     
     /// Sessions are always available on Apple Watch. They are also available on iPhones that support pairing with an Apple Watch. For all other devices, this will throw ``SundialError/sessionNotSupported``.
