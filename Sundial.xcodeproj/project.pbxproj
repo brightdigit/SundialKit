@@ -25,6 +25,8 @@
 		B37C95DA28FCA8C3005DB505 /* WatchMessageDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37C95D828FCA8C3005DB505 /* WatchMessageDemoView.swift */; };
 		B37C95DC28FCA980005DB505 /* WatchMessagableDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37C95DB28FCA980005DB505 /* WatchMessagableDemoView.swift */; };
 		B37C95DD28FCA980005DB505 /* WatchMessagableDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37C95DB28FCA980005DB505 /* WatchMessagableDemoView.swift */; };
+		B3CB995F28FE053200DC6E9E /* IpifyPing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3CB995E28FE053200DC6E9E /* IpifyPing.swift */; };
+		B3CB996028FE053200DC6E9E /* IpifyPing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3CB995E28FE053200DC6E9E /* IpifyPing.swift */; };
 		B4173D06EF53D6D47F7AB272 /* NetworkObserverDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A281B3B12379495F8F98E177 /* NetworkObserverDemoView.swift */; };
 		B8A8E1295123E549DCCCA89A /* NetworkObserverDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A281B3B12379495F8F98E177 /* NetworkObserverDemoView.swift */; };
 		C0991191BEB2F8C08502BA5C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 048FC4C09CE488F61D01B4CF /* Assets.xcassets */; };
@@ -101,6 +103,8 @@
 		AFED2F5198697D3CF3A7C6B9 /* Sundial.watchkitapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Sundial.watchkitapp.app; path = Sundial.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B37C95D828FCA8C3005DB505 /* WatchMessageDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMessageDemoView.swift; sourceTree = "<group>"; };
 		B37C95DB28FCA980005DB505 /* WatchMessagableDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMessagableDemoView.swift; sourceTree = "<group>"; };
+		B3CB995E28FE053200DC6E9E /* IpifyPing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IpifyPing.swift; sourceTree = "<group>"; };
+		B3CB996128FE099C00DC6E9E /* ConnectivityObserver.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = ConnectivityObserver.md; path = Packages/SundialKit/Sources/SundialKit/SundialKit.docc/ConnectivityObserver.md; sourceTree = "<group>"; };
 		B895FC985A3739AC5D15232D /* WCView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WCView.swift; sourceTree = "<group>"; };
 		C246DD13F8E09CE52FDEDF0E /* SundailObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundailObject.swift; sourceTree = "<group>"; };
 		C88CE6BEE611F68DE8C49C6F /* NWView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NWView.swift; sourceTree = "<group>"; };
@@ -210,6 +214,7 @@
 				27C507A978D071EC3C7BF21D /* SundialView.swift */,
 				41269DFF87E1F64024A3A8C1 /* WatchConnectivityDemoView.swift */,
 				B895FC985A3739AC5D15232D /* WCView.swift */,
+				B3CB995E28FE053200DC6E9E /* IpifyPing.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -252,6 +257,7 @@
 		E9BDFC4A18333819CDDADCB2 = {
 			isa = PBXGroup;
 			children = (
+				B3CB996128FE099C00DC6E9E /* ConnectivityObserver.md */,
 				8253BEA9A33496E7DCFCC9A6 /* Assets */,
 				E6BA6F5CB066751D0EF9D92A /* Packages */,
 				B4CA0001CCEEB12F3824D898 /* Sources */,
@@ -393,6 +399,7 @@
 				43AAA0596347F26724302DF6 /* ConnectivityMessage.Color.swift in Sources */,
 				9FF92BCF84938BB0E565FF4F /* NWView.swift in Sources */,
 				B8A8E1295123E549DCCCA89A /* NetworkObserverDemoView.swift in Sources */,
+				B3CB996028FE053200DC6E9E /* IpifyPing.swift in Sources */,
 				B04BCC66DD7DB09C442AFAB3 /* Publisher.swift in Sources */,
 				B37C95DC28FCA980005DB505 /* WatchMessagableDemoView.swift in Sources */,
 				4AAEDA5E70B118000FEF16B9 /* SundailObject.swift in Sources */,
@@ -412,6 +419,7 @@
 				A9520F4A678FBAD6F50AEC16 /* ConnectivityMessage.Color.swift in Sources */,
 				FA2CDF9ACED7EE314DDB4D71 /* NWView.swift in Sources */,
 				B4173D06EF53D6D47F7AB272 /* NetworkObserverDemoView.swift in Sources */,
+				B3CB995F28FE053200DC6E9E /* IpifyPing.swift in Sources */,
 				192982334AC145BD61685F1C /* Publisher.swift in Sources */,
 				B37C95DD28FCA980005DB505 /* WatchMessagableDemoView.swift in Sources */,
 				F72D61F76EABE47E9B81E91B /* SundailObject.swift in Sources */,

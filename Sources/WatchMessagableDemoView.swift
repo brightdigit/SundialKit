@@ -36,15 +36,27 @@ struct Message : Messagable {
   let text : String
 }
 
+import Combine
 class WatchMessagableObject : ObservableObject {
   private let connectivityObserver = ConnectivityObserver()
   private let messageDecoder = MessageDecoder(messagableTypes: [Message.self])
   
   @Published var isReachable : Bool = false
   @Published var lastReceivedMessage : String = ""
+  @Published var lastReplyMessage : String = ""
+  @Published var canReply : Bool = false
+  var lastReply : ConnectivityHandler?
+  var cancellable : AnyCancellable!
   init () {
     connectivityObserver.isReachablePublisher.receive(on: DispatchQueue.main).assign(to: &self.$isReachable)
-    connectivityObserver.messageReceivedPublisher
+    let messageReceivedPublisher = connectivityObserver.messageReceivedPublisher
+      .share()
+    self.cancellable = messageReceivedPublisher.map(\.context).map(\.replyHandler).sink { handler in
+      self.canReply = handler != nil
+      self.lastReply = handler
+    }
+    self.connectivityObserver.replyMessagePublisher.map(\.message).compactMap(self.messageDecoder.decode(_:)).compactMap{$0 as? Message}.map(\.text).receive(on: DispatchQueue.main).assign(to: &self.$lastReplyMessage)
+    messageReceivedPublisher
       .map(\.message)
       .compactMap(self.messageDecoder.decode)
       .compactMap{$0 as? Message}
@@ -59,6 +71,12 @@ class WatchMessagableObject : ObservableObject {
   
   func sendMessage(_ message: String) {
     self.connectivityObserver.sendingMessageSubject.send(Message(text: message).message())
+  }
+  
+  func replyMessage(_ message: String) {
+    self.lastReply?(Message(text: message).message())
+    self.lastReply = nil
+    self.canReply = false
   }
 }
 
@@ -76,9 +94,13 @@ struct WatchMessagableDemoView: View {
       Button("Send") {
         self.connectivityObject.sendMessage(self.message)
       }
-      
+      Button("Reply") {
+        self.connectivityObject.replyMessage(self.message)
+      }.disabled(!self.connectivityObject.canReply)
       Text("Last received message:")
       Text(self.connectivityObject.lastReceivedMessage)
+      Text("Last reply message:")
+      Text(self.connectivityObject.lastReplyMessage)
     }
   }
 }

@@ -6,31 +6,6 @@ import WatchConnectivity
 import Network
 
 
-struct IpifyPing : NetworkPing {
-  public func shouldPing(onStatus status: PathStatus) -> Bool {
-    switch status {
-    case .unknown, .unsatisfied:
-      return false
-    case .requiresConnection, .satisfied:
-      return true
-    }
-  }
-  
-  let session: URLSession
-  let timeInterval: TimeInterval
-  
-  static let url : URL = .init(string: "https://api.ipify.org")!
-  
-  func onPing(_ closure: @escaping (String?) -> Void) {
-    session.dataTask(with: IpifyPing.url) { data, _, _ in
-      closure(data.flatMap{String(data: $0, encoding: .utf8)})
-    }.resume()
-  }
-  
-  typealias StatusType = String?
-  
-  
-}
 
 enum InterfaceItem : Int, CaseIterable, Identifiable  {
       case cellular
