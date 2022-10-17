@@ -222,9 +222,8 @@ class SundailObject: ObservableObject {
   }
 
   func receivedReply(_ messageResult: ConnectivitySendResult) throws -> (Color, Color?)? {
-    let (sent, context) = messageResult
     let reply: ConnectivityMessage?
-    switch context {
+    switch messageResult.context {
     case .applicationContext:
       reply = nil
 
@@ -234,7 +233,7 @@ class SundailObject: ObservableObject {
     case let .failure(error):
       throw error
     }
-    guard let sentColor = sent.color else {
+    guard let sentColor = messageResult.message.color else {
       return nil
     }
 
@@ -243,12 +242,11 @@ class SundailObject: ObservableObject {
   }
 
   func receivedMessage(_ messageAcceptance: ConnectivityReceiveResult) -> Color? {
-    let (message, context) = messageAcceptance
-    let replyHandler = context.replyHandler
-    guard let color = message.color else {
+    let replyHandler = messageAcceptance.context.replyHandler
+    guard let color = messageAcceptance.message.color else {
       return nil
     }
-    replyHandler?(message)
+    replyHandler?(messageAcceptance.message)
     return color
   }
 }

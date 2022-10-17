@@ -45,7 +45,7 @@ class WatchMessagableObject : ObservableObject {
   init () {
     connectivityObserver.isReachablePublisher.receive(on: DispatchQueue.main).assign(to: &self.$isReachable)
     connectivityObserver.messageReceivedPublisher
-      .map(\.0)
+      .map(\.message)
       .compactMap(self.messageDecoder.decode)
       .compactMap{$0 as? Message}
       .map(\.text)

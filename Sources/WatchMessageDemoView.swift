@@ -15,8 +15,8 @@ class WatchMessageObject : ObservableObject {
   @Published var lastReceivedMessage : String = ""
   init () {
     connectivityObserver.isReachablePublisher.receive(on: DispatchQueue.main).assign(to: &self.$isReachable)
-    connectivityObserver.messageReceivedPublisher.compactMap({ (message, _) in
-      message["message"] as? String
+    connectivityObserver.messageReceivedPublisher.compactMap({ received in
+      received.message["message"] as? String
     }).receive(on: DispatchQueue.main).assign(to: &self.$lastReceivedMessage)
   }
   
