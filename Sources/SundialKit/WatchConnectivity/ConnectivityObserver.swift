@@ -3,14 +3,13 @@
   import Foundation
 
 
-  @available(macOS 10.15, *)
+  @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
   public class ConnectivityObserver: NSObject, ConnectivitySessionDelegate {
     /// `typealias` for `PassthroughSubject` without a `Failure`.
-    @available(macOS 10.15, *)
-    public typealias SuccessfulSubject<Output> = PassthroughSubject<Output, Never>
+    typealias SuccessfulSubject<Output> = PassthroughSubject<Output, Never>
     
     let session: ConnectivitySession
-    public let sendingMessageSubject = SuccessfulSubject<ConnectivityMessage>()
+    public let sendingMessageSubject = PassthroughSubject<ConnectivityMessage, Never>()
 
     // swiftlint:disable:next implicitly_unwrapped_optional
     private var cancellable: AnyCancellable!
@@ -44,11 +43,14 @@
       replyMessageSubject.eraseToAnyPublisher()
     }
 
-    #if os(iOS)
+    @available(watchOS, unavailable)
       public var isPairedPublisher: AnyPublisher<Bool, Never> {
-        isPairedSubject.anyPublisher(for: \.isPaired)
+        #if os(iOS)
+        return isPairedSubject.anyPublisher(for: \.isPaired)
+        #else
+        return Empty(outputType: Bool.self, failureType: Never.self).eraseToAnyPublisher()
+        #endif
       }
-    #endif
 
     init(session: ConnectivitySession) {
       self.session = session
@@ -57,13 +59,15 @@
       cancellable = sendingMessageSubject.sink(receiveValue: sendMessage(_:))
     }
 
-    #if canImport(WatchConnectivity)
-
+    @available(macOS, unavailable)
+    @available(tvOS, unavailable)
       override public convenience init() {
+        #if canImport(WatchConnectivity)
         self.init(session: WatchConnectivitySession())
+        #else
+        self.init(session: NeverConnectivitySession())
+        #endif
       }
-
-    #endif
 
     
     /// Sessions are always available on Apple Watch. They are also available on iPhones that support pairing with an Apple Watch. For all other devices, this will throw ``SundialError/sessionNotSupported``.

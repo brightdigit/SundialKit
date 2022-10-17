@@ -1,0 +1,18 @@
+# Enable custom routing.
+RewriteEngine On
+
+RedirectMatch ^/$ /documentation/
+
+# Route documentation and tutorial pages.
+RewriteRule ^(documentation|tutorials)\/.*$ SundialKit.doccarchive/index.html [L]
+
+RewriteRule /data/documentation.json SundialKit.doccarchive/data/documentation/sundialkit.json [L]
+
+# Route files and data for the documentation archive.
+#
+# If the file path doesn't exist in the website's root ...
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# ... route the request to that file path with the documentation archive.
+RewriteRule .* SundialKit.doccarchive/$0 [L]

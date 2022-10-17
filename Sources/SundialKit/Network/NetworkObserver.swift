@@ -3,7 +3,7 @@
   import Foundation
 
   /// Observes the status of network connectivity
-  @available(macOS 10.15, *)
+  @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
   public class NetworkObserver<MonitorType: PathMonitor, PingType: NetworkPing> {
     private let ping: PingType?
     private let monitor: MonitorType
@@ -86,7 +86,7 @@
     }
   }
 
-  @available(macOS 10.15, *)
+  @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
   public extension NetworkObserver {
     /// Creates `NetworkObserver` without a `NetworkPing` object.
     /// - Parameter monitor: The `PathMonitor` to monitor the network .

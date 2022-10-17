@@ -95,59 +95,239 @@ let package = Package(
 
 ## Listening to Networking Changes
 
+In the past `Reachability` or `AFNetworking` has been used to judge the network connectivity of a device.**SundialKit** uses the `Network` framework to listen to changes in connectivity providing all the information available.
+
+**SundialKit** provides a `NetworkObserver` which allows you the listen to variety of publishers related to the network. This is especially useful if you are using `SwiftUI` in particular. With `SwiftUI`, you can create an `ObservableObject` which contains an `NetworkObserver`:
+
 ```swift
 import SwiftUI
 import SundialKit
 
 class NetworkConnectivityObject : ObservableObject {
+  // our NetworkObserver
   let connectivityObserver = NetworkObserver()
   
+  // our published property for pathStatus initially set to `.unknown`
   @Published var pathStatus : PathStatus = .unknown
+
   init () {
-    connectivityObserver.pathStatusPublisher.receive(on: DispatchQueue.main).assign(to: &self.$pathStatus)
+    // set the pathStatus changes to our published property
+    connectivityObserver
+      .pathStatusPublisher
+      .receive(on: DispatchQueue.main)
+      .assign(to: &self.$pathStatus)
   }
   
+  // need to start listening
   func start () {
     self.connectivityObserver.start(queue: .global())
   }
 }
+```
+
+There are 3 important pieces:
+
+1. The `NetworkObserver` called `connectivityObserver`
+2. On `init`, we use `Combine` to listen to the publisher and store the each new `pathStatus` to our `@Published` property.
+3. A `start` method which needs to be called to start listening to the `NetworkObserver`.
+
+Therefore for our `SwiftUI` `View`, we need to `start` listening `onAppear` and can use the `pathStatus` property in the `View`:
+
+```swift
 
 struct NetworkObserverView: View {
   @StateObject var connectivityObject = NetworkConnectivityObject()
     var body: some View {
+      // Use the `message` property to display text of the `pathStatus`
       Text(self.connectivityObject.pathStatus.message).onAppear{
+        // start the NetworkObserver
         self.connectivityObject.start()
       }
     }
 }
 ```
 
+Besides `pathStatus`, you also have access to:
+
+* `isExpensive`
+* `isConstrained`
+
 ## Communication between iPhone and Apple Watch
+
+Besides networking, **SundialKit** also provides an easier reactive interface into `WatchConnectivity`. This includes:
+
+1. Various connection statues like `isReachable`, `isInstalled`, etc..
+2. Send messages between the iPhone and paried Apple Watch
+3. Easy encoding and decoding of messages between devices into `WatchConnectivity` friendly dictionaries.
+
+Let's first talk about how `WatchConnectivity` status works.
+
+### Connection Status
+
+With `WatchConnectivity` there's a variety of properties which tell you the status of connection between devices. Here's a similar example to `pathStatus` using `isReachable`:
+
 
 ```swift
 import SwiftUI
 import SundialKit
 
 class WatchConnectivityObject : ObservableObject {
+  // our ConnectivityObserver
   let connectivityObserver = ConnectivityObserver()
-  
+  // our published property for isReachable initially set to false
   @Published var isReachable : Bool = false
   init () {
-    connectivityObserver.isReachablePublisher.receive(on: DispatchQueue.main).assign(to: &self.$isReachable)
+    // set the isReachable changes to our published property
+    connectivityObserver
+      .isReachablePublisher
+      .receive(on: DispatchQueue.main)
+      .assign(to: &self.$isReachable)
   }
   
   func activate () {
+    // activate the WatchConnectivity session
     try! self.connectivityObserver.activate()
   }
 }
+```
+
+Again, there are 3 important pieces:
+
+1. The `ConnectivityObserver` called `connectivityObserver`
+2. On `init`, we use `Combine` to listen to the publisher and store the each new `isReachable` to our `@Published` property.
+3. An `activate` method which needs to be called to activate the session for `WatchConnectivity`.
+
+Therefore for our `SwiftUI` `View`, we need to `activate` the session at `onAppear` and can use the `isReachable` property in the `View`:
+
+```swift
 
 struct WatchConnectivityView: View {
   @StateObject var connectivityObject = WatchConnectivityObject()
   var body: some View {
-    Text(connectivityObject.isReachable ? "Reachable" : "Not Reachable").onAppear{
+    Text(
+      connectivityObject.isReachable ? 
+        "Reachable" : "Not Reachable"
+    )
+    .onAppear{
       self.connectivityObject.activate()
     }
   }
 }
 ```
 
+Besides `isReachable`, you also have access to:
+
+* `activationState`
+* `isReachable`
+* `isPairedAppInstalled`
+* `isPaired`
+
+Additionally there's also a set of publishers for sending, receiving, and replying to messages between the iPhone and paired Apple Watch.
+
+### Sending and Receiving Messages
+
+```swift
+import SwiftUI
+import SundialKit
+
+class WatchMessageObject : ObservableObject {
+  private let connectivityObserver = ConnectivityObserver()
+  
+  @Published var isReachable : Bool = false
+  @Published var lastReceivedMessage : String = ""
+  init () {
+    connectivityObserver.isReachablePublisher.receive(on: DispatchQueue.main).assign(to: &self.$isReachable)
+    connectivityObserver.messageReceivedPublisher.compactMap({ (message, _) in
+      message["message"] as? String
+    }).receive(on: DispatchQueue.main).assign(to: &self.$lastReceivedMessage)
+  }
+  
+  func activate () {
+    try! self.connectivityObserver.activate()
+  }
+  
+  func sendMessage(_ message: String) {
+    self.connectivityObserver.sendingMessageSubject.send(["message" : message])
+  }
+}
+
+
+
+struct WatchMessageDemoView: View {
+  @StateObject var connectivityObject = WatchMessageObject()
+  @State var message : String = ""
+  var body: some View {
+    VStack{
+      Text(connectivityObject.isReachable ? "Reachable" : "Not Reachable").onAppear{
+        self.connectivityObject.activate()
+      }
+      TextField("Message", text: self.$message)
+      Button("Send") {
+        self.connectivityObject.sendMessage(self.message)
+      }
+      
+      Text("Last received message:")
+      Text(self.connectivityObject.lastReceivedMessage)
+    }
+  }
+}
+```
+
+### Using `Messagable` to Communicate
+
+```swift
+
+struct Message : Messagable {
+  internal init(text: String) {
+    self.text = text
+  }
+  
+  static let key: String = "_message"
+  
+  enum Parameters : String {
+    case text
+  }
+  
+  init?(from parameters: [String : Any]?) {
+    guard let text = parameters?[Parameters.text.rawValue] as? String else {
+      return nil
+    }
+    
+    self.text = text
+  }
+  
+  func parameters() -> [String : Any] {
+    return [
+      Parameters.text.rawValue : self.text
+    ]
+  }
+  
+  let text : String
+}
+
+class WatchMessagableObject : ObservableObject {
+  private let connectivityObserver = ConnectivityObserver()
+  private let messageDecoder = MessageDecoder(messagableTypes: [Message.self])
+  
+  @Published var isReachable : Bool = false
+  @Published var lastReceivedMessage : String = ""
+  init () {
+    connectivityObserver.isReachablePublisher.receive(on: DispatchQueue.main).assign(to: &self.$isReachable)
+    connectivityObserver.messageReceivedPublisher
+      .map(\.0)
+      .compactMap(self.messageDecoder.decode)
+      .compactMap{$0 as? Message}
+      .map(\.text)
+      .receive(on: DispatchQueue.main)
+      .assign(to: &self.$lastReceivedMessage)
+  }
+  
+  func activate () {
+    try! self.connectivityObserver.activate()
+  }
+  
+  func sendMessage(_ message: String) {
+    self.connectivityObserver.sendingMessageSubject.send(Message(text: message).message())
+  }
+}
+```
