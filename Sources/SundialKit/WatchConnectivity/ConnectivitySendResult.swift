@@ -1,2 +1,6 @@
 /// The result from sending a message.
-public typealias ConnectivitySendResult = (ConnectivityMessage, ConnectivitySendContext)
+public struct ConnectivitySendResult {
+  
+  public let message : ConnectivityMessage
+  public let context : ConnectivitySendContext
+}

@@ -278,7 +278,6 @@ This code is distributed under the MIT license. See the [LICENSE](https://github
 ### Listening to Networking Changes
 
 - ``NetworkObserver``
-- ``Interfaceable``
 - ``NetworkPath``
 - ``NetworkPing``
 - ``NeverPing``

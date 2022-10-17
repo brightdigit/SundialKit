@@ -1,3 +1,5 @@
 /// Message received.
-public typealias ConnectivityReceiveResult =
-  (ConnectivityMessage, ConnectivityReceiveContext)
+public struct ConnectivityReceiveResult {
+  public let message : ConnectivityMessage
+  public let context : ConnectivityReceiveContext
+}

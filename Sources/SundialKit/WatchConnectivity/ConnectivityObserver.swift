@@ -2,13 +2,16 @@
   import Combine
   import Foundation
 
-
+  /// Class for communication between the Apple Watch and iPhone.
   @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
   public class ConnectivityObserver: NSObject, ConnectivitySessionDelegate {
     /// `typealias` for `PassthroughSubject` without a `Failure`.
     typealias SuccessfulSubject<Output> = PassthroughSubject<Output, Never>
     
     let session: ConnectivitySession
+    
+    
+    /// `Subject` for sending message through
     public let sendingMessageSubject = PassthroughSubject<ConnectivityMessage, Never>()
 
     // swiftlint:disable:next implicitly_unwrapped_optional
@@ -21,14 +24,21 @@
     private let messageReceivedSubject = SuccessfulSubject<ConnectivityReceiveResult>()
     private let replyMessageSubject = SuccessfulSubject<ConnectivitySendResult>()
 
+    
+    /// Creates a publisher for changes to the
+    /// [`activationState`](../watchconnectivity/wcsession/1615663-activationstate)
+    ///
     public var activationStatePublisher: AnyPublisher<ActivationState, Never> {
       activationStateSubject.anyPublisher(for: \.activationState)
     }
 
+    /// Creates a publisher for changes to the [`isReachable`](../watchconnectivity/wcsession/1615683-isreachable) .
     public var isReachablePublisher: AnyPublisher<Bool, Never> {
       isReachableSubject.anyPublisher(for: \.isReachable)
     }
 
+    /// Creates a publisher for changes to the [`isCompanionAppInstalled`](../watchconnectivity/wcsession/3235766-iscompanionappinstalled)
+    /// or [`isWatchAppInstalled`](../watchconnectivity/wcsession/1615623-iswatchappinstalled).
     public var isPairedAppInstalledPublisher: AnyPublisher<Bool, Never> {
       isPairedAppInstalledSubject.anyPublisher(
         for: \.isPairedAppInstalled
@@ -44,6 +54,7 @@
     }
 
     @available(watchOS, unavailable)
+    /// Creates a publisher for changes to the [`isPaired`](../watchconnectivity/wcsession/1615665-ispaired) .
       public var isPairedPublisher: AnyPublisher<Bool, Never> {
         #if os(iOS)
         return isPairedSubject.anyPublisher(for: \.isPaired)
@@ -118,19 +129,19 @@
     private func sendMessage(_ message: ConnectivityMessage) {
       if session.isReachable {
         session.sendMessage(message) { result in
-          self.replyMessageSubject.send((message, .init(result)))
+          self.replyMessageSubject.send(.init(message: message, context: .init(result)))
         }
       } else if session.isPairedAppInstalled {
         do {
           try session.updateApplicationContext(message)
         } catch {
-          replyMessageSubject.send((message, .failure(error)))
+          replyMessageSubject.send(.init(message: message, context: .failure(error)))
 
           return
         }
-        replyMessageSubject.send((message, .applicationContext))
+        replyMessageSubject.send(.init(message: message, context: .applicationContext))
       } else {
-        replyMessageSubject.send((message, .failure(SundialError.missingCompanion)))
+        replyMessageSubject.send(.init(message: message, context: .failure(SundialError.missingCompanion)))
       }
     }
 
@@ -139,7 +150,7 @@
       didReceiveMessage message: [String: Any],
       replyHandler: @escaping ([String: Any]) -> Void
     ) {
-      messageReceivedSubject.send((message, .replyWith(replyHandler)))
+      messageReceivedSubject.send(.init(message: message, context: .replyWith(replyHandler)))
     }
 
     func session(
@@ -147,7 +158,7 @@
       didReceiveApplicationContext applicationContext: ConnectivityMessage,
       error _: Error?
     ) {
-      messageReceivedSubject.send((applicationContext, .applicationContext))
+      messageReceivedSubject.send(.init(message: applicationContext, context: .applicationContext))
     }
   }
 #endif
