@@ -127,10 +127,13 @@ import SwiftUI
 import SundialKit
 
 class WatchConnectivityObject : ObservableObject {
+
   // our ConnectivityObserver
   let connectivityObserver = ConnectivityObserver()
+
   // our published property for isReachable initially set to false
   @Published var isReachable : Bool = false
+
   init () {
     // set the isReachable changes to our published property
     connectivityObserver
@@ -179,10 +182,84 @@ Besides `isReachable`, you also have access to:
 
 Additionally there's also a set of publishers for sending, receiving, and replying to messages between the iPhone and paired Apple Watch.
 
-#### Using `Messagable` to Communicate
+### Sending and Receiving Messages
+
+To send and receive messages through our ``ConnectivityObserver`` we can access two properties:
+
+- ``ConnectivityObserver/messageReceivedPublisher`` - for listening to messages
+- ``ConnectivityObserver/sendingMessageSubject`` - for sending messages
+
+**SundialKit** uses `[String:Any]` dictionaries for sending and receiving messages, which use the typealias ``ConnectivityMessage``. Let's expand upon the previous `WatchConnectivityObject` and use those properties: 
 
 ```swift
+class WatchConnectivityObject : ObservableObject {
 
+  // our ConnectivityObserver
+  let connectivityObserver = ConnectivityObserver()
+
+  // our published property for isReachable initially set to false
+  @Published var isReachable : Bool = false
+
+  // our published property for the last message received
+  @Published var lastReceivedMessage : String = ""
+
+  init () {
+    // set the isReachable changes to our published property
+    connectivityObserver
+      .isReachablePublisher
+      .receive(on: DispatchQueue.main)
+      .assign(to: &self.$isReachable)
+
+    // set the lastReceivedMessage based on the dictionary's _message_ key
+    connectivityObserver
+      .messageReceivedPublisher
+      .compactMap({ received in
+        received.message["message"] as? String
+      })
+      .receive(on: DispatchQueue.main)
+      .assign(to: &self.$lastReceivedMessage)
+  }
+  
+  func activate () {
+    // activate the WatchConnectivity session
+    try! self.connectivityObserver.activate()
+  }
+
+  func sendMessage(_ message: String) {
+    // create a dictionary with the message in the message key
+    self.connectivityObserver.sendingMessageSubject.send(["message" : message])
+  }
+}
+```
+
+We can now create a simple SwiftUI View using our updated `WatchConnectivityObject`:
+
+```swift
+struct WatchMessageDemoView: View {
+  @StateObject var connectivityObject = WatchMessageObject()
+  @State var message : String = ""
+  var body: some View {
+    VStack{
+      Text(connectivityObject.isReachable ? "Reachable" : "Not Reachable").onAppear{
+        self.connectivityObject.activate()
+      }
+      TextField("Message", text: self.$message)
+      Button("Send") {
+        self.connectivityObject.sendMessage(self.message)
+      }
+      
+      Text("Last received message:")
+      Text(self.connectivityObject.lastReceivedMessage)
+    }
+  }
+}
+```
+
+### Using _Messagable_ to Communicate
+
+We can even abstract the ``ConnectivityMessage`` using a ``MessageDecoder``. To do this we need to create a special type which implements ``Messagable``:
+
+```swift
 struct Message : Messagable {
   internal init(text: String) {
     self.text = text
@@ -210,66 +287,66 @@ struct Message : Messagable {
   
   let text : String
 }
+```
 
-class WatchMessagableObject : ObservableObject {
-  private let connectivityObserver = ConnectivityObserver()
-  private let messageDecoder = MessageDecoder(messagableTypes: [Message.self])
-  
+There are three requirements for implementing ``Messagable``:
+
+* ``Messagable/init(from:)`` - try to create the object based on the dictionary, return nil if it's invalid
+* ``Messagable/parameters()`` - return a dictionary with all the parameters need to recreate the object
+* ``Messagable/key`` - return a string which identifies the type and is unique to the ``MessageDecoder``
+
+Now that we have our implmentation of ``Messagable``, we can use it in our `WatchConnectivityObject`:
+
+```swift
+class WatchConnectivityObject : ObservableObject {
+
+  // our ConnectivityObserver
+  let connectivityObserver = ConnectivityObserver()
+
+  // create a `MessageDecoder` which can decode our new `Message` type
+  let messageDecoder = MessageDecoder(messagableTypes: [Message.self])
+
+  // our published property for isReachable initially set to false
   @Published var isReachable : Bool = false
+
+  // our published property for the last message received
   @Published var lastReceivedMessage : String = ""
+
   init () {
-    connectivityObserver.isReachablePublisher.receive(on: DispatchQueue.main).assign(to: &self.$isReachable)
-    connectivityObserver.messageReceivedPublisher
-      .map(\.0)
+    // set the isReachable changes to our published property
+    connectivityObserver
+      .isReachablePublisher
+      .receive(on: DispatchQueue.main)
+      .assign(to: &self.$isReachable)
+
+    
+    connectivityObserver
+      // get the ``ConnectivityReceiveResult/message`` part of the ``ConnectivityReceiveResult``
+      .map(\.message)
+      // use our `messageDecoder` to call ``MessageDecoder/decode(_:)``
       .compactMap(self.messageDecoder.decode)
+      // check it's our `Message`
       .compactMap{$0 as? Message}
+      // get the `text` property
       .map(\.text)
       .receive(on: DispatchQueue.main)
+      // set it to our published property
       .assign(to: &self.$lastReceivedMessage)
   }
   
   func activate () {
+    // activate the WatchConnectivity session
     try! self.connectivityObserver.activate()
   }
-  
+
   func sendMessage(_ message: String) {
+    // create a dictionary using ``Messagable/message()``
     self.connectivityObserver.sendingMessageSubject.send(Message(text: message).message())
   }
 }
 ```
-<!--
-Rather than working directly with the various formats, **SyndiKit** abstracts many of the common properties of the various formats. This enables developers to be agnostic regarding the specific format.
 
-```swift
-let decoder = SynDecoder()
-
-// decoding a RSS 2.0 feed
-let empowerAppsData = Data(contentsOf: "empowerapps-show.xml")!
-let empowerAppsRSSFeed = try decoder.decode(empowerAppsData)
-print(empowerAppsRSSFeed.title) // Prints "Empower Apps"
-
-// decoding a Atom feed from YouTube
-let kiloLocoData = Data(contentsOf: "kilo.youtube.xml")!
-let kiloLocoAtomFeed = try decoder.decode(kiloLocoData)
-print(kiloLocoAtomFeed.title) // Prints "Kilo Loco"
-```
-
-For a mapping of properties:
-
-Feedable | RSS 2.0 ``RSSFeed/channel`` | Atom ``AtomFeed`` | JSONFeed ``JSONFeed`` 
---- | --- | --- | ---
-``Feedable/title`` | ``RSSChannel/title`` | ``AtomFeed/title`` | ``JSONFeed/title``
-``Feedable/siteURL`` | ``RSSChannel/link`` | ``AtomFeed/siteURL``| ``JSONFeed/title``
-``Feedable/summary`` | ``RSSChannel/description`` | ``AtomFeed/summary`` | ``JSONFeed/homePageUrl``
-``Feedable/updated`` | ``RSSChannel/lastBuildDate`` | ``AtomFeed/pubDate`` or ``AtomFeed/published`` | `nil`
-``Feedable/authors`` | ``RSSChannel/author`` | ``AtomFeed/authors`` | ``JSONFeed/author``
-``Feedable/copyright`` | ``RSSChannel/copyright`` | `nil` | `nil`
-``Feedable/image`` | ``RSSImage/url`` | ``AtomFeed/links``.`first` | `nil`
-``Feedable/children`` | ``RSSChannel/items`` | ``AtomFeed/entries``| ``JSONFeed/items``
-
-!-->
-
-### License 
+## License 
 
 This code is distributed under the MIT license. See the [LICENSE](https://github.com/brightdigit/SundialKit/LICENSE) file for more info.
 

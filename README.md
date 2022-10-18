@@ -17,51 +17,31 @@ Communications library across Apple platforms.
 
 [![Codecov](https://img.shields.io/codecov/c/github/brightdigit/SundialKit)](https://codecov.io/gh/brightdigit/SundialKit)
 [![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/brightdigit/SundialKit)](https://www.codefactor.io/repository/github/brightdigit/SundialKit)
-[![codebeat badge](https://codebeat.co/badges/c47b7e58-867c-410b-80c5-57e10140ba0f)](https://codebeat.co/projects/github-com-brightdigit-SundialKit-main)
+[![codebeat badge](https://codebeat.co/badges/54695d4b-98c8-4f0f-855e-215500163094)](https://codebeat.co/projects/github-com-brightdigit-SundialKit-main)
 [![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/brightdigit/SundialKit)](https://codeclimate.com/github/brightdigit/SundialKit)
 [![Code Climate technical debt](https://img.shields.io/codeclimate/tech-debt/brightdigit/SundialKit?label=debt)](https://codeclimate.com/github/brightdigit/SundialKit)
 [![Code Climate issues](https://img.shields.io/codeclimate/issues/brightdigit/SundialKit)](https://codeclimate.com/github/brightdigit/SundialKit)
 [![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
 
-![](Assets/Readme-Sundial.gif)
-
-![](Assets/Reachable-Sundial.gif)
-
-
+![Communication between iPhone and Apple Watch using Demo App](Assets/Readme-Sundial.gif "Communication between iPhone and Apple Watch using Demo App")
 
 # Table of Contents
 
-   * [**Introduction**](#introduction)
-   * [**Features**](#features)
-   * [**Installation**](#installation)
-   * [**Usage**](#usage)
-      * [Network Availability](#fetching-records-using-a-query-recordsquery)
-      * [Watch Connectivity](#fetching-records-by-record-name-recordslookup)
-      * [Examples](#examples)
-      * [Further Code Documentation](#further-code-documentation)
-   * [**Roadmap**](#roadmap)
-      * [~~0.1.0~~](#010)
-      * [~~0.2.0~~](#020)
-      * [**0.4.0**](#040)
-      * [0.6.0](#060)
-      * [0.8.0](#080)
-      * [0.9.0](#090)
-      * [v1.0.0](#v100)
-   * [**License**](#license)
+* [**Introduction**](#introduction)
+* [**Features**](#features)
+* [**Installation**](#installation)
+* [**Usage**](#usage)
+   * [**Listening to Networking Changes**](#listening-to-networking-changes)
+   * [**Communication between iPhone and Apple Watch**](#communication-between-iphone-and-apple-watch)
+      * [**Connection Status**](#connection-status)
+      * [**Sending and Receiving Messages**](#sending-and-receiving-messages)
+      * [**Using Messagable to Communicate**](#using-messagable-to-communicate)
+* [**License**](#license)
 
 # Introduction
 
-_what does this do_
-_why should you use_
-
-
-
-### Demo Example
-
-#### Sundial App
-
-![Sample Schema for Todo List](Assets/CloudKitDB-Demo-Schema.jpg)
+For easier use in reactive user interfaces, especially with `SwiftUI` and `Combine`, I've created a library which abstracts and maps common connectivity APIs. Particularly in my app Heartwitch, I mapped the functionaly of _WatchConnectivity_ and _Network_ over to track the users ability to connect to the Internet as well as the ability for their iPhone to connect to their Apple Watch via _WatchConnectivity_
 
 # Features 
 
@@ -69,6 +49,9 @@ Here's what's currently implemented with this library:
 
 - [x] Monitor network connectivity and quality
 - [x] Communicate between iPhone and Apple Watch
+  - [x] Monitor connectivity between devices
+  - [x] Send messages back and forth between iPhone and Apple Watch
+  - [x] Abstract messages for easier _encoding_ and _decoding_
 
 # Installation
 
@@ -160,6 +143,8 @@ Besides networking, **SundialKit** also provides an easier reactive interface in
 2. Send messages between the iPhone and paried Apple Watch
 3. Easy encoding and decoding of messages between devices into `WatchConnectivity` friendly dictionaries.
 
+![Showing changes to `isReachable` using SundialKit](Assets/Reachable-Sundial.gif "Showing changes to `isReachable` using SundialKit")
+
 Let's first talk about how `WatchConnectivity` status works.
 
 ### Connection Status
@@ -226,33 +211,57 @@ Additionally there's also a set of publishers for sending, receiving, and replyi
 
 ### Sending and Receiving Messages
 
-```swift
-import SwiftUI
-import SundialKit
+To send and receive messages through our ``ConnectivityObserver`` we can access two properties:
 
-class WatchMessageObject : ObservableObject {
-  private let connectivityObserver = ConnectivityObserver()
-  
+- ``ConnectivityObserver/messageReceivedPublisher`` - for listening to messages
+- ``ConnectivityObserver/sendingMessageSubject`` - for sending messages
+
+**SundialKit** uses `[String:Any]` dictionaries for sending and receiving messages, which use the typealias ``ConnectivityMessage``. Let's expand upon the previous `WatchConnectivityObject` and use those properties: 
+
+```swift
+class WatchConnectivityObject : ObservableObject {
+
+  // our ConnectivityObserver
+  let connectivityObserver = ConnectivityObserver()
+
+  // our published property for isReachable initially set to false
   @Published var isReachable : Bool = false
+
+  // our published property for the last message received
   @Published var lastReceivedMessage : String = ""
+
   init () {
-    connectivityObserver.isReachablePublisher.receive(on: DispatchQueue.main).assign(to: &self.$isReachable)
-    connectivityObserver.messageReceivedPublisher.compactMap({ (message, _) in
-      message["message"] as? String
-    }).receive(on: DispatchQueue.main).assign(to: &self.$lastReceivedMessage)
+    // set the isReachable changes to our published property
+    connectivityObserver
+      .isReachablePublisher
+      .receive(on: DispatchQueue.main)
+      .assign(to: &self.$isReachable)
+
+    // set the lastReceivedMessage based on the dictionary's _message_ key
+    connectivityObserver
+      .messageReceivedPublisher
+      .compactMap({ received in
+        received.message["message"] as? String
+      })
+      .receive(on: DispatchQueue.main)
+      .assign(to: &self.$lastReceivedMessage)
   }
   
   func activate () {
+    // activate the WatchConnectivity session
     try! self.connectivityObserver.activate()
   }
-  
+
   func sendMessage(_ message: String) {
+    // create a dictionary with the message in the message key
     self.connectivityObserver.sendingMessageSubject.send(["message" : message])
   }
 }
+```
 
+We can now create a simple SwiftUI View using our updated `WatchConnectivityObject`:
 
-
+```swift
 struct WatchMessageDemoView: View {
   @StateObject var connectivityObject = WatchMessageObject()
   @State var message : String = ""
@@ -275,8 +284,9 @@ struct WatchMessageDemoView: View {
 
 ### Using `Messagable` to Communicate
 
-```swift
+We can even abstract the ``ConnectivityMessage`` using a ``MessageDecoder``. To do this we need to create a special type which implements ``Messagable``:
 
+```swift
 struct Message : Messagable {
   internal init(text: String) {
     self.text = text
@@ -304,30 +314,65 @@ struct Message : Messagable {
   
   let text : String
 }
+```
 
-class WatchMessagableObject : ObservableObject {
-  private let connectivityObserver = ConnectivityObserver()
-  private let messageDecoder = MessageDecoder(messagableTypes: [Message.self])
-  
+There are three requirements for implementing ``Messagable``:
+
+* ``Messagable/init(from:)`` - try to create the object based on the dictionary, return nil if it's invalid
+* ``Messagable/parameters()`` - return a dictionary with all the parameters need to recreate the object
+* ``Messagable/key`` - return a string which identifies the type and is unique to the ``MessageDecoder``
+
+Now that we have our implmentation of ``Messagable``, we can use it in our `WatchConnectivityObject`:
+
+```swift
+class WatchConnectivityObject : ObservableObject {
+
+  // our ConnectivityObserver
+  let connectivityObserver = ConnectivityObserver()
+
+  // create a `MessageDecoder` which can decode our new `Message` type
+  let messageDecoder = MessageDecoder(messagableTypes: [Message.self])
+
+  // our published property for isReachable initially set to false
   @Published var isReachable : Bool = false
+
+  // our published property for the last message received
   @Published var lastReceivedMessage : String = ""
+
   init () {
-    connectivityObserver.isReachablePublisher.receive(on: DispatchQueue.main).assign(to: &self.$isReachable)
-    connectivityObserver.messageReceivedPublisher
-      .map(\.0)
+    // set the isReachable changes to our published property
+    connectivityObserver
+      .isReachablePublisher
+      .receive(on: DispatchQueue.main)
+      .assign(to: &self.$isReachable)
+
+    
+    connectivityObserver
+      // get the ``ConnectivityReceiveResult/message`` part of the ``ConnectivityReceiveResult``
+      .map(\.message)
+      // use our `messageDecoder` to call ``MessageDecoder/decode(_:)``
       .compactMap(self.messageDecoder.decode)
+      // check it's our `Message`
       .compactMap{$0 as? Message}
+      // get the `text` property
       .map(\.text)
       .receive(on: DispatchQueue.main)
+      // set it to our published property
       .assign(to: &self.$lastReceivedMessage)
   }
   
   func activate () {
+    // activate the WatchConnectivity session
     try! self.connectivityObserver.activate()
   }
-  
+
   func sendMessage(_ message: String) {
+    // create a dictionary using ``Messagable/message()``
     self.connectivityObserver.sendingMessageSubject.send(Message(text: message).message())
   }
 }
 ```
+
+# License 
+
+This code is distributed under the MIT license. See the [LICENSE](https://github.com/brightdigit/SundialKit/LICENSE) file for more info.
