@@ -1,5 +1,5 @@
 import Foundation
-import SundialKit
+@testable import SundialKit
 
 import XCTest
 

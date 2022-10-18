@@ -1,10 +1,8 @@
 /// Message received.
 public struct ConnectivityReceiveResult {
-  
   /// Message received.
-  public let message : ConnectivityMessage
-  
-  
+  public let message: ConnectivityMessage
+
   /// How the message was received.
-  public let context : ConnectivityReceiveContext
+  public let context: ConnectivityReceiveContext
 }

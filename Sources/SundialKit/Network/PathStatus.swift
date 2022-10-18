@@ -43,7 +43,8 @@ public enum PathStatus: Equatable {
     public static let wifi: Self = .init(rawValue: 2)
     /// The network interface type used for communication over wired Ethernet networks.
     public static let wiredEthernet: Self = .init(rawValue: 4)
-    /// The network interface type used for communication over virtual networks or networks of unknown types.
+    /// The network interface type used for communication
+    /// over virtual networks or networks of unknown types.
     public static let other: Self = .init(rawValue: 8)
     /// The network interface type used for communication over local loopback networks.
     public static let loopback: Self = .init(rawValue: 16)

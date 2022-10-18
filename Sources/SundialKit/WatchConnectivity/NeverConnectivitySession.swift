@@ -1,48 +1,38 @@
-//
-//  File.swift
-//  
-//
-//  Created by Leo Dion on 10/16/22.
-//
-
 import Foundation
 
 internal class NeverConnectivitySession: NSObject, ConnectivitySession {
-  var delegate: ConnectivitySessionDelegate? {
+  internal var delegate: ConnectivitySessionDelegate? {
     get {
-      return nil
+      nil
     }
-    set {
-      
-    }
+    // swiftlint:disable:next unused_setter_value
+    set {}
   }
-  
-  var isReachable: Bool {
-    return false
+
+  internal var isReachable: Bool {
+    false
   }
-  
-  var isPaired: Bool {
-    return false
+
+  internal var isPaired: Bool {
+    false
   }
-  
-  var isPairedAppInstalled: Bool {
-    return false
+
+  internal var isPairedAppInstalled: Bool {
+    false
   }
-  
-  var activationState: ActivationState {
-    return .notActivated
+
+  internal var activationState: ActivationState {
+    .notActivated
   }
-  
-  func activate() throws {
+
+  internal func activate() throws {
     throw SundialError.sessionNotSupported
   }
-  
-  func updateApplicationContext(_ context: ConnectivityMessage) throws {
-    
-  }
-  
-  func sendMessage(_ message: ConnectivityMessage, _ completion: @escaping (Result<ConnectivityMessage, Error>) -> Void) {
-    
-  }
-  
+
+  internal func updateApplicationContext(_: ConnectivityMessage) throws {}
+
+  internal func sendMessage(
+    _: ConnectivityMessage,
+    _: @escaping (Result<ConnectivityMessage, Error>) -> Void
+  ) {}
 }

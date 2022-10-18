@@ -4,8 +4,10 @@
 
   /// Observes the status of network connectivity
   ///
-  /// `NetworkObserver` allows you the listen to variety of publishers related to the network. This is especially useful if you are using `SwiftUI` in particular. With `SwiftUI`, you can create an `ObservableObject` which contains an `NetworkObserver`:
-  /// 
+  /// `NetworkObserver` allows you the listen to variety of publishers related to the network.
+  /// This is especially useful if you are using `SwiftUI` in particular.
+  /// With `SwiftUI`, you can create an `ObservableObject` which contains an `NetworkObserver`:
+  ///
   /// ```swift
   /// import SwiftUI
   /// import SundialKit
@@ -79,11 +81,9 @@
       self.monitor = monitor
       ping = pingOrNil
 
-      // swiftlint:disable line_length
       pathSubject.map(\.pathStatus).subscribe(pathStatusSubject).store(in: &otherCancellables)
       pathSubject.map(\.isExpensive).subscribe(isExpensiveSubject).store(in: &otherCancellables)
       pathSubject.map(\.isConstrained).subscribe(isConstrainedSubject).store(in: &otherCancellables)
-      // swiftlint:enable line_length
 
       monitor.onPathUpdate(onUpdate(path:))
     }

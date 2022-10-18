@@ -1,4 +1,4 @@
-import SundialKit
+@testable import SundialKit
 
 internal class MockSession: ConnectivitySession {
   internal var lastMessageSent: ConnectivityMessage?
