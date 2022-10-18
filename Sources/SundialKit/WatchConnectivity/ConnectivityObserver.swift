@@ -8,7 +8,7 @@
     /// `typealias` for `PassthroughSubject` without a `Failure`.
     private typealias SuccessfulSubject<Output> = PassthroughSubject<Output, Never>
 
-    private let session: ConnectivitySession
+    internal let session: ConnectivitySession
 
     /// `Subject` for sending message through
     public let sendingMessageSubject = PassthroughSubject<ConnectivityMessage, Never>()
