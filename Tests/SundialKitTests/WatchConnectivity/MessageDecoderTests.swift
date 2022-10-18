@@ -1,7 +1,7 @@
 @testable import SundialKit
 import XCTest
 
-public class MessageDecoderTests: XCTestCase {
+public final class MessageDecoderTests: XCTestCase {
   public func testExample() throws {
     let decoder = MessageDecoder(messagableTypes: [MockMessage.self])
     let expMessage = MockMessage()

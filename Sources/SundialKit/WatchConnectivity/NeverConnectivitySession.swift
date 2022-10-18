@@ -29,10 +29,14 @@ internal class NeverConnectivitySession: NSObject, ConnectivitySession {
     throw SundialError.sessionNotSupported
   }
 
-  internal func updateApplicationContext(_: ConnectivityMessage) throws {}
+  internal func updateApplicationContext(_: ConnectivityMessage) throws {
+    throw SundialError.sessionNotSupported
+  }
 
   internal func sendMessage(
     _: ConnectivityMessage,
-    _: @escaping (Result<ConnectivityMessage, Error>) -> Void
-  ) {}
+    _ completion: @escaping (Result<ConnectivityMessage, Error>) -> Void
+  ) {
+    completion(.failure(SundialError.sessionNotSupported))
+  }
 }

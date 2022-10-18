@@ -3,7 +3,7 @@ import Foundation
 
 import XCTest
 
-public class ConnectivityObserverPropertyTests: XCTestCase {
+public final class ConnectivityObserverPropertyTests: XCTestCase {
   public func testIsReachablePublisher() throws {
     #if canImport(Combine)
       let expectation = expectation(description: "Reachability Changed")

@@ -7,7 +7,7 @@ import Foundation
 
 import XCTest
 
-public class NWInterfaceTests: XCTestCase {
+public final class NWInterfaceTests: XCTestCase {
   #if canImport(Network)
     public func rawValue(
       of interface: PathStatus.Interface,

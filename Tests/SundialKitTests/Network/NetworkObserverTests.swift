@@ -4,7 +4,7 @@ import Foundation
 
 import XCTest
 
-public class NetworkObserverTests: XCTestCase {
+public final class NetworkObserverTests: XCTestCase {
   public func testStart() throws {
     #if canImport(Combine)
       let monitor = MockPathMonitor(id: UUID())
@@ -141,6 +141,27 @@ public class NetworkObserverTests: XCTestCase {
       let observer = NetworkObserver(
         monitor: MockPathMonitor(id: monitorID)
       )
+      XCTAssertFalse(observer.hasNetworkPing)
+    #else
+      throw XCTSkip("Combine is not supported by this OS.")
+    #endif
+  }
+
+  public func testInitNetwork() throws {
+    #if canImport(Combine) && canImport(Network)
+      let pingID = UUID()
+      let observer = NetworkObserver(
+        ping: MockNetworkPing(id: pingID, timeInterval: 2.0)
+      )
+      XCTAssertTrue(observer.hasNetworkPing)
+    #else
+      throw XCTSkip("Combine is not supported by this OS.")
+    #endif
+  }
+
+  public func testInitNetworkNever() throws {
+    #if canImport(Combine) && canImport(Network)
+      let observer = NetworkObserver()
       XCTAssertFalse(observer.hasNetworkPing)
     #else
       throw XCTSkip("Combine is not supported by this OS.")

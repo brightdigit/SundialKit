@@ -3,7 +3,7 @@ import Foundation
 
 import XCTest
 
-public class ConnectivityObserverMessageTests: XCTestCase {
+public final class ConnectivityObserverMessageTests: XCTestCase {
   // swiftlint:disable:next function_body_length
   internal func testCombineSendMessageReachable() throws {
     #if canImport(Combine)

@@ -6,7 +6,7 @@ import SundialKit
 #endif
 import XCTest
 
-public class NWPathMonitorTests: XCTestCase {
+public final class NWPathMonitorTests: XCTestCase {
   public func testPathUpdate() throws {
     #if canImport(Network)
       if #available(macOS 11.0, iOS 14.2, watchOS 7.1, tvOS 14.2, *) {

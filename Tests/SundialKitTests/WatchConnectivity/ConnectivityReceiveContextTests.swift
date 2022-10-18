@@ -1,7 +1,7 @@
 import SundialKit
 import XCTest
 
-public class ConnectivityReceiveContextTests: XCTestCase {
+public final class ConnectivityReceiveContextTests: XCTestCase {
   public func testReplyHandler() {
     XCTAssertNil(ConnectivityReceiveContext.applicationContext.replyHandler)
     XCTAssertNotNil(ConnectivityReceiveContext.replyWith { _ in
