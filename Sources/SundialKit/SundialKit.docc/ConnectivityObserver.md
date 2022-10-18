@@ -61,12 +61,21 @@ class WatchMessageObject : ObservableObject {
 ### Getting the Connection Status
 
 - ``activationStatePublisher``
+- ``ActivationState``
 - ``isPairedPublisher``
 - ``isPairedAppInstalledPublisher``
 - ``isReachablePublisher``
 
-### Communicating with other device
+### Communicating with another device
 
 - ``sendingMessageSubject``
 - ``messageReceivedPublisher``
 - ``replyMessagePublisher``
+- ``ConnectivityMessage``
+- ``ConnectivitySendContext``
+- ``ConnectivityReceiveContext``
+
+### Decoding Messages
+
+- ``Messagable``
+- ``MessageDecoder``

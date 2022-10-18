@@ -1,8 +1,8 @@
 /// Context of the message received
 public enum ConnectivityReceiveContext {
-  /// received as a sent message with a reploy handler
+  /// Received as a sent message with a reply handler
   case replyWith(ConnectivityHandler)
-  /// received as application context.
+  /// Received as application context.
   case applicationContext
 
   /// The reply handler if it contains one.

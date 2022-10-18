@@ -135,6 +135,45 @@ Besides `pathStatus`, you also have access to:
 * `isExpensive`
 * `isConstrained`
 
+### Verify Connectivity with ``NetworkPing``
+
+In addition to utilizing `NWPathMonitor`, you can setup a periodic pings by implementing ``NetworkPing``. Here's an example which calls the _ipify_ API to verify there's an ip address:
+
+```swift
+struct IpifyPing : NetworkPing {
+  typealias StatusType = String?
+
+  let session: URLSession
+  let timeInterval: TimeInterval
+
+  public func shouldPing(onStatus status: PathStatus) -> Bool {
+    switch status {
+    case .unknown, .unsatisfied:
+      return false
+    case .requiresConnection, .satisfied:
+      return true
+    }
+  }
+
+  static let url : URL = .init(string: "https://api.ipify.org")!
+
+  func onPing(_ closure: @escaping (String?) -> Void) {
+    session.dataTask(with: IpifyPing.url) { data, _, _ in
+      closure(data.flatMap{String(data: $0, encoding: .utf8)})
+    }.resume()
+  }
+}
+```
+
+Next, in our `ObservableObject`, we can create a ``NetworkObserver`` to use this with:
+
+```swift
+  @Published var nwObject = NetworkObserver(ping:
+    // use the shared `URLSession` and check every 10.0 seconds
+    IpifyPing(session: .shared, timeInterval: 10.0)
+   )
+```
+
 ## Communication between iPhone and Apple Watch
 
 Besides networking, **SundialKit** also provides an easier reactive interface into `WatchConnectivity`. This includes:
