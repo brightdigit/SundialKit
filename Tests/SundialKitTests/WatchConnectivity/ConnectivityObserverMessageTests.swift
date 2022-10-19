@@ -1,9 +1,9 @@
 import Foundation
-import SundialKit
+@testable import SundialKit
 
 import XCTest
 
-public class ConnectivityObserverMessageTests: XCTestCase {
+public final class ConnectivityObserverMessageTests: XCTestCase {
   // swiftlint:disable:next function_body_length
   internal func testCombineSendMessageReachable() throws {
     #if canImport(Combine)
@@ -19,10 +19,10 @@ public class ConnectivityObserverMessageTests: XCTestCase {
       let replyMessage = [replyKey: replyValue]
       session.isReachable = true
       session.nextReplyResult = .success(replyMessage)
-      let replyCancellable = wcObject.replyMessagePublisher.sink { message, result in
-        XCTAssertEqual(message[key] as? UUID, value)
+      let replyCancellable = wcObject.replyMessagePublisher.sink { response in
+        XCTAssertEqual(response.message[key] as? UUID, value)
 
-        guard case let .reply(actual) = result else {
+        guard case let .reply(actual) = response.context else {
           XCTFail("Missing result")
           return
         }
@@ -57,10 +57,10 @@ public class ConnectivityObserverMessageTests: XCTestCase {
       let replyMessage = [replyKey: replyValue]
       session.isPairedAppInstalled = true
       session.nextReplyResult = .success(replyMessage)
-      let replyCancellable = wcObject.replyMessagePublisher.sink { message, result in
-        XCTAssertEqual(message[key] as? UUID, value)
+      let replyCancellable = wcObject.replyMessagePublisher.sink { response in
+        XCTAssertEqual(response.message[key] as? UUID, value)
 
-        guard case .applicationContext = result else {
+        guard case .applicationContext = response.context else {
           XCTFail("Missing application context")
           return
         }

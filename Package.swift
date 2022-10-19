@@ -4,7 +4,12 @@ import PackageDescription
 
 let package = Package(
   name: "SundialKit",
-  platforms: [.watchOS(.v6), .iOS(.v13)],
+  platforms: [
+    .iOS(.v13),
+    .watchOS(.v6),
+    .tvOS(.v13),
+    .macOS(.v10_13)
+  ],
   products: [
     .library(
       name: "SundialKit",

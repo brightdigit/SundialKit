@@ -2,14 +2,16 @@
   import Combine
   import Foundation
 
-  /// `typealias` for `PassthroughSubject` without a `Failure`.
-  @available(macOS 10.15, *)
-  public typealias SuccessfulSubject<Output> = PassthroughSubject<Output, Never>
-
-  @available(macOS 10.15, *)
+  /// Class for communication between the Apple Watch and iPhone.
+  @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
   public class ConnectivityObserver: NSObject, ConnectivitySessionDelegate {
-    public let session: ConnectivitySession
-    public let sendingMessageSubject = SuccessfulSubject<ConnectivityMessage>()
+    /// `typealias` for `PassthroughSubject` without a `Failure`.
+    private typealias SuccessfulSubject<Output> = PassthroughSubject<Output, Never>
+
+    internal let session: ConnectivitySession
+
+    /// `Subject` for sending message through
+    public let sendingMessageSubject = PassthroughSubject<ConnectivityMessage, Never>()
 
     // swiftlint:disable:next implicitly_unwrapped_optional
     private var cancellable: AnyCancellable!
@@ -21,70 +23,93 @@
     private let messageReceivedSubject = SuccessfulSubject<ConnectivityReceiveResult>()
     private let replyMessageSubject = SuccessfulSubject<ConnectivitySendResult>()
 
+    /// Creates a publisher for changes to the
+    /// [`activationState`](../watchconnectivity/wcsession/1615663-activationstate)
     public var activationStatePublisher: AnyPublisher<ActivationState, Never> {
       activationStateSubject.anyPublisher(for: \.activationState)
     }
 
+    /// Creates a publisher for changes to the
+    /// [`isReachable`](../watchconnectivity/wcsession/1615683-isreachable) .
     public var isReachablePublisher: AnyPublisher<Bool, Never> {
       isReachableSubject.anyPublisher(for: \.isReachable)
     }
 
+    /// Creates a publisher for changes to the
+    /// [`isCompanionAppInstalled`](../watchconnectivity/wcsession/3235766-iscompanionappinstalled)
+    /// or [`isWatchAppInstalled`](../watchconnectivity/wcsession/1615623-iswatchappinstalled).
     public var isPairedAppInstalledPublisher: AnyPublisher<Bool, Never> {
       isPairedAppInstalledSubject.anyPublisher(
         for: \.isPairedAppInstalled
       )
     }
 
+    /// Creates a publisher for messages received through WatchConnectivity.
     public var messageReceivedPublisher: AnyPublisher<ConnectivityReceiveResult, Never> {
       messageReceivedSubject.eraseToAnyPublisher()
     }
 
+    /// Creates a publisher for replies
+    /// from send messages received through WatchConnectivity.
     public var replyMessagePublisher: AnyPublisher<ConnectivitySendResult, Never> {
       replyMessageSubject.eraseToAnyPublisher()
     }
 
-    #if os(iOS)
-      public var isPairedPublisher: AnyPublisher<Bool, Never> {
-        isPairedSubject.anyPublisher(for: \.isPaired)
-      }
-    #endif
+    @available(watchOS, unavailable)
+    /// Creates a publisher for changes
+    /// to the [`isPaired`](../watchconnectivity/wcsession/1615665-ispaired) .
+    public var isPairedPublisher: AnyPublisher<Bool, Never> {
+      #if os(iOS)
+        return isPairedSubject.anyPublisher(for: \.isPaired)
+      #else
+        return Empty(outputType: Bool.self, failureType: Never.self).eraseToAnyPublisher()
+      #endif
+    }
 
-    public init(session: ConnectivitySession) {
+    internal init(session: ConnectivitySession) {
       self.session = session
       super.init()
       session.delegate = self
       cancellable = sendingMessageSubject.sink(receiveValue: sendMessage(_:))
     }
 
-    #if canImport(WatchConnectivity)
-
-      override public convenience init() {
+    @available(macOS, unavailable)
+    @available(tvOS, unavailable)
+    /// Creates a `ConnectivityObserver` which uses [WatchConnectivity](../watchconnectivity).
+    override public convenience init() {
+      #if canImport(WatchConnectivity)
         self.init(session: WatchConnectivitySession())
-      }
+      #else
+        self.init(session: NeverConnectivitySession())
+      #endif
+    }
 
-    #endif
-
+    /// Sessions are always available on Apple Watch.
+    /// They are also available on iPhones that support pairing with an Apple Watch.
+    /// For all other devices, this will throw ``SundialError/sessionNotSupported``.
+    ///
+    /// - Throws: `SundialError.sessionNotSupported` if session is not supported.
     public func activate() throws {
       session.delegate = self
       try session.activate()
     }
 
-    public func sessionDidBecomeInactive(_ session: ConnectivitySession) {
+    internal func sessionDidBecomeInactive(_ session: ConnectivitySession) {
       activationStateSubject.send(session)
     }
 
-    public func sessionDidDeactivate(_ session: ConnectivitySession) {
+    internal func sessionDidDeactivate(_ session: ConnectivitySession) {
       activationStateSubject.send(session)
     }
 
-    public func sessionCompanionStateDidChange(_ session: ConnectivitySession) {
+    internal func sessionCompanionStateDidChange(_ session: ConnectivitySession) {
       DispatchQueue.main.async {
         self.isPairedSubject.send(session)
         self.isPairedAppInstalledSubject.send(session)
       }
     }
 
-    public func session(
+    internal func session(
       _ session: ConnectivitySession,
       activationDidCompleteWith _: ActivationState,
       error _: Error?
@@ -100,7 +125,7 @@
       }
     }
 
-    public func sessionReachabilityDidChange(_ session: ConnectivitySession) {
+    internal func sessionReachabilityDidChange(_ session: ConnectivitySession) {
       DispatchQueue.main.async {
         self.isReachableSubject.send(session)
       }
@@ -109,36 +134,38 @@
     private func sendMessage(_ message: ConnectivityMessage) {
       if session.isReachable {
         session.sendMessage(message) { result in
-          self.replyMessageSubject.send((message, .init(result)))
+          self.replyMessageSubject.send(.init(message: message, context: .init(result)))
         }
       } else if session.isPairedAppInstalled {
         do {
           try session.updateApplicationContext(message)
         } catch {
-          replyMessageSubject.send((message, .failure(error)))
+          replyMessageSubject.send(.init(message: message, context: .failure(error)))
 
           return
         }
-        replyMessageSubject.send((message, .applicationContext))
+        replyMessageSubject.send(.init(message: message, context: .applicationContext))
       } else {
-        replyMessageSubject.send((message, .failure(SundialError.missingCompanion)))
+        replyMessageSubject.send(
+          .init(message: message, context: .failure(SundialError.missingCompanion))
+        )
       }
     }
 
-    public func session(
+    internal func session(
       _: ConnectivitySession,
       didReceiveMessage message: [String: Any],
       replyHandler: @escaping ([String: Any]) -> Void
     ) {
-      messageReceivedSubject.send((message, .replyWith(replyHandler)))
+      messageReceivedSubject.send(.init(message: message, context: .replyWith(replyHandler)))
     }
 
-    public func session(
+    internal func session(
       _: ConnectivitySession,
       didReceiveApplicationContext applicationContext: ConnectivityMessage,
       error _: Error?
     ) {
-      messageReceivedSubject.send((applicationContext, .applicationContext))
+      messageReceivedSubject.send(.init(message: applicationContext, context: .applicationContext))
     }
   }
 #endif

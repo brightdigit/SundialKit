@@ -3,7 +3,38 @@
   import Foundation
 
   /// Observes the status of network connectivity
-  @available(macOS 10.15, *)
+  ///
+  /// `NetworkObserver` allows you the listen to variety of publishers related to the network.
+  /// This is especially useful if you are using `SwiftUI` in particular.
+  /// With `SwiftUI`, you can create an `ObservableObject` which contains an `NetworkObserver`:
+  ///
+  /// ```swift
+  /// import SwiftUI
+  /// import SundialKit
+  ///
+  /// class NetworkConnectivityObject : ObservableObject {
+  ///   // our NetworkObserver
+  ///   let connectivityObserver = NetworkObserver()
+  ///
+  ///   // our published property for pathStatus initially set to `.unknown`
+  ///   @Published var pathStatus : PathStatus = .unknown
+  ///
+  ///   init () {
+  ///     // set the pathStatus changes to our published property
+  ///     connectivityObserver
+  ///       .pathStatusPublisher
+  ///       .receive(on: DispatchQueue.main)
+  ///       .assign(to: &self.$pathStatus)
+  ///   }
+  ///
+  ///   // need to start listening
+  ///   func start () {
+  ///     self.connectivityObserver.start(queue: .global())
+  ///   }
+  /// }
+  /// ```
+  ///
+  @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
   public class NetworkObserver<MonitorType: PathMonitor, PingType: NetworkPing> {
     private let ping: PingType?
     private let monitor: MonitorType
@@ -50,11 +81,9 @@
       self.monitor = monitor
       ping = pingOrNil
 
-      // swiftlint:disable line_length
       pathSubject.map(\.pathStatus).subscribe(pathStatusSubject).store(in: &otherCancellables)
       pathSubject.map(\.isExpensive).subscribe(isExpensiveSubject).store(in: &otherCancellables)
       pathSubject.map(\.isConstrained).subscribe(isConstrainedSubject).store(in: &otherCancellables)
-      // swiftlint:enable line_length
 
       monitor.onPathUpdate(onUpdate(path:))
     }
@@ -86,7 +115,7 @@
     }
   }
 
-  @available(macOS 10.15, *)
+  @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
   public extension NetworkObserver {
     /// Creates `NetworkObserver` without a `NetworkPing` object.
     /// - Parameter monitor: The `PathMonitor` to monitor the network .

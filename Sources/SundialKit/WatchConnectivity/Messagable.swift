@@ -1,4 +1,36 @@
-/// An object which can be decoded from a `ConnectivityMessage`
+/// An object which can be decoded by a ``MessageDecoder`` from a ``ConnectivityMessage``.
+///
+/// ```swift
+/// struct Message : Messagable {
+///   internal init(text: String) {
+///     self.text = text
+///   }
+///
+///   static let key: String = "_message"
+///
+///   enum Parameters : String {
+///     case text
+///   }
+///
+///   init?(from parameters: [String : Any]?) {
+///     guard let text = parameters?[Parameters.text.rawValue] as? String else {
+///       return nil
+///     }
+///
+///     self.text = text
+///   }
+///
+///   func parameters() -> [String : Any] {
+///     return [
+///       Parameters.text.rawValue : self.text
+///     ]
+///   }
+///
+///   let text : String
+/// }
+///
+/// let messageDecoder = MessageDecoder(messagableTypes: [Message.self])
+/// ```
 public protocol Messagable {
   /// The unique key or type name to use for decoding.
   static var key: String { get }

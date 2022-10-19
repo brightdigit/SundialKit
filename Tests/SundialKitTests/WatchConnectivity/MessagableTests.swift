@@ -1,7 +1,7 @@
 @testable import SundialKit
 import XCTest
 
-public class MessagableTests: XCTestCase {
+public final class MessagableTests: XCTestCase {
   public func testMessage() {
     let mockMessage = MockMessage()
     let dict = mockMessage.message()

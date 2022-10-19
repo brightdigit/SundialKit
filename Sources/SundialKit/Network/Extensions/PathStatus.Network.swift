@@ -3,7 +3,7 @@
   import Network
 
   @available(macOS 10.14, *)
-  public extension PathStatus {
+  extension PathStatus {
     /// Creates a `PathStatus`.
     /// - Parameters:
     ///   - status: The `NWPath.Status`
@@ -11,6 +11,7 @@
     @available(macOS, obsoleted: 11.0)
     @available(iOS, obsoleted: 14.2)
     @available(watchOS, obsoleted: 7.0)
+    // swiftlint:disable:next explicit_acl
     init(
       _ status: NWPath.Status,
       interfaces: [Interfaceable]
@@ -24,6 +25,7 @@
     ///   - reason: The `NWPath.UnsatisfiedReason`
     ///   - interfaces: The `Interfacable` objects.
     @available(iOS 14.2, watchOS 7.1, macOS 11.0, *)
+    // swiftlint:disable:next explicit_acl
     init(
       _ status: NWPath.Status,
       reason: NWPath.UnsatisfiedReason,

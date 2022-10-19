@@ -108,8 +108,8 @@ function_body_length:
   - 25
 function_parameter_count: 8
 line_length:
-  - 90
-  - 90
+  - 100
+  - 120
 identifier_name:
   excluded:
     - id

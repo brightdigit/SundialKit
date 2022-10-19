@@ -1,5 +1,5 @@
 import Foundation
-import SundialKit
+@testable import SundialKit
 
 #if canImport(Network)
   import Network
@@ -7,7 +7,7 @@ import SundialKit
 
 import XCTest
 
-public class PathStatusNetworkTests: XCTestCase {
+public final class PathStatusNetworkTests: XCTestCase {
   #if canImport(Network)
 
     @available(macOS 11.0, iOS 14.2, watchOS 7.1, tvOS 14.2, *)

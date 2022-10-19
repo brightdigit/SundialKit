@@ -1,4 +1,4 @@
-public protocol ConnectivitySession: AnyObject {
+internal protocol ConnectivitySession: AnyObject {
   var delegate: ConnectivitySessionDelegate? { get set }
   var isReachable: Bool { get }
 
