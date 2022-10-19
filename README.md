@@ -41,7 +41,7 @@ Communications library across Apple platforms.
 
 # Introduction
 
-For easier use in reactive user interfaces, especially with `SwiftUI` and `Combine`, I've created a library which abstracts and maps common connectivity APIs. Particularly in my app Heartwitch, I mapped the functionaly of _WatchConnectivity_ and _Network_ over to track the users ability to connect to the Internet as well as the ability for their iPhone to connect to their Apple Watch via _WatchConnectivity_
+For easier use in reactive user interfaces, especially with `SwiftUI` and `Combine`, I've created a library which abstracts and maps common connectivity APIs. Particularly in my app Heartwitch, I mapped the functionality of _WatchConnectivity_ and _Network_ over to track the user's ability to connect to the Internet as well as the ability for their iPhone to connect to their Apple Watch via _WatchConnectivity_
 
 # Features 
 
@@ -78,9 +78,9 @@ let package = Package(
 
 ## Listening to Networking Changes
 
-In the past `Reachability` or `AFNetworking` has been used to judge the network connectivity of a device.**SundialKit** uses the `Network` framework to listen to changes in connectivity providing all the information available.
+In the past `Reachability` or `AFNetworking` has been used to judge the network connectivity of a device. **SundialKit** uses the `Network` framework to listen to changes in connectivity providing all the information available.
 
-**SundialKit** provides a `NetworkObserver` which allows you the listen to variety of publishers related to the network. This is especially useful if you are using `SwiftUI` in particular. With `SwiftUI`, you can create an `ObservableObject` which contains an `NetworkObserver`:
+**SundialKit** provides a `NetworkObserver` which allows you to listen to a variety of publishers related to the network. This is especially useful if you are using `SwiftUI` in particular. With `SwiftUI`, you can create an `ObservableObject` which contains a `NetworkObserver`:
 
 ```swift
 import SwiftUI
