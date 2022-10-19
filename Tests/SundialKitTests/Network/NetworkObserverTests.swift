@@ -30,7 +30,7 @@ public final class NetworkObserverTests: XCTestCase {
 
       waitForExpectations(timeout: 10.0) { error in
         XCTAssertNil(error)
-        XCTAssertNil(statuses[0])
+        XCTAssertNotNil(statuses[0])
         XCTAssertNotNil(statuses[1])
         cancellable.cancel()
       }

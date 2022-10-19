@@ -47,7 +47,7 @@
     private let pathStatusSubject = PassthroughSubject<PathStatus, Never>()
     private let isExpensiveSubject = PassthroughSubject<Bool, Never>()
     private let isConstrainedSubject = PassthroughSubject<Bool, Never>()
-    private let pingStatusSubject = PassthroughSubject<PingType.StatusType?, Never>()
+    private let pingStatusSubject = PassthroughSubject<PingType.StatusType, Never>()
 
     internal var isPingActive: Bool {
       timerCancellable != nil
@@ -73,7 +73,7 @@
     }
 
     /// Publishes updates to the `PingType.StatusType`
-    public var pingStatusPublisher: AnyPublisher<PingType.StatusType?, Never> {
+    public var pingStatusPublisher: AnyPublisher<PingType.StatusType, Never> {
       pingStatusSubject.eraseToAnyPublisher()
     }
 
@@ -93,11 +93,9 @@
     public func start(queue: DispatchQueue) {
       timerCancellable = ping.map {
         $0.publish(with: self.pathStatusSubject)
-          .map { $0 as PingType.StatusType? }
           .subscribe(self.pingStatusSubject)
       }
       monitor.start(queue: queue)
-      pingStatusSubject.send(nil)
     }
 
     /// Cancels the montor.
