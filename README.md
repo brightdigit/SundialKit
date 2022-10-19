@@ -111,7 +111,7 @@ class NetworkConnectivityObject : ObservableObject {
 There are 3 important pieces:
 
 1. The `NetworkObserver` called `connectivityObserver`
-2. On `init`, we use `Combine` to listen to the publisher and store the each new `pathStatus` to our `@Published` property.
+2. On `init`, we use `Combine` to listen to the publisher and store each new `pathStatus` to our `@Published` property.
 3. A `start` method which needs to be called to start listening to the `NetworkObserver`.
 
 Therefore for our `SwiftUI` `View`, we need to `start` listening `onAppear` and can use the `pathStatus` property in the `View`:
@@ -137,7 +137,7 @@ Besides `pathStatus`, you also have access to:
 
 ### Verify Connectivity with ``NetworkPing``
 
-In addition to utilizing `NWPathMonitor`, you can setup a periodic pings by implementing ``NetworkPing``. Here's an example which calls the _ipify_ API to verify there's an ip address:
+In addition to utilizing `NWPathMonitor`, you can setup a periodic ping by implementing ``NetworkPing``. Here's an example which calls the _ipify_ API to verify there's an ip address:
 
 ```swift
 struct IpifyPing : NetworkPing {
@@ -178,8 +178,8 @@ Next, in our `ObservableObject`, we can create a ``NetworkObserver`` to use this
 
 Besides networking, **SundialKit** also provides an easier reactive interface into `WatchConnectivity`. This includes:
 
-1. Various connection statues like `isReachable`, `isInstalled`, etc..
-2. Send messages between the iPhone and paried Apple Watch
+1. Various connection statuses like `isReachable`, `isInstalled`, etc..
+2. Send messages between the iPhone and paired Apple Watch
 3. Easy encoding and decoding of messages between devices into `WatchConnectivity` friendly dictionaries.
 
 ![Showing changes to `isReachable` using SundialKit](Assets/Reachable-Sundial.gif "Showing changes to `isReachable` using SundialKit")
@@ -218,7 +218,7 @@ class WatchConnectivityObject : ObservableObject {
 Again, there are 3 important pieces:
 
 1. The `ConnectivityObserver` called `connectivityObserver`
-2. On `init`, we use `Combine` to listen to the publisher and store the each new `isReachable` to our `@Published` property.
+2. On `init`, we use `Combine` to listen to the publisher and store each new `isReachable` to our `@Published` property.
 3. An `activate` method which needs to be called to activate the session for `WatchConnectivity`.
 
 Therefore for our `SwiftUI` `View`, we need to `activate` the session at `onAppear` and can use the `isReachable` property in the `View`:
