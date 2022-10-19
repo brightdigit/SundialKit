@@ -3,7 +3,7 @@
 </p>
 <h1 align="center"> SundialKit </h1>
 
-Communications library across Apple platforms.
+Reactive communications library across Apple platforms.
 
 [![SwiftPM](https://img.shields.io/badge/SPM-Linux%20%7C%20iOS%20%7C%20macOS%20%7C%20watchOS%20%7C%20tvOS-success?logo=swift)](https://swift.org)
 [![Twitter](https://img.shields.io/badge/twitter-@brightdigit-blue.svg?style=flat)](http://twitter.com/brightdigit)
