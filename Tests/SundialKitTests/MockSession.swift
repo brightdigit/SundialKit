@@ -1,10 +1,10 @@
-import SundialKit
+@testable import SundialKit
 
-internal class MockSession: WCSessionable {
-  internal var lastMessageSent: WCMessage?
-  internal var lastAppContext: WCMessage?
+internal class MockSession: ConnectivitySession {
+  internal var lastMessageSent: ConnectivityMessage?
+  internal var lastAppContext: ConnectivityMessage?
   // swiftlint:disable:next implicitly_unwrapped_optional
-  internal var nextReplyResult: Result<WCMessage, Error>!
+  internal var nextReplyResult: Result<ConnectivityMessage, Error>!
   internal var nextApplicationContextError: Error?
   internal var isPaired = false {
     didSet {
@@ -12,7 +12,7 @@ internal class MockSession: WCSessionable {
     }
   }
 
-  internal var delegate: WCSessionableDelegate?
+  internal var delegate: ConnectivitySessionDelegate?
 
   internal var isReachable = false {
     didSet {
@@ -45,7 +45,7 @@ internal class MockSession: WCSessionable {
     activationState = .activated
   }
 
-  internal func updateApplicationContext(_ context: WCMessage) throws {
+  internal func updateApplicationContext(_ context: ConnectivityMessage) throws {
     if let nextApplicationContextError = nextApplicationContextError {
       throw nextApplicationContextError
     }
@@ -54,16 +54,16 @@ internal class MockSession: WCSessionable {
   }
 
   internal func sendMessage(
-    _ message: WCMessage,
-    _ replyHandler: @escaping (Result<WCMessage, Error>) -> Void
+    _ message: ConnectivityMessage,
+    _ replyHandler: @escaping (Result<ConnectivityMessage, Error>) -> Void
   ) {
     lastMessageSent = message
     replyHandler(nextReplyResult)
   }
 
   internal func receiveMessage(
-    _ message: WCMessage,
-    withReplyHandler replyHandler: @escaping WCMessageHandler
+    _ message: ConnectivityMessage,
+    withReplyHandler replyHandler: @escaping ConnectivityHandler
   ) {
     delegate?.session(self, didReceiveMessage: message, replyHandler: replyHandler)
   }

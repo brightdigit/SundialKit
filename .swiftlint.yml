@@ -108,8 +108,8 @@ function_body_length:
   - 25
 function_parameter_count: 8
 line_length:
-  - 90
-  - 90
+  - 100
+  - 120
 identifier_name:
   excluded:
     - id
@@ -122,3 +122,4 @@ indentation_width:
   indentation_width: 2
 file_name:
   suffix_pattern: "\\..+"
+  excluded: ["DeprecatedRenamed.swift", "PathStatus.UnsatisfiedReason.swift"]
