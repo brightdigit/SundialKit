@@ -361,7 +361,7 @@ There are three requirements for implementing ``Messagable``:
 * ``Messagable/parameters()`` - return a dictionary with all the parameters need to recreate the object
 * ``Messagable/key`` - return a string which identifies the type and is unique to the ``MessageDecoder``
 
-Now that we have our implmentation of ``Messagable``, we can use it in our `WatchConnectivityObject`:
+Now that we have our implementation of ``Messagable``, we can use it in our `WatchConnectivityObject`:
 
 ```swift
 class WatchConnectivityObject : ObservableObject {
