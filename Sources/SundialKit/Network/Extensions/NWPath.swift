@@ -8,16 +8,19 @@
         return PathStatus(
           status,
           reason: unsatisfiedReason,
-          interfaces: availableInterfaces
+          interfaces: availableInterfaces.map {
+            $0 as Interfaceable
+          }
         )
       } else {
         return PathStatus(
           status,
-          interfaces: availableInterfaces
+          interfaces: availableInterfaces.map {
+            $0 as Interfaceable
+          }
         )
       }
     }
   }
 
 #endif
-
