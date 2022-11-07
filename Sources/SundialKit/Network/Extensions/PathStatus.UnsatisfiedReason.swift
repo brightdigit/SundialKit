@@ -2,9 +2,7 @@ import Foundation
 #if canImport(Network)
   import Network
 
-  @available(macOS 11.0, *)
-  @available(iOS 14.2, *)
-  @available(watchOS 7.1, *)
+  @available(macOS 11.0, iOS 14.2, watchOS 7.1, tvOS 14.2, *)
   public extension PathStatus.UnsatisfiedReason {
     /// Creates `UnsatisfiedReason` from a `Network` one.
     /// - Parameter reason: The `UnsatisfiedReason` from the `Network` API.
