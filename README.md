@@ -387,6 +387,7 @@ class WatchConnectivityObject : ObservableObject {
 
     
     connectivityObserver
+      .messageReceivedPublisher
       // get the ``ConnectivityReceiveResult/message`` part of the ``ConnectivityReceiveResult``
       .map(\.message)
       // use our `messageDecoder` to call ``MessageDecoder/decode(_:)``
