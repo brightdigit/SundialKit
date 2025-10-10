@@ -28,7 +28,7 @@ jobs:
         exclude:
           - os: noble
             swift:
-              - version: "5.9"
+              version: "5.9"
     steps:
       - uses: actions/checkout@v4
       - uses: brightdigit/swift-build@v1.3.4
@@ -55,11 +55,11 @@ jobs:
       matrix:
         include:
           # SPM Build Matrix - Xcode 15.x (Swift 5.9-5.10)
-          - runs-on: macos-15
+          - runs-on: macos-14
             xcode: "/Applications/Xcode_15.0.1.app"
-          - runs-on: macos-15
+          - runs-on: macos-14
             xcode: "/Applications/Xcode_15.2.app"
-          - runs-on: macos-15
+          - runs-on: macos-14
             xcode: "/Applications/Xcode_15.4.app"
           
           # SPM Build Matrix - Xcode 16.x+ (Swift 6.x)
@@ -72,7 +72,7 @@ jobs:
 
           # iOS Build Matrix - Xcode 15.x (Swift 5.9-5.10)
           - type: ios
-            runs-on: macos-15
+            runs-on: macos-14
             xcode: "/Applications/Xcode_15.4.app"
             deviceName: "iPhone 15"
             osVersion: "17.5"
@@ -99,7 +99,7 @@ jobs:
 
           # watchOS Build Matrix - Xcode 15.x (Swift 5.9-5.10)
           - type: watchos
-            runs-on: macos-15
+            runs-on: macos-14
             xcode: "/Applications/Xcode_15.4.app"
             deviceName: "Apple Watch Series 9 (45mm)"
             osVersion: "10.5"
