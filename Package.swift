@@ -16,12 +16,6 @@ let package = Package(
       targets: ["SundialKit"]
     )
   ],
-  dependencies: [
-    .package(url: "https://github.com/shibapm/Komondor", from: "1.1.2"), // dev
-    .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.47.0"), // dev
-    .package(url: "https://github.com/realm/SwiftLint", from: "0.41.0"), // dev
-    .package(url: "https://github.com/shibapm/Rocket", from: "1.2.0") // dev
-  ],
   targets: [
     .target(
       name: "SundialKit",
@@ -33,37 +27,3 @@ let package = Package(
     )
   ]
 )
-
-#if canImport(PackageConfig)
-  import PackageConfig
-
-  let requiredCoverage: Int = 0
-
-  let config = PackageConfiguration([
-    "rocket": [
-      "steps":
-        [
-          "hide_dev_dependencies",
-          "git_add",
-          ["commit": ["no_verify": true]],
-          "tag",
-          "unhide_dev_dependencies",
-          "git_add",
-          ["commit": ["message": "Unhide dev dependencies"]]
-        ]
-    ],
-    "komondor": [
-      "pre-push": [
-        "swift test --enable-code-coverage"
-      ],
-      "pre-commit": [
-        "swift test --enable-code-coverage",
-        "swift run swiftformat .",
-        "swift run swiftlint autocorrect",
-        "git add .",
-        "swift run swiftformat --lint .",
-        "swift run swiftlint lint --strict"
-      ]
-    ]
-  ]).write()
-#endif

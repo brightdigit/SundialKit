@@ -117,6 +117,8 @@ excluded:
   - Tests/*/XCTestManifests.swift
   - DerivedData
   - .build
+  - .mint
+  - Mint
   - Tests/LinuxMain.swift
 indentation_width:
   indentation_width: 2
