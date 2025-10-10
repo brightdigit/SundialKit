@@ -1,9 +1,9 @@
 import Foundation
-@testable import SundialKit
-
 import XCTest
 
-public final class ConnectivityObserverMessageTests: XCTestCase {
+@testable import SundialKit
+
+internal final class ConnectivityObserverMessageTests: XCTestCase {
   // swiftlint:disable:next function_body_length
   internal func testCombineSendMessageReachable() throws {
     #if canImport(Combine)

@@ -1,9 +1,9 @@
 import Foundation
-@testable import SundialKit
-
 import XCTest
 
-public final class ConnectivityObserverInternalTests: XCTestCase {
+@testable import SundialKit
+
+internal final class ConnectivityObserverInternalTests: XCTestCase {
   internal func testInit() throws {
     #if canImport(WatchConnectivity)
       let object = ConnectivityObserver()

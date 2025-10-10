@@ -7,16 +7,16 @@
 import Foundation
 import SundialKit
 
-public struct MockMessage: Messagable, Equatable {
-  public static let key: String = UUID().uuidString
+internal struct MockMessage: Messagable, Equatable {
+  internal static let key: String = UUID().uuidString
   internal let key: String
   internal let value: UUID
-  public init() {
+  internal init() {
     key = UUID().uuidString
     value = UUID()
   }
 
-  public init?(from parameters: [String: Any]?) {
+  internal init?(from parameters: [String: Any]?) {
     guard let pair = parameters?.first else {
       return nil
     }
@@ -29,7 +29,7 @@ public struct MockMessage: Messagable, Equatable {
     self.value = value
   }
 
-  public func parameters() -> [String: Any] {
+  internal func parameters() -> [String: Any] {
     [key: value]
   }
 }

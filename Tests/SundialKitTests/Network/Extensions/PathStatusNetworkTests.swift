@@ -1,17 +1,17 @@
 import Foundation
+import XCTest
+
 @testable import SundialKit
 
 #if canImport(Network)
   import Network
 #endif
 
-import XCTest
-
-public final class PathStatusNetworkTests: XCTestCase {
+internal final class PathStatusNetworkTests: XCTestCase {
   #if canImport(Network)
 
     @available(macOS 11.0, iOS 14.2, watchOS 7.1, tvOS 14.2, *)
-    public func assertStatus(
+    internal func assertStatus(
       _ status: NWPath.Status,
       reason: NWPath.UnsatisfiedReason,
       interfaces: [PathStatus.Interface],
@@ -22,7 +22,7 @@ public final class PathStatusNetworkTests: XCTestCase {
     }
   #endif
   // swiftlint:disable:next function_body_length
-  public func testInit() throws {
+  internal func testInit() throws {
     if #available(macOS 11.0, iOS 14.2, watchOS 7.1, tvOS 14.2, *) {
       #if canImport(Network)
         assertStatus(

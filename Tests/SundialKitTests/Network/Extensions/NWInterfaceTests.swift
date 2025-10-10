@@ -1,15 +1,15 @@
 import Foundation
+import XCTest
+
 @testable import SundialKit
 
 #if canImport(Network)
   import Network
 #endif
 
-import XCTest
-
-public final class NWInterfaceTests: XCTestCase {
+internal final class NWInterfaceTests: XCTestCase {
   #if canImport(Network)
-    public func rawValue(
+    internal func rawValue(
       of interface: PathStatus.Interface,
       interfaceType: NWInterface.InterfaceType
     ) {
@@ -17,7 +17,7 @@ public final class NWInterfaceTests: XCTestCase {
     }
   #endif
 
-  public func testValue() throws {
+  internal func testValue() throws {
     #if canImport(Network)
 
       rawValue(of: .wifi, interfaceType: .wifi)

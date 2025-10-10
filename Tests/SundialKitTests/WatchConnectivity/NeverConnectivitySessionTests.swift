@@ -1,42 +1,43 @@
-@testable import SundialKit
 import XCTest
 
-public final class NeverConnectivitySessionTests: XCTestCase {
+@testable import SundialKit
+
+internal final class NeverConnectivitySessionTests: XCTestCase {
   private let session = NeverConnectivitySession()
 
-  public func testDelegateGet() {
+  internal func testDelegateGet() {
     XCTAssertNil(session.delegate)
   }
 
-  public func testIsReachable() {
+  internal func testIsReachable() {
     XCTAssertFalse(session.isReachable)
   }
 
-  public func testIsPaired() {
+  internal func testIsPaired() {
     XCTAssertFalse(session.isPaired)
   }
 
-  public func testIsPairedAppInstalled() {
+  internal func testIsPairedAppInstalled() {
     XCTAssertFalse(session.isPairedAppInstalled)
   }
 
-  public func testActivationState() {
+  internal func testActivationState() {
     XCTAssertEqual(session.activationState, .notActivated)
   }
 
-  public func testActivate() {
+  internal func testActivate() {
     XCTAssertThrowsError(try session.activate()) { error in
       XCTAssertEqual(error as? SundialError, SundialError.sessionNotSupported)
     }
   }
 
-  public func testUpdateApplicationContext() {
+  internal func testUpdateApplicationContext() {
     XCTAssertThrowsError(try session.updateApplicationContext(.init())) { error in
       XCTAssertEqual(error as? SundialError, SundialError.sessionNotSupported)
     }
   }
 
-  public func testSendMessage() {
+  internal func testSendMessage() {
     let messageSentDone = expectation(description: "Message Sent Done")
     session.sendMessage(.init()) { result in
       guard case let .failure(error as SundialError) = result else {

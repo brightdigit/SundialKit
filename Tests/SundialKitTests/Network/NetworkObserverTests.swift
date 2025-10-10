@@ -1,11 +1,11 @@
 // swiftlint:disable discouraged_optional_boolean
 import Foundation
-@testable import SundialKit
-
 import XCTest
 
-public final class NetworkObserverTests: XCTestCase {
-  public func testStart() throws {
+@testable import SundialKit
+
+internal final class NetworkObserverTests: XCTestCase {
+  internal func testStart() throws {
     #if canImport(Combine)
       let monitor = MockPathMonitor(id: UUID())
       let ping = MockNetworkPing(id: UUID(), timeInterval: 1.0)
@@ -39,7 +39,7 @@ public final class NetworkObserverTests: XCTestCase {
     #endif
   }
 
-  public func testCancel() throws {
+  internal func testCancel() throws {
     #if canImport(Combine)
       let monitor = MockPathMonitor(id: UUID())
       let ping = MockNetworkPing(id: UUID(), timeInterval: 1.0)
@@ -58,7 +58,7 @@ public final class NetworkObserverTests: XCTestCase {
     #endif
   }
 
-  public func testPathStatusPublisher() throws {
+  internal func testPathStatusPublisher() throws {
     #if canImport(Combine)
       let monitor = MockPathMonitor(id: UUID())
       let ping = MockNetworkPing(id: UUID(), timeInterval: 1.0)
@@ -79,7 +79,7 @@ public final class NetworkObserverTests: XCTestCase {
     #endif
   }
 
-  public func testIsExpensivePublisher() throws {
+  internal func testIsExpensivePublisher() throws {
     #if canImport(Combine)
       let monitor = MockPathMonitor(id: UUID())
       let ping = MockNetworkPing(id: UUID(), timeInterval: 1.0)
@@ -100,7 +100,7 @@ public final class NetworkObserverTests: XCTestCase {
     #endif
   }
 
-  public func testIsConstrainedPublisher() throws {
+  internal func testIsConstrainedPublisher() throws {
     #if canImport(Combine)
       let monitor = MockPathMonitor(id: UUID())
       let ping = MockNetworkPing(id: UUID(), timeInterval: 1.0)
@@ -121,7 +121,7 @@ public final class NetworkObserverTests: XCTestCase {
     #endif
   }
 
-  public func testInit() throws {
+  internal func testInit() throws {
     #if canImport(Combine)
       let monitorID = UUID()
       let pingID = UUID()
@@ -135,7 +135,7 @@ public final class NetworkObserverTests: XCTestCase {
     #endif
   }
 
-  public func testInitNever() throws {
+  internal func testInitNever() throws {
     #if canImport(Combine)
       let monitorID = UUID()
       let observer = NetworkObserver(
@@ -147,7 +147,7 @@ public final class NetworkObserverTests: XCTestCase {
     #endif
   }
 
-  public func testInitNetwork() throws {
+  internal func testInitNetwork() throws {
     #if canImport(Combine) && canImport(Network)
       let pingID = UUID()
       let observer = NetworkObserver(
@@ -159,7 +159,7 @@ public final class NetworkObserverTests: XCTestCase {
     #endif
   }
 
-  public func testInitNetworkNever() throws {
+  internal func testInitNetworkNever() throws {
     #if canImport(Combine) && canImport(Network)
       let observer = NetworkObserver()
       XCTAssertFalse(observer.hasNetworkPing)
