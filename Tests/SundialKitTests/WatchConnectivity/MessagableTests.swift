@@ -1,8 +1,9 @@
-@testable import SundialKit
 import XCTest
 
-public final class MessagableTests: XCTestCase {
-  public func testMessage() {
+@testable import SundialKit
+
+internal final class MessagableTests: XCTestCase {
+  internal func testMessage() {
     let mockMessage = MockMessage()
     let dict = mockMessage.message()
     XCTAssertEqual(dict[MessagableKeys.typeKey] as? String, MockMessage.key)

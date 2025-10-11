@@ -1,9 +1,10 @@
+import XCTest
+
+@testable import SundialKit
+
 #if canImport(Combine)
   import Combine
 #endif
-
-@testable import SundialKit
-import XCTest
 
 internal class PassthroughSubjectTests: XCTestCase {
   private struct MockStruct {

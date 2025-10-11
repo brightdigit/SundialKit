@@ -1,9 +1,9 @@
 import Foundation
-@testable import SundialKit
-
 import XCTest
 
-public final class ConnectivityObserverMessageTests: XCTestCase {
+@testable import SundialKit
+
+internal final class ConnectivityObserverMessageTests: XCTestCase {
   // swiftlint:disable:next function_body_length
   internal func testCombineSendMessageReachable() throws {
     #if canImport(Combine)
@@ -22,7 +22,7 @@ public final class ConnectivityObserverMessageTests: XCTestCase {
       let replyCancellable = wcObject.replyMessagePublisher.sink { response in
         XCTAssertEqual(response.message[key] as? UUID, value)
 
-        guard case let .reply(actual) = response.context else {
+        guard case .reply(let actual) = response.context else {
           XCTFail("Missing result")
           return
         }

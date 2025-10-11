@@ -1,0 +1,13 @@
+name: SundialKit
+settings:
+  LINT_MODE: ${LINT_MODE}
+packages:
+  SundialKit:
+    path: .
+aggregateTargets:
+  Lint:
+    buildScripts:
+      - path: Scripts/lint.sh
+        name: Lint
+        basedOnDependencyAnalysis: false
+    schemes: {}

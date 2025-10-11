@@ -1,13 +1,13 @@
 import Foundation
 import SundialKit
+import XCTest
 
 #if canImport(Network)
   import Network
 #endif
-import XCTest
 
-public final class NWPathMonitorTests: XCTestCase {
-  public func testPathUpdate() throws {
+internal final class NWPathMonitorTests: XCTestCase {
+  internal func testPathUpdate() throws {
     #if canImport(Network)
       if #available(macOS 11.0, iOS 14.2, watchOS 7.1, tvOS 14.2, *) {
         let monitor = NWPathMonitor()

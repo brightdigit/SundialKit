@@ -11,26 +11,40 @@ SundialKit is a reactive communications library for Apple platforms that provide
 
 ## Build & Test Commands
 
-### Running Tests
+### Using Make (Recommended)
 ```bash
+make build          # Build the package
+make test           # Run tests with coverage
+make lint           # Run linting and formatting (strict mode)
+make format         # Format code only
+make clean          # Clean build artifacts
+make help           # Show all available commands
+```
+
+### Using Swift Directly
+```bash
+swift build
 swift test
-```
-
-### Running Tests with Coverage
-```bash
 swift test --enable-code-coverage
-```
-
-### Running a Single Test
-```bash
 swift test --filter <TestName>
 ```
 
-### Formatting & Linting (Dev Dependencies)
+### Formatting & Linting (Mint)
+SundialKit uses [Mint](https://github.com/yonaskolb/Mint) to manage development tools:
+- **swift-format** (swiftlang/swift-format@601.0.0) - Official Apple Swift formatter
+- **SwiftLint** (realm/SwiftLint@0.59.1) - Swift style and conventions linter
+- **Periphery** (peripheryapp/periphery@3.2.0) - Unused code detection
+
+#### Install Mint (macOS)
 ```bash
-swift run swiftformat .
-swift run swiftlint autocorrect
-swift run swiftlint lint --strict
+brew install mint
+```
+
+#### Run linting script
+```bash
+./Scripts/lint.sh              # Normal mode
+LINT_MODE=STRICT ./Scripts/lint.sh  # Strict mode (CI)
+FORMAT_ONLY=1 ./Scripts/lint.sh     # Format only
 ```
 
 ## Architecture
@@ -94,8 +108,8 @@ swift run swiftlint lint --strict
 
 ## Development Notes
 
-### Pre-commit Hooks (Komondor)
-Configured in Package.swift to run tests, formatting, and linting on commit/push when komondor is installed.
+### Development Tools
+Development tools (formatter, linter, unused code detector) are managed via Mint and defined in `Mintfile`. The `Scripts/lint.sh` script orchestrates formatting, linting, and code quality checks. Use `make lint` for local development.
 
 ### Important Type Aliases
 - `ConnectivityMessage` = `[String:Any]` (WatchConnectivity-compatible dictionary)

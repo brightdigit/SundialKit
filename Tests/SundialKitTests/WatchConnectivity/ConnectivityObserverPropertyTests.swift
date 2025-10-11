@@ -1,10 +1,10 @@
 import Foundation
-@testable import SundialKit
-
 import XCTest
 
-public final class ConnectivityObserverPropertyTests: XCTestCase {
-  public func testIsReachablePublisher() throws {
+@testable import SundialKit
+
+internal final class ConnectivityObserverPropertyTests: XCTestCase {
+  internal func testIsReachablePublisher() throws {
     #if canImport(Combine)
       let expectation = expectation(description: "Reachability Changed")
       let session = MockSession()
@@ -26,7 +26,7 @@ public final class ConnectivityObserverPropertyTests: XCTestCase {
     #endif
   }
 
-  public func testIsPairedAppInstalledPublisher() throws {
+  internal func testIsPairedAppInstalledPublisher() throws {
     #if canImport(Combine)
       let expectation = expectation(description: "Installed Changed")
       let session = MockSession()
@@ -48,7 +48,7 @@ public final class ConnectivityObserverPropertyTests: XCTestCase {
     #endif
   }
 
-  public func testIsPairedPublisher() throws {
+  internal func testIsPairedPublisher() throws {
     #if canImport(Combine)
       #if os(iOS)
         let expectation = expectation(description: "Installed Changed")
@@ -74,7 +74,7 @@ public final class ConnectivityObserverPropertyTests: XCTestCase {
     #endif
   }
 
-  public func testActivationStatePublisher() throws {
+  internal func testActivationStatePublisher() throws {
     #if canImport(Combine)
       let expectation = expectation(description: "State Change Called")
       let session = MockSession()
@@ -95,7 +95,7 @@ public final class ConnectivityObserverPropertyTests: XCTestCase {
     #endif
   }
 
-  public func testSessionDidBecomeInactive() throws {
+  internal func testSessionDidBecomeInactive() throws {
     #if canImport(Combine)
       let expectation = expectation(description: "State Change Called")
       let session = MockSession()
@@ -116,7 +116,8 @@ public final class ConnectivityObserverPropertyTests: XCTestCase {
     #endif
   }
 
-  public func testSessionDidDeactivate() throws {
+  // swiftlint:disable:next function_body_length
+  internal func testSessionDidDeactivate() throws {
     #if canImport(Combine)
       let actExpectation = expectation(description: "State Change Called to Activate")
       let notExpectation = expectation(
