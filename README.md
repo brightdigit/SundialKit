@@ -9,7 +9,7 @@ Reactive communications library across Apple platforms.
 [![Twitter](https://img.shields.io/badge/twitter-@brightdigit-blue.svg?style=flat)](http://twitter.com/brightdigit)
 ![GitHub](https://img.shields.io/github/license/brightdigit/SundialKit)
 ![GitHub issues](https://img.shields.io/github/issues/brightdigit/SundialKit)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/brightdigit/SundialKit/SundialKit?label=actions&logo=github)
+[![SundialKit](https://github.com/brightdigit/SundialKit/actions/workflows/SundialKit.yml/badge.svg)](https://github.com/brightdigit/SundialKit/actions/workflows/SundialKit.yml)
 
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fbrightdigit%2FSundialKit%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/brightdigit/SundialKit)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fbrightdigit%2FSundialKit%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/brightdigit/SundialKit)
@@ -17,11 +17,6 @@ Reactive communications library across Apple platforms.
 
 [![Codecov](https://img.shields.io/codecov/c/github/brightdigit/SundialKit)](https://codecov.io/gh/brightdigit/SundialKit)
 [![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/brightdigit/SundialKit)](https://www.codefactor.io/repository/github/brightdigit/SundialKit)
-[![codebeat badge](https://codebeat.co/badges/54695d4b-98c8-4f0f-855e-215500163094)](https://codebeat.co/projects/github-com-brightdigit-SundialKit-main)
-[![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/brightdigit/SundialKit)](https://codeclimate.com/github/brightdigit/SundialKit)
-[![Code Climate technical debt](https://img.shields.io/codeclimate/tech-debt/brightdigit/SundialKit?label=debt)](https://codeclimate.com/github/brightdigit/SundialKit)
-[![Code Climate issues](https://img.shields.io/codeclimate/issues/brightdigit/SundialKit)](https://codeclimate.com/github/brightdigit/SundialKit)
-[![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
 
 ![Communication between iPhone and Apple Watch using Demo App](Assets/Readme-Sundial.gif "Communication between iPhone and Apple Watch using Demo App")
@@ -37,6 +32,7 @@ Reactive communications library across Apple platforms.
       * [**Connection Status**](#connection-status)
       * [**Sending and Receiving Messages**](#sending-and-receiving-messages)
       * [**Using Messagable to Communicate**](#using-messagable-to-communicate)
+* [**Development**](#development)
 * [**License**](#license)
 
 # Introduction
@@ -55,15 +51,15 @@ Here's what's currently implemented with this library:
 
 # Installation
 
-Swift Package Manager is Apple's decentralized dependency manager to integrate libraries to your Swift projects. It is now fully integrated with Xcode 13.
+Swift Package Manager is Apple's decentralized dependency manager to integrate libraries to your Swift projects. It is now fully integrated with Xcode 15+.
 
 To integrate **SundialKit** into your project using SPM, specify it in your Package.swift file:
 
-```swift    
+```swift
 let package = Package(
   ...
   dependencies: [
-    .package(url: "https://github.com/brightdigit/SundialKit.git", from: "0.2.0")
+    .package(url: "https://github.com/brightdigit/SundialKit.git", from: "1.0.0-beta.1")
   ],
   targets: [
       .target(
@@ -73,6 +69,12 @@ let package = Package(
   ]
 )
 ```
+
+## Requirements
+
+- **Swift**: 5.9+
+- **Xcode**: 15.0+
+- **Platforms**: iOS 13+, watchOS 6+, tvOS 13+, macOS 10.13+
 
 # Usage 
 
@@ -208,9 +210,14 @@ class WatchConnectivityObject : ObservableObject {
       .assign(to: &self.$isReachable)
   }
   
-  func activate () {
+  func activate() {
     // activate the WatchConnectivity session
-    try! self.connectivityObserver.activate()
+    do {
+      try connectivityObserver.activate()
+    } catch {
+      // Handle activation errors (e.g., SundialError.sessionNotSupported)
+      print("Failed to activate WatchConnectivity: \(error)")
+    }
   }
 }
 ```
@@ -286,9 +293,14 @@ class WatchConnectivityObject : ObservableObject {
       .assign(to: &self.$lastReceivedMessage)
   }
   
-  func activate () {
+  func activate() {
     // activate the WatchConnectivity session
-    try! self.connectivityObserver.activate()
+    do {
+      try connectivityObserver.activate()
+    } catch {
+      // Handle activation errors (e.g., SundialError.sessionNotSupported)
+      print("Failed to activate WatchConnectivity: \(error)")
+    }
   }
 
   func sendMessage(_ message: String) {
@@ -401,9 +413,14 @@ class WatchConnectivityObject : ObservableObject {
       .assign(to: &self.$lastReceivedMessage)
   }
   
-  func activate () {
+  func activate() {
     // activate the WatchConnectivity session
-    try! self.connectivityObserver.activate()
+    do {
+      try connectivityObserver.activate()
+    } catch {
+      // Handle activation errors (e.g., SundialError.sessionNotSupported)
+      print("Failed to activate WatchConnectivity: \(error)")
+    }
   }
 
   func sendMessage(_ message: String) {
@@ -413,6 +430,40 @@ class WatchConnectivityObject : ObservableObject {
 }
 ```
 
-# License 
+# Development
+
+SundialKit uses a Make-based workflow for building, testing, and linting the project.
+
+## Building and Testing
+
+```bash
+make build          # Build the package
+make test           # Run tests with code coverage
+make lint           # Run linting and formatting (strict mode)
+make format         # Format code only
+make clean          # Clean build artifacts
+make help           # Show all available commands
+```
+
+## Development Tools
+
+The project uses [Mint](https://github.com/yonaskolb/Mint) to manage development tools:
+- **swift-format** - Official Apple Swift formatter
+- **SwiftLint** - Swift style and conventions linter
+- **Periphery** - Unused code detection
+
+Install Mint on macOS:
+```bash
+brew install mint
+```
+
+Run linting manually:
+```bash
+./Scripts/lint.sh                    # Normal mode
+LINT_MODE=STRICT ./Scripts/lint.sh   # Strict mode (CI)
+FORMAT_ONLY=1 ./Scripts/lint.sh      # Format only
+```
+
+# License
 
 This code is distributed under the MIT license. See the [LICENSE](https://github.com/brightdigit/SundialKit/LICENSE) file for more info.
