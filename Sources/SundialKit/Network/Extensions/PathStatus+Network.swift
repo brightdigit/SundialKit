@@ -63,6 +63,7 @@
       self.init(status, reason: UnsatisfiedReason(reason), interfaces: interfaces)
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private init(
       _ status: NWPath.Status,
       reason: UnsatisfiedReason,

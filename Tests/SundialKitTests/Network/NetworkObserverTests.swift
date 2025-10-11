@@ -4,6 +4,7 @@ import XCTest
 @testable import SundialKit
 
 internal final class NetworkObserverTests: XCTestCase {
+  // swiftlint:disable:next function_body_length
   internal func testStart() throws {
     #if canImport(Combine)
       let monitor = MockPathMonitor(id: UUID())

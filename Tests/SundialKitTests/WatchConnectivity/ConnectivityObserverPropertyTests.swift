@@ -116,6 +116,7 @@ internal final class ConnectivityObserverPropertyTests: XCTestCase {
     #endif
   }
 
+  // swiftlint:disable:next function_body_length
   internal func testSessionDidDeactivate() throws {
     #if canImport(Combine)
       let actExpectation = expectation(description: "State Change Called to Activate")
