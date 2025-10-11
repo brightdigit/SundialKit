@@ -41,10 +41,10 @@ extension ConnectivitySendContext {
   // swiftlint:disable:next explicit_acl
   init(_ result: Result<ConnectivityMessage, Error>) {
     switch result {
-    case let .success(message):
+    case .success(let message):
       self = .reply(message)
 
-    case let .failure(error):
+    case .failure(let error):
       self = .failure(error)
     }
   }

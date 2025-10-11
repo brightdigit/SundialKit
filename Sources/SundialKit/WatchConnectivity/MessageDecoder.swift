@@ -69,7 +69,8 @@ public struct MessageDecoder {
     self.messagableTypes = Dictionary(
       uniqueKeysWithValues: messagableTypes.map {
         ($0.key, $0)
-      })
+      }
+    )
   }
 
   /// Decodes the `ConnectivityMessage` into a `Messagable` object.

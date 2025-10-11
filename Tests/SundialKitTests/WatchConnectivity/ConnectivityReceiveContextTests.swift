@@ -6,13 +6,17 @@ internal final class ConnectivityReceiveContextTests: XCTestCase {
     XCTAssertNil(ConnectivityReceiveContext.applicationContext.replyHandler)
     XCTAssertNotNil(
       ConnectivityReceiveContext.replyWith { _ in
-      }.replyHandler)
+      }
+      .replyHandler
+    )
   }
 
   internal func testIsApplicationContext() {
     XCTAssertTrue(ConnectivityReceiveContext.applicationContext.isApplicationContext)
     XCTAssertFalse(
       ConnectivityReceiveContext.replyWith { _ in
-      }.isApplicationContext)
+      }
+      .isApplicationContext
+    )
   }
 }

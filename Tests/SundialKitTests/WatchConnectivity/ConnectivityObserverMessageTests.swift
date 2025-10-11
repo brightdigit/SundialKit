@@ -22,7 +22,7 @@ internal final class ConnectivityObserverMessageTests: XCTestCase {
       let replyCancellable = wcObject.replyMessagePublisher.sink { response in
         XCTAssertEqual(response.message[key] as? UUID, value)
 
-        guard case let .reply(actual) = response.context else {
+        guard case .reply(let actual) = response.context else {
           XCTFail("Missing result")
           return
         }

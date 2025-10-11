@@ -1,4 +1,3 @@
-// swiftlint:disable discouraged_optional_boolean
 import Foundation
 import XCTest
 
@@ -88,6 +87,7 @@ internal final class NetworkObserverTests: XCTestCase {
         ping: ping
       )
       let expectedIsExpensive: Bool = .random()
+      // swiftlint:disable:next discouraged_optional_boolean
       var actualIsExpensive: Bool?
       let cancellable = observer.isExpensivePublisher.sink {
         actualIsExpensive = $0
@@ -109,6 +109,7 @@ internal final class NetworkObserverTests: XCTestCase {
         ping: ping
       )
       let expectedIsConstrained: Bool = .random()
+      // swiftlint:disable:next discouraged_optional_boolean
       var actualIsConstrained: Bool?
       let cancellable = observer.isConstrainedPublisher.sink {
         actualIsConstrained = $0

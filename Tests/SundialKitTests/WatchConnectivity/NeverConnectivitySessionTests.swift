@@ -40,7 +40,7 @@ internal final class NeverConnectivitySessionTests: XCTestCase {
   internal func testSendMessage() {
     let messageSentDone = expectation(description: "Message Sent Done")
     session.sendMessage(.init()) { result in
-      guard case let .failure(error as SundialError) = result else {
+      guard case .failure(let error as SundialError) = result else {
         return
       }
       XCTAssertEqual(error, .sessionNotSupported)

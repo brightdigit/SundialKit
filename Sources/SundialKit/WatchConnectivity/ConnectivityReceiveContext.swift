@@ -36,7 +36,7 @@ public enum ConnectivityReceiveContext {
 
   /// The reply handler if it contains one.
   public var replyHandler: ConnectivityHandler? {
-    guard case let .replyWith(handler) = self else {
+    guard case .replyWith(let handler) = self else {
       return nil
     }
     return handler

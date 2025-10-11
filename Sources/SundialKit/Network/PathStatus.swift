@@ -49,6 +49,17 @@ public enum PathStatus: Equatable {
 
   /// Types of network interfaces, based on their link layer media types.
   public struct Interface: OptionSet, Interfaceable {
+    /// The network interface type used for communication over cellular networks.
+    public static let cellular: Self = .init(rawValue: 1)
+    /// The network interface type used for communication over Wi-Fi networks.
+    public static let wifi: Self = .init(rawValue: 2)
+    /// The network interface type used for communication over wired Ethernet networks.
+    public static let wiredEthernet: Self = .init(rawValue: 4)
+    /// The network interface type used for communication
+    /// over virtual networks or networks of unknown types.
+    public static let other: Self = .init(rawValue: 8)
+    /// The network interface type used for communication over local loopback networks.
+    public static let loopback: Self = .init(rawValue: 16)
     public var typeValue: Int {
       rawValue
     }
@@ -65,17 +76,5 @@ public enum PathStatus: Equatable {
       let rawValue = Set(interfaces.map(\.typeValue)).reduce(0, +)
       self.init(rawValue: rawValue)
     }
-
-    /// The network interface type used for communication over cellular networks.
-    public static let cellular: Self = .init(rawValue: 1)
-    /// The network interface type used for communication over Wi-Fi networks.
-    public static let wifi: Self = .init(rawValue: 2)
-    /// The network interface type used for communication over wired Ethernet networks.
-    public static let wiredEthernet: Self = .init(rawValue: 4)
-    /// The network interface type used for communication
-    /// over virtual networks or networks of unknown types.
-    public static let other: Self = .init(rawValue: 8)
-    /// The network interface type used for communication over local loopback networks.
-    public static let loopback: Self = .init(rawValue: 16)
   }
 }
