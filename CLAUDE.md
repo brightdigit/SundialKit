@@ -119,3 +119,7 @@ Development tools (formatter, linter, unused code detector) are managed via Mint
 - NetworkObserver and ConnectivityObserver require explicit start/activate calls
 - Platform-specific APIs guarded with `@available` and `#if` (watch behavior on iOS vs watchOS)
 - Messages must be property list types for WatchConnectivity compatibility
+
+## Task Master AI Instructions
+**Import Task Master's development workflow commands and guidelines, treat as if import is in the main CLAUDE.md file.**
+@./.taskmaster/CLAUDE.md
