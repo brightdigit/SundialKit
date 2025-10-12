@@ -1,0 +1,93 @@
+{
+	"meta": {
+		"generatedAt": "2025-10-12T15:41:57.245Z",
+		"tasksAnalyzed": 10,
+		"totalTasks": 10,
+		"analysisCount": 10,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": true
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 1,
+			"taskTitle": "Create SundialKitCore protocols and types",
+			"complexityScore": 4,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break down into: 1) Define NetworkMonitoring protocol with all required methods and properties, 2) Define ConnectivityManagement protocol with messaging interfaces, 3) Create PathStatus enum with nested types (Interface OptionSet, UnsatisfiedReason), 4) Implement typed error enums (NetworkError, ConnectivityError, SerializationError) with WCError mapping helpers, 5) Add Sendable conformance and documentation to all types",
+			"reasoning": "This is primarily protocol and type definition work without complex implementation logic. The existing codebase already has these types in the v1.0.0 implementation that can be referenced. The main effort is in properly structuring the protocols, ensuring Sendable conformance, and creating clean abstractions."
+		},
+		{
+			"taskId": 2,
+			"taskTitle": "Extract NetworkMonitor from NetworkObserver",
+			"complexityScore": 6,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Break down into: 1) Create NetworkMonitor class structure implementing NetworkMonitoring protocol, 2) Extract PathMonitor abstraction and NWPathMonitor implementation from existing code, 3) Implement observer pattern with weak references and thread-safe state management, 4) Extract and adapt NetworkPing integration logic, 5) Remove Combine dependencies and replace with stored properties, 6) Implement state query methods and lifecycle management, 7) Create comprehensive unit tests with mocks",
+			"reasoning": "This requires significant refactoring of existing NetworkObserver code to remove Combine dependencies while maintaining all functionality. The codebase analysis shows complex state management, ping integration, and thread safety requirements that need careful extraction and reimplementation."
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "Extract ConnectivityManager from ConnectivityObserver",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Break down into: 1) Create ConnectivityManager class implementing ConnectivityManagement protocol, 2) Extract ConnectivitySession abstraction over WCSession from existing code, 3) Implement platform-specific delegate methods with iOS/watchOS guards, 4) Bridge delegate-based activation to async/await with continuations and timeout handling, 5) Extract message routing logic (sendMessage with updateApplicationContext fallback), 6) Implement observer pattern for state change notifications, 7) Handle error mapping from WCError to ConnectivityError, 8) Create comprehensive platform-specific tests",
+			"reasoning": "WatchConnectivity is complex with platform-specific behavior, delegate patterns, and intricate message routing logic. The existing ConnectivityObserver has substantial logic that needs careful extraction, especially the async/await bridging and fallback mechanisms."
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "Create SundialKit umbrella target",
+			"complexityScore": 2,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down into: 1) Update Package.swift to define SundialKit product with proper dependencies and platform restrictions, 2) Create SundialKit.swift file with @_exported imports for all three modules, 3) Write tests to verify all public APIs are accessible through umbrella import",
+			"reasoning": "This is straightforward Package.swift configuration and a simple re-export file. The existing v1.0.0 already uses a similar pattern that can be adapted. Minimal implementation complexity."
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "Implement SundialKitCombine compatibility plugin",
+			"complexityScore": 5,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down into: 1) Create NetworkObserver wrapper around NetworkMonitor with @Published properties, 2) Implement all v1.0.0 publishers using PassthroughSubject utilities, 3) Create ConnectivityObserver wrapper around ConnectivityManager, 4) Implement message publishers (sendingMessageSubject, messageReceivedPublisher, replyMessagePublisher), 5) Bridge observer callbacks to Combine publishers, 6) Verify complete v1.0.0 API compatibility with existing tests",
+			"reasoning": "While this requires reimplementing the Combine layer, it's essentially wrapping the already-extracted core functionality. The v1.0.0 code provides a clear template for the exact API surface needed. The complexity is moderate as it's mostly bridging work."
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "Implement SundialKitMessagable compatibility plugin",
+			"complexityScore": 3,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down into: 1) Port Messagable protocol with all required methods from v1.0.0, 2) Port MessageDecoder class with type registry implementation, 3) Add ConnectivityMessage typealias and helper extensions, 4) Create comprehensive tests for encoding/decoding and backwards compatibility",
+			"reasoning": "This is a direct port of existing v1.0.0 code with minimal changes. The Messagable protocol and MessageDecoder are well-defined in the current codebase and just need to be extracted into a separate module."
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "Implement SundialKitStream modern async plugin",
+			"complexityScore": 6,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Break down into: 1) Create actor NetworkStream with proper isolation, 2) Implement AsyncStream bridges for network state properties, 3) Create actor ConnectivityStream with message handling, 4) Implement AsyncStream for connectivity state and messages, 5) Add async send and activate methods with typed throws, 6) Ensure Swift 6.1 strict concurrency compliance, 7) Write actor isolation and stream tests",
+			"reasoning": "Actor-based concurrency with AsyncStream requires careful design for proper isolation and stream lifecycle management. While conceptually similar to the Combine plugin, actors and strict concurrency add implementation complexity."
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "Implement SundialKitBinary serialization plugin",
+			"complexityScore": 5,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down into: 1) Define BinarySerializable protocol with Data conversion methods, 2) Implement WatchConnectivity integration with sendMessageData, 3) Add fallback mechanism using base64 encoding for updateApplicationContext, 4) Implement generic send and request methods with type safety, 5) Add message size validation and error handling, 6) Create tests for various binary formats and edge cases",
+			"reasoning": "This requires designing a new serialization abstraction and integrating with WatchConnectivity's binary APIs. The fallback mechanism and size validation add complexity, but the core concept is straightforward."
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "Migrate all tests to Swift Testing",
+			"complexityScore": 8,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Break down into: 1) Migrate SundialKitCore tests to Swift Testing with @Test and @Suite, 2) Migrate NetworkMonitor tests including mock implementations, 3) Migrate ConnectivityManager tests with platform-specific scenarios, 4) Convert SundialKitCombine plugin tests, 5) Convert SundialKitMessagable plugin tests, 6) Convert SundialKitStream plugin tests, 7) Convert SundialKitBinary plugin tests, 8) Update CI/CD configuration for Swift Testing, 9) Create testing utilities and documentation",
+			"reasoning": "This is a comprehensive migration affecting the entire test suite across multiple packages. Each package has different testing requirements (async, actors, publishers) that need specialized Swift Testing approaches. The volume of tests and variety of scenarios makes this highly complex."
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "Create documentation and example applications",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Break down into: 1) Create DocC documentation for all public APIs, 2) Write MIGRATION.md with step-by-step v1 to v2 guide, 3) Create v1 compatibility example app using Combine and Messagable plugins, 4) Create modern async/await example using Stream plugin, 5) Create binary messaging examples with multiple formats, 6) Develop iPhone/Watch communication demo app, 7) Update README and PLUGINS documentation, 8) Create real-world integration guide with performance comparisons",
+			"reasoning": "Documentation and examples require understanding all v2.0.0 features, creating multiple functional applications, and comprehensive written guides. The variety of examples and depth of documentation needed makes this a substantial effort."
+		}
+	]
+}

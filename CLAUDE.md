@@ -119,3 +119,50 @@ Development tools (formatter, linter, unused code detector) are managed via Mint
 - NetworkObserver and ConnectivityObserver require explicit start/activate calls
 - Platform-specific APIs guarded with `@available` and `#if` (watch behavior on iOS vs watchOS)
 - Messages must be property list types for WatchConnectivity compatibility
+
+## Repository Structure & GitHub Workflow Integration
+
+### Monorepo Development Strategy (v2.0.0)
+
+SundialKit v2.0.0 uses a **monorepo-first development approach** with git-subrepo:
+- **During Development**: All packages developed in the main `brightdigit/SundialKit` monorepo
+- **git-subrepo Links**: Set up during development to link to eventual separate repos (for distribution flexibility)
+- **After v2.0.0**: Sever subrepo ties and finalize distribution strategy (monorepo vs separate repos vs Swift Package Collection)
+
+**Benefits:**
+- Single source of truth during development
+- Easy coordination across packages
+- Simplified dependency management
+- Flexibility to choose distribution model later
+
+### GitHub Issues & Pull Requests (Task Master Integration)
+
+This project uses GitHub Issues and Pull Requests integrated with Task Master:
+- **Each main task** (1, 2, 3, etc.) gets a GitHub issue and feature branch
+- **Subtasks** (1.1, 1.2, etc.) are tracked as task lists in the issue or as sub-issues
+- **Component/Package labeling** is required for all issues and PRs
+  - Issue titles prefixed with component: `[Core] Task 1: ...`, `[Network] Task 2: ...`, `[Connectivity] Task 3: ...`
+  - GitHub labels applied: `component:core`, `component:network`, `component:connectivity`, `component:combine`, `component:stream`, etc.
+  - Components documented in Task Master: `Component: Core`
+- **Feature branches** follow the pattern: `feature/[component-]task-<id>-<description>`
+- **Commit messages** reference component and task: `feat(core/task-1.1): description (#issue-number)`
+- **Pull requests** include component scope: `feat(core): Task 1 - Description`
+- **Pull requests** are created when all subtasks complete, closing the related issue
+
+**Component Labels:**
+- `component:core` - SundialKitCore protocols and types
+- `component:network` - SundialKitNetwork implementation
+- `component:connectivity` - SundialKitConnectivity implementation
+- `component:combine` - SundialKitCombine plugin (v1 compatibility)
+- `component:messagable` - SundialKitMessagable plugin (v1 compatibility)
+- `component:stream` - SundialKitStream plugin (modern async/await)
+- `component:binary` - SundialKitBinary plugin (modern serialization)
+- `component:infrastructure` - Build, CI/CD, tooling
+- `component:docs` - Documentation and examples
+- `component:tests` - Testing infrastructure
+
+See `.taskmaster/CLAUDE.md` for detailed GitHub integration workflow and commands.
+
+## Task Master AI Instructions
+**Import Task Master's development workflow commands and guidelines, treat as if import is in the main CLAUDE.md file.**
+@./.taskmaster/CLAUDE.md
