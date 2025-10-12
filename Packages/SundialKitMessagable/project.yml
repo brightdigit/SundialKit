@@ -1,0 +1,13 @@
+name: SundialKitMessagable
+settings:
+  LINT_MODE: ${LINT_MODE}
+packages:
+  SundialKitMessagable:
+    path: .
+aggregateTargets:
+  Lint:
+    buildScripts:
+      - path: Scripts/lint.sh
+        name: Lint
+        basedOnDependencyAnalysis: false
+    schemes: {}
