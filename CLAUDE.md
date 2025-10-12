@@ -141,8 +141,8 @@ This project uses GitHub Issues and Pull Requests integrated with Task Master:
 - **Each main task** (1, 2, 3, etc.) gets a GitHub issue and feature branch
 - **Subtasks** (1.1, 1.2, etc.) are tracked as task lists in the issue or as sub-issues
 - **Component/Package labeling** is required for all issues and PRs
-  - Issue titles prefixed with component: `[Core] Task 1: ...`, `[Network] Task 2: ...`, `[Connectivity] Task 3: ...`
-  - GitHub labels applied: `component:core`, `component:network`, `component:connectivity`, `component:combine`, `component:stream`, etc.
+  - Issue titles prefixed with component: `[Core] Task 1: ...`, `[Network] Task 2: ...`, `[WatchConnectivity] Task 3: ...`
+  - GitHub labels applied: `component:core`, `component:network`, `component:watchconnectivity`, `component:combine`, `component:stream`, etc.
   - Components documented in Task Master: `Component: Core`
 - **Feature branches** follow the pattern: `feature/[component-]task-<id>-<description>`
 - **Commit messages** reference component and task: `feat(core/task-1.1): description (#issue-number)`
@@ -152,14 +152,15 @@ This project uses GitHub Issues and Pull Requests integrated with Task Master:
 **Component Labels:**
 - `component:core` - SundialKitCore protocols and types
 - `component:network` - SundialKitNetwork implementation
-- `component:connectivity` - SundialKitConnectivity implementation
+- `component:watchconnectivity` - SundialKitConnectivity implementation
 - `component:combine` - SundialKitCombine plugin (v1 compatibility)
 - `component:messagable` - SundialKitMessagable plugin (v1 compatibility)
 - `component:stream` - SundialKitStream plugin (modern async/await)
 - `component:binary` - SundialKitBinary plugin (modern serialization)
-- `component:infrastructure` - Build, CI/CD, tooling
+- `component:infrastructure` - Build, CI/CD, tooling, git-subrepo
 - `component:docs` - Documentation and examples
-- `component:tests` - Testing infrastructure
+- `component:tests` - Testing infrastructure and Swift Testing migration
+
 
 See `.taskmaster/CLAUDE.md` for detailed GitHub integration workflow and commands.
 
