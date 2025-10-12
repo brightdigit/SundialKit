@@ -125,15 +125,104 @@ Development tools (formatter, linter, unused code detector) are managed via Mint
 ### Monorepo Development Strategy (v2.0.0)
 
 SundialKit v2.0.0 uses a **monorepo-first development approach** with git-subrepo:
-- **During Development**: All packages developed in the main `brightdigit/SundialKit` monorepo
-- **git-subrepo Links**: Set up during development to link to eventual separate repos (for distribution flexibility)
-- **After v2.0.0**: Sever subrepo ties and finalize distribution strategy (monorepo vs separate repos vs Swift Package Collection)
+
+**Repository Structure:**
+- **Main Monorepo** (`brightdigit/SundialKit`): Contains SundialKitCore, SundialKitNetwork, SundialKitConnectivity, and SundialKit umbrella
+- **Plugin Subrepos** (in `Packages/`): SundialKitStream, SundialKitBinary, SundialKitCombine, SundialKitMessagable
+  - Linked via git-subrepo to separate repositories
+  - Tracked on `v1.0.0` branch during development
+- **After v2.0.0**: Sever subrepo ties and finalize distribution strategy
 
 **Benefits:**
 - Single source of truth during development
 - Easy coordination across packages
 - Simplified dependency management
 - Flexibility to choose distribution model later
+
+#### Git-Subrepo Workflow
+
+**What is git-subrepo?**
+Git-subrepo is a simpler alternative to git submodules for managing external repositories within a project. Unlike submodules, subrepos are automatically cloned when users clone the main repository—no special commands needed.
+
+**Key Differences from Git Submodules:**
+- Simpler command-line usage
+- Users get all subrepos automatically on clone
+- No need to install git-subrepo for basic repository usage
+- Keeps git history clean by condensing upstream changes into single commits
+
+**Basic Commands:**
+
+```bash
+# Clone a subrepo (initial setup - already done for plugins)
+git subrepo clone <remote-url> <subdir> [-b <branch>]
+
+# Pull upstream changes from subrepo
+git subrepo pull <subdir>
+
+# Push local changes to subrepo
+git subrepo push <subdir>
+
+# Check status of all subrepos
+git subrepo status
+
+# Check status of specific subrepo
+git subrepo status <subdir>
+```
+
+**Plugin Subrepo Locations:**
+- `Packages/SundialKitStream` → `git@github.com:brightdigit/SundialKitStream.git` (branch: v1.0.0)
+- `Packages/SundialKitBinary` → `git@github.com:brightdigit/SundialKitBinary.git` (branch: v1.0.0)
+- `Packages/SundialKitCombine` → `git@github.com:brightdigit/SundialKitCombine.git` (branch: v1.0.0)
+- `Packages/SundialKitMessagable` → `git@github.com:brightdigit/SundialKitMessagable.git` (branch: v1.0.0)
+
+**The .gitrepo File:**
+Each subrepo directory contains a `.gitrepo` file that stores metadata about the upstream repository:
+```ini
+[subrepo]
+    remote = git@github.com:brightdigit/SundialKitStream.git
+    branch = v1.0.0
+    commit = <upstream-commit-sha>
+    parent = <local-commit-sha>
+```
+
+**Development Workflow:**
+
+1. **Working on Plugin Code:**
+   ```bash
+   # Edit files in Packages/SundialKitStream/
+   git add Packages/SundialKitStream/
+   git commit -m "feat(stream): add new feature"
+
+   # Push changes to the plugin's separate repository
+   git subrepo push Packages/SundialKitStream
+   ```
+
+2. **Pulling Updates from Plugins:**
+   ```bash
+   # Pull latest changes from plugin repo
+   git subrepo pull Packages/SundialKitStream
+
+   # Or update all plugins
+   git subrepo pull Packages/SundialKitStream
+   git subrepo pull Packages/SundialKitBinary
+   git subrepo pull Packages/SundialKitCombine
+   git subrepo pull Packages/SundialKitMessagable
+   ```
+
+3. **Checking Subrepo Status:**
+   ```bash
+   # See status of all subrepos
+   git subrepo status
+
+   # Output shows which subrepos have local changes
+   ```
+
+**Best Practices:**
+- Treat plugin code in `Packages/` like normal code changes
+- Commit and push changes to main repo first, then push to subrepo
+- Pull from subrepos before making modifications
+- Use `git subrepo status` regularly to check sync state
+- Each `git subrepo push` creates a commit in the plugin's repository
 
 ### GitHub Issues & Pull Requests (Task Master Integration)
 

@@ -324,6 +324,110 @@ gh pr create --title "Complete task 1.2: User authentication" --body "Implements
 git commit -m "feat: implement JWT auth (task 1.2)"
 ```
 
+#### Git-Subrepo Integration
+
+SundialKit uses git-subrepo for managing plugin packages. Reference: https://github.com/ingydotnet/git-subrepo
+
+**Plugin Subrepo Structure:**
+```
+Packages/
+├── SundialKitStream/       # → brightdigit/SundialKitStream (branch: v1.0.0)
+├── SundialKitBinary/       # → brightdigit/SundialKitBinary (branch: v1.0.0)
+├── SundialKitCombine/      # → brightdigit/SundialKitCombine (branch: v1.0.0)
+└── SundialKitMessagable/   # → brightdigit/SundialKitMessagable (branch: v1.0.0)
+```
+
+**Essential git-subrepo Commands:**
+
+```bash
+# Check status of all subrepos
+git subrepo status
+
+# Pull updates from plugin repository
+git subrepo pull Packages/SundialKitStream
+
+# Push local changes to plugin repository
+git subrepo push Packages/SundialKitStream
+
+# Clone a new subrepo (initial setup)
+git subrepo clone git@github.com:brightdigit/SundialKitStream.git Packages/SundialKitStream -b v1.0.0
+```
+
+**Workflow for Plugin Development:**
+
+1. **Making changes to plugins:**
+   ```bash
+   # Edit files in Packages/SundialKitStream/
+   # Commit to main repo first
+   git add Packages/SundialKitStream/
+   git commit -m "feat(stream/task-7.2): implement NetworkStream actor"
+
+   # Then push to plugin's separate repo
+   git subrepo push Packages/SundialKitStream
+   ```
+
+2. **Pulling updates from plugin repos:**
+   ```bash
+   # Pull latest from a plugin
+   git subrepo pull Packages/SundialKitCombine
+
+   # Update all plugins
+   for pkg in Packages/*/; do git subrepo pull "$pkg"; done
+   ```
+
+3. **Task Master + Subrepo Workflow:**
+   ```bash
+   # Working on Task 7 (Stream plugin)
+   task-master show 7.1
+
+   # Make changes in Packages/SundialKitStream/
+   vim Packages/SundialKitStream/Sources/NetworkStream.swift
+
+   # Commit locally
+   git add Packages/SundialKitStream/
+   git commit -m "feat(stream/task-7.1): create NetworkStream actor (#issue)"
+
+   # Update Task Master
+   task-master set-status --id=7.1 --status=done
+
+   # Push to plugin repo when subtask or task complete
+   git subrepo push Packages/SundialKitStream
+   ```
+
+**Understanding .gitrepo Files:**
+
+Each subrepo has a `.gitrepo` file tracking upstream metadata:
+```ini
+[subrepo]
+    remote = git@github.com:brightdigit/SundialKitStream.git
+    branch = v1.0.0
+    commit = abc123...  # Upstream commit
+    parent = def456...  # Local commit
+```
+This file is automatically managed by git-subrepo. Never edit manually.
+
+**Best Practices:**
+
+- **Work in main repo first**: Make changes in `Packages/`, commit to main repo
+- **Push to subrepo after task completion**: Use `git subrepo push` when subtask or task is done
+- **Check status regularly**: Run `git subrepo status` to see which subrepos have unpushed changes
+- **Pull before working**: Always `git subrepo pull` before starting work on a plugin
+- **Task Master integration**: Reference subrepo in task updates: `task-master update-subtask --id=7.1 --prompt="Implemented in Packages/SundialKitStream"`
+
+**Troubleshooting:**
+
+```bash
+# If subrepo gets out of sync
+git subrepo clean Packages/SundialKitStream
+git subrepo pull Packages/SundialKitStream
+
+# Force push (use carefully)
+git subrepo push Packages/SundialKitStream --force
+
+# Check subrepo configuration
+cat Packages/SundialKitStream/.gitrepo
+```
+
 ### GitHub Issues & Pull Request Integration
 
 **Workflow Overview**: Each Task Master task should have a corresponding GitHub issue, with subtasks represented as sub-issues or task lists within the main issue. Major features should have dedicated branches and pull requests.
