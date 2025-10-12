@@ -324,6 +324,391 @@ gh pr create --title "Complete task 1.2: User authentication" --body "Implements
 git commit -m "feat: implement JWT auth (task 1.2)"
 ```
 
+### GitHub Issues & Pull Request Integration
+
+**Workflow Overview**: Each Task Master task should have a corresponding GitHub issue, with subtasks represented as sub-issues or task lists within the main issue. Major features should have dedicated branches and pull requests.
+
+#### 1. Creating Issues for Tasks
+
+```bash
+# Create GitHub issue for a main task
+task-master show <id>                                  # Get task details
+gh issue create \
+  --title "[Component] Task <id>: <title>" \
+  --label "component:<name>" \
+  --body "$(cat <<EOF
+## Component/Subrepo
+<component-name> (e.g., SundialKit, WatchConnectivity, Network, etc.)
+
+## Description
+<task description>
+
+## Implementation Details
+<task details>
+
+## Test Strategy
+<task test strategy>
+
+## Task Master Reference
+- Task ID: <id>
+- Status: pending
+- Dependencies: <list dependencies>
+- Component: <component-name>
+
+## Subtasks
+<list of subtasks from task-master>
+EOF
+)"
+
+# Store the issue number for reference
+task-master update-task --id=<id> --prompt="GitHub Issue: #<issue-number>"
+```
+
+**Component/Subrepo Labeling**:
+- Use title prefixes: `[Network] Task 1.2: ...`, `[WatchConnectivity] Task 2.1: ...`
+- Apply GitHub labels: `--label "component:network"`, `--label "component:watchconnectivity"`
+- Document component in issue body under "Component/Subrepo" section
+- Update Task Master with component info for tracking
+
+**Common Component Labels**:
+```bash
+# Network subsystem
+--label "component:network"
+
+# WatchConnectivity subsystem
+--label "component:watchconnectivity"
+
+# Infrastructure/tooling
+--label "component:infrastructure"
+
+# Documentation
+--label "component:docs"
+
+# Testing
+--label "component:tests"
+```
+
+#### 2. Creating Sub-Issues for Subtasks
+
+For complex tasks with many subtasks, create individual sub-issues:
+
+```bash
+# Create sub-issue linked to parent (inherits component from parent)
+gh issue create \
+  --title "[Component] Subtask <id>: <subtask-title>" \
+  --body "Part of #<parent-issue-number>\n\n<subtask-details>" \
+  --label "subtask" \
+  --label "component:<name>"
+
+# Link back to Task Master
+task-master update-subtask --id=<id> --prompt="GitHub Issue: #<sub-issue-number>"
+```
+
+**Note**: Subtasks inherit the component label from their parent task for consistency.
+
+Alternatively, use GitHub's task list feature in the main issue:
+
+```markdown
+## Subtasks
+- [ ] Task 1.1: Setup authentication module (#123)
+- [ ] Task 1.2: Implement JWT tokens (#124)
+- [ ] Task 1.3: Add password hashing (#125)
+```
+
+#### 3. Branch Strategy for Major Features
+
+Create feature branches for each major task (typically tasks without dots, like `1`, `2`, `3`):
+
+```bash
+# Get task information
+task-master show 1
+
+# Create feature branch
+git checkout -b feature/task-1-network-observer
+
+# Set task to in-progress
+task-master set-status --id=1 --status=in-progress
+
+# Work on subtasks on the same branch
+task-master next  # Get next subtask
+# ... implement subtask ...
+git add . && git commit -m "feat(task-1.1): implement PathMonitor abstraction"
+
+# Continue with more subtasks on the same branch
+task-master next
+# ... implement next subtask ...
+git add . && git commit -m "feat(task-1.2): add NetworkPing integration"
+```
+
+#### 4. Creating Pull Requests for Completed Tasks
+
+When all subtasks are complete, create a PR:
+
+```bash
+# Verify all subtasks are done
+task-master show 1
+
+# Push branch
+git push -u origin feature/task-1-network-observer
+
+# Create PR with comprehensive details
+gh pr create \
+  --title "feat(network): Task 1 - Implement NetworkObserver" \
+  --label "component:network" \
+  --body "$(cat <<EOF
+## Component
+Network
+
+## Summary
+Implements NetworkObserver system as specified in Task Master task 1.
+
+## Changes
+- PathMonitor abstraction over NWPathMonitor
+- NetworkPing integration for connectivity verification
+- Combine publishers for reactive state management
+- Comprehensive test coverage
+
+## Task Master Reference
+- Task ID: 1
+- Component: Network
+- All subtasks completed (1.1, 1.2, 1.3, 1.4)
+- Dependencies: None
+
+## Related Issues
+Closes #<issue-number>
+
+## Testing
+- [x] Unit tests pass
+- [x] Integration tests pass
+- [x] Manual testing completed
+
+## Test Plan
+- PathMonitor correctly reports network state changes
+- NetworkPing functions when reachability changes
+- Publishers emit expected values
+- Error handling works correctly
+EOF
+)" \
+  --base main
+
+# Mark task as done
+task-master set-status --id=1 --status=done
+```
+
+#### 5. Commit Message Convention
+
+Use consistent commit messages that reference tasks and components:
+
+```bash
+# Format: <type>(component/task-<id>): <description>
+git commit -m "feat(network/task-1.1): implement PathMonitor protocol abstraction"
+git commit -m "test(network/task-1.2): add NetworkPing unit tests"
+git commit -m "docs(network/task-1.3): document NetworkObserver public API"
+git commit -m "fix(network/task-1.4): handle edge case in status transitions"
+
+# WatchConnectivity component examples
+git commit -m "feat(watchconnectivity/task-2.1): implement ConnectivitySession protocol"
+git commit -m "test(watchconnectivity/task-2.2): add message encoding tests"
+
+# Infrastructure/cross-cutting examples
+git commit -m "chore(infra/task-3.1): setup CI/CD pipeline"
+git commit -m "docs(all/task-4.1): update README with API examples"
+
+# Types: feat, fix, docs, test, refactor, chore, style, perf
+```
+
+**Commit Scope Format**:
+- Use `component/task-id` format: `feat(network/task-1.1): ...`
+- Component should match the GitHub label: `network`, `watchconnectivity`, `infra`, `docs`, `tests`
+- This provides clear traceability from commit → component → task → issue
+
+#### 6. Linking Issues in Commits
+
+Reference GitHub issues in commits for automatic tracking:
+
+```bash
+# Link to issue with component scope
+git commit -m "feat(network/task-1.1): implement PathMonitor (#42)"
+
+# Close issue on merge with component
+git commit -m "feat(network/task-1): complete NetworkObserver implementation
+
+Closes #42"
+
+# Multiple component commits
+git commit -m "feat(watchconnectivity/task-2.1): add message encoding (#43)"
+git commit -m "fix(network/task-1.2): handle edge case in ping timeout (#42)"
+```
+
+#### 7. Automated Workflow Commands
+
+Create a custom slash command `.claude/commands/github-task.md`:
+
+```markdown
+Create a GitHub issue for Task Master task: $ARGUMENTS
+
+Steps:
+1. Get task details with `task-master show $ARGUMENTS`
+2. Identify the component/subrepo for this task (Network, WatchConnectivity, etc.)
+3. Create GitHub issue using `gh issue create` with:
+   - Title prefix: `[Component] Task X: ...`
+   - Component label: `--label "component:<name>"`
+   - Component section in body
+4. Update Task Master with issue reference AND component: `task-master update-task --id=$ARGUMENTS --prompt="GitHub Issue: #X, Component: <name>"`
+5. Create feature branch if it's a main task: `feature/<component>-task-X-<description>`
+6. Display next steps
+```
+
+Create `.claude/commands/github-pr.md`:
+
+```markdown
+Create a pull request for Task Master task: $ARGUMENTS
+
+Steps:
+1. Verify task completion with `task-master show $ARGUMENTS`
+2. Get component from Task Master task metadata
+3. Ensure all changes are committed
+4. Push branch to remote
+5. Create PR with `gh pr create` including:
+   - Title with component scope: `feat(<component>): Task X - ...`
+   - Component label: `--label "component:<name>"`
+   - Component section in PR body
+   - Task summary and subtask list
+6. Link PR number back to Task Master
+7. Mark task as done
+```
+
+#### 8. Best Practices
+
+**Issue Creation**:
+- Create issues for main tasks (1, 2, 3) at project start
+- Create sub-issues or use task lists for subtasks (1.1, 1.2, etc.)
+- Use labels: `task-master`, `feature`, `subtask`, `bug`, `enhancement`, `component:<name>`
+- Link issues to project milestones when applicable
+- **Always include component/subrepo** in issue title and labels
+- Add "Component/Subrepo" section in issue body
+
+**Component/Subrepo Tracking**:
+- Prefix all issue titles with component: `[Network] Task 1.2: ...`
+- Apply component labels to all issues and PRs: `--label "component:network"`
+- Use component scope in commit messages: `feat(network/task-1.1): ...`
+- Document component in Task Master: `task-master update-task --id=1 --prompt="Component: Network"`
+- Filter issues by component using GitHub label search
+
+**Branch Management**:
+- One branch per main task (feature/task-1-description)
+- All subtasks implemented on the same feature branch
+- Keep branches focused and merge when task complete
+- Delete branches after PR merge
+- Branch names should reflect component when clear: `feature/network-task-1-observer`
+
+**Pull Request Workflow**:
+- One PR per main task (includes all subtasks)
+- Reference all related issues and subtasks in PR description
+- Include Task Master task ID and component in PR title: `feat(network): Task 1 - ...`
+- Apply component label to PR
+- Use "Closes #<issue>" to auto-close issues on merge
+- Request reviews before merging
+
+**Synchronization**:
+- Update Task Master when creating issues: `task-master update-task --id=<id> --prompt="GitHub Issue: #<number>, Component: <name>"`
+- Update Task Master when creating PRs: `task-master update-task --id=<id> --prompt="Pull Request: #<number>"`
+- Update GitHub issues when Task Master status changes
+- Keep both systems in sync throughout development
+- Maintain component information across all systems
+
+**Example Full Workflow**:
+
+```bash
+# 1. Start new task
+task-master next  # Returns task 1 (Network module)
+
+# 2. Create GitHub issue with component labeling
+gh issue create \
+  --title "[Network] Task 1: Implement NetworkObserver" \
+  --label "component:network" \
+  --label "task-master" \
+  --body "$(cat <<EOF
+## Component/Subrepo
+Network
+
+## Description
+Implement NetworkObserver for monitoring network connectivity status.
+...
+EOF
+)"
+# Returns issue #42
+
+# 3. Link issue to task with component information
+task-master update-task --id=1 --prompt="GitHub Issue: #42, Component: Network"
+
+# 4. Create feature branch
+git checkout -b feature/network-task-1-observer
+
+# 5. Set status
+task-master set-status --id=1 --status=in-progress
+
+# 6. Work through subtasks with component in commits
+task-master show 1.1
+# ... implement 1.1 ...
+git commit -m "feat(network/task-1.1): implement PathMonitor protocol abstraction (#42)"
+task-master set-status --id=1.1 --status=done
+
+task-master show 1.2
+# ... implement 1.2 ...
+git commit -m "feat(network/task-1.2): add NetworkPing integration (#42)"
+task-master set-status --id=1.2 --status=done
+
+task-master show 1.3
+# ... implement 1.3 ...
+git commit -m "test(network/task-1.3): add NetworkObserver unit tests (#42)"
+task-master set-status --id=1.3 --status=done
+
+# ... continue for all subtasks ...
+
+# 7. Create PR when task complete with component labeling
+git push -u origin feature/network-task-1-observer
+gh pr create \
+  --title "feat(network): Task 1 - Implement NetworkObserver" \
+  --label "component:network" \
+  --body "$(cat <<EOF
+## Component
+Network
+
+## Summary
+Implements NetworkObserver system as specified in Task Master task 1.
+...
+
+Closes #42
+EOF
+)"
+# Returns PR #45
+
+# 8. Link PR to task
+task-master update-task --id=1 --prompt="Pull Request: #45"
+
+# 9. After merge
+task-master set-status --id=1 --status=done
+git checkout main && git pull
+git branch -d feature/network-task-1-observer
+
+# 10. Move to next component/task
+task-master next  # Returns task 2 (WatchConnectivity module)
+```
+
+**Component Filtering on GitHub**:
+
+```bash
+# View all Network component issues
+gh issue list --label "component:network"
+
+# View all WatchConnectivity component issues
+gh issue list --label "component:watchconnectivity"
+
+# View all open PRs for a component
+gh pr list --label "component:network" --state open
+```
+
 ### Parallel Development with Git Worktrees
 
 ```bash

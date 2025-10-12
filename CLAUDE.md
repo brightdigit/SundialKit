@@ -120,6 +120,22 @@ Development tools (formatter, linter, unused code detector) are managed via Mint
 - Platform-specific APIs guarded with `@available` and `#if` (watch behavior on iOS vs watchOS)
 - Messages must be property list types for WatchConnectivity compatibility
 
+## GitHub Workflow Integration
+
+This project uses GitHub Issues and Pull Requests integrated with Task Master:
+- **Each main task** (1, 2, 3, etc.) gets a GitHub issue and feature branch
+- **Subtasks** (1.1, 1.2, etc.) are tracked as task lists in the issue or as sub-issues
+- **Component/Subrepo labeling** is required for all issues and PRs
+  - Issue titles prefixed with component: `[Network] Task 1: ...`
+  - GitHub labels applied: `component:network`, `component:watchconnectivity`, etc.
+  - Components documented in Task Master: `Component: Network`
+- **Feature branches** follow the pattern: `feature/[component-]task-<id>-<description>`
+- **Commit messages** reference component and task: `feat(network/task-1.1): description (#issue-number)`
+- **Pull requests** include component scope: `feat(network): Task 1 - Description`
+- **Pull requests** are created when all subtasks complete, closing the related issue
+
+See `.taskmaster/CLAUDE.md` for detailed GitHub integration workflow and commands.
+
 ## Task Master AI Instructions
 **Import Task Master's development workflow commands and guidelines, treat as if import is in the main CLAUDE.md file.**
 @./.taskmaster/CLAUDE.md
