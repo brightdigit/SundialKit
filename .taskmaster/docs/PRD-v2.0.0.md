@@ -11,6 +11,8 @@
 
 SundialKit v2.0.0 represents a significant architectural evolution from a monolithic reactive communications library to a modular, plugin-based framework. This redesign enables developers to choose their preferred reactive patterns (Combine or AsyncStream) and serialization methods (Messagable dictionaries or Protobuf) while maintaining full backwards compatibility with v1.0.0.
 
+**Modern Swift 6.1 packages** (`SundialKitStream`, `SundialKitProtobuf`) leverage actor-based concurrency, strict concurrency checking, and the latest Swift features, while **v1.0.0 compatibility packages** (`SundialKitCombine`, `SundialKitMessagable`) maintain Swift 5.9 support for seamless migration.
+
 ### Vision
 
 Transform SundialKit into an extensible platform where:
@@ -22,10 +24,11 @@ Transform SundialKit into an extensible platform where:
 ### Key Goals
 
 1. **Modularity** - Separate concerns into focused, composable packages
-2. **Modern Swift** - Support AsyncStream, typed throws, and Swift 6.0+ features
-3. **Backwards Compatibility** - Maintain v1.0.0 API surface through plugin packages
+2. **Modern Swift** - Swift 6.1 with actor-based concurrency, AsyncStream, typed throws, and strict concurrency for modern packages
+3. **Backwards Compatibility** - Maintain v1.0.0 API surface through Swift 5.9 plugin packages
 4. **Flexibility** - Enable mix-and-match of reactive and serialization approaches
 5. **Quality** - Migrate to Swift Testing for improved test reliability
+6. **Thread Safety** - Actor-based implementations in modern packages for safe concurrent access
 
 ---
 
@@ -83,7 +86,7 @@ Transform SundialKit into an extensible platform where:
 
 ```swift
 import SundialKit
-import SundialKitAsync
+import SundialKitStream
 
 for await status in networkMonitor.pathStatusStream {
     updateUI(status)
@@ -176,6 +179,8 @@ SundialKit v2.0.0 adopts a **host + plugin** architecture where:
   - `SundialError` (with typed throws support)
   - Plugin extension points
 - Dependencies: Foundation only
+- **Swift Version**: 5.9+ (v1.0.0 compatibility)
+- **Platforms**: iOS 13+, watchOS 6+, tvOS 13+, macOS 10.13+
 - Audience: Plugin developers
 
 **Target: `SundialKit`**
@@ -186,11 +191,13 @@ SundialKit v2.0.0 adopts a **host + plugin** architecture where:
   - Platform-specific implementations (NWPathMonitor, WCSession)
   - Internal monitoring logic
 - Dependencies: `SundialKitCore`, Network framework, WatchConnectivity
+- **Swift Version**: 5.9+ (v1.0.0 compatibility)
+- **Platforms**: iOS 13+, watchOS 6+, tvOS 13+, macOS 10.13+
 - Audience: All users (required)
 
 #### Plugin Packages
 
-**Package: `SundialKitCombine`**
+**Package: `SundialKitCombine`** (v1.0.0 Compatibility)
 - Purpose: Combine reactive layer
 - Contents:
   - `NetworkObserver` (wraps `NetworkMonitor`, exposes publishers)
@@ -198,19 +205,11 @@ SundialKit v2.0.0 adopts a **host + plugin** architecture where:
   - Publisher extensions for all state properties
   - PassthroughSubject utilities
 - Dependencies: `SundialKitCore`, Combine
+- **Swift Version**: 5.9+ (v1.0.0 compatibility)
+- **Platforms**: iOS 13+, watchOS 6+, tvOS 13+, macOS 10.15+
 - Backwards Compatibility: Provides v1.0.0 API surface
 
-**Package: `SundialKitAsync`**
-- Purpose: AsyncStream and async/await layer
-- Contents:
-  - `AsyncNetworkMonitor` (wraps `NetworkMonitor`, exposes AsyncStreams)
-  - `AsyncConnectivityManager` (wraps `ConnectivityManager`, exposes AsyncStreams)
-  - AsyncSequence conformances
-  - Async/await convenience methods
-- Dependencies: `SundialKitCore`
-- Platform: iOS 13+ (with @available guards for concurrency features)
-
-**Package: `SundialKitMessagable`**
+**Package: `SundialKitMessagable`** (v1.0.0 Compatibility)
 - Purpose: Dictionary-based messaging for WatchConnectivity
 - Contents:
   - `Messagable` protocol
@@ -218,16 +217,31 @@ SundialKit v2.0.0 adopts a **host + plugin** architecture where:
   - `ConnectivityMessage` typealias
   - Dictionary serialization utilities
 - Dependencies: `SundialKitCore`
+- **Swift Version**: 5.9+ (v1.0.0 compatibility)
+- **Platforms**: iOS 13+, watchOS 6+, tvOS 13+, macOS 10.13+
 - Backwards Compatibility: Provides v1.0.0 messaging API
 
-**Package: `SundialKitProtobuf`**
+**Package: `SundialKitStream`** (New in v2.0.0)
+- Purpose: Actor-based AsyncStream and async/await layer
+- Contents:
+  - `actor NetworkStream` (wraps `NetworkMonitor`, exposes AsyncStreams)
+  - `actor ConnectivityStream` (wraps `ConnectivityManager`, exposes AsyncStreams)
+  - AsyncSequence conformances
+  - Async/await convenience methods
+- Dependencies: `SundialKitCore` (no swift-async-algorithms)
+- **Swift Version**: 6.1+ with strict concurrency enabled
+- **Platforms**: iOS 13+, macOS 10.15+, watchOS 6+, tvOS 13+
+- **Architecture**: Actor-based for thread safety, no @available guards
+
+**Package: `SundialKitProtobuf`** (New in v2.0.0)
 - Purpose: Protobuf serialization for WatchConnectivity
 - Contents:
   - `ProtobufMessagable` protocol
   - Protobuf encoding/decoding extensions
   - WatchConnectivity integration
-- Dependencies: `SundialKitCore`, SwiftProtobuf
-- Platform: All SundialKit platforms
+- Dependencies: `SundialKitCore`, SwiftProtobuf (latest stable)
+- **Swift Version**: 6.1+ with strict concurrency enabled
+- **Platforms**: Determined by latest SwiftProtobuf
 - Note: Users provide their own `.proto` schemas
 
 ---
@@ -294,6 +308,14 @@ public func activate() throws(ConnectivityError) {
 
 - [ ] Define `MessageSerializing` protocol for serialization plugins
 
+#### Core Type Sendable Conformance
+- [ ] Mark all core value types as `Sendable` for Swift 6.1 compatibility:
+  - `PathStatus` enum and nested types
+  - `ActivationState` enum
+  - `NetworkError`, `ConnectivityError`, `SerializationError` enums
+  - All message-related types
+  - Required for modern packages using Swift 6.1 strict concurrency
+
 #### Extension Points
 - [ ] Observable state pattern for plugin consumption
 - [ ] Delegate-based change notifications
@@ -315,19 +337,23 @@ public func activate() throws(ConnectivityError) {
   - `messageReceivedPublisher`, `replyMessagePublisher`
   - Exact v1.0.0 API compatibility
 
-#### SundialKitAsync
-- [ ] `AsyncNetworkMonitor` wrapping `NetworkMonitor`
+#### SundialKitStream
+- [ ] `NetworkStream` wrapping `NetworkMonitor` (actor-based for Swift 6.1)
   - `pathStatusStream: AsyncStream<PathStatus>`
   - `isExpensiveStream: AsyncStream<Bool>`
   - `isConstrainedStream: AsyncStream<Bool>`
   - `async func currentStatus() -> PathStatus`
+  - Implemented as `actor NetworkStream` for thread safety
+  - Full Swift 6.1 strict concurrency
 
-- [ ] `AsyncConnectivityManager` wrapping `ConnectivityManager`
+- [ ] `ConnectivityStream` wrapping `ConnectivityManager` (actor-based for Swift 6.1)
   - `activationStateStream: AsyncStream<ActivationState>`
   - `isReachableStream: AsyncStream<Bool>`
   - `messageStream: AsyncStream<ReceivedMessage>`
   - `async func send<M: MessageSerializing>(_ message: M) throws`
   - `async func activate() throws`
+  - Implemented as `actor ConnectivityStream` for thread safety
+  - Full Swift 6.1 strict concurrency
 
 ### 5.4 Serialization Plugins
 
@@ -396,23 +422,132 @@ try await connectivity.send(update)
 
 ### 5.6 Platform Support
 
-#### Minimum Platform Versions (TBD)
+Platform requirements vary by package based on their dependencies and backwards compatibility needs. SundialKit v2.0.0 uses a **two-tier strategy**:
 
-**Option A: Maintain v1.0.0 minimums**
+**Tier 1: V1.0.0 Compatibility Layer** (Swift 5.9)
+- SundialKitCore, SundialKit, SundialKitCombine, SundialKitMessagable
+- Must maintain v1.0.0 platform support
+- Use `@available` guards where needed for backwards compatibility
+
+**Tier 2: Modern Swift Packages** (Swift 6.1)
+- SundialKitStream, SundialKitProtobuf
+- No backwards compatibility constraints
+- No `@available` guards - simply declare minimum platforms in Package.swift
+- Leverage latest Swift features
+
+#### Summary Table
+
+| Package | Swift Version | iOS | macOS | watchOS | tvOS | @available Guards? |
+|---------|--------------|-----|-------|---------|------|--------------------|
+| SundialKitCore | 5.9+ | 13+ | 10.13+ | 6+ | 13+ | Yes (where needed) |
+| SundialKit | 5.9+ | 13+ | 10.13+ | 6+ | 13+ | Yes (where needed) |
+| SundialKitCombine | 5.9+ | 13+ | 10.15+ | 6+ | 13+ | Yes |
+| SundialKitMessagable | 5.9+ | 13+ | 10.13+ | 6+ | 13+ | Yes (where needed) |
+| SundialKitStream | 6.1+ | 13+ | 10.15+ | 6+ | 13+ | No |
+| SundialKitProtobuf | 6.1+ | Per SwiftProtobuf | Per SwiftProtobuf | Per SwiftProtobuf | Per SwiftProtobuf | No |
+
+#### Core Package: SundialKit / SundialKitCore
+
+**Minimum Platform Versions:**
 - iOS 13+, watchOS 6+, tvOS 13+, macOS 10.13+
-- Use `@available` guards for async/await features
-- Broader compatibility, more complex implementation
+- **Must maintain v1.0.0 compatibility** for backwards-compatibility plugins
 
-**Option B: Bump for modern features**
-- iOS 15+ (async/await native support)
-- watchOS 8+, tvOS 15+, macOS 12+
-- Cleaner implementation, narrower compatibility
+**Dependencies:**
+- Foundation (system)
+- Network framework (iOS 12+, macOS 10.14+)
+- WatchConnectivity (iOS/watchOS only)
 
-**Recommendation:** Start with Option A, use `@available` guards extensively. Consider Option B for v3.0.0.
+**Platform Considerations:**
+- Core must use `@available` guards where needed to support v1.0.0 minimums
+- Particularly for any concurrency features in the observer pattern
+
+#### Plugin Package: SundialKitCombine (Backwards Compatibility)
+
+**Minimum Platform Versions:**
+- iOS 13+, watchOS 6+, tvOS 13+, macOS 10.15+
+- **Must match v1.0.0 API platform support**
+- Note: macOS 10.15+ is required for Combine (slightly higher than v1.0.0's macOS 10.13+)
+
+**Dependencies:**
+- SundialKitCore ^2.0.0
+- Combine (Apple framework, iOS 13+, macOS 10.15+)
+
+**Platform Considerations:**
+- Must maintain exact v1.0.0 platform compatibility
+- Use `@available` guards extensively to match v1.0.0 behavior
+- Cannot break existing code that targets v1.0.0 minimums
+
+#### Plugin Package: SundialKitMessagable (Backwards Compatibility)
+
+**Minimum Platform Versions:**
+- iOS 13+, watchOS 6+, tvOS 13+, macOS 10.13+
+- **Must match v1.0.0 platform requirements exactly**
+
+**Dependencies:**
+- SundialKitCore ^2.0.0
+- No external dependencies
+
+**Platform Considerations:**
+- Must maintain exact v1.0.0 platform compatibility
+- Use `@available` guards where needed to match v1.0.0 behavior
+- Critical for zero-breaking-change migration
+
+#### Plugin Package: SundialKitStream (New in v2.0.0)
+
+**Minimum Platform Versions:**
+- iOS 13+, watchOS 6+, tvOS 13+, macOS 10.15+
+- **New package - no backwards compatibility constraints**
+- Platforms set to match AsyncStream/concurrency requirements
+
+**Dependencies:**
+- SundialKitCore ^2.0.0
+- swift-async-algorithms (optional)
+
+**Swift Version:**
+- Minimum: Swift 6.1
+- Leverages modern Swift concurrency and typed throws
+
+**Platform Considerations:**
+- **Does NOT use `@available` guards** - simply declares minimum platforms in Package.swift
+- Clean, modern Swift 6.1 implementation
+- No backwards compatibility concerns
+- If using swift-async-algorithms, follow its minimum platform requirements
+
+**Recommendation:** Don't use swift-async-algorithms unless advanced features are needed; keep dependencies minimal.
+
+#### Plugin Package: SundialKitProtobuf (New in v2.0.0)
+
+**Minimum Platform Versions:**
+- Determined by latest [SwiftProtobuf](https://github.com/apple/swift-protobuf) requirements
+- Pinned to latest stable SwiftProtobuf release
+- Effectively: max(SundialKitCore platforms, latest SwiftProtobuf platforms)
+- **New package - no backwards compatibility constraints**
+
+**Dependencies:**
+- SundialKitCore ^2.0.0
+- SwiftProtobuf (latest stable version)
+
+**Swift Version:**
+- Minimum: Swift 6.1
+- Leverages modern Swift features for type safety and concurrency
+
+**Platform Considerations:**
+- **Does NOT use `@available` guards** - simply declares minimum platforms in Package.swift
+- Minimum platforms determined by latest SwiftProtobuf dependency
+- Pin to latest stable SwiftProtobuf version
+- Clean, modern Swift 6.1 implementation
+- No backwards compatibility concerns
 
 #### Swift Version
-- Minimum: Swift 5.9 (current v1.0.0 requirement)
-- Recommended: Swift 6.0+ for typed throws and full concurrency support
+
+**V1.0.0 Compatibility Layer** (SundialKitCore, SundialKit, SundialKitCombine, SundialKitMessagable):
+- Minimum: Swift 5.9 (maintains v1.0.0 requirement)
+- Must not introduce Swift 6.0+ requirements to maintain backwards compatibility
+
+**Modern Packages** (SundialKitStream, SundialKitProtobuf):
+- Minimum: Swift 6.1
+- Leverages latest Swift features for typed throws, concurrency, and modern patterns
+- No backwards compatibility constraints
 
 ---
 
@@ -487,12 +622,15 @@ public final class NetworkObserver: ObservableObject {
 ### 6.3 AsyncStream Plugin Example
 
 ```swift
-// SundialKitAsync
+// SundialKitStream (Swift 6.1 with actors)
 import SundialKitCore
 
-@available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
-public final class AsyncNetworkMonitor {
+public actor NetworkStream {
     private let monitor: NetworkMonitoring
+
+    public init(monitor: NetworkMonitoring) {
+        self.monitor = monitor
+    }
 
     public var pathStatusStream: AsyncStream<PathStatus> {
         AsyncStream { continuation in
@@ -510,12 +648,14 @@ public final class AsyncNetworkMonitor {
     public func currentPathStatus() async -> PathStatus {
         monitor.pathStatus
     }
-
-    public init(monitor: NetworkMonitoring) {
-        self.monitor = monitor
-    }
 }
 ```
+
+**Key Features:**
+- Actor-based for automatic thread safety
+- No `@available` guards needed (declares minimum platforms in Package.swift)
+- Swift 6.1 strict concurrency enabled
+- All async operations are actor-isolated
 
 ### 6.4 Protobuf Plugin Example
 
@@ -591,11 +731,11 @@ observer.pathStatusPublisher.sink { status in
 
 #### Path 2: Gradual Async Adoption
 ```swift
-// Start with Combine for network, Async for connectivity
+// Start with Combine for network, AsyncStream for connectivity
 dependencies: [
     .package(url: "https://github.com/brightdigit/SundialKit", from: "2.0.0"),
     .package(url: "https://github.com/brightdigit/SundialKitCombine", from: "2.0.0"),
-    .package(url: "https://github.com/brightdigit/SundialKitAsync", from: "2.0.0"),
+    .package(url: "https://github.com/brightdigit/SundialKitStream", from: "2.0.0"),
     .package(url: "https://github.com/brightdigit/SundialKitMessagable", from: "2.0.0")
 ]
 
@@ -603,7 +743,7 @@ dependencies: [
 let networkObserver = NetworkObserver()
 
 // Connectivity: new AsyncStream approach
-let connectivityMonitor = AsyncConnectivityManager()
+let connectivityMonitor = ConnectivityStream()
 Task {
     for await isReachable in connectivityMonitor.isReachableStream {
         print("Reachable: \(isReachable)")
@@ -616,22 +756,22 @@ Task {
 // Pure async/await + Protobuf
 dependencies: [
     .package(url: "https://github.com/brightdigit/SundialKit", from: "2.0.0"),
-    .package(url: "https://github.com/brightdigit/SundialKitAsync", from: "2.0.0"),
+    .package(url: "https://github.com/brightdigit/SundialKitStream", from: "2.0.0"),
     .package(url: "https://github.com/brightdigit/SundialKitProtobuf", from: "2.0.0")
 ]
 
 import SundialKit
-import SundialKitAsync
+import SundialKitStream
 import SundialKitProtobuf
 
-let network = AsyncNetworkMonitor()
+let network = NetworkStream()
 Task {
     for await status in network.pathStatusStream {
         print(status)
     }
 }
 
-let connectivity = AsyncConnectivityManager()
+let connectivity = ConnectivityStream()
 let message = MyProtoMessage()
 try await connectivity.send(message)
 ```
@@ -662,22 +802,28 @@ try await connectivity.send(message)
 - **Foundation**: Apple framework
 - **Network**: Apple framework (iOS 12+, macOS 10.14+)
 - **WatchConnectivity**: Apple framework (iOS, watchOS only)
+- **Swift Version**: 5.9+
 
 ### Plugin: SundialKitCombine
 - **SundialKitCore**: ^2.0.0
 - **Combine**: Apple framework (iOS 13+, macOS 10.15+)
+- **Swift Version**: 5.9+
 
-### Plugin: SundialKitAsync
+### Plugin: SundialKitStream
 - **SundialKitCore**: ^2.0.0
-- No external dependencies (uses Swift Concurrency)
+- **swift-async-algorithms**: Optional (recommended not to use unless needed)
+- **Swift Version**: 6.1+
+- Uses Swift Concurrency (AsyncStream, async/await)
 
 ### Plugin: SundialKitMessagable
 - **SundialKitCore**: ^2.0.0
+- **Swift Version**: 5.9+
 - No external dependencies
 
 ### Plugin: SundialKitProtobuf
 - **SundialKitCore**: ^2.0.0
-- **SwiftProtobuf**: ~1.20.0 (or latest stable)
+- **SwiftProtobuf**: Latest stable version (pinned)
+- **Swift Version**: 6.1+
 
 ---
 
@@ -699,8 +845,11 @@ try await connectivity.send(message)
 ### Quality Metrics
 1. **Swift Testing Migration** - 100% of tests migrated
 2. **Typed Throws Coverage** - All public throwing APIs use typed throws
-3. **Documentation** - Complete API documentation for all packages
-4. **Example Apps** - Working demos for each plugin combination
+3. **Sendable Conformance** - All core value types conform to Sendable
+4. **Swift 6.1 Strict Concurrency** - Modern packages compile without warnings under strict concurrency
+5. **Actor Isolation** - All actor-based types properly isolated
+6. **Documentation** - Complete API documentation for all packages
+7. **Example Apps** - Working demos for each plugin combination
 
 ---
 
@@ -754,17 +903,24 @@ try await connectivity.send(message)
 ### Phase 3: Modern Features (Milestone: v2.0.0-beta.1)
 **Timeline: 4-6 weeks**
 
-- [ ] Create `SundialKitAsync` package
-  - `AsyncNetworkMonitor` with AsyncStreams
-  - `AsyncConnectivityManager` with AsyncStreams
+- [ ] Add Sendable conformance to core types
+  - Mark all value types as Sendable in SundialKitCore
+  - Ensure compatibility with Swift 6.1 strict concurrency
+  - Update documentation
+
+- [ ] Create `SundialKitStream` package (Swift 6.1 + actors)
+  - `actor NetworkStream` with AsyncStreams
+  - `actor ConnectivityStream` with AsyncStreams
   - Async/await convenience methods
+  - Full Swift 6.1 strict concurrency mode enabled
   - Comprehensive tests with Swift Testing
 
-- [ ] Create `SundialKitProtobuf` package
+- [ ] Create `SundialKitProtobuf` package (Swift 6.1)
   - `ProtobufMessagable` protocol
   - Serialization/deserialization
   - Integration with `ConnectivityManager`
   - Example `.proto` files and usage
+  - Swift 6.1 strict concurrency mode enabled
   - Comprehensive tests
 
 ### Phase 4: Documentation & Examples (Milestone: v2.0.0-rc.1)
@@ -802,13 +958,29 @@ try await connectivity.send(message)
 ## 11. Open Questions & Decisions Needed
 
 ### Platform & Swift Version
-- [ ] **Decision**: Minimum platform versions (iOS 13+ vs iOS 15+)?
-  - **Recommendation**: Start with iOS 13+, use `@available` guards
-  - **Impact**: Wider compatibility but more complex implementation
+- [x] **Decision**: Minimum platform versions for Core package?
+  - **Decision**: iOS 13+, macOS 10.13+, watchOS 6+, tvOS 13+ (maintain v1.0.0 compatibility)
+  - **Impact**: Core must use `@available` guards where needed for backwards-compatibility plugins
+  - **Note**: New plugins (Stream, Protobuf) can set their own minimums freely
 
-- [ ] **Decision**: Minimum Swift version (5.9 vs 6.0)?
-  - **Recommendation**: Swift 5.9 minimum, Swift 6.0 recommended
-  - **Impact**: Typed throws optional in 5.9, native in 6.0
+- [x] **Decision**: Should SundialKitStream depend on swift-async-algorithms?
+  - **Decision**: No external dependency (keep dependencies minimal)
+  - **Impact**: Use built-in AsyncStream only; cleaner dependency graph
+
+- [x] **Decision**: SundialKitStream minimum platforms and Swift version?
+  - **Decision**: iOS 13+, macOS 10.15+, watchOS 6+, tvOS 13+ with Swift 6.1+
+  - **Impact**: No @available guards needed; clean modern implementation
+  - **Note**: New package with no backwards compatibility constraints
+
+- [x] **Decision**: Swift version split strategy?
+  - **Decision**:
+    - Swift 5.9 for v1.0.0 compatibility layer (Core, SundialKit, Combine, Messagable)
+    - Swift 6.1 for modern packages (Stream, Protobuf)
+  - **Impact**: Backwards compatibility maintained while enabling modern Swift features for new packages
+
+- [x] **Decision**: SwiftProtobuf version for SundialKitProtobuf?
+  - **Decision**: Pin to latest stable SwiftProtobuf release
+  - **Impact**: Always use most recent SwiftProtobuf features and platform support
 
 ### Package Management
 - [ ] **Decision**: Should plugin packages live in the same monorepo or separate repos?
@@ -822,12 +994,16 @@ try await connectivity.send(message)
   - **Recommendation**: Lock-step for simplicity
 
 ### API Design
-- [ ] **Decision**: Should `NetworkMonitor` and `ConnectivityManager` be actors?
-  - **Consideration**: Thread-safety benefits vs complexity
-  - **Recommendation**: Not initially, add in v2.1.0 if needed
+- [ ] **Decision**: Should modern package types be actors?
+  - **`NetworkStream` and `ConnectivityStream`**: Yes (Swift 6.1 actor-based)
+  - **`NetworkMonitor` and `ConnectivityManager`**: No (keep as classes for v1 compatibility)
+  - **Rationale**: Modern packages should leverage Swift 6.1 concurrency fully
+  - **Impact**: Thread-safe by default, better for concurrent workloads
 
 - [ ] **Decision**: Should core types (PathStatus, etc.) conform to Sendable?
-  - **Recommendation**: Yes, mark as Sendable for Swift 6 compatibility
+  - **Decision**: Yes, mark all core value types as Sendable
+  - **Impact**: Required for Swift 6.1 strict concurrency in modern packages
+  - **Applies to**: PathStatus, ActivationState, error types, etc.
 
 ### Testing
 - [ ] **Decision**: Swift Testing availability on older platforms?
@@ -894,22 +1070,16 @@ try await connectivity.send(message)
 ## 13. Future Considerations (Post v2.0.0)
 
 ### v2.1.0+
-- Actor-based implementations for thread safety
-- Additional reactive plugins (ReactiveSwift, RxSwift?)
+- SwiftUI property wrappers and macros (`@NetworkStatus`, `@ConnectivityState`)
+- Enhanced debugging and logging plugins
 - Additional serialization plugins (JSON, MessagePack?)
 - Performance optimizations and profiling tools
 
-### v2.x.0
-- SwiftUI property wrappers and macros
-- Enhanced debugging and logging plugins
-- Network simulation and testing utilities
-- Xcode extension for migration assistance
-
 ### v3.0.0
 - Potential platform minimum bump (iOS 15+?)
-- AsyncStream as primary reactive approach
-- Deprecate or archive Combine plugins
-- Full Swift 6.0 strict concurrency
+- AsyncStream as primary reactive approach (deprecate Combine plugins)
+- Migrate Core layer to Swift 6.1 (breaking change for v1 compatibility layer)
+- Consider actor-based Core implementations
 
 ---
 
@@ -929,6 +1099,7 @@ try await connectivity.send(message)
 - [Swift Evolution: Typed Throws](https://github.com/apple/swift-evolution/blob/main/proposals/0413-typed-throws.md)
 - [Swift Testing Documentation](https://developer.apple.com/documentation/testing)
 - [SwiftProtobuf Documentation](https://github.com/apple/swift-protobuf)
+- [swift-async-algorithms](https://github.com/apple/swift-async-algorithms)
 - [AsyncStream Documentation](https://developer.apple.com/documentation/swift/asyncstream)
 
 ---
