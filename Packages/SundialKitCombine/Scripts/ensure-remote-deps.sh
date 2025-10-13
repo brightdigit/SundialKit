@@ -24,9 +24,16 @@ fi
 # Switch from local to remote
 if grep -q "\.package(path:" "$PACKAGE_FILE"; then
   echo "🔄 Switching to remote dependency..."
-  sed -i '' \
-    -e 's|\.package(path: "'"$LOCAL_PATH"'")|.package(url: "'"$REMOTE_URL"'", '"$REMOTE_BRANCH"')|g' \
-    "$PACKAGE_FILE"
+  # Cross-platform sed: use -i with empty string on macOS, without on Linux
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' \
+      -e 's|\.package(path: "'"$LOCAL_PATH"'")|.package(url: "'"$REMOTE_URL"'", '"$REMOTE_BRANCH"')|g' \
+      "$PACKAGE_FILE"
+  else
+    sed -i \
+      -e 's|\.package(path: "'"$LOCAL_PATH"'")|.package(url: "'"$REMOTE_URL"'", '"$REMOTE_BRANCH"')|g' \
+      "$PACKAGE_FILE"
+  fi
   echo "✅ Switched to remote dependency"
 else
   echo "⚠️  Unknown dependency format in Package.swift"
