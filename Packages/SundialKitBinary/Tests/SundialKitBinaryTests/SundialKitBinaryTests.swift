@@ -3,9 +3,9 @@ import Testing
 @testable import SundialKitBinary
 
 @Suite("SundialKitBinary Tests")
-struct SundialKitBinaryTests {
+internal struct SundialKitBinaryTests {
   @Test("Version is defined")
-  func versionIsDefined() {
+  internal func versionIsDefined() {
     #expect(!SundialKitBinary.version.isEmpty)
   }
 }
