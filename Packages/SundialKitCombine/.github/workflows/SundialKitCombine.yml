@@ -1,10 +1,10 @@
-name: SundialKit
+name: SundialKitCombine
 on:
   push:
     branches-ignore:
       - '*WIP'
 env:
-  PACKAGE_NAME: SundialKit
+  PACKAGE_NAME: SundialKitCombine
 jobs:
   build-ubuntu:
     name: Build on Ubuntu
@@ -31,9 +31,12 @@ jobs:
               version: "5.9"
     steps:
       - uses: actions/checkout@v4
+      - name: Ensure remote dependencies
+        run: ./Scripts/ensure-remote-deps.sh
       - uses: brightdigit/swift-build@main
         with:
           scheme: ${{ env.PACKAGE_NAME }}
+          skip-package-resolved: true
       - uses: sersoft-gmbh/swift-coverage-action@v4
         id: coverage-files
         with:
@@ -61,7 +64,7 @@ jobs:
             xcode: "/Applications/Xcode_15.2.app"
           - runs-on: macos-14
             xcode: "/Applications/Xcode_15.4.app"
-          
+
           # SPM Build Matrix - Xcode 16.x+ (Swift 6.x)
           - runs-on: macos-15
             xcode: "/Applications/Xcode_26.0.app"
@@ -126,6 +129,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Ensure remote dependencies
+        run: ./Scripts/ensure-remote-deps.sh
 
       - name: Build and Test
         uses: brightdigit/swift-build@main
@@ -136,6 +141,7 @@ jobs:
           deviceName: ${{ matrix.deviceName }}
           osVersion: ${{ matrix.osVersion }}
           download-platform: ${{ matrix.download-platform }}
+          skip-package-resolved: true
 
       # Coverage Steps
       - name: Process Coverage
@@ -158,6 +164,8 @@ jobs:
       LINT_MODE: STRICT
     steps:
       - uses: actions/checkout@v4
+      - name: Ensure remote dependencies
+        run: ./Scripts/ensure-remote-deps.sh
       - name: Cache mint
         id: cache-mint
         uses: actions/cache@v4

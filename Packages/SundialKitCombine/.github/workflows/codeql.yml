@@ -17,7 +17,7 @@ on:
       - '*WIP'
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ "main" , "v2.0.0" ]
+    branches: [ "main" ]
   schedule:
     - cron: '20 11 * * 3'
 
@@ -48,7 +48,7 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      
+
     - name: Setup Xcode
       run: sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
 

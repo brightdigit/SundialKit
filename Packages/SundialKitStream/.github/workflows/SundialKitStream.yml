@@ -1,10 +1,10 @@
-name: SundialKit
+name: SundialKitStream
 on:
   push:
     branches-ignore:
       - '*WIP'
 env:
-  PACKAGE_NAME: SundialKit
+  PACKAGE_NAME: SundialKitStream
 jobs:
   build-ubuntu:
     name: Build on Ubuntu
@@ -16,24 +16,20 @@ jobs:
       matrix:
         os: [noble, jammy]
         swift:
-          - version: "5.9"
-          - version: "5.10"
-          - version: "6.0"
           - version: "6.1"
           - version: "6.2"
           - version: "6.1"
             nightly: true
           - version: "6.2"
             nightly: true
-        exclude:
-          - os: noble
-            swift:
-              version: "5.9"
     steps:
       - uses: actions/checkout@v4
+      - name: Ensure remote dependencies
+        run: ./Scripts/ensure-remote-deps.sh
       - uses: brightdigit/swift-build@main
         with:
           scheme: ${{ env.PACKAGE_NAME }}
+          skip-package-resolved: true
       - uses: sersoft-gmbh/swift-coverage-action@v4
         id: coverage-files
         with:
@@ -54,15 +50,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # SPM Build Matrix - Xcode 15.x (Swift 5.9-5.10)
-          - runs-on: macos-14
-            xcode: "/Applications/Xcode_15.0.1.app"
-          - runs-on: macos-14
-            xcode: "/Applications/Xcode_15.2.app"
-          - runs-on: macos-14
-            xcode: "/Applications/Xcode_15.4.app"
-          
-          # SPM Build Matrix - Xcode 16.x+ (Swift 6.x)
+          # SPM Build Matrix - Xcode 16.x+ (Swift 6.1+)
           - runs-on: macos-15
             xcode: "/Applications/Xcode_26.0.app"
           - runs-on: macos-15
@@ -70,14 +58,7 @@ jobs:
           - runs-on: macos-15
             xcode: "/Applications/Xcode_16.3.app"
 
-          # iOS Build Matrix - Xcode 15.x (Swift 5.9-5.10)
-          - type: ios
-            runs-on: macos-14
-            xcode: "/Applications/Xcode_15.4.app"
-            deviceName: "iPhone 15"
-            osVersion: "17.5"
-
-          # iOS Build Matrix - Xcode 16.x+ (Swift 6.x)
+          # iOS Build Matrix - Xcode 16.x+ (Swift 6.1+)
           - type: ios
             runs-on: macos-15
             xcode: "/Applications/Xcode_26.0.app"
@@ -97,14 +78,7 @@ jobs:
             deviceName: "iPhone 16"
             osVersion: "18.4"
 
-          # watchOS Build Matrix - Xcode 15.x (Swift 5.9-5.10)
-          - type: watchos
-            runs-on: macos-14
-            xcode: "/Applications/Xcode_15.4.app"
-            deviceName: "Apple Watch Series 9 (45mm)"
-            osVersion: "10.5"
-
-          # watchOS Build Matrix - Xcode 16.x+ (Swift 6.x)
+          # watchOS Build Matrix - Xcode 16.x+ (Swift 6.1+)
           - type: watchos
             runs-on: macos-15
             xcode: "/Applications/Xcode_26.0.app"
@@ -127,6 +101,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Ensure remote dependencies
+        run: ./Scripts/ensure-remote-deps.sh
+
       - name: Build and Test
         uses: brightdigit/swift-build@main
         with:
@@ -136,6 +113,7 @@ jobs:
           deviceName: ${{ matrix.deviceName }}
           osVersion: ${{ matrix.osVersion }}
           download-platform: ${{ matrix.download-platform }}
+          skip-package-resolved: true
 
       # Coverage Steps
       - name: Process Coverage
@@ -158,6 +136,8 @@ jobs:
       LINT_MODE: STRICT
     steps:
       - uses: actions/checkout@v4
+      - name: Ensure remote dependencies
+        run: ./Scripts/ensure-remote-deps.sh
       - name: Cache mint
         id: cache-mint
         uses: actions/cache@v4

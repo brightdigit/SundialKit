@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:brightdigit/SundialKitBinary.git
+	branch = v1.0.0
+	commit = e9d4abbb11cd386b070203ebc6928e6c116b762e
+	parent = 212a699b15ae7a53ebbb4967bb3ded13ce825c0c
+	method = merge
+	cmdver = 0.4.9
