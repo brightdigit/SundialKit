@@ -3,9 +3,9 @@ import Testing
 @testable import SundialKitStream
 
 @Suite("SundialKitStream Tests")
-struct SundialKitStreamTests {
+internal struct SundialKitStreamTests {
   @Test("Version is defined")
-  func versionIsDefined() {
+  internal func versionIsDefined() {
     #expect(!SundialKitStream.version.isEmpty)
   }
 }

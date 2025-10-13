@@ -2,8 +2,8 @@ import XCTest
 
 @testable import SundialKitMessagable
 
-final class SundialKitMessagableTests: XCTestCase {
-  func testVersionIsDefined() {
+internal final class SundialKitMessagableTests: XCTestCase {
+  internal func testVersionIsDefined() {
     XCTAssertFalse(SundialKitMessagable.version.isEmpty)
   }
 }
