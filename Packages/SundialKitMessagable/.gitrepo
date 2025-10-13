@@ -6,7 +6,7 @@
 [subrepo]
 	remote = git@github.com:brightdigit/SundialKitMessagable.git
 	branch = v1.0.0
-	commit = 92364faeaa686ce76a0103a31c64df9265ea6f36
-	parent = 5f2698b93323a27e736eebe920a618d2ed199fe0
+	commit = fc519ee4a3856f802e649086945f536d85223966
+	parent = 258b3040fceb0bd3a9a8d27b130136396052c0d0
 	method = merge
 	cmdver = 0.4.9
