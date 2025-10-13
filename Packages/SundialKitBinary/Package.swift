@@ -57,13 +57,14 @@ let package = Package(
     )
   ],
   dependencies: [
-    // TODO: Add SundialKit dependency
-    // .package(url: "https://github.com/brightdigit/SundialKit.git", from: "2.0.0")
+    .package(path: "../../")
   ],
   targets: [
     .target(
       name: "SundialKitBinary",
-      dependencies: [],
+      dependencies: [
+        .product(name: "SundialKit", package: "SundialKit")
+      ],
       swiftSettings: swiftSettings
     ),
     .testTarget(

@@ -1,4 +1,5 @@
 import Testing
+
 @testable import SundialKitBinary
 
 @Suite("SundialKitBinary Tests")

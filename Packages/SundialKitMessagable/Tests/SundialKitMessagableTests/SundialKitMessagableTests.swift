@@ -1,4 +1,5 @@
 import XCTest
+
 @testable import SundialKitMessagable
 
 final class SundialKitMessagableTests: XCTestCase {

@@ -1,4 +1,5 @@
 import Testing
+
 @testable import SundialKitStream
 
 @Suite("SundialKitStream Tests")

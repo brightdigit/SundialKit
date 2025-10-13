@@ -31,6 +31,8 @@ jobs:
               version: "5.9"
     steps:
       - uses: actions/checkout@v4
+      - name: Ensure remote dependencies
+        run: ./Scripts/ensure-remote-deps.sh
       - uses: brightdigit/swift-build@v1.3.4
         with:
           scheme: ${{ env.PACKAGE_NAME }}
@@ -127,6 +129,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Ensure remote dependencies
+        run: ./Scripts/ensure-remote-deps.sh
+
       - name: Build and Test
         uses: brightdigit/swift-build@v1.3.4
         with:
@@ -158,6 +163,8 @@ jobs:
       LINT_MODE: STRICT
     steps:
       - uses: actions/checkout@v4
+      - name: Ensure remote dependencies
+        run: ./Scripts/ensure-remote-deps.sh
       - name: Cache mint
         id: cache-mint
         uses: actions/cache@v4
