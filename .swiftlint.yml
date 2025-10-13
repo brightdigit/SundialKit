@@ -116,7 +116,7 @@ excluded:
   - .build
   - Mint
   - Examples
-  - Sources/MistKit/Generated
+  - Packages
 indentation_width:
   indentation_width: 2
 file_name:
