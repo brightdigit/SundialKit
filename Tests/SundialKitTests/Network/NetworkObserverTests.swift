@@ -20,7 +20,7 @@ internal final class NetworkObserverTests: XCTestCase, @unchecked Sendable {
 
       let cancellable = observer.pingStatusPublisher.sink { status in
         statuses.append(status)
-        if statuses.count > 1 {
+        if statuses.count >= 2 {
           pingStatusExpectaion.fulfill()
         }
       }
@@ -30,7 +30,7 @@ internal final class NetworkObserverTests: XCTestCase, @unchecked Sendable {
 
       XCTAssertEqual(monitor.dispatchQueueLabel, dispatchQueueLabel)
 
-      waitForExpectations(timeout: 10.0) { error in
+      waitForExpectations(timeout: 10.0) { [statuses] error in
         XCTAssertNil(error)
         XCTAssertNotNil(statuses[0])
         XCTAssertNotNil(statuses[1])

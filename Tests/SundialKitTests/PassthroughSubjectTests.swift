@@ -6,7 +6,7 @@ import XCTest
   import Combine
 #endif
 
-internal class PassthroughSubjectTests: XCTestCase {
+internal class PassthroughSubjectTests: XCTestCase, @unchecked Sendable {
   private struct MockStruct {
     // swiftlint:disable:next strict_fileprivate
     fileprivate let id: UUID
@@ -23,7 +23,7 @@ internal class PassthroughSubjectTests: XCTestCase {
         expectation.fulfill()
       }
       subject.send(.init(id: expected))
-      waitForExpectations(timeout: 1.0) { error in
+      waitForExpectations(timeout: 1.0) { [actual] error in
         XCTAssertNil(error)
         XCTAssertEqual(expected, actual)
         cancellable.cancel()
