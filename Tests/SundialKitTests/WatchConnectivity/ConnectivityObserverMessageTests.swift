@@ -8,9 +8,8 @@ import XCTest
   import Combine
 #endif
 
-internal final class ConnectivityObserverMessageTests: XCTestCase, @unchecked Sendable {
+internal final class ConnectivityObserverMessageTests: XCTestCase {
   // swiftlint:disable:next function_body_length
-  @MainActor
   internal func testCombineSendMessageReachable() throws {
     #if canImport(Combine)
       let expectation = expectation(description: "Message Sent Received")
@@ -49,7 +48,6 @@ internal final class ConnectivityObserverMessageTests: XCTestCase, @unchecked Se
   }
 
   // swiftlint:disable:next function_body_length
-  @MainActor
   internal func testCombineSendMessageAppInstalled() throws {
     #if canImport(Combine)
       let expectation = expectation(description: "Message Sent Received")
