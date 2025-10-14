@@ -10,9 +10,10 @@ import XCTest
 
 internal final class NetworkObserverTests: XCTestCase, @unchecked Sendable {
   // swiftlint:disable:next function_body_length
+  @MainActor
   internal func testStart() throws {
     #if canImport(Combine)
-      class StatusSet {
+      class StatusSet: @unchecked Sendable {
         var statuses = [MockNetworkPing.StatusType?]()
 
         func append(_ status: MockNetworkPing.StatusType?) -> Int {

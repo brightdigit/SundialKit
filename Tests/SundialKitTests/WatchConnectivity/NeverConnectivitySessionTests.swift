@@ -38,6 +38,7 @@ internal final class NeverConnectivitySessionTests: XCTestCase, @unchecked Senda
     }
   }
 
+  @MainActor
   internal func testSendMessage() {
     let messageSentDone = expectation(description: "Message Sent Done")
     session.sendMessage(.init()) { result in
