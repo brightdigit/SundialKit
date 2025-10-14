@@ -9,7 +9,6 @@ import XCTest
 #endif
 
 internal final class ConnectivityObserverPropertyTests: XCTestCase, @unchecked Sendable {
-  
   internal func testIsReachablePublisher() throws {
     #if canImport(Combine)
       let expectation = expectation(description: "Reachability Changed")
@@ -32,7 +31,6 @@ internal final class ConnectivityObserverPropertyTests: XCTestCase, @unchecked S
     #endif
   }
 
-  
   internal func testIsPairedAppInstalledPublisher() throws {
     #if canImport(Combine)
       let expectation = expectation(description: "Installed Changed")
@@ -81,7 +79,6 @@ internal final class ConnectivityObserverPropertyTests: XCTestCase, @unchecked S
     #endif
   }
 
-  
   internal func testActivationStatePublisher() throws {
     #if canImport(Combine)
       let expectation = expectation(description: "State Change Called")
@@ -103,7 +100,6 @@ internal final class ConnectivityObserverPropertyTests: XCTestCase, @unchecked S
     #endif
   }
 
-  
   internal func testSessionDidBecomeInactive() throws {
     #if canImport(Combine)
       let expectation = expectation(description: "State Change Called")
@@ -126,7 +122,7 @@ internal final class ConnectivityObserverPropertyTests: XCTestCase, @unchecked S
   }
 
   // swiftlint:disable:next function_body_length
-  
+
   internal func testSessionDidDeactivate() throws {
     #if canImport(Combine)
       let actExpectation = expectation(description: "State Change Called to Activate")

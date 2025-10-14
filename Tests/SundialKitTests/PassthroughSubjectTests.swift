@@ -12,7 +12,6 @@ internal class PassthroughSubjectTests: XCTestCase, @unchecked Sendable {
     fileprivate let id: UUID
   }
 
-  
   internal func testAnyPublisher() throws {
     #if canImport(Combine)
       let expected = UUID()

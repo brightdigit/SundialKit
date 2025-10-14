@@ -38,8 +38,7 @@ internal final class NeverConnectivitySessionTests: XCTestCase, @unchecked Senda
     }
   }
 
-  
-  internal func testSendMessage() {
+  internal func testSendMessage() async {
     let messageSentDone = expectation(description: "Message Sent Done")
     session.sendMessage(.init()) { result in
       guard case .failure(let error as SundialError) = result else {
@@ -48,8 +47,7 @@ internal final class NeverConnectivitySessionTests: XCTestCase, @unchecked Senda
       XCTAssertEqual(error, .sessionNotSupported)
       messageSentDone.fulfill()
     }
-    waitForExpectations(timeout: 1.0) {
-      XCTAssertNil($0)
-    }
+
+    await fulfillment(of: [messageSentDone], timeout: 1.0)
   }
 }

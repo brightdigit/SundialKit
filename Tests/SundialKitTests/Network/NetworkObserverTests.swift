@@ -10,7 +10,6 @@ import XCTest
 
 internal final class NetworkObserverTests: XCTestCase, @unchecked Sendable {
   // swiftlint:disable:next function_body_length
-  @MainActor
   internal func testStart() throws {
     #if canImport(Combine)
       class StatusSet: @unchecked Sendable {

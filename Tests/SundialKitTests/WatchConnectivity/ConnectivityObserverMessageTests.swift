@@ -10,7 +10,7 @@ import XCTest
 
 internal final class ConnectivityObserverMessageTests: XCTestCase {
   // swiftlint:disable:next function_body_length
-  internal func testCombineSendMessageReachable() throws {
+  internal func testCombineSendMessageReachable() async throws {
     #if canImport(Combine)
       let expectation = expectation(description: "Message Sent Received")
       let session = MockSession()
@@ -36,19 +36,17 @@ internal final class ConnectivityObserverMessageTests: XCTestCase {
         expectation.fulfill()
       }
       wcObject.sendingMessageSubject.send(newState)
-      waitForExpectations(timeout: 5.0) { error in
-        XCTAssertNil(error)
-        XCTAssertEqual(session.lastMessageSent?[key] as? UUID, value)
+      await fulfillment(of: [expectation], timeout: 5.0)
+      XCTAssertEqual(session.lastMessageSent?[key] as? UUID, value)
 
-        replyCancellable.cancel()
-      }
+      replyCancellable.cancel()
     #else
       throw XCTSkip("OS doesn't support Combine.")
     #endif
   }
 
   // swiftlint:disable:next function_body_length
-  internal func testCombineSendMessageAppInstalled() throws {
+  internal func testCombineSendMessageAppInstalled() async throws {
     #if canImport(Combine)
       let expectation = expectation(description: "Message Sent Received")
       let session = MockSession()
@@ -73,12 +71,12 @@ internal final class ConnectivityObserverMessageTests: XCTestCase {
         expectation.fulfill()
       }
       wcObject.sendingMessageSubject.send(newState)
-      waitForExpectations(timeout: 5.0) { error in
-        XCTAssertNil(error)
-        XCTAssertEqual(session.lastAppContext?[key] as? UUID, value)
+      await fulfillment(of: [expectation], timeout: 5.0)
 
-        replyCancellable.cancel()
-      }
+      XCTAssertEqual(session.lastAppContext?[key] as? UUID, value)
+
+      replyCancellable.cancel()
+    // }
 
     #else
       throw XCTSkip("OS doesn't support Combine.")
