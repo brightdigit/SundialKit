@@ -28,12 +28,15 @@
 //
 
 #if canImport(WatchConnectivity)
-  import WatchConnectivity
+  import SundialKitCore
+  @preconcurrency import WatchConnectivity
 
   internal typealias WatchConnectivitySessionProtocol =
     ConnectivitySession & WCSessionDelegate
 
-  internal class WatchConnectivitySession: NSObject, WatchConnectivitySessionProtocol {
+  internal final class WatchConnectivitySession: NSObject, WatchConnectivitySessionProtocol,
+    @unchecked Sendable
+  {
     private let session: WCSession
 
     internal var delegate: ConnectivitySessionDelegate?

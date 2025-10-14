@@ -1,9 +1,12 @@
-import Combine
 import Foundation
 import XCTest
 
 @testable import SundialKit
 @testable import SundialKitConnectivity
+
+#if canImport(Combine)
+  import Combine
+#endif
 
 internal final class ConnectivityObserverPropertyTests: XCTestCase, @unchecked Sendable {
   internal func testIsReachablePublisher() throws {

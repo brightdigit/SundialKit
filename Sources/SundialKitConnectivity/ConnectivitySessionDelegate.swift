@@ -27,7 +27,7 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-internal protocol ConnectivitySessionDelegate: AnyObject {
+internal protocol ConnectivitySessionDelegate: AnyObject, Sendable {
   func session(
     _ session: ConnectivitySession,
     activationDidCompleteWith activationState: ActivationState,

@@ -28,7 +28,7 @@
 //
 
 #if canImport(WatchConnectivity)
-  import WatchConnectivity
+  public import WatchConnectivity
 
   extension WCSession {
     /// polyfill for whether the app is installed on the other device
