@@ -10,7 +10,6 @@ SUBREPOS=("SundialKitStream" "SundialKitBinary" "SundialKitCombine" "SundialKitM
 
 # Remote URL for SundialKit
 REMOTE_URL="https://github.com/brightdigit/SundialKit.git"
-REMOTE_BRANCH="branch: \"v2.0.0\""
 LOCAL_PATH="../../"
 
 if [[ "$MODE" != "local" && "$MODE" != "remote" ]]; then
@@ -24,26 +23,28 @@ fi
 echo "Switching dependencies to $MODE mode..."
 
 for subrepo in "${SUBREPOS[@]}"; do
-  package_file="$PACKAGES_DIR/$subrepo/Package.swift"
+  for fname in "Package.swift" "Package@swift-6.1.swift"; do
+    package_file="$PACKAGES_DIR/$subrepo/$fname"
 
-  if [[ ! -f "$package_file" ]]; then
-    echo "⚠️  Skipping $subrepo - Package.swift not found"
-    continue
-  fi
+    if [[ ! -f "$package_file" ]]; then
+      echo "⚠️  Skipping $subrepo - $fname not found"
+      continue
+    fi
 
-  if [[ "$MODE" == "local" ]]; then
-    # Switch to local path
-    echo "  📦 $subrepo -> local path"
-    sed -i '' \
-      -e 's|\.package(url: "'"$REMOTE_URL"'", '"$REMOTE_BRANCH"')|.package(path: "'"$LOCAL_PATH"'")|g' \
-      "$package_file"
-  else
-    # Switch to remote URL
-    echo "  🌐 $subrepo -> remote URL"
-    sed -i '' \
-      -e 's|\.package(path: "'"$LOCAL_PATH"'")|.package(url: "'"$REMOTE_URL"'", '"$REMOTE_BRANCH"')|g' \
-      "$package_file"
-  fi
+    if [[ "$MODE" == "local" ]]; then
+      # Switch to local path
+      echo "  📦 $subrepo ($fname) -> local path"
+      sed -i '' \
+        -e 's|\.package(url: "'"$REMOTE_URL"'", branch: "v2.0.0")|.package(path: "'"$LOCAL_PATH"'")|g' \
+        "$package_file"
+    else
+      # Switch to remote URL
+      echo "  🌐 $subrepo ($fname) -> remote URL"
+      sed -i '' \
+        -e 's|\.package(path: "'"$LOCAL_PATH"'")|.package(url: "'"$REMOTE_URL"'", branch: "v2.0.0")|g' \
+        "$package_file"
+    fi
+  done
 done
 
 echo ""

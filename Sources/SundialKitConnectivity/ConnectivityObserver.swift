@@ -30,11 +30,11 @@
 #if canImport(Combine)
   public import Combine
   public import Foundation
-import SundialKitCore
+  import SundialKitCore
 
   /// Class for communication between the Apple Watch and iPhone.
   @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-public class ConnectivityObserver: NSObject, ConnectivitySessionDelegate, @unchecked Sendable {
+  public class ConnectivityObserver: NSObject, ConnectivitySessionDelegate, @unchecked Sendable {
     /// `typealias` for `PassthroughSubject` without a `Failure`.
     private typealias SuccessfulSubject<Output> = PassthroughSubject<Output, Never>
 

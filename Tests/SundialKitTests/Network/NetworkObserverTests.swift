@@ -1,26 +1,41 @@
+import Combine
 import Foundation
 import XCTest
 
 @testable import SundialKit
 @testable import SundialKitNetwork
-import Combine
 
 internal final class NetworkObserverTests: XCTestCase, @unchecked Sendable {
   // swiftlint:disable:next function_body_length
   internal func testStart() throws {
     #if canImport(Combine)
+      class StatusSet {
+        var statuses = [MockNetworkPing.StatusType?]()
+
+        func append(_ status: MockNetworkPing.StatusType?) -> Int {
+          statuses.append(status)
+          return statuses.count
+        }
+
+        func get(_ index: Int) -> MockNetworkPing.StatusType? {
+          if index < statuses.count {
+            return statuses[index]
+          }
+          return nil
+        }
+      }
       let monitor = MockPathMonitor(id: UUID())
       let ping = MockNetworkPing(id: UUID(), timeInterval: 1.0)
       let observer = NetworkObserver(
         monitor: monitor,
         ping: ping
       )
-      var statuses = [MockNetworkPing.StatusType?]()
+      var statuses = StatusSet()
       let pingStatusExpectaion = expectation(description: "ping status received")
 
       let cancellable = observer.pingStatusPublisher.sink { status in
-        statuses.append(status)
-        if statuses.count >= 2 {
+        let count = statuses.append(status)
+        if count > 1 {
           pingStatusExpectaion.fulfill()
         }
       }
@@ -32,8 +47,8 @@ internal final class NetworkObserverTests: XCTestCase, @unchecked Sendable {
 
       waitForExpectations(timeout: 10.0) { [statuses] error in
         XCTAssertNil(error)
-        XCTAssertNotNil(statuses[0])
-        XCTAssertNotNil(statuses[1])
+        XCTAssertNotNil(statuses.get(0))
+        XCTAssertNotNil(statuses.get(1))
         cancellable.cancel()
       }
     #else
