@@ -51,7 +51,7 @@ internal final class ConnectivityObserverPropertyTests: XCTestCase, @unchecked S
     #endif
   }
 
-  internal func testIsPairedPublisher() throws {
+  internal func testIsPairedPublisher() async throws {
     #if canImport(Combine)
       #if os(iOS)
         let expectation = expectation(description: "Installed Changed")
@@ -65,10 +65,8 @@ internal final class ConnectivityObserverPropertyTests: XCTestCase, @unchecked S
           expectation.fulfill()
         }
         session.isPaired = newState
-        waitForExpectations(timeout: 1.0) { error in
-          XCTAssertNil(error)
-          cancellable.cancel()
-        }
+        await fulfillment(of: [expectation], timeout: 1.0)
+        cancellable.cancel()
       #else
         throw XCTSkip("`isPairedPublisher` is not supported by this OS.")
       #endif

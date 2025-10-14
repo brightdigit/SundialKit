@@ -48,7 +48,9 @@ jobs:
       matrix:
         include:
           # SPM Build Matrix - Xcode 16.x+ (Swift 6.x)
-          - runs-on: macos-15
+          - runs-on: macos-26
+            xcode: "/Applications/Xcode_26.1.app"
+          - runs-on: macos-26
             xcode: "/Applications/Xcode_26.0.app"
           - runs-on: macos-15
             xcode: "/Applications/Xcode_16.4.app"
@@ -57,7 +59,14 @@ jobs:
 
           # iOS Build Matrix - Xcode 16.x+ (Swift 6.x)
           - type: ios
-            runs-on: macos-15
+            runs-on: macos-26
+            xcode: "/Applications/Xcode_26.1.app"
+            deviceName: "iPhone 17 Pro"
+            osVersion: "26.0"
+            download-platform: true
+
+          - type: ios
+            runs-on: macos-26
             xcode: "/Applications/Xcode_26.0.app"
             deviceName: "iPhone 17 Pro"
             osVersion: "26.0"
@@ -77,7 +86,14 @@ jobs:
 
           # watchOS Build Matrix - Xcode 16.x+ (Swift 6.x)
           - type: watchos
-            runs-on: macos-15
+            runs-on: macos-26
+            xcode: "/Applications/Xcode_26.1.app"
+            deviceName: "Apple Watch Ultra 3 (49mm)"
+            osVersion: "26.0"
+            download-platform: true
+
+          - type: watchos
+            runs-on: macos-26
             xcode: "/Applications/Xcode_26.0.app"
             deviceName: "Apple Watch Ultra 3 (49mm)"
             osVersion: "26.0"
