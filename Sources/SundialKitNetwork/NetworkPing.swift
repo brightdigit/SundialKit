@@ -28,6 +28,7 @@
 //
 
 public import Foundation
+public import SundialKitCore
 
 #if canImport(Combine)
   import Combine

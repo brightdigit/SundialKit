@@ -1,5 +1,7 @@
-import SundialKit
 import XCTest
+
+@testable import SundialKitCore
+import SundialKit
 
 internal final class ConnectivityReceiveContextTests: XCTestCase {
   internal func testReplyHandler() {

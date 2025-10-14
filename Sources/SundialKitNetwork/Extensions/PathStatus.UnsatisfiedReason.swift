@@ -28,6 +28,7 @@
 //
 
 import Foundation
+public import SundialKitCore
 
 #if canImport(Network)
   public import Network

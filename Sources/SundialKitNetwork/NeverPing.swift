@@ -28,6 +28,7 @@
 //
 
 public import Foundation
+public import SundialKitCore
 
 /// `NetworkPing` which is never called.
 /// This used for a `NetworkObserver` that doesn't need a continuous ping.

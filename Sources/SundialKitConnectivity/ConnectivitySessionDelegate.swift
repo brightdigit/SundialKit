@@ -27,6 +27,8 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import SundialKitCore
+
 internal protocol ConnectivitySessionDelegate: AnyObject, Sendable {
   func session(
     _ session: ConnectivitySession,

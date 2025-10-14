@@ -30,7 +30,7 @@
 #if canImport(Combine)
   public import Combine
   public import Foundation
-  import SundialKitCore
+  public import SundialKitCore
 
   /// Class for communication between the Apple Watch and iPhone.
   @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)

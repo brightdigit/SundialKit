@@ -28,6 +28,7 @@
 //
 
 public import Foundation
+public import SundialKitCore
 
 /// Monitors the network for connectivity
 ///

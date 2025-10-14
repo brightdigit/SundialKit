@@ -1,4 +1,5 @@
 import Foundation
+@testable import SundialKitCore
 import SundialKit
 
 internal struct MockPath: NetworkPath {

@@ -1,3 +1,4 @@
+@testable import SundialKitCore
 @testable import SundialKitConnectivity
 
 internal final class MockSession: ConnectivitySession, @unchecked Sendable {

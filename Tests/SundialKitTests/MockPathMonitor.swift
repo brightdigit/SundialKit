@@ -5,6 +5,7 @@
 //  Created by Leo Dion on 5/19/22.
 //
 import Foundation
+@testable import SundialKitCore
 import SundialKit
 
 internal class MockPathMonitor: PathMonitor {

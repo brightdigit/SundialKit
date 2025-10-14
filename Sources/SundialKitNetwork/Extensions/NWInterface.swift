@@ -27,6 +27,8 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+public import SundialKitCore
+
 #if canImport(Network)
 
   public import Network

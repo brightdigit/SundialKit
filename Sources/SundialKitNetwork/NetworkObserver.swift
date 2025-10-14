@@ -27,6 +27,8 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+public import SundialKitCore
+
 #if canImport(Combine)
   public import Combine
   public import Foundation

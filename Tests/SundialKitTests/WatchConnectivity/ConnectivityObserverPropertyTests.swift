@@ -1,6 +1,7 @@
 import Foundation
 import XCTest
 
+@testable import SundialKitCore
 @testable import SundialKit
 @testable import SundialKitConnectivity
 

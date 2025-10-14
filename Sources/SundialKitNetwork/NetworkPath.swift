@@ -27,6 +27,8 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+public import SundialKitCore
+
 /// A path which contains information about the network connections.
 public protocol NetworkPath {
   /// Whether the network path is constrained.

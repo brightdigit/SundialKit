@@ -27,6 +27,8 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+public import SundialKitCore
+
 #if canImport(Network)
   public import Network
 
@@ -38,14 +40,14 @@
           status,
           reason: unsatisfiedReason,
           interfaces: availableInterfaces.map {
-            $0 as Interfaceable
+            $0 as any Interfaceable
           }
         )
       } else {
         return PathStatus(
           status,
           interfaces: availableInterfaces.map {
-            $0 as Interfaceable
+            $0 as any Interfaceable
           }
         )
       }

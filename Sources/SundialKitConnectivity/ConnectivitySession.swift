@@ -27,6 +27,8 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import SundialKitCore
+
 internal protocol ConnectivitySession: AnyObject, Sendable {
   var delegate: ConnectivitySessionDelegate? { get set }
   var isReachable: Bool { get }

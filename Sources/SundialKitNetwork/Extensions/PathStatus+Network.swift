@@ -29,6 +29,7 @@
 
 #if canImport(Network)
   import Network
+  public import SundialKitCore
 
   @available(macOS 10.14, *)
   extension PathStatus {
@@ -43,7 +44,7 @@
     // swiftlint:disable:next explicit_acl
     init(
       _ status: NWPath.Status,
-      interfaces: [Interfaceable]
+      interfaces: [any Interfaceable]
     ) {
       self.init(status, reason: .unsupported, interfaces: interfaces)
     }
@@ -58,7 +59,7 @@
     init(
       _ status: NWPath.Status,
       reason: NWPath.UnsatisfiedReason,
-      interfaces: [Interfaceable]
+      interfaces: [any Interfaceable]
     ) {
       self.init(status, reason: UnsatisfiedReason(reason), interfaces: interfaces)
     }
@@ -67,7 +68,7 @@
     private init(
       _ status: NWPath.Status,
       reason: UnsatisfiedReason,
-      interfaces: [Interfaceable]
+      interfaces: [any Interfaceable]
     ) {
       switch (status, reason) {
       case (.satisfied, _):
