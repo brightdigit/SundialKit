@@ -1,5 +1,5 @@
 //
-//  NeverPing.swift
+//  NeverConnectivitySession.swift
 //  SundialKit
 //
 //  Created by Leo Dion.
@@ -28,21 +28,45 @@
 //
 
 import Foundation
+import SundialKitCore
 
-/// `NetworkPing` which is never called.
-/// This used for a `NetworkObserver` that doesn't need a continuous ping.
-public struct NeverPing: NetworkPing {
-  public typealias StatusType = Never
-
-  public var timeInterval: TimeInterval {
-    .nan
+internal final class NeverConnectivitySession: NSObject, ConnectivitySession {
+  internal var delegate: ConnectivitySessionDelegate? {
+    get {
+      nil
+    }
+    // swiftlint:disable:next unused_setter_value
+    set {}
   }
 
-  private init() {}
-
-  public func shouldPing(onStatus _: PathStatus) -> Bool {
+  internal var isReachable: Bool {
     false
   }
 
-  public func onPing(_: @escaping (Never) -> Void) {}
+  internal var isPaired: Bool {
+    false
+  }
+
+  internal var isPairedAppInstalled: Bool {
+    false
+  }
+
+  internal var activationState: ActivationState {
+    .notActivated
+  }
+
+  internal func activate() throws {
+    throw SundialError.sessionNotSupported
+  }
+
+  internal func updateApplicationContext(_: ConnectivityMessage) throws {
+    throw SundialError.sessionNotSupported
+  }
+
+  internal func sendMessage(
+    _: ConnectivityMessage,
+    _ completion: @escaping (Result<ConnectivityMessage, Error>) -> Void
+  ) {
+    completion(.failure(SundialError.sessionNotSupported))
+  }
 }

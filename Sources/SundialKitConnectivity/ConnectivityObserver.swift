@@ -28,16 +28,17 @@
 //
 
 #if canImport(Combine)
-  import Combine
-  import Foundation
+  public import Combine
+  public import Foundation
+import SundialKitCore
 
   /// Class for communication between the Apple Watch and iPhone.
   @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-  public class ConnectivityObserver: NSObject, ConnectivitySessionDelegate {
+public class ConnectivityObserver: NSObject, ConnectivitySessionDelegate, @unchecked Sendable {
     /// `typealias` for `PassthroughSubject` without a `Failure`.
     private typealias SuccessfulSubject<Output> = PassthroughSubject<Output, Never>
 
-    internal let session: ConnectivitySession
+    internal let session: any ConnectivitySession
 
     /// `Subject` for sending message through
     public let sendingMessageSubject = PassthroughSubject<ConnectivityMessage, Never>()
@@ -45,10 +46,10 @@
     // swiftlint:disable:next implicitly_unwrapped_optional
     private var cancellable: AnyCancellable!
 
-    private let activationStateSubject = SuccessfulSubject<ConnectivitySession>()
-    private let isReachableSubject = SuccessfulSubject<ConnectivitySession>()
-    private let isPairedAppInstalledSubject = SuccessfulSubject<ConnectivitySession>()
-    private let isPairedSubject = SuccessfulSubject<ConnectivitySession>()
+    private let activationStateSubject = SuccessfulSubject<any ConnectivitySession>()
+    private let isReachableSubject = SuccessfulSubject<any ConnectivitySession>()
+    private let isPairedAppInstalledSubject = SuccessfulSubject<any ConnectivitySession>()
+    private let isPairedSubject = SuccessfulSubject<any ConnectivitySession>()
     private let messageReceivedSubject = SuccessfulSubject<ConnectivityReceiveResult>()
     private let replyMessageSubject = SuccessfulSubject<ConnectivitySendResult>()
 
@@ -95,7 +96,7 @@
       #endif
     }
 
-    internal init(session: ConnectivitySession) {
+    internal init(session: any ConnectivitySession) {
       self.session = session
       super.init()
       session.delegate = self
@@ -123,15 +124,15 @@
       try session.activate()
     }
 
-    internal func sessionDidBecomeInactive(_ session: ConnectivitySession) {
+    internal func sessionDidBecomeInactive(_ session: any ConnectivitySession) {
       activationStateSubject.send(session)
     }
 
-    internal func sessionDidDeactivate(_ session: ConnectivitySession) {
+    internal func sessionDidDeactivate(_ session: any ConnectivitySession) {
       activationStateSubject.send(session)
     }
 
-    internal func sessionCompanionStateDidChange(_ session: ConnectivitySession) {
+    internal func sessionCompanionStateDidChange(_ session: any ConnectivitySession) {
       DispatchQueue.main.async {
         self.isPairedSubject.send(session)
         self.isPairedAppInstalledSubject.send(session)
@@ -139,9 +140,9 @@
     }
 
     internal func session(
-      _ session: ConnectivitySession,
+      _ session: any ConnectivitySession,
       activationDidCompleteWith _: ActivationState,
-      error _: Error?
+      error _: (any Error)?
     ) {
       DispatchQueue.main.async {
         self.activationStateSubject.send(session)
@@ -154,7 +155,7 @@
       }
     }
 
-    internal func sessionReachabilityDidChange(_ session: ConnectivitySession) {
+    internal func sessionReachabilityDidChange(_ session: any ConnectivitySession) {
       DispatchQueue.main.async {
         self.isReachableSubject.send(session)
       }
@@ -182,7 +183,7 @@
     }
 
     internal func session(
-      _: ConnectivitySession,
+      _: any ConnectivitySession,
       didReceiveMessage message: [String: Any],
       replyHandler: @escaping ([String: Any]) -> Void
     ) {
@@ -190,9 +191,9 @@
     }
 
     internal func session(
-      _: ConnectivitySession,
+      _: any ConnectivitySession,
       didReceiveApplicationContext applicationContext: ConnectivityMessage,
-      error _: Error?
+      error _: (any Error)?
     ) {
       messageReceivedSubject.send(.init(message: applicationContext, context: .applicationContext))
     }

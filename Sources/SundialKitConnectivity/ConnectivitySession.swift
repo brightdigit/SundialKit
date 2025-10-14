@@ -1,5 +1,5 @@
 //
-//  NWInterface.swift
+//  ConnectivitySession.swift
 //  SundialKit
 //
 //  Created by Leo Dion.
@@ -27,40 +27,20 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#if canImport(Network)
+internal protocol ConnectivitySession: AnyObject, Sendable {
+  var delegate: ConnectivitySessionDelegate? { get set }
+  var isReachable: Bool { get }
 
-  import Network
-  @available(macOS 10.14, *)
-  // swiftlint:disable:next file_types_order
-  extension NWInterface.InterfaceType {
-    // swiftlint:disable:next explicit_acl
-    var value: Int {
-      switch self {
-      case .other:
-        return PathStatus.Interface.other.rawValue
+  #if os(iOS)
+    var isPaired: Bool { get }
+  #endif
+  var isPairedAppInstalled: Bool { get }
+  var activationState: ActivationState { get }
 
-      case .wifi:
-        return PathStatus.Interface.wifi.rawValue
-
-      case .cellular:
-        return PathStatus.Interface.cellular.rawValue
-
-      case .wiredEthernet:
-        return PathStatus.Interface.wiredEthernet.rawValue
-
-      case .loopback:
-        return PathStatus.Interface.loopback.rawValue
-
-      @unknown default:
-        return 0
-      }
-    }
-  }
-
-  @available(macOS 10.14, *)
-  extension NWInterface: Interfaceable {
-    public var typeValue: Int {
-      type.value
-    }
-  }
-#endif
+  func activate() throws
+  func updateApplicationContext(_ context: ConnectivityMessage) throws
+  func sendMessage(
+    _ message: ConnectivityMessage,
+    _ completion: @escaping (Result<ConnectivityMessage, Error>) -> Void
+  )
+}

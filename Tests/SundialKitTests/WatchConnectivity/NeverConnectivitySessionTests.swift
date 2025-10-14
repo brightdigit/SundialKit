@@ -1,8 +1,9 @@
 import XCTest
 
 @testable import SundialKit
+@testable import SundialKitConnectivity
 
-internal final class NeverConnectivitySessionTests: XCTestCase {
+internal final class NeverConnectivitySessionTests: XCTestCase, @unchecked Sendable {
   private let session = NeverConnectivitySession()
 
   internal func testDelegateGet() {

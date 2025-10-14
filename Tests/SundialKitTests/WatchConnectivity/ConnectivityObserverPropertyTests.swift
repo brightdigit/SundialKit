@@ -2,8 +2,10 @@ import Foundation
 import XCTest
 
 @testable import SundialKit
+@testable import SundialKitConnectivity
+import Combine
 
-internal final class ConnectivityObserverPropertyTests: XCTestCase {
+internal final class ConnectivityObserverPropertyTests: XCTestCase, @unchecked Sendable {
   internal func testIsReachablePublisher() throws {
     #if canImport(Combine)
       let expectation = expectation(description: "Reachability Changed")

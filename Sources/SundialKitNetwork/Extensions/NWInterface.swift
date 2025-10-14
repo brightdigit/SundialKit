@@ -1,5 +1,5 @@
 //
-//  NeverConnectivitySession.swift
+//  NWInterface.swift
 //  SundialKit
 //
 //  Created by Leo Dion.
@@ -27,45 +27,40 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import Foundation
+#if canImport(Network)
 
-internal class NeverConnectivitySession: NSObject, ConnectivitySession {
-  internal var delegate: ConnectivitySessionDelegate? {
-    get {
-      nil
+  public import Network
+  @available(macOS 10.14, *)
+  // swiftlint:disable:next file_types_order
+  extension NWInterface.InterfaceType {
+    // swiftlint:disable:next explicit_acl
+    var value: Int {
+      switch self {
+      case .other:
+        return PathStatus.Interface.other.rawValue
+
+      case .wifi:
+        return PathStatus.Interface.wifi.rawValue
+
+      case .cellular:
+        return PathStatus.Interface.cellular.rawValue
+
+      case .wiredEthernet:
+        return PathStatus.Interface.wiredEthernet.rawValue
+
+      case .loopback:
+        return PathStatus.Interface.loopback.rawValue
+
+      @unknown default:
+        return 0
+      }
     }
-    // swiftlint:disable:next unused_setter_value
-    set {}
   }
 
-  internal var isReachable: Bool {
-    false
+  @available(macOS 10.14, *)
+  extension NWInterface: Interfaceable {
+    public var typeValue: Int {
+      type.value
+    }
   }
-
-  internal var isPaired: Bool {
-    false
-  }
-
-  internal var isPairedAppInstalled: Bool {
-    false
-  }
-
-  internal var activationState: ActivationState {
-    .notActivated
-  }
-
-  internal func activate() throws {
-    throw SundialError.sessionNotSupported
-  }
-
-  internal func updateApplicationContext(_: ConnectivityMessage) throws {
-    throw SundialError.sessionNotSupported
-  }
-
-  internal func sendMessage(
-    _: ConnectivityMessage,
-    _ completion: @escaping (Result<ConnectivityMessage, Error>) -> Void
-  ) {
-    completion(.failure(SundialError.sessionNotSupported))
-  }
-}
+#endif

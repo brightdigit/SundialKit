@@ -2,8 +2,10 @@ import Foundation
 import XCTest
 
 @testable import SundialKit
+@testable import SundialKitConnectivity
+import Combine
 
-internal final class ConnectivityObserverMessageTests: XCTestCase {
+internal final class ConnectivityObserverMessageTests: XCTestCase, @unchecked Sendable {
   // swiftlint:disable:next function_body_length
   internal func testCombineSendMessageReachable() throws {
     #if canImport(Combine)

@@ -2,6 +2,7 @@ import Foundation
 import XCTest
 
 @testable import SundialKit
+@testable import SundialKitNetwork
 
 #if canImport(Network)
   import Network

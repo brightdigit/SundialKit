@@ -1,5 +1,5 @@
 //
-//  NWPath.swift
+//  NWPathMonitor.swift
 //  SundialKit
 //
 //  Created by Leo Dion.
@@ -28,27 +28,29 @@
 //
 
 #if canImport(Network)
-  import Network
+  public import Network
 
   @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-  extension NWPath: NetworkPath {
-    public var pathStatus: PathStatus {
-      if #available(iOS 14.2, watchOS 7.1, macOS 11.0, tvOS 14.2, *) {
-        return PathStatus(
-          status,
-          reason: unsatisfiedReason,
-          interfaces: availableInterfaces.map {
-            $0 as Interfaceable
-          }
-        )
-      } else {
-        return PathStatus(
-          status,
-          interfaces: availableInterfaces.map {
-            $0 as Interfaceable
-          }
-        )
-      }
+  extension NWPathMonitor: PathMonitor {
+    public func onPathUpdate(_ handler: @escaping @Sendable (NWPath) -> Void) {
+      pathUpdateHandler = handler
+    }
+  }
+
+  @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+  extension NetworkObserver {
+    /// Default implementation of `NetworkObserver`
+    /// which does not use execute a perodic ``NetworkPing``.
+    public convenience init() where MonitorType == NWPathMonitor, PingType == NeverPing {
+      let monitor = NWPathMonitor()
+      self.init(monitor: monitor)
+    }
+
+    /// Default implementation of `NetworkObserver`
+    /// which does use execute a perodic ``NetworkPing``.
+    public convenience init(ping: PingType) where MonitorType == NWPathMonitor {
+      let monitor = NWPathMonitor()
+      self.init(monitor: monitor, ping: ping)
     }
   }
 

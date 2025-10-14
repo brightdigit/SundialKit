@@ -1,5 +1,5 @@
 //
-//  PassthroughSubject.swift
+//  NeverPing.swift
 //  SundialKit
 //
 //  Created by Leo Dion.
@@ -27,16 +27,22 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#if canImport(Combine)
-  import Combine
+public import Foundation
 
-  @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-  extension PassthroughSubject {
-    // swiftlint:disable:next explicit_acl
-    func anyPublisher<T>(
-      for keyPath: KeyPath<Output, T>
-    ) -> AnyPublisher<T, Failure> {
-      map(keyPath).eraseToAnyPublisher()
-    }
+/// `NetworkPing` which is never called.
+/// This used for a `NetworkObserver` that doesn't need a continuous ping.
+public struct NeverPing: NetworkPing {
+  public typealias StatusType = Never
+
+  public var timeInterval: TimeInterval {
+    .nan
   }
-#endif
+
+  private init() {}
+
+  public func shouldPing(onStatus _: PathStatus) -> Bool {
+    false
+  }
+
+  public func onPing(_: @escaping (Never) -> Void) {}
+}

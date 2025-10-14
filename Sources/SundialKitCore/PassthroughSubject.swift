@@ -1,5 +1,5 @@
 //
-//  PathMonitor.swift
+//  PassthroughSubject.swift
 //  SundialKit
 //
 //  Created by Leo Dion.
@@ -27,19 +27,16 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import Foundation
+#if canImport(Combine)
+  public import Combine
 
-/// Monitors the network for connectivity
-///
-/// Typically you don't need to implement this and
-/// can use [`NWPathMonitor`](../network/nwpathmonitor)
-public protocol PathMonitor {
-  /// The type of path accepted by the `PathMonitor`.
-  associatedtype PathType: NetworkPath
-  /// Sets the handler for when the `PathType` updates.
-  func onPathUpdate(_ handler: @escaping (PathType) -> Void)
-  /// Starts the monitor.
-  func start(queue: DispatchQueue)
-  /// Stops the montor.
-  func cancel()
-}
+  @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+  extension PassthroughSubject {
+    // swiftlint:disable:next explicit_acl
+    public func anyPublisher<T>(
+      for keyPath: KeyPath<Output, T>
+    ) -> AnyPublisher<T, Failure> {
+      map(keyPath).eraseToAnyPublisher()
+    }
+  }
+#endif

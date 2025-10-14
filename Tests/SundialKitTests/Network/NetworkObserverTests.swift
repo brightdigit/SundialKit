@@ -2,8 +2,10 @@ import Foundation
 import XCTest
 
 @testable import SundialKit
+@testable import SundialKitNetwork
+import Combine
 
-internal final class NetworkObserverTests: XCTestCase {
+internal final class NetworkObserverTests: XCTestCase, @unchecked Sendable {
   // swiftlint:disable:next function_body_length
   internal func testStart() throws {
     #if canImport(Combine)

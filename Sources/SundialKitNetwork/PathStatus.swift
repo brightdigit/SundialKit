@@ -48,7 +48,7 @@ public enum PathStatus: Equatable {
   }
 
   /// Types of network interfaces, based on their link layer media types.
-  public struct Interface: OptionSet, Interfaceable {
+  public struct Interface: OptionSet, Interfaceable, Sendable {
     /// The network interface type used for communication over cellular networks.
     public static let cellular: Self = .init(rawValue: 1)
     /// The network interface type used for communication over Wi-Fi networks.

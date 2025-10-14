@@ -1,5 +1,5 @@
 //
-//  PathStatus.UnsatisfiedReason.swift
+//  PathMonitor.swift
 //  SundialKit
 //
 //  Created by Leo Dion.
@@ -27,32 +27,19 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import Foundation
+public import Foundation
 
-#if canImport(Network)
-  import Network
-
-  @available(macOS 11.0, iOS 14.2, watchOS 7.1, tvOS 14.2, *)
-  extension PathStatus.UnsatisfiedReason {
-    /// Creates `UnsatisfiedReason` from a `Network` one.
-    /// - Parameter reason: The `UnsatisfiedReason` from the `Network` API.
-    public init(_ reason: NWPath.UnsatisfiedReason) {
-      switch reason {
-      case .notAvailable:
-        self = .notAvailable
-
-      case .cellularDenied:
-        self = .cellularDenied
-
-      case .wifiDenied:
-        self = .wifiDenied
-
-      case .localNetworkDenied:
-        self = .localNetworkDenied
-
-      @unknown default:
-        self = .unknown
-      }
-    }
-  }
-#endif
+/// Monitors the network for connectivity
+///
+/// Typically you don't need to implement this and
+/// can use [`NWPathMonitor`](../network/nwpathmonitor)
+public protocol PathMonitor {
+  /// The type of path accepted by the `PathMonitor`.
+  associatedtype PathType: NetworkPath
+  /// Sets the handler for when the `PathType` updates.
+  func onPathUpdate(_ handler: @escaping  @Sendable (PathType) -> Void)
+  /// Starts the monitor.
+  func start(queue: DispatchQueue)
+  /// Stops the montor.
+  func cancel()
+}

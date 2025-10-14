@@ -1,5 +1,5 @@
 //
-//  NWPathMonitor.swift
+//  PathStatus.UnsatisfiedReason.swift
 //  SundialKit
 //
 //  Created by Leo Dion.
@@ -27,31 +27,32 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import Foundation
+
 #if canImport(Network)
-  import Network
+  public import Network
 
-  @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-  extension NWPathMonitor: PathMonitor {
-    public func onPathUpdate(_ handler: @escaping (NWPath) -> Void) {
-      pathUpdateHandler = handler
+  @available(macOS 11.0, iOS 14.2, watchOS 7.1, tvOS 14.2, *)
+  extension PathStatus.UnsatisfiedReason {
+    /// Creates `UnsatisfiedReason` from a `Network` one.
+    /// - Parameter reason: The `UnsatisfiedReason` from the `Network` API.
+    public init(_ reason: NWPath.UnsatisfiedReason) {
+      switch reason {
+      case .notAvailable:
+        self = .notAvailable
+
+      case .cellularDenied:
+        self = .cellularDenied
+
+      case .wifiDenied:
+        self = .wifiDenied
+
+      case .localNetworkDenied:
+        self = .localNetworkDenied
+
+      @unknown default:
+        self = .unknown
+      }
     }
   }
-
-  @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-  extension NetworkObserver {
-    /// Default implementation of `NetworkObserver`
-    /// which does not use execute a perodic ``NetworkPing``.
-    public convenience init() where MonitorType == NWPathMonitor, PingType == NeverPing {
-      let monitor = NWPathMonitor()
-      self.init(monitor: monitor)
-    }
-
-    /// Default implementation of `NetworkObserver`
-    /// which does use execute a perodic ``NetworkPing``.
-    public convenience init(ping: PingType) where MonitorType == NWPathMonitor {
-      let monitor = NWPathMonitor()
-      self.init(monitor: monitor, ping: ping)
-    }
-  }
-
 #endif

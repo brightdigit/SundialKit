@@ -1,6 +1,7 @@
 import XCTest
 
-@testable import SundialKit
+@testable import SundialKitConnectivity
+
 
 internal final class MessagableTests: XCTestCase {
   internal func testMessage() {

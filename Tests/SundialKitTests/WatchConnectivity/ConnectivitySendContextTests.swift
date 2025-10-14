@@ -1,6 +1,7 @@
 import XCTest
 
-@testable import SundialKit
+import SundialKitCore
+@testable import SundialKitConnectivity
 
 internal final class ConnectivitySendContextTests: XCTestCase {
   internal func testResult() {

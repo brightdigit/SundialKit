@@ -1,5 +1,5 @@
 //
-//  ConnectivitySession.swift
+//  NWPath.swift
 //  SundialKit
 //
 //  Created by Leo Dion.
@@ -27,20 +27,29 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-internal protocol ConnectivitySession: AnyObject {
-  var delegate: ConnectivitySessionDelegate? { get set }
-  var isReachable: Bool { get }
+#if canImport(Network)
+  public import Network
 
-  #if os(iOS)
-    var isPaired: Bool { get }
-  #endif
-  var isPairedAppInstalled: Bool { get }
-  var activationState: ActivationState { get }
+  @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+  extension NWPath: NetworkPath {
+    public var pathStatus: PathStatus {
+      if #available(iOS 14.2, watchOS 7.1, macOS 11.0, tvOS 14.2, *) {
+        return PathStatus(
+          status,
+          reason: unsatisfiedReason,
+          interfaces: availableInterfaces.map {
+            $0 as Interfaceable
+          }
+        )
+      } else {
+        return PathStatus(
+          status,
+          interfaces: availableInterfaces.map {
+            $0 as Interfaceable
+          }
+        )
+      }
+    }
+  }
 
-  func activate() throws
-  func updateApplicationContext(_ context: ConnectivityMessage) throws
-  func sendMessage(
-    _ message: ConnectivityMessage,
-    _ completion: @escaping (Result<ConnectivityMessage, Error>) -> Void
-  )
-}
+#endif

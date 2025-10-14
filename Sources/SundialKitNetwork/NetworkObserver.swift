@@ -28,8 +28,8 @@
 //
 
 #if canImport(Combine)
-  import Combine
-  import Foundation
+ public import Combine
+public import Foundation
 
   /// Observes the status of network connectivity
   ///
@@ -64,13 +64,13 @@
   /// ```
   ///
   @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-  public class NetworkObserver<MonitorType: PathMonitor, PingType: NetworkPing> {
+public final class NetworkObserver<MonitorType: PathMonitor, PingType: NetworkPing>: @unchecked Sendable {
     private let ping: PingType?
     private let monitor: MonitorType
 
     private let pathSubject = PassthroughSubject<MonitorType.PathType, Never>()
     private var pingCancellable: AnyCancellable?
-    private var timerCancellable: Cancellable?
+  private var timerCancellable: (any Cancellable)?
     private var otherCancellables = [AnyCancellable]()
 
     private let pathStatusSubject = PassthroughSubject<PathStatus, Never>()
