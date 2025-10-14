@@ -12,7 +12,7 @@ internal class PassthroughSubjectTests: XCTestCase, @unchecked Sendable {
     fileprivate let id: UUID
   }
 
-  internal func testAnyPublisher() throws {
+  internal func testAnyPublisher() async throws {
     #if canImport(Combine)
       let expected = UUID()
       var actual: UUID?
@@ -23,11 +23,10 @@ internal class PassthroughSubjectTests: XCTestCase, @unchecked Sendable {
         expectation.fulfill()
       }
       subject.send(.init(id: expected))
-      waitForExpectations(timeout: 1.0) { [actual] error in
-        XCTAssertNil(error)
-        XCTAssertEqual(expected, actual)
-        cancellable.cancel()
-      }
+      await fulfillment(of: [expectation], timeout: 1.0)
+      XCTAssertEqual(expected, actual)
+      cancellable.cancel()
+
     #else
       throw XCTSkip("OS doesn't support Combine.")
     #endif

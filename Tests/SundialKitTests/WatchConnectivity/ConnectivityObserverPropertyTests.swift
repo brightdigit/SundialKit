@@ -9,7 +9,7 @@ import XCTest
 #endif
 
 internal final class ConnectivityObserverPropertyTests: XCTestCase, @unchecked Sendable {
-  internal func testIsReachablePublisher() throws {
+  internal func testIsReachablePublisher() async throws {
     #if canImport(Combine)
       let expectation = expectation(description: "Reachability Changed")
       let session = MockSession()
@@ -22,16 +22,16 @@ internal final class ConnectivityObserverPropertyTests: XCTestCase, @unchecked S
         expectation.fulfill()
       }
       session.isReachable = newState
-      waitForExpectations(timeout: 1.0) { error in
-        XCTAssertNil(error)
-        cancellable.cancel()
-      }
+      await fulfillment(of: [expectation], timeout: 1.0)
+
+      cancellable.cancel()
+
     #else
       throw XCTSkip("OS doesn't support Combine.")
     #endif
   }
 
-  internal func testIsPairedAppInstalledPublisher() throws {
+  internal func testIsPairedAppInstalledPublisher() async throws {
     #if canImport(Combine)
       let expectation = expectation(description: "Installed Changed")
       let session = MockSession()
@@ -44,10 +44,8 @@ internal final class ConnectivityObserverPropertyTests: XCTestCase, @unchecked S
         expectation.fulfill()
       }
       session.isPairedAppInstalled = newState
-      waitForExpectations(timeout: 1.0) { error in
-        XCTAssertNil(error)
-        cancellable.cancel()
-      }
+      await fulfillment(of: [expectation], timeout: 1.0)
+      cancellable.cancel()
     #else
       throw XCTSkip("OS doesn't support Combine.")
     #endif
@@ -79,7 +77,7 @@ internal final class ConnectivityObserverPropertyTests: XCTestCase, @unchecked S
     #endif
   }
 
-  internal func testActivationStatePublisher() throws {
+  internal func testActivationStatePublisher() async throws {
     #if canImport(Combine)
       let expectation = expectation(description: "State Change Called")
       let session = MockSession()
@@ -91,16 +89,14 @@ internal final class ConnectivityObserverPropertyTests: XCTestCase, @unchecked S
         expectation.fulfill()
       }
       try wcObject.activate()
-      waitForExpectations(timeout: 1.0) { error in
-        XCTAssertNil(error)
-        cancellable.cancel()
-      }
+      await fulfillment(of: [expectation], timeout: 1.0)
+      cancellable.cancel()
     #else
       throw XCTSkip("OS doesn't support Combine.")
     #endif
   }
 
-  internal func testSessionDidBecomeInactive() throws {
+  internal func testSessionDidBecomeInactive() async throws {
     #if canImport(Combine)
       let expectation = expectation(description: "State Change Called")
       let session = MockSession()
@@ -112,10 +108,8 @@ internal final class ConnectivityObserverPropertyTests: XCTestCase, @unchecked S
         expectation.fulfill()
       }
       session.activationState = .inactive
-      waitForExpectations(timeout: 1.0) { error in
-        XCTAssertNil(error)
-        cancellable.cancel()
-      }
+      await fulfillment(of: [expectation], timeout: 1.0)
+      cancellable.cancel()
     #else
       throw XCTSkip("OS doesn't support Combine.")
     #endif
@@ -123,7 +117,7 @@ internal final class ConnectivityObserverPropertyTests: XCTestCase, @unchecked S
 
   // swiftlint:disable:next function_body_length
 
-  internal func testSessionDidDeactivate() throws {
+  internal func testSessionDidDeactivate() async throws {
     #if canImport(Combine)
       let actExpectation = expectation(description: "State Change Called to Activate")
       let notExpectation = expectation(
@@ -146,10 +140,8 @@ internal final class ConnectivityObserverPropertyTests: XCTestCase, @unchecked S
         }
       }
       try session.activate()
-      waitForExpectations(timeout: 1.0) { error in
-        XCTAssertNil(error)
-        cancellable.cancel()
-      }
+      await fulfillment(of: [actExpectation, notExpectation], timeout: 1.0)
+      cancellable.cancel()
     #else
       throw XCTSkip("OS doesn't support Combine.")
     #endif
