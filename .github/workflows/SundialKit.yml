@@ -16,19 +16,12 @@ jobs:
       matrix:
         os: [noble, jammy]
         swift:
-          - version: "5.9"
-          - version: "5.10"
-          - version: "6.0"
           - version: "6.1"
           - version: "6.2"
           - version: "6.1"
             nightly: true
           - version: "6.2"
             nightly: true
-        exclude:
-          - os: noble
-            swift:
-              version: "5.9"
     steps:
       - uses: actions/checkout@v4
       - uses: brightdigit/swift-build@v1.4.0
@@ -54,14 +47,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # SPM Build Matrix - Xcode 15.x (Swift 5.9-5.10)
-          - runs-on: macos-14
-            xcode: "/Applications/Xcode_15.0.1.app"
-          - runs-on: macos-14
-            xcode: "/Applications/Xcode_15.2.app"
-          - runs-on: macos-14
-            xcode: "/Applications/Xcode_15.4.app"
-          
           # SPM Build Matrix - Xcode 16.x+ (Swift 6.x)
           - runs-on: macos-15
             xcode: "/Applications/Xcode_26.0.app"
@@ -69,13 +54,6 @@ jobs:
             xcode: "/Applications/Xcode_16.4.app"
           - runs-on: macos-15
             xcode: "/Applications/Xcode_16.3.app"
-
-          # iOS Build Matrix - Xcode 15.x (Swift 5.9-5.10)
-          - type: ios
-            runs-on: macos-14
-            xcode: "/Applications/Xcode_15.4.app"
-            deviceName: "iPhone 15"
-            osVersion: "17.5"
 
           # iOS Build Matrix - Xcode 16.x+ (Swift 6.x)
           - type: ios
@@ -96,13 +74,6 @@ jobs:
             xcode: "/Applications/Xcode_16.3.app"
             deviceName: "iPhone 16"
             osVersion: "18.4"
-
-          # watchOS Build Matrix - Xcode 15.x (Swift 5.9-5.10)
-          - type: watchos
-            runs-on: macos-14
-            xcode: "/Applications/Xcode_15.4.app"
-            deviceName: "Apple Watch Series 9 (45mm)"
-            osVersion: "10.5"
 
           # watchOS Build Matrix - Xcode 16.x+ (Swift 6.x)
           - type: watchos

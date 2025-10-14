@@ -708,7 +708,7 @@
       {
         "id": "9",
         "title": "Migrate all tests to Swift Testing",
-        "description": "Convert entire test suite from XCTest to Swift Testing framework across all packages",
+        "description": "Convert entire test suite from XCTest to Swift Testing framework across all packages (requires Swift 6.1+ - Swift 5.9/5.10/6.0 support dropped)",
         "status": "pending",
         "dependencies": [
           "1",
@@ -721,7 +721,7 @@
           "8"
         ],
         "priority": "high",
-        "details": "Comprehensive Swift Testing migration:\n1. Core package tests (SundialKitCore, Network, Connectivity):\n   - Replace XCTestCase with @Test functions\n   - Convert XCTAssert* to Swift Testing assertions\n   - Use @Suite for test organization\n   - Parameterized tests for multiple scenarios\n2. Plugin package tests:\n   - SundialKitCombine: Publisher testing with Swift Testing\n   - SundialKitMessagable: Encoding/decoding tests\n3. Testing utilities:\n   - Mock implementations using Swift Testing\n   - Test fixtures and helpers\n   - Async test support\n4. CI/CD updates:\n   - GitHub Actions configuration\n   - Code coverage reporting\n   - Test performance tracking\n5. Documentation:\n   - Testing guide for contributors\n   - Example test patterns\n\nTools: Xcode 16+, Swift 6.1+, swift test command",
+        "details": "Comprehensive Swift Testing migration:\n\n**Prerequisites**: Swift 6.1+ is now required. Support for Swift 5.9, 5.10, and 6.0 has been dropped to enable Swift Testing adoption. Package@swift-5.9.swift manifests removed, CI/CD updated to test only Swift 6.1+ builds.\n\n1. Core package tests (SundialKitCore, Network, Connectivity):\n   - Replace XCTestCase with @Test functions\n   - Convert XCTAssert* to Swift Testing assertions\n   - Use @Suite for test organization\n   - Parameterized tests for multiple scenarios\n2. Plugin package tests:\n   - SundialKitCombine: Publisher testing with Swift Testing\n   - SundialKitMessagable: Encoding/decoding tests\n3. Testing utilities:\n   - Mock implementations using Swift Testing\n   - Test fixtures and helpers\n   - Async test support\n4. CI/CD updates:\n   - GitHub Actions configuration\n   - Code coverage reporting\n   - Test performance tracking\n5. Documentation:\n   - Testing guide for contributors\n   - Example test patterns\n\nTools: Xcode 16+, Swift 6.1+, swift test command",
         "testStrategy": "Meta-testing: Verify all tests pass, maintain or improve code coverage (target 90%+), ensure CI/CD pipeline works, validate test performance.",
         "subtasks": [
           {

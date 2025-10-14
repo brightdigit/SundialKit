@@ -89,6 +89,7 @@ FORMAT_ONLY=1 ./Scripts/lint.sh     # Format only
 ### Testing Architecture
 
 - All tests in `Tests/SundialKitTests/`
+- **Testing Framework**: Swift Testing (requires Swift 6.1+) - v2.0.0 migration from XCTest
 - Mock implementations prefixed with "Mock" (MockSession, MockPathMonitor, MockNetworkPing, MockMessage)
 - Protocol-based abstractions enable dependency injection for testing
 - Never* types (NeverPing, NeverConnectivitySession) used for platforms without certain capabilities
@@ -102,9 +103,11 @@ FORMAT_ONLY=1 ./Scripts/lint.sh     # Format only
 
 ## Platform Support
 
-- Minimum versions: iOS 13, watchOS 6, tvOS 13, macOS 10.13
+- **Swift Version**: Swift 6.1+ required (v2.0.0+)
+- **Deployment Targets**: iOS 13, watchOS 6, tvOS 13, macOS 10.13
 - Requires Combine framework (macOS 10.15+, iOS 13+, watchOS 6+, tvOS 13+)
 - WatchConnectivity only available on iOS and watchOS (not macOS/tvOS)
+- **Note**: v2.0.0 dropped support for Swift 5.9, 5.10, and 6.0 to enable Swift Testing framework migration
 
 ## Development Notes
 

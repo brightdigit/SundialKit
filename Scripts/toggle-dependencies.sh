@@ -23,7 +23,7 @@ fi
 echo "Switching dependencies to $MODE mode..."
 
 for subrepo in "${SUBREPOS[@]}"; do
-  for fname in "Package.swift" "Package@swift-6.1.swift"; do
+  for fname in "Package.swift"; do
     package_file="$PACKAGES_DIR/$subrepo/$fname"
 
     if [[ ! -f "$package_file" ]]; then

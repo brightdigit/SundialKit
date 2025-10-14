@@ -1,5 +1,9 @@
 # Task Master AI - Agent Integration Guide
 
+## SundialKit v2.0.0 Requirements
+
+**Swift 6.1+ Required**: SundialKit v2.0.0 requires Swift 6.1+ for Swift Testing framework adoption. Support for Swift 5.9, 5.10, and 6.0 has been dropped. All CI/CD pipelines updated to test Swift 6.1, 6.2, and nightly builds only.
+
 ## Essential Commands
 
 ### Core Workflow Commands
