@@ -30,7 +30,7 @@
 public import Foundation
 
 #if canImport(WatchConnectivity)
-  @preconcurrency import WatchConnectivity
+  @preconcurrency public import WatchConnectivity
 #endif
 
 /// Errors that can occur during WatchConnectivity operations.
@@ -65,6 +65,12 @@ public import Foundation
 /// - ``transferTimedOut``
 /// - ``insufficientSpace``
 /// - ``fileNotAccessible``
+/// - ``fileAccessDenied``
+///
+/// ### Session Configuration Errors
+/// - ``sessionMissingDelegate``
+/// - ``deliveryFailed``
+/// - ``watchOnlyApp``
 ///
 /// ### WCError Mapping
 /// - ``init(wcError:)``
@@ -177,6 +183,28 @@ public enum ConnectivityError: Error, Sendable {
   /// The specified file cannot be read or does not exist at the provided path.
   case fileNotAccessible
 
+  // MARK: - Session Configuration Errors
+
+  /// The WatchConnectivity session is missing a required delegate.
+  ///
+  /// A delegate must be set on the session before activation.
+  case sessionMissingDelegate
+
+  /// Access to the file was denied by the system.
+  ///
+  /// The app does not have permission to access the requested file.
+  case fileAccessDenied
+
+  /// Message delivery failed.
+  ///
+  /// The message could not be delivered to the counterpart device.
+  case deliveryFailed
+
+  /// The app is watch-only and cannot use certain connectivity features.
+  ///
+  /// Some WatchConnectivity features require a companion iOS app.
+  case watchOnlyApp
+
   /// An unknown or generic connectivity error occurred.
   ///
   /// - Parameter underlyingError: The original system error, if available.
@@ -230,8 +258,16 @@ public enum ConnectivityError: Error, Sendable {
         self = .transferTimedOut
       case .insufficientSpace:
         self = .insufficientSpace
-      case .fileAccessible:
-        self = .fileNotAccessible
+      case .sessionMissingDelegate:
+        self = .sessionMissingDelegate
+      case .fileAccessDenied:
+        self = .fileAccessDenied
+      case .deliveryFailed:
+        self = .deliveryFailed
+      case .companionAppNotInstalled:
+        self = .companionAppNotInstalled
+      case .watchOnlyApp:
+        self = .watchOnlyApp
       case .genericError:
         self = .genericError(wcError)
       @unknown default:
@@ -275,6 +311,14 @@ extension ConnectivityError: LocalizedError {
       return "Insufficient storage space for the transfer."
     case .fileNotAccessible:
       return "The file is not accessible for transfer."
+    case .sessionMissingDelegate:
+      return "The connectivity session is missing a required delegate."
+    case .fileAccessDenied:
+      return "Access to the file was denied by the system."
+    case .deliveryFailed:
+      return "Message delivery failed."
+    case .watchOnlyApp:
+      return "The app is watch-only and cannot use certain connectivity features."
     case .genericError(let error):
       return "Connectivity error: \(error.localizedDescription)"
     }
@@ -311,6 +355,14 @@ extension ConnectivityError: LocalizedError {
       return "The receiving device does not have enough available storage."
     case .fileNotAccessible:
       return "The specified file cannot be accessed or does not exist."
+    case .sessionMissingDelegate:
+      return "A delegate must be set on the WatchConnectivity session before it can be activated."
+    case .fileAccessDenied:
+      return "The app does not have the necessary permissions to access this file."
+    case .deliveryFailed:
+      return "The message could not be delivered to the counterpart device."
+    case .watchOnlyApp:
+      return "This is a watch-only app that requires a companion iOS app for full connectivity features."
     case .genericError:
       return "An unexpected error occurred during the connectivity operation."
     }
@@ -347,6 +399,14 @@ extension ConnectivityError: LocalizedError {
       return "Free up storage space on the receiving device and retry the transfer."
     case .fileNotAccessible:
       return "Verify the file path is correct and the file exists."
+    case .sessionMissingDelegate:
+      return "Set a delegate on the WatchConnectivity session before calling activate()."
+    case .fileAccessDenied:
+      return "Check the app's file access permissions and request access if needed."
+    case .deliveryFailed:
+      return "Ensure the counterpart device is reachable and try sending the message again."
+    case .watchOnlyApp:
+      return "Install the companion iOS app to enable full connectivity features."
     case .genericError:
       return "Check the underlying error for more details and try the operation again."
     }
