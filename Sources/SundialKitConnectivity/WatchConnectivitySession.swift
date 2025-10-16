@@ -74,7 +74,7 @@
     }
 
     public func updateApplicationContext(_ context: ConnectivityMessage) throws {
-      try session.updateApplicationContext(context)
+      try session.updateApplicationContext(context as [String: Any])
     }
 
     public func sendMessage(
@@ -82,9 +82,10 @@
       _ completion: @escaping (Result<ConnectivityMessage, Error>) -> Void
     ) {
       session.sendMessage(
-        message
-      ) { message in
-        completion(.success(message))
+        message as [String: Any]
+      ) { response in
+        let sendableResponse: ConnectivityMessage = response.mapValues { $0 as! any Sendable }
+        completion(.success(sendableResponse))
       } errorHandler: { error in
         completion(.failure(error))
       }
@@ -145,16 +146,19 @@
       didReceiveMessage message: [String: Any],
       replyHandler: @escaping ([String: Any]) -> Void
     ) {
-      delegate?.session(self, didReceiveMessage: message, replyHandler: replyHandler)
+      let sendableMessage: ConnectivityMessage = message.mapValues { $0 as! any Sendable }
+      let handler = unsafeBitCast(replyHandler, to: ConnectivityHandler.self)
+      delegate?.session(self, didReceiveMessage: sendableMessage, replyHandler: handler)
     }
 
     internal func session(
       _: WCSession,
       didReceiveApplicationContext applicationContext: [String: Any]
     ) {
+      let sendableContext: ConnectivityMessage = applicationContext.mapValues { $0 as! any Sendable }
       delegate?.session(
         self,
-        didReceiveApplicationContext: applicationContext,
+        didReceiveApplicationContext: sendableContext,
         error: nil
       )
     }
@@ -164,9 +168,10 @@
       didReceiveApplicationContext applicationContext: [String: Any],
       error: Error?
     ) {
+      let sendableContext: ConnectivityMessage = applicationContext.mapValues { $0 as! any Sendable }
       delegate?.session(
         self,
-        didReceiveApplicationContext: applicationContext,
+        didReceiveApplicationContext: sendableContext,
         error: error
       )
     }
