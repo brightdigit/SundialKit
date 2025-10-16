@@ -32,7 +32,7 @@ public import SundialKitCore
 
 /// `NetworkPing` which is never called.
 /// This used for a `NetworkObserver` that doesn't need a continuous ping.
-public struct NeverPing: NetworkPing {
+public struct NeverPing: NetworkPing, Sendable {
   public typealias StatusType = Never
 
   public var timeInterval: TimeInterval {

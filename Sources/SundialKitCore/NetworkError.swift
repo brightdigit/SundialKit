@@ -136,7 +136,8 @@ extension NetworkError: LocalizedError {
   public var recoverySuggestion: String? {
     switch self {
     case .monitoringUnavailable:
-      return "Check platform requirements and ensure network monitoring is supported on this device."
+      return
+        "Check platform requirements and ensure network monitoring is supported on this device."
     case .pathUpdateFailed:
       return "Try restarting network monitoring or check system network settings."
     case .pingTimeout:
@@ -144,7 +145,8 @@ extension NetworkError: LocalizedError {
     case .pingFailed:
       return "Verify network configuration and ensure the target is reachable."
     case .invalidConfiguration:
-      return "Review monitoring configuration parameters and ensure all required values are provided."
+      return
+        "Review monitoring configuration parameters and ensure all required values are provided."
     }
   }
 }

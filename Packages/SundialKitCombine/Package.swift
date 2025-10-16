@@ -65,7 +65,9 @@ let package = Package(
     .target(
       name: "SundialKitCombine",
       dependencies: [
-        .product(name: "SundialKit", package: "SundialKit")
+        .product(name: "SundialKitCore", package: "SundialKit"),
+        .product(name: "SundialKitNetwork", package: "SundialKit"),
+        .product(name: "SundialKitConnectivity", package: "SundialKit")
       ],
       swiftSettings: swiftSettings
     ),

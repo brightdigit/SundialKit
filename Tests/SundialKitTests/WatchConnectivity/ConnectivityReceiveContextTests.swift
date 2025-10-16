@@ -1,22 +1,33 @@
-import XCTest
+//
+//  ConnectivityReceiveContextTests.swift
+//  SundialKit
+//
+//  Created by Leo Dion.
+//  Copyright © 2025 BrightDigit.
+//
+
+import SundialKit
+import Testing
 
 @testable import SundialKitCore
-import SundialKit
 
-internal final class ConnectivityReceiveContextTests: XCTestCase {
-  internal func testReplyHandler() {
-    XCTAssertNil(ConnectivityReceiveContext.applicationContext.replyHandler)
-    XCTAssertNotNil(
+@Suite("Connectivity Receive Context Tests")
+struct ConnectivityReceiveContextTests {
+  @Test("Reply handler is nil for application context")
+  func replyHandler() {
+    #expect(ConnectivityReceiveContext.applicationContext.replyHandler == nil)
+    #expect(
       ConnectivityReceiveContext.replyWith { _ in
       }
-      .replyHandler
+      .replyHandler != nil
     )
   }
 
-  internal func testIsApplicationContext() {
-    XCTAssertTrue(ConnectivityReceiveContext.applicationContext.isApplicationContext)
-    XCTAssertFalse(
-      ConnectivityReceiveContext.replyWith { _ in
+  @Test("Is application context flag works correctly")
+  func isApplicationContext() {
+    #expect(ConnectivityReceiveContext.applicationContext.isApplicationContext)
+    #expect(
+      !ConnectivityReceiveContext.replyWith { _ in
       }
       .isApplicationContext
     )

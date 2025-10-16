@@ -1,12 +1,22 @@
-import XCTest
+//
+//  ConnectivitySendContextTests.swift
+//  SundialKit
+//
+//  Created by Leo Dion.
+//  Copyright © 2025 BrightDigit.
+//
 
-@testable import SundialKitCore
+import Testing
+
 @testable import SundialKitConnectivity
+@testable import SundialKitCore
 
-internal final class ConnectivitySendContextTests: XCTestCase {
-  internal func testResult() {
+@Suite("Connectivity Send Context Tests")
+struct ConnectivitySendContextTests {
+  @Test("Context created from result matches expected pattern")
+  func resultPatterns() {
     guard case .reply = ConnectivitySendContext(.success(.init())) else {
-      XCTFail("Missing Reply")
+      Issue.record("Should be a reply")
       return
     }
 
@@ -15,7 +25,7 @@ internal final class ConnectivitySendContextTests: XCTestCase {
         .failure(SundialError.sessionNotSupported)
       )
     else {
-      XCTFail("Should be a failure")
+      Issue.record("Should be a failure")
       return
     }
   }

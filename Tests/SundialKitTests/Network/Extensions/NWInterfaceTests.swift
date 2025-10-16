@@ -1,25 +1,35 @@
-import Foundation
-import XCTest
+//
+//  NWInterfaceTests.swift
+//  SundialKit
+//
+//  Created by Leo Dion.
+//  Copyright © 2025 BrightDigit.
+//
 
-@testable import SundialKitCore
+import Foundation
+import Testing
+
 @testable import SundialKit
+@testable import SundialKitCore
 @testable import SundialKitNetwork
 
 #if canImport(Network)
   import Network
 #endif
 
-internal final class NWInterfaceTests: XCTestCase {
+@Suite("NWInterface Tests")
+struct NWInterfaceTests {
   #if canImport(Network)
-    internal func rawValue(
+    func rawValue(
       of interface: PathStatus.Interface,
       interfaceType: NWInterface.InterfaceType
     ) {
-      XCTAssertEqual(interface.rawValue, interfaceType.value)
+      #expect(interface.rawValue == interfaceType.value)
     }
   #endif
 
-  internal func testValue() throws {
+  @Test("Interface raw values match NWInterface types")
+  func interfaceValues() throws {
     #if canImport(Network)
 
       rawValue(of: .wifi, interfaceType: .wifi)
@@ -27,8 +37,6 @@ internal final class NWInterfaceTests: XCTestCase {
       rawValue(of: .loopback, interfaceType: .loopback)
       rawValue(of: .cellular, interfaceType: .cellular)
       rawValue(of: .other, interfaceType: .other)
-    #else
-      throw XCTSkip("OS doesn't support Combine.")
     #endif
   }
 }

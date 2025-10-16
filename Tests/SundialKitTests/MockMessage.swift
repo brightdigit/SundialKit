@@ -5,8 +5,9 @@
 //  Created by Leo Dion on 5/20/22.
 //
 import Foundation
-@testable import SundialKitCore
 import SundialKit
+
+@testable import SundialKitCore
 
 internal struct MockMessage: Messagable, Equatable {
   internal static let key: String = UUID().uuidString
@@ -17,7 +18,7 @@ internal struct MockMessage: Messagable, Equatable {
     value = UUID()
   }
 
-  internal init?(from parameters: [String: Any]?) {
+  internal init?(from parameters: [String: any Sendable]?) {
     guard let pair = parameters?.first else {
       return nil
     }
@@ -30,7 +31,7 @@ internal struct MockMessage: Messagable, Equatable {
     self.value = value
   }
 
-  internal func parameters() -> [String: Any] {
+  internal func parameters() -> [String: any Sendable] {
     [key: value]
   }
 }

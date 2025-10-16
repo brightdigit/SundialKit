@@ -1,53 +1,69 @@
-import XCTest
+//
+//  NeverConnectivitySessionTests.swift
+//  SundialKit
+//
+//  Created by Leo Dion.
+//  Copyright © 2025 BrightDigit.
+//
+
+import Testing
 
 @testable import SundialKit
 @testable import SundialKitConnectivity
 
-internal final class NeverConnectivitySessionTests: XCTestCase, @unchecked Sendable {
-  private let session = NeverConnectivitySession()
+@Suite("Never Connectivity Session Tests")
+struct NeverConnectivitySessionTests {
+  let session = NeverConnectivitySession()
 
-  internal func testDelegateGet() {
-    XCTAssertNil(session.delegate)
+  @Test("Delegate is nil")
+  func delegateGet() {
+    #expect(session.delegate == nil)
   }
 
-  internal func testIsReachable() {
-    XCTAssertFalse(session.isReachable)
+  @Test("Is not reachable")
+  func isNotReachable() {
+    #expect(!session.isReachable)
   }
 
-  internal func testIsPaired() {
-    XCTAssertFalse(session.isPaired)
+  @Test("Is not paired")
+  func isNotPaired() {
+    #expect(!session.isPaired)
   }
 
-  internal func testIsPairedAppInstalled() {
-    XCTAssertFalse(session.isPairedAppInstalled)
+  @Test("Paired app is not installed")
+  func isPairedAppNotInstalled() {
+    #expect(!session.isPairedAppInstalled)
   }
 
-  internal func testActivationState() {
-    XCTAssertEqual(session.activationState, .notActivated)
+  @Test("Activation state is not activated")
+  func activationStateNotActivated() {
+    #expect(session.activationState == .notActivated)
   }
 
-  internal func testActivate() {
-    XCTAssertThrowsError(try session.activate()) { error in
-      XCTAssertEqual(error as? SundialError, SundialError.sessionNotSupported)
+  @Test("Activate throws session not supported error")
+  func activateThrows() {
+    #expect(throws: SundialError.self) {
+      try session.activate()
     }
   }
 
-  internal func testUpdateApplicationContext() {
-    XCTAssertThrowsError(try session.updateApplicationContext(.init())) { error in
-      XCTAssertEqual(error as? SundialError, SundialError.sessionNotSupported)
+  @Test("Update application context throws session not supported error")
+  func updateApplicationContextThrows() {
+    #expect(throws: SundialError.self) {
+      try session.updateApplicationContext(.init())
     }
   }
 
-  internal func testSendMessage() async {
-    let messageSentDone = expectation(description: "Message Sent Done")
-    session.sendMessage(.init()) { result in
-      guard case .failure(let error as SundialError) = result else {
-        return
+  @Test("Send message returns session not supported error")
+  func sendMessageReturnsError() async {
+    await confirmation("Message sent with error") { confirm in
+      session.sendMessage(.init()) { result in
+        guard case .failure(let error as SundialError) = result else {
+          return
+        }
+        #expect(error == .sessionNotSupported)
+        confirm()
       }
-      XCTAssertEqual(error, .sessionNotSupported)
-      messageSentDone.fulfill()
     }
-
-    await fulfillment(of: [messageSentDone], timeout: 1.0)
   }
 }

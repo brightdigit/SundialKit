@@ -27,11 +27,11 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import Foundation
-import SundialKitCore
+public import Foundation
+public import SundialKitCore
 
-internal final class NeverConnectivitySession: NSObject, ConnectivitySession {
-  internal var delegate: ConnectivitySessionDelegate? {
+public final class NeverConnectivitySession: NSObject, ConnectivitySession {
+  public var delegate: ConnectivitySessionDelegate? {
     get {
       nil
     }
@@ -39,31 +39,31 @@ internal final class NeverConnectivitySession: NSObject, ConnectivitySession {
     set {}
   }
 
-  internal var isReachable: Bool {
+  public var isReachable: Bool {
     false
   }
 
-  internal var isPaired: Bool {
+  public var isPaired: Bool {
     false
   }
 
-  internal var isPairedAppInstalled: Bool {
+  public var isPairedAppInstalled: Bool {
     false
   }
 
-  internal var activationState: ActivationState {
+  public var activationState: ActivationState {
     .notActivated
   }
 
-  internal func activate() throws {
+  public func activate() throws {
     throw SundialError.sessionNotSupported
   }
 
-  internal func updateApplicationContext(_: ConnectivityMessage) throws {
+  public func updateApplicationContext(_: ConnectivityMessage) throws {
     throw SundialError.sessionNotSupported
   }
 
-  internal func sendMessage(
+  public func sendMessage(
     _: ConnectivityMessage,
     _ completion: @escaping (Result<ConnectivityMessage, Error>) -> Void
   ) {

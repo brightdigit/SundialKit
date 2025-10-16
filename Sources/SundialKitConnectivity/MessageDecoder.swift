@@ -27,6 +27,8 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+public import SundialKitCore
+
 /// Decodes a ``ConnectivityMessage`` based on provided ``Messagable`` types.
 ///
 /// ```swift
@@ -85,6 +87,6 @@ public struct MessageDecoder {
       return nil
     }
 
-    return type.init(from: message[MessagableKeys.parametersKey] as? [String: Any])
+    return type.init(from: message[MessagableKeys.parametersKey] as? [String: any Sendable])
   }
 }

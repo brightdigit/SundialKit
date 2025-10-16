@@ -28,33 +28,34 @@
 //
 
 #if canImport(WatchConnectivity)
-  import SundialKitCore
-  @preconcurrency import WatchConnectivity
+  public import Foundation
+  public import SundialKitCore
+  import WatchConnectivity
 
   internal typealias WatchConnectivitySessionProtocol =
     ConnectivitySession & WCSessionDelegate
 
-  internal final class WatchConnectivitySession: NSObject, WatchConnectivitySessionProtocol,
+  public final class WatchConnectivitySession: NSObject, WatchConnectivitySessionProtocol,
     @unchecked Sendable
   {
     private let session: WCSession
 
-    internal var delegate: ConnectivitySessionDelegate?
+    public var delegate: ConnectivitySessionDelegate?
 
-    internal var isReachable: Bool {
+    public var isReachable: Bool {
       session.isReachable
     }
 
     @available(watchOS, unavailable)
-    internal var isPaired: Bool {
+    public var isPaired: Bool {
       session.isPaired
     }
 
-    internal var isPairedAppInstalled: Bool {
+    public var isPairedAppInstalled: Bool {
       session.isPairedAppInstalled
     }
 
-    internal var activationState: ActivationState {
+    public var activationState: ActivationState {
       guard let state = ActivationState(rawValue: session.activationState.rawValue) else {
         preconditionFailure()
       }
@@ -68,15 +69,15 @@
       session.delegate = self
     }
 
-    override internal convenience init() {
+    override public convenience init() {
       self.init(session: .default)
     }
 
-    internal func updateApplicationContext(_ context: ConnectivityMessage) throws {
+    public func updateApplicationContext(_ context: ConnectivityMessage) throws {
       try session.updateApplicationContext(context)
     }
 
-    internal func sendMessage(
+    public func sendMessage(
       _ message: ConnectivityMessage,
       _ completion: @escaping (Result<ConnectivityMessage, Error>) -> Void
     ) {
@@ -89,7 +90,7 @@
       }
     }
 
-    internal func activate() throws {
+    public func activate() throws {
       guard WCSession.isSupported() else {
         throw SundialError.sessionNotSupported
       }

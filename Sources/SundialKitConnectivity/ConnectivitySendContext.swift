@@ -27,8 +27,10 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+public import SundialKitCore
+
 /// Result from sending a message
-public enum ConnectivitySendContext {
+public enum ConnectivitySendContext: Sendable {
   /// Sent via application context
   case applicationContext
   /// Sent via message with reply received
@@ -38,8 +40,9 @@ public enum ConnectivitySendContext {
 }
 
 extension ConnectivitySendContext {
-  // swiftlint:disable:next explicit_acl
-  init(_ result: Result<ConnectivityMessage, Error>) {
+  /// Creates a send context from a result.
+  /// - Parameter result: The result of sending a message
+  public init(_ result: Result<ConnectivityMessage, Error>) {
     switch result {
     case .success(let message):
       self = .reply(message)

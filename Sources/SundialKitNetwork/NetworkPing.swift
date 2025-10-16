@@ -73,7 +73,7 @@ public import SundialKitCore
 /// ```
 public protocol NetworkPing {
   /// The resulting status of the ping.
-  associatedtype StatusType
+  associatedtype StatusType: Sendable
   /// The amount of time between each verification
   var timeInterval: TimeInterval { get }
   /// Based on the `PathStatus` should it verify network connectivity.

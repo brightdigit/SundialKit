@@ -183,7 +183,8 @@ extension SerializationError: LocalizedError {
     case .encodingFailed:
       return "Ensure all message data uses supported types and check for circular references."
     case .unsupportedType:
-      return "Convert custom types to property list types (String, Number, Date, Data, Array, Dictionary) before encoding."
+      return
+        "Convert custom types to property list types (String, Number, Date, Data, Array, Dictionary) before encoding."
     case .invalidMessageFormat:
       return "Review message structure and ensure it conforms to the expected format."
     case .decodingFailed:
@@ -191,7 +192,8 @@ extension SerializationError: LocalizedError {
     case .missingRequiredKey:
       return "Ensure the sender includes all required fields in the message."
     case .typeMismatch:
-      return "Verify the message format matches the expected schema and check for type conversion issues."
+      return
+        "Verify the message format matches the expected schema and check for type conversion issues."
     case .invalidData:
       return "Check that the data source is providing data in the expected format."
     case .corruptedData:

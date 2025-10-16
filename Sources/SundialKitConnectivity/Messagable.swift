@@ -27,6 +27,8 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+public import SundialKitCore
+
 /// An object which can be decoded by a ``MessageDecoder`` from a ``ConnectivityMessage``.
 ///
 /// ```swift
@@ -66,11 +68,11 @@ public protocol Messagable {
 
   /// Create the object based on the `Dictionary<String, Any>`.
   /// - Parameter parameters: The parameters value.
-  init?(from parameters: [String: Any]?)
+  init?(from parameters: [String: any Sendable]?)
 
   /// The parameters of the `Messagable` object.
   /// - Returns: The parameters of the `Messagable` object.
-  func parameters() -> [String: Any]
+  func parameters() -> [String: any Sendable]
 }
 
 extension Messagable {

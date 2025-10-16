@@ -1,19 +1,31 @@
-import XCTest
+//
+//  MessagableTests.swift
+//  SundialKit
+//
+//  Created by Leo Dion.
+//  Copyright © 2025 BrightDigit.
+//
+
+import Foundation
+import Testing
 
 @testable import SundialKitConnectivity
 
-internal final class MessagableTests: XCTestCase {
-  internal func testMessage() {
+@Suite("Messagable Tests")
+struct MessagableTests {
+  @Test("Message encoding includes type key and parameters")
+  func messageEncoding() {
     let mockMessage = MockMessage()
     let dict = mockMessage.message()
-    XCTAssertEqual(dict[MessagableKeys.typeKey] as? String, MockMessage.key)
+
+    #expect(dict[MessagableKeys.typeKey] as? String == MockMessage.key)
 
     let actualParams = dict[MessagableKeys.parametersKey]
-    guard let params = actualParams as? [String: Any] else {
-      XCTAssertNotNil(actualParams)
+    guard let params = actualParams as? [String: any Sendable] else {
+      Issue.record("Parameters should not be nil")
       return
     }
 
-    XCTAssertEqual(params[mockMessage.key] as? UUID, mockMessage.value)
+    #expect(params[mockMessage.key] as? UUID == mockMessage.value)
   }
 }

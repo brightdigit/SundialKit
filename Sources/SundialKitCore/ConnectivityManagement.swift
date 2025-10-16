@@ -33,7 +33,7 @@ public import Foundation
 ///
 /// Represents the dictionary-based message format required by WatchConnectivity.
 /// Messages must contain only property list types (String, Number, Date, Data, Array, Dictionary).
-public typealias ConnectivityMessage = [String: Any]
+public typealias ConnectivityMessage = [String: any Sendable]
 
 /// A protocol for managing connectivity between iOS and watchOS devices.
 ///

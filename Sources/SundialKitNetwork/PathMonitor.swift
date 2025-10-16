@@ -36,7 +36,7 @@ public import SundialKitCore
 /// can use [`NWPathMonitor`](../network/nwpathmonitor)
 public protocol PathMonitor {
   /// The type of path accepted by the `PathMonitor`.
-  associatedtype PathType: NetworkPath
+  associatedtype PathType: NetworkPath & Sendable
   /// Sets the handler for when the `PathType` updates.
   func onPathUpdate(_ handler: @escaping @Sendable (PathType) -> Void)
   /// Starts the monitor.

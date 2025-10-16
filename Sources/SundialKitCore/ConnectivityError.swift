@@ -30,7 +30,7 @@
 public import Foundation
 
 #if canImport(WatchConnectivity)
-  @preconcurrency public import WatchConnectivity
+  public import WatchConnectivity
 #endif
 
 /// Errors that can occur during WatchConnectivity operations.
@@ -362,7 +362,8 @@ extension ConnectivityError: LocalizedError {
     case .deliveryFailed:
       return "The message could not be delivered to the counterpart device."
     case .watchOnlyApp:
-      return "This is a watch-only app that requires a companion iOS app for full connectivity features."
+      return
+        "This is a watch-only app that requires a companion iOS app for full connectivity features."
     case .genericError:
       return "An unexpected error occurred during the connectivity operation."
     }
@@ -382,13 +383,16 @@ extension ConnectivityError: LocalizedError {
     case .companionAppNotInstalled:
       return "Install the companion app on the paired device."
     case .notReachable:
-      return "Ensure both devices are powered on, within range, and the app is running on the counterpart."
+      return
+        "Ensure both devices are powered on, within range, and the app is running on the counterpart."
     case .messageReplyFailed:
-      return "Check the message format and try again. The counterpart may need to handle the message differently."
+      return
+        "Check the message format and try again. The counterpart may need to handle the message differently."
     case .messageReplyTimedOut:
       return "Try sending the message again. Consider checking if the counterpart is responsive."
     case .invalidParameter:
-      return "Ensure all message data uses property list types (String, Number, Date, Data, Array, Dictionary)."
+      return
+        "Ensure all message data uses property list types (String, Number, Date, Data, Array, Dictionary)."
     case .payloadTooLarge:
       return "Reduce the message size or split the data into multiple smaller messages."
     case .payloadUnsupportedTypes:

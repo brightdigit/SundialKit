@@ -1,4 +1,13 @@
-import XCTest
+//
+//  PassthroughSubjectTests.swift
+//  SundialKit
+//
+//  Created by Leo Dion.
+//  Copyright © 2025 BrightDigit.
+//
+
+import Foundation
+import Testing
 
 @testable import SundialKit
 
@@ -6,29 +15,32 @@ import XCTest
   import Combine
 #endif
 
-internal class PassthroughSubjectTests: XCTestCase, @unchecked Sendable {
+@Suite("PassthroughSubject Tests")
+struct PassthroughSubjectTests {
   private struct MockStruct {
-    // swiftlint:disable:next strict_fileprivate
     fileprivate let id: UUID
   }
 
-  internal func testAnyPublisher() async throws {
+  @Test("AnyPublisher maps keypath correctly")
+  func anyPublisher() async throws {
     #if canImport(Combine)
       let expected = UUID()
       var actual: UUID?
-      let expectation = expectation(description: "Publisher Works")
       let subject = PassthroughSubject<MockStruct, Never>()
-      let cancellable = subject.anyPublisher(for: \.id).sink { value in
-        actual = value
-        expectation.fulfill()
-      }
-      subject.send(.init(id: expected))
-      await fulfillment(of: [expectation], timeout: 1.0)
-      XCTAssertEqual(expected, actual)
-      cancellable.cancel()
 
-    #else
-      throw XCTSkip("OS doesn't support Combine.")
+      await confirmation("Publisher works") { confirm in
+        let cancellable = subject.anyPublisher(for: \.id).sink { value in
+          actual = value
+          confirm()
+        }
+
+        subject.send(.init(id: expected))
+
+        // Keep cancellable alive
+        withExtendedLifetime(cancellable) {}
+      }
+
+      #expect(expected == actual)
     #endif
   }
 }

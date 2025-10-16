@@ -27,11 +27,33 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-/// SundialKitCombine provides Combine framework compatibility for SundialKit v1.
+/// SundialKitCombine provides Combine framework integration for SundialKit v2.
 ///
-/// This package maintains backward compatibility with SundialKit 1.x by providing
-/// Combine publishers for network monitoring and connectivity events.
+/// This package offers @MainActor-isolated observers with @Published properties
+/// for reactive network monitoring and WatchConnectivity communication.
+///
+/// ## Features
+///
+/// - **NetworkObserver**: Reactive network monitoring with Combine publishers
+/// - **ConnectivityObserver**: WatchConnectivity integration with Combine support
+/// - **@MainActor**: All updates guaranteed on main thread for UI safety
+/// - **@Published**: SwiftUI-ready observable properties
+///
+/// ## Example
+///
+/// ```swift
+/// import SundialKitCombine
+///
+/// let observer = NetworkObserver()
+/// observer.start()
+///
+/// observer.$pathStatus
+///   .sink { status in
+///     print("Network: \(status)")
+///   }
+///   .store(in: &cancellables)
+/// ```
 public enum SundialKitCombine {
   /// The version of SundialKitCombine
-  public static let version = "1.0.0"
+  public static let version = "2.0.0"
 }

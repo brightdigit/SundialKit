@@ -27,10 +27,12 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+public import SundialKitCore
+
 /// Context of the message received
-public enum ConnectivityReceiveContext {
+public enum ConnectivityReceiveContext: Sendable {
   /// Received as a sent message with a reply handler
-  case replyWith(ConnectivityHandler)
+  case replyWith(@Sendable (ConnectivityMessage) -> Void)
   /// Received as application context.
   case applicationContext
 

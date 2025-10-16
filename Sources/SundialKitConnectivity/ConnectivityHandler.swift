@@ -27,5 +27,7 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+public import SundialKitCore
+
 /// Handles a message received.
-public typealias ConnectivityHandler = (ConnectivityMessage) -> Void
+public typealias ConnectivityHandler = @Sendable (ConnectivityMessage) -> Void

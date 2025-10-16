@@ -27,11 +27,22 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+public import SundialKitCore
+
 /// Message received.
-public struct ConnectivityReceiveResult {
+public struct ConnectivityReceiveResult: Sendable {
   /// Message received.
   public let message: ConnectivityMessage
 
   /// How the message was received.
   public let context: ConnectivityReceiveContext
+
+  /// Creates a new receive result.
+  /// - Parameters:
+  ///   - message: The message that was received
+  ///   - context: How the message was received
+  public init(message: ConnectivityMessage, context: ConnectivityReceiveContext) {
+    self.message = message
+    self.context = context
+  }
 }

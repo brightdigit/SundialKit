@@ -1,5 +1,5 @@
-@testable import SundialKitCore
 @testable import SundialKitConnectivity
+@testable import SundialKitCore
 
 internal final class MockSession: ConnectivitySession, @unchecked Sendable {
   internal var lastMessageSent: ConnectivityMessage?
