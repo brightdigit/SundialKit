@@ -33,6 +33,7 @@ struct PathStatusNetworkTests {
     }
   #endif
 
+  #if canImport(Network)
   @Test(
     "PathStatus initialized from NWPath properties",
     arguments: [
@@ -72,4 +73,5 @@ struct PathStatusNetworkTests {
       assertStatus(status, reason: reason, interfaces: interfaces, equalsPathStatus: expected)
     #endif
   }
+  #endif
 }
