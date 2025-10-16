@@ -105,7 +105,6 @@ public protocol ConnectivityManagement {
   ///
   /// - SeeAlso: ``ActivationState``
   var activationState: ActivationState { get }
-
   /// Indicates whether the counterpart device is currently reachable.
   ///
   /// A counterpart is reachable when:

@@ -30,7 +30,7 @@
 public import SundialKitCore
 
 public protocol ConnectivitySession: AnyObject, Sendable {
-  var delegate: ConnectivitySessionDelegate? { get set }
+  var delegate: (any ConnectivitySessionDelegate)? { get set }
   var isReachable: Bool { get }
 
   #if os(iOS)
@@ -43,6 +43,6 @@ public protocol ConnectivitySession: AnyObject, Sendable {
   func updateApplicationContext(_ context: ConnectivityMessage) throws
   func sendMessage(
     _ message: ConnectivityMessage,
-    _ completion: @escaping (Result<ConnectivityMessage, Error>) -> Void
+    _ completion: @escaping (Result<ConnectivityMessage, any Error>) -> Void
   )
 }

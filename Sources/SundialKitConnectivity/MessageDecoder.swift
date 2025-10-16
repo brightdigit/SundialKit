@@ -63,11 +63,11 @@ public import SundialKitCore
 /// let messageDecoder = MessageDecoder(messagableTypes: [Message.self])
 /// ```
 public struct MessageDecoder {
-  private let messagableTypes: [String: Messagable.Type]
+  private let messagableTypes: [String: any Messagable.Type]
 
   /// Creates a `MessageDecoder` based on a list of `Messagable` types.
   /// - Parameter messagableTypes: A list of `Messagable` types.
-  public init(messagableTypes: [Messagable.Type]) {
+  public init(messagableTypes: [any Messagable.Type]) {
     self.messagableTypes = Dictionary(
       uniqueKeysWithValues: messagableTypes.map {
         ($0.key, $0)
@@ -78,7 +78,7 @@ public struct MessageDecoder {
   /// Decodes the `ConnectivityMessage` into a `Messagable` object.
   /// - Parameter message: The `ConnectivityMessage` or `[String : Any]` object.
   /// - Returns: The `Messagable`  object or nil if it couldn't be decoded.
-  public func decode(_ message: ConnectivityMessage) -> Messagable? {
+  public func decode(_ message: ConnectivityMessage) -> (any Messagable)? {
     guard let typeKey = message[MessagableKeys.typeKey] as? String else {
       return nil
     }

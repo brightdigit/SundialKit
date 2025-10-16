@@ -36,13 +36,13 @@ public enum ConnectivitySendContext: Sendable {
   /// Sent via message with reply received
   case reply(ConnectivityMessage)
   /// Failure
-  case failure(Error)
+  case failure(any Error)
 }
 
 extension ConnectivitySendContext {
   /// Creates a send context from a result.
   /// - Parameter result: The result of sending a message
-  public init(_ result: Result<ConnectivityMessage, Error>) {
+  public init(_ result: Result<ConnectivityMessage, any Error>) {
     switch result {
     case .success(let message):
       self = .reply(message)

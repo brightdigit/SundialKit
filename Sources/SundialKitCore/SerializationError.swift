@@ -183,8 +183,10 @@ extension SerializationError: LocalizedError {
     case .encodingFailed:
       return "Ensure all message data uses supported types and check for circular references."
     case .unsupportedType:
-      return
-        "Convert custom types to property list types (String, Number, Date, Data, Array, Dictionary) before encoding."
+      return """
+        Convert custom types to property list types \
+        (String, Number, Date, Data, Array, Dictionary) before encoding.
+        """
     case .invalidMessageFormat:
       return "Review message structure and ensure it conforms to the expected format."
     case .decodingFailed:

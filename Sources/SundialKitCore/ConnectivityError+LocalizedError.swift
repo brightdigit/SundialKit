@@ -30,6 +30,31 @@
 public import Foundation
 
 extension ConnectivityError: LocalizedError {
+  // MARK: - Error Information Dictionary
+
+  private static let errorInfo: [ConnectivityError: LocalizedInfo] = [
+    .sessionNotSupported: .sessionNotSupported,
+    .sessionNotActivated: .sessionNotActivated,
+    .sessionInactive: .sessionInactive,
+    .deviceNotPaired: .deviceNotPaired,
+    .companionAppNotInstalled: .companionAppNotInstalled,
+    .notReachable: .notReachable,
+    .messageReplyFailed: .messageReplyFailed,
+    .messageReplyTimedOut: .messageReplyTimedOut,
+    .invalidParameter: .invalidParameter,
+    .payloadTooLarge: .payloadTooLarge,
+    .payloadUnsupportedTypes: .payloadUnsupportedTypes,
+    .transferTimedOut: .transferTimedOut,
+    .insufficientSpace: .insufficientSpace,
+    .fileNotAccessible: .fileNotAccessible,
+    .sessionMissingDelegate: .sessionMissingDelegate,
+    .fileAccessDenied: .fileAccessDenied,
+    .deliveryFailed: .deliveryFailed,
+    .watchOnlyApp: .watchOnlyApp,
+  ]
+
+  // MARK: - LocalizedError Properties
+
   /// A localized message describing what error occurred.
   public var errorDescription: String? {
     guard case .genericErrorCode(let code) = self else {
@@ -59,27 +84,4 @@ extension ConnectivityError: LocalizedError {
     }
     return "Check the underlying error for more details and try the operation again."
   }
-
-  // MARK: - Error Information Dictionary
-
-  private static let errorInfo: [ConnectivityError: LocalizedInfo] = [
-    .sessionNotSupported: .sessionNotSupported,
-    .sessionNotActivated: .sessionNotActivated,
-    .sessionInactive: .sessionInactive,
-    .deviceNotPaired: .deviceNotPaired,
-    .companionAppNotInstalled: .companionAppNotInstalled,
-    .notReachable: .notReachable,
-    .messageReplyFailed: .messageReplyFailed,
-    .messageReplyTimedOut: .messageReplyTimedOut,
-    .invalidParameter: .invalidParameter,
-    .payloadTooLarge: .payloadTooLarge,
-    .payloadUnsupportedTypes: .payloadUnsupportedTypes,
-    .transferTimedOut: .transferTimedOut,
-    .insufficientSpace: .insufficientSpace,
-    .fileNotAccessible: .fileNotAccessible,
-    .sessionMissingDelegate: .sessionMissingDelegate,
-    .fileAccessDenied: .fileAccessDenied,
-    .deliveryFailed: .deliveryFailed,
-    .watchOnlyApp: .watchOnlyApp,
-  ]
 }

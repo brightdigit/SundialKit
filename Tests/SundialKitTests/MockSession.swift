@@ -5,15 +5,15 @@ internal final class MockSession: ConnectivitySession, @unchecked Sendable {
   internal var lastMessageSent: ConnectivityMessage?
   internal var lastAppContext: ConnectivityMessage?
   // swiftlint:disable:next implicitly_unwrapped_optional
-  internal var nextReplyResult: Result<ConnectivityMessage, Error>!
-  internal var nextApplicationContextError: Error?
+  internal var nextReplyResult: Result<ConnectivityMessage, any Error>!
+  internal var nextApplicationContextError: (any Error)?
   internal var isPaired = false {
     didSet {
       delegate?.sessionCompanionStateDidChange(self)
     }
   }
 
-  internal var delegate: ConnectivitySessionDelegate?
+  internal var delegate: (any ConnectivitySessionDelegate)?
 
   internal var isReachable = false {
     didSet {
@@ -56,7 +56,7 @@ internal final class MockSession: ConnectivitySession, @unchecked Sendable {
 
   internal func sendMessage(
     _ message: ConnectivityMessage,
-    _ replyHandler: @escaping (Result<ConnectivityMessage, Error>) -> Void
+    _ replyHandler: @escaping (Result<ConnectivityMessage, any Error>) -> Void
   ) {
     lastMessageSent = message
     replyHandler(nextReplyResult)

@@ -31,28 +31,28 @@ public import SundialKitCore
 
 public protocol ConnectivitySessionDelegate: AnyObject {
   func session(
-    _ session: ConnectivitySession,
+    _ session: any ConnectivitySession,
     activationDidCompleteWith activationState: ActivationState,
-    error: Error?
+    error: (any Error)?
   )
 
-  func sessionDidBecomeInactive(_ session: ConnectivitySession)
+  func sessionDidBecomeInactive(_ session: any ConnectivitySession)
 
-  func sessionDidDeactivate(_ session: ConnectivitySession)
+  func sessionDidDeactivate(_ session: any ConnectivitySession)
 
-  func sessionCompanionStateDidChange(_ session: ConnectivitySession)
+  func sessionCompanionStateDidChange(_ session: any ConnectivitySession)
 
-  func sessionReachabilityDidChange(_ session: ConnectivitySession)
+  func sessionReachabilityDidChange(_ session: any ConnectivitySession)
 
   func session(
-    _ session: ConnectivitySession,
+    _ session: any ConnectivitySession,
     didReceiveMessage message: ConnectivityMessage,
     replyHandler: @escaping ConnectivityHandler
   )
 
   func session(
-    _ session: ConnectivitySession,
+    _ session: any ConnectivitySession,
     didReceiveApplicationContext applicationContext: ConnectivityMessage,
-    error: Error?
+    error: (any Error)?
   )
 }

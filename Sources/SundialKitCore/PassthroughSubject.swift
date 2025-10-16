@@ -32,7 +32,10 @@
 
   @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
   extension PassthroughSubject {
-    // swiftlint:disable:next explicit_acl
+    /// Creates a publisher that emits values from a specific key path of the subject's output.
+    ///
+    /// - Parameter keyPath: A key path to a property of the output type.
+    /// - Returns: A type-erased publisher that emits values from the specified key path.
     public func anyPublisher<T>(
       for keyPath: KeyPath<Output, T>
     ) -> AnyPublisher<T, Failure> {

@@ -31,7 +31,7 @@ public import Foundation
 public import SundialKitCore
 
 public final class NeverConnectivitySession: NSObject, ConnectivitySession {
-  public var delegate: ConnectivitySessionDelegate? {
+  public var delegate: (any ConnectivitySessionDelegate)? {
     get {
       nil
     }
@@ -65,7 +65,7 @@ public final class NeverConnectivitySession: NSObject, ConnectivitySession {
 
   public func sendMessage(
     _: ConnectivityMessage,
-    _ completion: @escaping (Result<ConnectivityMessage, Error>) -> Void
+    _ completion: @escaping (Result<ConnectivityMessage, any Error>) -> Void
   ) {
     completion(.failure(SundialError.sessionNotSupported))
   }
