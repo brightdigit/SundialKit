@@ -93,7 +93,7 @@ public import Foundation
 ///     }
 /// }
 /// ```
-public enum ConnectivityError: Error, Sendable {
+public enum ConnectivityError: Error, Sendable, Hashable {
   // MARK: - Session Errors
 
   /// WatchConnectivity session is not supported on this device.
@@ -208,7 +208,7 @@ public enum ConnectivityError: Error, Sendable {
   /// An unknown or generic connectivity error occurred.
   ///
   /// - Parameter underlyingError: The original system error, if available.
-  case genericError(any Error)
+  case genericErrorCode(Int)
 
   // MARK: - WCError Mapping
 
@@ -230,189 +230,38 @@ public enum ConnectivityError: Error, Sendable {
     ///     }
     /// }
     /// ```
+
+    private static let wcErrorMapping: [WCError.Code: ConnectivityError] = [
+      .sessionNotSupported: .sessionNotSupported,
+      .sessionNotActivated: .sessionNotActivated,
+      .sessionInactive: .sessionInactive,
+      .deviceNotPaired: .deviceNotPaired,
+      .watchAppNotInstalled: .companionAppNotInstalled,
+      .notReachable: .notReachable,
+      .invalidParameter: .invalidParameter,
+      .payloadTooLarge: .payloadTooLarge,
+      .payloadUnsupportedTypes: .payloadUnsupportedTypes,
+      .messageReplyFailed: .messageReplyFailed,
+      .messageReplyTimedOut: .messageReplyTimedOut,
+      .transferTimedOut: .transferTimedOut,
+      .insufficientSpace: .insufficientSpace,
+      .sessionMissingDelegate: .sessionMissingDelegate,
+      .fileAccessDenied: .fileAccessDenied,
+      .deliveryFailed: .deliveryFailed,
+      .companionAppNotInstalled: .companionAppNotInstalled,
+      .watchOnlyApp: .watchOnlyApp,
+    ]
+
     public init(wcError: WCError) {
-      switch wcError.code {
-      case .sessionNotSupported:
-        self = .sessionNotSupported
-      case .sessionNotActivated:
-        self = .sessionNotActivated
-      case .sessionInactive:
-        self = .sessionInactive
-      case .deviceNotPaired:
-        self = .deviceNotPaired
-      case .watchAppNotInstalled:
-        self = .companionAppNotInstalled
-      case .notReachable:
-        self = .notReachable
-      case .invalidParameter:
-        self = .invalidParameter
-      case .payloadTooLarge:
-        self = .payloadTooLarge
-      case .payloadUnsupportedTypes:
-        self = .payloadUnsupportedTypes
-      case .messageReplyFailed:
-        self = .messageReplyFailed
-      case .messageReplyTimedOut:
-        self = .messageReplyTimedOut
-      case .transferTimedOut:
-        self = .transferTimedOut
-      case .insufficientSpace:
-        self = .insufficientSpace
-      case .sessionMissingDelegate:
-        self = .sessionMissingDelegate
-      case .fileAccessDenied:
-        self = .fileAccessDenied
-      case .deliveryFailed:
-        self = .deliveryFailed
-      case .companionAppNotInstalled:
-        self = .companionAppNotInstalled
-      case .watchOnlyApp:
-        self = .watchOnlyApp
-      case .genericError:
-        self = .genericError(wcError)
-      @unknown default:
-        self = .genericError(wcError)
+      guard let mapped = Self.wcErrorMapping[wcError.code] else {
+        self = .genericErrorCode(wcError.code.rawValue)
+        return
       }
+      self = mapped
     }
   #endif
 }
 
+// MARK: - Error Information Structure
+
 // MARK: - LocalizedError Conformance
-
-extension ConnectivityError: LocalizedError {
-  /// A localized message describing what error occurred.
-  public var errorDescription: String? {
-    switch self {
-    case .sessionNotSupported:
-      return "WatchConnectivity is not supported on this device."
-    case .sessionNotActivated:
-      return "The connectivity session has not been activated."
-    case .sessionInactive:
-      return "The connectivity session is inactive."
-    case .deviceNotPaired:
-      return "No companion device is paired."
-    case .companionAppNotInstalled:
-      return "The companion app is not installed on the paired device."
-    case .notReachable:
-      return "The counterpart device is not currently reachable."
-    case .messageReplyFailed:
-      return "The message reply operation failed."
-    case .messageReplyTimedOut:
-      return "The message reply timed out."
-    case .invalidParameter:
-      return "Invalid parameter provided to connectivity operation."
-    case .payloadTooLarge:
-      return "The message payload exceeds the maximum size limit."
-    case .payloadUnsupportedTypes:
-      return "The message payload contains unsupported types."
-    case .transferTimedOut:
-      return "The data transfer operation timed out."
-    case .insufficientSpace:
-      return "Insufficient storage space for the transfer."
-    case .fileNotAccessible:
-      return "The file is not accessible for transfer."
-    case .sessionMissingDelegate:
-      return "The connectivity session is missing a required delegate."
-    case .fileAccessDenied:
-      return "Access to the file was denied by the system."
-    case .deliveryFailed:
-      return "Message delivery failed."
-    case .watchOnlyApp:
-      return "The app is watch-only and cannot use certain connectivity features."
-    case .genericError(let error):
-      return "Connectivity error: \(error.localizedDescription)"
-    }
-  }
-
-  /// A localized message describing the reason for the failure.
-  public var failureReason: String? {
-    switch self {
-    case .sessionNotSupported:
-      return "WatchConnectivity is only available on iPhone and Apple Watch devices."
-    case .sessionNotActivated:
-      return "The session must be activated before sending or receiving messages."
-    case .sessionInactive:
-      return "The session is transitioning to a deactivated state."
-    case .deviceNotPaired:
-      return "This device is not paired with a companion device."
-    case .companionAppNotInstalled:
-      return "The corresponding app is not installed on the paired device."
-    case .notReachable:
-      return "The device may be out of range, powered off, or the app may not be running."
-    case .messageReplyFailed:
-      return "The counterpart encountered an error while processing the message."
-    case .messageReplyTimedOut:
-      return "The counterpart did not respond within the timeout period."
-    case .invalidParameter:
-      return "One or more parameters do not meet the required format or constraints."
-    case .payloadTooLarge:
-      return "The data exceeds WatchConnectivity's transfer size limits."
-    case .payloadUnsupportedTypes:
-      return "The message contains types that cannot be transmitted via WatchConnectivity."
-    case .transferTimedOut:
-      return "The transfer did not complete within the expected time."
-    case .insufficientSpace:
-      return "The receiving device does not have enough available storage."
-    case .fileNotAccessible:
-      return "The specified file cannot be accessed or does not exist."
-    case .sessionMissingDelegate:
-      return "A delegate must be set on the WatchConnectivity session before it can be activated."
-    case .fileAccessDenied:
-      return "The app does not have the necessary permissions to access this file."
-    case .deliveryFailed:
-      return "The message could not be delivered to the counterpart device."
-    case .watchOnlyApp:
-      return
-        "This is a watch-only app that requires a companion iOS app for full connectivity features."
-    case .genericError:
-      return "An unexpected error occurred during the connectivity operation."
-    }
-  }
-
-  /// A localized message describing how to recover from the failure.
-  public var recoverySuggestion: String? {
-    switch self {
-    case .sessionNotSupported:
-      return "WatchConnectivity features are only available on compatible devices."
-    case .sessionNotActivated:
-      return "Call activate() on the connectivity manager before using messaging features."
-    case .sessionInactive:
-      return "Wait for the session to become active again or reactivate it."
-    case .deviceNotPaired:
-      return "Pair an Apple Watch with this iPhone or an iPhone with this Apple Watch."
-    case .companionAppNotInstalled:
-      return "Install the companion app on the paired device."
-    case .notReachable:
-      return
-        "Ensure both devices are powered on, within range, and the app is running on the counterpart."
-    case .messageReplyFailed:
-      return
-        "Check the message format and try again. The counterpart may need to handle the message differently."
-    case .messageReplyTimedOut:
-      return "Try sending the message again. Consider checking if the counterpart is responsive."
-    case .invalidParameter:
-      return
-        "Ensure all message data uses property list types (String, Number, Date, Data, Array, Dictionary)."
-    case .payloadTooLarge:
-      return "Reduce the message size or split the data into multiple smaller messages."
-    case .payloadUnsupportedTypes:
-      return "Use only property list types in message dictionaries."
-    case .transferTimedOut:
-      return "Check network connectivity and try the transfer again."
-    case .insufficientSpace:
-      return "Free up storage space on the receiving device and retry the transfer."
-    case .fileNotAccessible:
-      return "Verify the file path is correct and the file exists."
-    case .sessionMissingDelegate:
-      return "Set a delegate on the WatchConnectivity session before calling activate()."
-    case .fileAccessDenied:
-      return "Check the app's file access permissions and request access if needed."
-    case .deliveryFailed:
-      return "Ensure the counterpart device is reachable and try sending the message again."
-    case .watchOnlyApp:
-      return "Install the companion iOS app to enable full connectivity features."
-    case .genericError:
-      return "Check the underlying error for more details and try the operation again."
-    }
-  }
-}

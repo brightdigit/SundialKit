@@ -29,8 +29,8 @@
 
 public import Combine
 public import Foundation
-public import SundialKitCore
 public import SundialKitConnectivity
+public import SundialKitCore
 
 /// MainActor-isolated WatchConnectivity observer providing Combine publishers
 ///
@@ -69,7 +69,6 @@ public import SundialKitConnectivity
 @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
 @MainActor
 public final class ConnectivityObserver: ConnectivitySessionDelegate {
-
   // MARK: - Published Properties
 
   /// Current activation state
@@ -239,7 +238,8 @@ public final class ConnectivityObserver: ConnectivitySessionDelegate {
     error: (any Error)?
   ) {
     Task { @MainActor in
-      let result = ConnectivityReceiveResult(message: applicationContext, context: .applicationContext)
+      let result = ConnectivityReceiveResult(
+        message: applicationContext, context: .applicationContext)
       self.messageReceived.send(result)
     }
   }

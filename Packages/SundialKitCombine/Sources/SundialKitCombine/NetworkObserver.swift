@@ -63,7 +63,6 @@ public import SundialKitNetwork
 @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
 @MainActor
 public final class NetworkObserver<MonitorType: PathMonitor, PingType: NetworkPing & Sendable> {
-
   // MARK: - Published Properties
 
   /// Current network path status

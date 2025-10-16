@@ -84,6 +84,7 @@
       session.sendMessage(
         message as [String: Any]
       ) { response in
+        // swiftlint:disable:next force_cast
         let sendableResponse: ConnectivityMessage = response.mapValues { $0 as! any Sendable }
         completion(.success(sendableResponse))
       } errorHandler: { error in
@@ -146,6 +147,7 @@
       didReceiveMessage message: [String: Any],
       replyHandler: @escaping ([String: Any]) -> Void
     ) {
+      // swiftlint:disable:next force_cast
       let sendableMessage: ConnectivityMessage = message.mapValues { $0 as! any Sendable }
       let handler = unsafeBitCast(replyHandler, to: ConnectivityHandler.self)
       delegate?.session(self, didReceiveMessage: sendableMessage, replyHandler: handler)
@@ -155,7 +157,10 @@
       _: WCSession,
       didReceiveApplicationContext applicationContext: [String: Any]
     ) {
-      let sendableContext: ConnectivityMessage = applicationContext.mapValues { $0 as! any Sendable }
+      let sendableContext: ConnectivityMessage = applicationContext.mapValues {
+        // swiftlint:disable:next force_cast
+        $0 as! any Sendable
+      }
       delegate?.session(
         self,
         didReceiveApplicationContext: sendableContext,
@@ -168,7 +173,10 @@
       didReceiveApplicationContext applicationContext: [String: Any],
       error: Error?
     ) {
-      let sendableContext: ConnectivityMessage = applicationContext.mapValues { $0 as! any Sendable }
+      let sendableContext: ConnectivityMessage = applicationContext.mapValues {
+        // swiftlint:disable:next force_cast
+        $0 as! any Sendable
+      }
       delegate?.session(
         self,
         didReceiveApplicationContext: sendableContext,

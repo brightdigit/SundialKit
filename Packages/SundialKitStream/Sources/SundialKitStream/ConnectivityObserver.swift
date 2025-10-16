@@ -28,8 +28,8 @@
 //
 
 public import Foundation
-public import SundialKitCore
 public import SundialKitConnectivity
+public import SundialKitCore
 
 /// Actor-based WatchConnectivity observer providing AsyncStream APIs
 ///
@@ -55,8 +55,6 @@ public import SundialKitConnectivity
 ///
 @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
 public actor ConnectivityObserver: ConnectivitySessionDelegate {
-
-  
   // MARK: - Private Properties
 
   internal let session: any ConnectivitySession
@@ -72,8 +70,10 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
   private var reachabilityContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
   private var pairedAppInstalledContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
   private var pairedContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
-  private var messageReceivedContinuations: [UUID: AsyncStream<ConnectivityReceiveResult>.Continuation] = [:]
-  private var sendResultContinuations: [UUID: AsyncStream<ConnectivitySendResult>.Continuation] = [:]
+  private var messageReceivedContinuations:
+    [UUID: AsyncStream<ConnectivityReceiveResult>.Continuation] = [:]
+  private var sendResultContinuations: [UUID: AsyncStream<ConnectivitySendResult>.Continuation] =
+    [:]
 
   // MARK: - Initialization
 
@@ -382,7 +382,10 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
     #endif
   }
 
-  private func handleMessage(_ message: ConnectivityMessage, replyHandler: @escaping @Sendable ([String: any Sendable]) -> Void) {
+  private func handleMessage(
+    _ message: ConnectivityMessage,
+    replyHandler: @escaping @Sendable ([String: any Sendable]) -> Void
+  ) {
     let result = ConnectivityReceiveResult(message: message, context: .replyWith(replyHandler))
 
     for continuation in messageReceivedContinuations.values {
@@ -391,7 +394,8 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
   }
 
   private func handleApplicationContext(_ applicationContext: ConnectivityMessage, error: Error?) {
-    let result = ConnectivityReceiveResult(message: applicationContext, context: .applicationContext)
+    let result = ConnectivityReceiveResult(
+      message: applicationContext, context: .applicationContext)
 
     for continuation in messageReceivedContinuations.values {
       continuation.yield(result)

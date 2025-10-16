@@ -33,46 +33,43 @@ struct PathStatusNetworkTests {
     }
   #endif
 
-  @Test("PathStatus initialized from NWPath properties")
+  @Test(
+    "PathStatus initialized from NWPath properties",
+    arguments: [
+      (
+        NWPath.Status.satisfied, NWPath.UnsatisfiedReason.cellularDenied,
+        [PathStatus.Interface.loopback, .cellular], PathStatus.satisfied([.loopback, .cellular])
+      ),
+      (
+        NWPath.Status.requiresConnection, NWPath.UnsatisfiedReason.cellularDenied,
+        [PathStatus.Interface.loopback, .cellular], PathStatus.requiresConnection
+      ),
+      (
+        NWPath.Status.unsatisfied, NWPath.UnsatisfiedReason.cellularDenied,
+        [PathStatus.Interface.loopback, .cellular], PathStatus.unsatisfied(.cellularDenied)
+      ),
+      (
+        NWPath.Status.unsatisfied, NWPath.UnsatisfiedReason.notAvailable,
+        [PathStatus.Interface.loopback, .cellular], PathStatus.unsatisfied(.notAvailable)
+      ),
+      (
+        NWPath.Status.unsatisfied, NWPath.UnsatisfiedReason.localNetworkDenied,
+        [PathStatus.Interface.loopback, .cellular], PathStatus.unsatisfied(.localNetworkDenied)
+      ),
+      (
+        NWPath.Status.unsatisfied, NWPath.UnsatisfiedReason.wifiDenied,
+        [PathStatus.Interface.loopback, .cellular], PathStatus.unsatisfied(.wifiDenied)
+      ),
+    ])
   @available(macOS 11.0, iOS 14.2, watchOS 7.1, tvOS 14.2, *)
-  func pathStatusInit() throws {
+  func pathStatusInit(
+    status: NWPath.Status,
+    reason: NWPath.UnsatisfiedReason,
+    interfaces: [PathStatus.Interface],
+    expected: PathStatus
+  ) throws {
     #if canImport(Network)
-      assertStatus(
-        .satisfied,
-        reason: .cellularDenied,
-        interfaces: [.loopback, .cellular],
-        equalsPathStatus: .satisfied([.loopback, .cellular])
-      )
-      assertStatus(
-        .requiresConnection,
-        reason: .cellularDenied,
-        interfaces: [.loopback, .cellular],
-        equalsPathStatus: .requiresConnection
-      )
-      assertStatus(
-        .unsatisfied,
-        reason: .cellularDenied,
-        interfaces: [.loopback, .cellular],
-        equalsPathStatus: .unsatisfied(.cellularDenied)
-      )
-      assertStatus(
-        .unsatisfied,
-        reason: .notAvailable,
-        interfaces: [.loopback, .cellular],
-        equalsPathStatus: .unsatisfied(.notAvailable)
-      )
-      assertStatus(
-        .unsatisfied,
-        reason: .localNetworkDenied,
-        interfaces: [.loopback, .cellular],
-        equalsPathStatus: .unsatisfied(.localNetworkDenied)
-      )
-      assertStatus(
-        .unsatisfied,
-        reason: .wifiDenied,
-        interfaces: [.loopback, .cellular],
-        equalsPathStatus: .unsatisfied(.wifiDenied)
-      )
+      assertStatus(status, reason: reason, interfaces: interfaces, equalsPathStatus: expected)
     #endif
   }
 }
