@@ -62,7 +62,7 @@ jobs:
             runs-on: macos-26
             xcode: "/Applications/Xcode_26.1.app"
             deviceName: "iPhone 17 Pro"
-            osVersion: "26.0"
+            osVersion: "26.1"
             download-platform: true
 
           - type: ios
