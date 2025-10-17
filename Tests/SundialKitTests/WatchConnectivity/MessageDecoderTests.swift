@@ -11,9 +11,9 @@ import Testing
 @testable import SundialKit
 
 @Suite("Message Decoder Tests")
-struct MessageDecoderTests {
+internal struct MessageDecoderTests {
   @Test("Decoder can decode messages")
-  func decodeMessage() throws {
+  internal func decodeMessage() throws {
     let decoder = MessageDecoder(messagableTypes: [MockMessage.self])
     let expMessage = MockMessage()
     let dict = expMessage.message()

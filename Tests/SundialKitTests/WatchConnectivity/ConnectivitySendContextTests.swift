@@ -12,9 +12,9 @@ import Testing
 @testable import SundialKitCore
 
 @Suite("Connectivity Send Context Tests")
-struct ConnectivitySendContextTests {
+internal struct ConnectivitySendContextTests {
   @Test("Context created from result matches expected pattern")
-  func resultPatterns() {
+  internal func resultPatterns() {
     guard case .reply = ConnectivitySendContext(.success(.init())) else {
       Issue.record("Should be a reply")
       return

@@ -16,13 +16,13 @@ import Testing
 #endif
 
 @Suite("PassthroughSubject Tests")
-struct PassthroughSubjectTests {
+internal struct PassthroughSubjectTests {
   private struct MockStruct {
     fileprivate let id: UUID
   }
 
   @Test("AnyPublisher maps keypath correctly")
-  func anyPublisher() async throws {
+  internal func anyPublisher() async throws {
     #if canImport(Combine)
       let expected = UUID()
       var actual: UUID?

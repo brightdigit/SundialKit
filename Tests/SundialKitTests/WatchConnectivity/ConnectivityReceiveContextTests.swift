@@ -12,9 +12,9 @@ import Testing
 @testable import SundialKitCore
 
 @Suite("Connectivity Receive Context Tests")
-struct ConnectivityReceiveContextTests {
+internal struct ConnectivityReceiveContextTests {
   @Test("Reply handler is nil for application context")
-  func replyHandler() {
+  internal func replyHandler() {
     #expect(ConnectivityReceiveContext.applicationContext.replyHandler == nil)
     #expect(
       ConnectivityReceiveContext.replyWith { _ in
@@ -24,7 +24,7 @@ struct ConnectivityReceiveContextTests {
   }
 
   @Test("Is application context flag works correctly")
-  func isApplicationContext() {
+  internal func isApplicationContext() {
     #expect(ConnectivityReceiveContext.applicationContext.isApplicationContext)
     #expect(
       !ConnectivityReceiveContext.replyWith { _ in

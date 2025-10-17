@@ -18,9 +18,9 @@ import Testing
 #endif
 
 @Suite("NWInterface Tests")
-struct NWInterfaceTests {
+internal struct NWInterfaceTests {
   #if canImport(Network)
-    func rawValue(
+    internal func rawValue(
       of interface: PathStatus.Interface,
       interfaceType: NWInterface.InterfaceType
     ) {
@@ -29,7 +29,7 @@ struct NWInterfaceTests {
   #endif
 
   @Test("Interface raw values match NWInterface types")
-  func interfaceValues() throws {
+  internal func interfaceValues() throws {
     #if canImport(Network)
 
       rawValue(of: .wifi, interfaceType: .wifi)

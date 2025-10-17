@@ -18,11 +18,11 @@ import Testing
 #endif
 
 @Suite("PathStatus Network Tests")
-struct PathStatusNetworkTests {
+internal struct PathStatusNetworkTests {
   #if canImport(Network)
 
     @available(macOS 11.0, iOS 14.2, watchOS 7.1, tvOS 14.2, *)
-    func assertStatus(
+    internal func assertStatus(
       _ status: NWPath.Status,
       reason: NWPath.UnsatisfiedReason,
       interfaces: [PathStatus.Interface],
@@ -63,7 +63,7 @@ struct PathStatusNetworkTests {
         ),
       ])
     @available(macOS 11.0, iOS 14.2, watchOS 7.1, tvOS 14.2, *)
-    func pathStatusInit(
+    internal func pathStatusInit(
       status: NWPath.Status,
       reason: NWPath.UnsatisfiedReason,
       interfaces: [PathStatus.Interface],

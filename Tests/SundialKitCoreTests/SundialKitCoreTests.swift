@@ -10,9 +10,9 @@ import Testing
 @testable import SundialKitCore
 
 @Suite("SundialKitCore Tests")
-struct SundialKitCoreTests {
+internal struct SundialKitCoreTests {
   @Test("Version is correct")
-  func versionIsCorrect() {
+  internal func versionIsCorrect() {
     #expect(SundialKitCore.version == "2.0.0")
   }
 }

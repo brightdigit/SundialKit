@@ -17,10 +17,10 @@ import Testing
 #endif
 
 @Suite("NWPathMonitor Tests")
-struct NWPathMonitorTests {
+internal struct NWPathMonitorTests {
   @Test("Path update handler can be set")
   @available(macOS 11.0, iOS 14.2, watchOS 7.1, tvOS 14.2, *)
-  func pathUpdate() throws {
+  internal func pathUpdate() throws {
     #if canImport(Network)
       let monitor = NWPathMonitor()
       #expect(monitor.pathUpdateHandler == nil)

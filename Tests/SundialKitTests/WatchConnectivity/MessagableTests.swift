@@ -12,9 +12,9 @@ import Testing
 @testable import SundialKitConnectivity
 
 @Suite("Messagable Tests")
-struct MessagableTests {
+internal struct MessagableTests {
   @Test("Message encoding includes type key and parameters")
-  func messageEncoding() {
+  internal func messageEncoding() {
     let mockMessage = MockMessage()
     let dict = mockMessage.message()
 
