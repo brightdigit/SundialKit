@@ -32,47 +32,54 @@ public import SundialKitCore
 /// An object which can be decoded by a ``MessageDecoder`` from a ``ConnectivityMessage``.
 ///
 /// ```swift
-/// struct Message : Messagable {
-///   internal init(text: String) {
-///     self.text = text
-///   }
+/// struct Message: Messagable {
+///   // key defaults to "Message" (type name)
 ///
-///   static let key: String = "_message"
-///
-///   enum Parameters : String {
+///   enum Parameters: String {
 ///     case text
 ///   }
 ///
-///   init?(from parameters: [String : Any]?) {
-///     guard let text = parameters?[Parameters.text.rawValue] as? String else {
-///       return nil
+///   init(from parameters: [String: any Sendable]) throws {
+///     guard let text = parameters[Parameters.text.rawValue] as? String else {
+///       throw SerializationError.missingField(Parameters.text.rawValue)
 ///     }
 ///
 ///     self.text = text
 ///   }
 ///
-///   func parameters() -> [String : Any] {
+///   func parameters() -> [String: any Sendable] {
 ///     return [
-///       Parameters.text.rawValue : self.text
+///       Parameters.text.rawValue: self.text
 ///     ]
 ///   }
 ///
-///   let text : String
+///   let text: String
 /// }
 ///
 /// let messageDecoder = MessageDecoder(messagableTypes: [Message.self])
+/// let message = try messageDecoder.decode(connectivityMessage)
 /// ```
 public protocol Messagable {
   /// The unique key or type name to use for decoding.
+  /// Defaults to the type name if not explicitly provided.
   static var key: String { get }
 
-  /// Create the object based on the `Dictionary<String, Any>`.
-  /// - Parameter parameters: The parameters value.
-  init?(from parameters: [String: any Sendable]?)
+  /// Create the object from parameters dictionary.
+  /// - Parameter parameters: The parameters dictionary.
+  /// - Throws: SerializationError if decoding fails.
+  init(from parameters: [String: any Sendable]) throws
 
   /// The parameters of the `Messagable` object.
   /// - Returns: The parameters of the `Messagable` object.
   func parameters() -> [String: any Sendable]
+}
+
+// Default key implementation using type name
+extension Messagable {
+  /// Default implementation uses the type name as the key
+  public static var key: String {
+    String(describing: Self.self)
+  }
 }
 
 extension Messagable {

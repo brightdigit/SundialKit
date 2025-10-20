@@ -17,7 +17,7 @@ internal struct MessageDecoderTests {
     let decoder = MessageDecoder(messagableTypes: [MockMessage.self])
     let expMessage = MockMessage()
     let dict = expMessage.message()
-    let actualMessage = decoder.decode(dict) as? MockMessage
+    let actualMessage = try decoder.decode(dict) as? MockMessage
     #expect(expMessage == actualMessage)
   }
 }

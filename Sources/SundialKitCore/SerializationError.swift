@@ -128,6 +128,38 @@ public enum SerializationError: Error, Sendable {
   ///
   /// The data may have been truncated during transmission or storage.
   case corruptedData
+
+  // MARK: - Binary Messaging Errors
+
+  /// The message type key is missing from the connectivity message.
+  ///
+  /// All messages must include a type discriminator for proper routing.
+  case missingTypeKey
+
+  /// Binary data is missing from a binary message.
+  ///
+  /// BinaryMessagable types require binary data in the message parameters.
+  case missingBinaryData
+
+  /// The specified message type is not registered with the decoder.
+  ///
+  /// - Parameter type: The unknown message type key.
+  case unknownMessageType(String)
+
+  /// A required field is missing from the message parameters.
+  ///
+  /// - Parameter field: The name of the missing field.
+  case missingField(String)
+
+  /// The binary data size is invalid for the expected format.
+  ///
+  /// Binary formats often have fixed or minimum size requirements.
+  case invalidDataSize
+
+  /// The binary message format is invalid.
+  ///
+  /// The binary framing or structure does not match expected format.
+  case invalidFormat
 }
 
 // MARK: - LocalizedError Conformance
@@ -152,6 +184,18 @@ extension SerializationError: LocalizedError {
       return "The provided data is invalid."
     case .corruptedData:
       return "The data appears to be corrupted."
+    case .missingTypeKey:
+      return "Message type key is missing."
+    case .missingBinaryData:
+      return "Binary data is missing from binary message."
+    case .unknownMessageType(let type):
+      return "Unknown message type '\(type)'."
+    case .missingField(let field):
+      return "Required field '\(field)' is missing."
+    case .invalidDataSize:
+      return "Binary data size is invalid for expected format."
+    case .invalidFormat:
+      return "Binary message format is invalid."
     }
   }
 
@@ -174,6 +218,18 @@ extension SerializationError: LocalizedError {
       return "The data format is unrecognized or malformed."
     case .corruptedData:
       return "The data may have been damaged during transmission or storage."
+    case .missingTypeKey:
+      return "The message does not include a type discriminator for routing."
+    case .missingBinaryData:
+      return "The binary message parameters do not include required binary data."
+    case .unknownMessageType:
+      return "The message type is not recognized by the decoder."
+    case .missingField:
+      return "A required parameter field is not present in the message."
+    case .invalidDataSize:
+      return "The binary data does not meet size requirements for the format."
+    case .invalidFormat:
+      return "The binary message framing or structure is malformed."
     }
   }
 
@@ -200,6 +256,18 @@ extension SerializationError: LocalizedError {
       return "Check that the data source is providing data in the expected format."
     case .corruptedData:
       return "Verify data integrity and consider requesting a fresh copy of the data."
+    case .missingTypeKey:
+      return "Ensure all messages include the '__type' key for proper routing."
+    case .missingBinaryData:
+      return "Ensure binary messages include the '__data' key with valid Data content."
+    case .unknownMessageType:
+      return "Register the message type with MessageDecoder or verify the type key is correct."
+    case .missingField:
+      return "Ensure the sender includes all required parameter fields in the message."
+    case .invalidDataSize:
+      return "Verify the binary format requirements and ensure data meets size constraints."
+    case .invalidFormat:
+      return "Check the binary framing format and ensure type footer is correctly formatted."
     }
   }
 }

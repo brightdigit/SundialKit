@@ -5,6 +5,7 @@
 //  Created by Leo Dion on 5/20/22.
 //
 import Foundation
+import SundialKitCore
 
 @testable import SundialKitConnectivity
 
@@ -17,13 +18,17 @@ internal struct MockMessage: Messagable, Equatable {
     value = UUID()
   }
 
-  internal init?(from parameters: [String: any Sendable]?) {
-    guard let pair = parameters?.first else {
-      return nil
+  internal init(from parameters: [String: any Sendable]) throws {
+    guard let pair = parameters.first else {
+      throw SerializationError.missingField("parameters")
     }
 
     guard let value = pair.value as? UUID else {
-      return nil
+      throw SerializationError.typeMismatch(
+        key: pair.key,
+        expected: "UUID",
+        actual: String(describing: type(of: pair.value))
+      )
     }
 
     key = pair.key
