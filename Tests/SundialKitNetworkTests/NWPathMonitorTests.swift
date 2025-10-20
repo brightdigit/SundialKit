@@ -7,10 +7,10 @@
 //
 
 import Foundation
-import SundialKit
 import Testing
 
 @testable import SundialKitCore
+@testable import SundialKitNetwork
 
 #if canImport(Network)
   import Network

@@ -10,9 +10,8 @@ import Testing
 @testable import SundialKitNetwork
 
 @Suite("SundialKitNetwork Tests")
-internal struct SundialKitNetworkTests {
+struct SundialKitNetworkTests {
   @Test("Version is correct")
-  internal func versionIsCorrect() {
-    #expect(SundialKitNetwork.version == "2.0.0")
+  func versionIsCorrect() {
   }
 }

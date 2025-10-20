@@ -9,7 +9,6 @@
 import Foundation
 import Testing
 
-@testable import SundialKit
 @testable import SundialKitCore
 @testable import SundialKitNetwork
 

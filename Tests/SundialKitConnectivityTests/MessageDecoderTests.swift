@@ -8,7 +8,7 @@
 
 import Testing
 
-@testable import SundialKit
+@testable import SundialKitConnectivity
 
 @Suite("Message Decoder Tests")
 internal struct MessageDecoderTests {

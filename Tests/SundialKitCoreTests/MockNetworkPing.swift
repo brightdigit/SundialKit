@@ -5,9 +5,9 @@
 //  Created by Leo Dion on 5/19/22.
 //
 import Foundation
-import SundialKit
 
 @testable import SundialKitCore
+@testable import SundialKitNetwork
 
 internal class MockNetworkPing: NetworkPing {
   internal struct StatusType {}

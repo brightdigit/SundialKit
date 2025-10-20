@@ -83,7 +83,7 @@ let package = Package(
     ),
     .testTarget(
       name: "SundialKitCoreTests",
-      dependencies: ["SundialKitCore"],
+      dependencies: ["SundialKitCore", "SundialKitNetwork"],
       swiftSettings: swiftSettings
     ),
 
@@ -119,11 +119,6 @@ let package = Package(
         "SundialKitNetwork",
         "SundialKitConnectivity"
       ],
-      swiftSettings: swiftSettings
-    ),
-    .testTarget(
-      name: "SundialKitTests",
-      dependencies: ["SundialKit"],
       swiftSettings: swiftSettings
     )
   ]

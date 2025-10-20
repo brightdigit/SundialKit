@@ -1,7 +1,7 @@
 import Foundation
-import SundialKit
 
 @testable import SundialKitCore
+@testable import SundialKitNetwork
 
 internal struct MockPath: NetworkPath {
   internal let isConstrained: Bool

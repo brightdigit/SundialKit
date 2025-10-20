@@ -5,9 +5,8 @@
 //  Created by Leo Dion on 5/20/22.
 //
 import Foundation
-import SundialKit
 
-@testable import SundialKitCore
+@testable import SundialKitConnectivity
 
 internal struct MockMessage: Messagable, Equatable {
   internal static let key: String = UUID().uuidString

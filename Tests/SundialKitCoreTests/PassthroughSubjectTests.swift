@@ -9,7 +9,7 @@
 import Foundation
 import Testing
 
-@testable import SundialKit
+@testable import SundialKitCore
 
 #if canImport(Combine)
   import Combine

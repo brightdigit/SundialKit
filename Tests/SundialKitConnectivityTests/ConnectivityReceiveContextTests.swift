@@ -6,10 +6,10 @@
 //  Copyright © 2025 BrightDigit.
 //
 
-import SundialKit
 import Testing
 
 @testable import SundialKitCore
+@testable import SundialKitConnectivity
 
 @Suite("Connectivity Receive Context Tests")
 internal struct ConnectivityReceiveContextTests {

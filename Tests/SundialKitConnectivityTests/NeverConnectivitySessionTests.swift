@@ -8,8 +8,8 @@
 
 import Testing
 
-@testable import SundialKit
 @testable import SundialKitConnectivity
+@testable import SundialKitCore
 
 @Suite("Never Connectivity Session Tests")
 internal struct NeverConnectivitySessionTests {
