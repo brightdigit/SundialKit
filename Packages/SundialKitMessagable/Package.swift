@@ -57,7 +57,7 @@ let package = Package(
     )
   ],
   dependencies: [
-    .package(path: "../../")
+    .package(name: "SundialKit", path: "../../")
   ],
   targets: [
     .target(
