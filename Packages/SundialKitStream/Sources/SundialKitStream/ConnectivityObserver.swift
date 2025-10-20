@@ -49,6 +49,21 @@ public import SundialKitCore
 ///   print("Activation state: \(state)")
 /// }
 ///
+/// // Monitor activation completion (with errors)
+/// for await result in observer.activationCompletionStream() {
+///   switch result {
+///   case .success(let state):
+///     print("Activated: \(state)")
+///   case .failure(let error):
+///     print("Activation failed: \(error)")
+///   }
+/// }
+///
+/// // Check for activation errors
+/// if let error = await observer.getCurrentActivationError() {
+///   print("Last activation error: \(error)")
+/// }
+///
 /// // Send messages
 /// let result = try await observer.sendMessage(["key": "value"])
 /// ```
@@ -61,12 +76,14 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
 
   // Current state
   private var currentActivationState: ActivationState?
+  private var currentActivationError: (any Error)?
   private var currentIsReachable: Bool = false
   private var currentIsPairedAppInstalled: Bool = false
   private var currentIsPaired: Bool = false
 
   // Stream continuations for active subscribers
   private var activationContinuations: [UUID: AsyncStream<ActivationState>.Continuation] = [:]
+  private var activationCompletionContinuations: [UUID: AsyncStream<Result<ActivationState, Error>>.Continuation] = [:]
   private var reachabilityContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
   private var pairedAppInstalledContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
   private var pairedContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
@@ -112,6 +129,12 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
     currentActivationState
   }
 
+  /// Gets the last activation error
+  /// - Returns: The last activation error, or nil if no error occurred
+  public func getCurrentActivationError() -> (any Error)? {
+    currentActivationError
+  }
+
   /// Gets the current reachability status
   /// - Returns: Whether the counterpart is reachable
   public func isReachable() -> Bool {
@@ -149,6 +172,19 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
 
       continuation.onTermination = { [weak self] _ in
         Task { await self?.removeActivationContinuation(id: id) }
+      }
+    }
+  }
+
+  /// AsyncStream of activation completion events (with success state or error)
+  /// - Returns: Stream that yields Result containing activation state or error
+  public func activationCompletionStream() -> AsyncStream<Result<ActivationState, Error>> {
+    AsyncStream { continuation in
+      let id = UUID()
+      activationCompletionContinuations[id] = continuation
+
+      continuation.onTermination = { [weak self] _ in
+        Task { await self?.removeActivationCompletionContinuation(id: id) }
       }
     }
   }
@@ -329,6 +365,7 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
 
   private func handleActivation(_ state: ActivationState, error: Error?) {
     currentActivationState = state
+    currentActivationError = error
     currentIsReachable = session.isReachable
     currentIsPairedAppInstalled = session.isPairedAppInstalled
 
@@ -336,9 +373,19 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
       currentIsPaired = session.isPaired
     #endif
 
-    // Notify all subscribers
+    // Notify all activation state subscribers
     for continuation in activationContinuations.values {
       continuation.yield(state)
+    }
+
+    // Notify activation completion subscribers with Result
+    let result: Result<ActivationState, Error> = if let error = error {
+      .failure(error)
+    } else {
+      .success(state)
+    }
+    for continuation in activationCompletionContinuations.values {
+      continuation.yield(result)
     }
 
     for continuation in reachabilityContinuations.values {
@@ -412,6 +459,10 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
 
   private func removeActivationContinuation(id: UUID) {
     activationContinuations.removeValue(forKey: id)
+  }
+
+  private func removeActivationCompletionContinuation(id: UUID) {
+    activationCompletionContinuations.removeValue(forKey: id)
   }
 
   private func removeReachabilityContinuation(id: UUID) {
