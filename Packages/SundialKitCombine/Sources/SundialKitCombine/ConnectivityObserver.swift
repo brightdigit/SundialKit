@@ -52,6 +52,23 @@ public import SundialKitCore
 ///   }
 ///   .store(in: &cancellables)
 ///
+/// // Observe activation completion (with errors)
+/// observer.activationCompleted
+///   .sink { result in
+///     switch result {
+///     case .success(let state):
+///       print("Activated: \(state)")
+///     case .failure(let error):
+///       print("Activation failed: \(error)")
+///     }
+///   }
+///   .store(in: &cancellables)
+///
+/// // Check for activation errors
+/// if let error = observer.activationError {
+///   print("Last activation error: \(error)")
+/// }
+///
 /// // Observe messages
 /// observer.messageReceived
 ///   .sink { result in
@@ -85,6 +102,9 @@ public final class ConnectivityObserver: ConnectivitySessionDelegate {
     @Published public private(set) var isPaired: Bool = false
   #endif
 
+  /// Last activation error (nil if no error occurred)
+  @Published public private(set) var activationError: (any Error)?
+
   // MARK: - Event Publishers
 
   /// Publisher for received messages
@@ -92,6 +112,9 @@ public final class ConnectivityObserver: ConnectivitySessionDelegate {
 
   /// Publisher for send results
   public let sendResult = PassthroughSubject<ConnectivitySendResult, Never>()
+
+  /// Publisher for activation completion events (with success state or error)
+  public let activationCompleted = PassthroughSubject<Result<ActivationState, Error>, Never>()
 
   // MARK: - Private Properties
 
@@ -186,11 +209,19 @@ public final class ConnectivityObserver: ConnectivitySessionDelegate {
   ) {
     Task { @MainActor in
       self.activationState = state
+      self.activationError = error
       self.isReachable = session.isReachable
       self.isPairedAppInstalled = session.isPairedAppInstalled
       #if os(iOS)
         self.isPaired = session.isPaired
       #endif
+
+      // Publish activation completion event
+      if let error = error {
+        self.activationCompleted.send(.failure(error))
+      } else {
+        self.activationCompleted.send(.success(state))
+      }
     }
   }
 
