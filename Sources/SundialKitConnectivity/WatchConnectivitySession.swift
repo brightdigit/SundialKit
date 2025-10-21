@@ -200,7 +200,8 @@
       didReceiveMessageData messageData: Data,
       replyHandler: @escaping (Data) -> Void
     ) {
-      delegate?.session(self, didReceiveMessageData: messageData, replyHandler: replyHandler)
+      let handler = unsafeBitCast(replyHandler, to: (@Sendable (Data) -> Void).self)
+      delegate?.session(self, didReceiveMessageData: messageData, replyHandler: handler)
     }
   }
 
