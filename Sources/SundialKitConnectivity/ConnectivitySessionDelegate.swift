@@ -27,6 +27,7 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+public import Foundation
 public import SundialKitCore
 
 public protocol ConnectivitySessionDelegate: AnyObject {
@@ -54,5 +55,23 @@ public protocol ConnectivitySessionDelegate: AnyObject {
     _ session: any ConnectivitySession,
     didReceiveApplicationContext applicationContext: ConnectivityMessage,
     error: (any Error)?
+  )
+
+  /// Called when binary message data is received from the counterpart device.
+  ///
+  /// This method is invoked when the session receives binary data via
+  /// WatchConnectivity's `session(_:didReceiveMessageData:replyHandler:)`.
+  ///
+  /// The binary data includes a type discrimination footer that can be decoded
+  /// using `BinaryMessageEncoder.decode(_:)` or `MessageDecoder.decodeBinary(_:)`.
+  ///
+  /// - Parameters:
+  ///   - session: The connectivity session
+  ///   - messageData: The received binary message data with type footer
+  ///   - replyHandler: Handler to send binary reply data back to sender
+  func session(
+    _ session: any ConnectivitySession,
+    didReceiveMessageData messageData: Data,
+    replyHandler: @escaping @Sendable (Data) -> Void
   )
 }

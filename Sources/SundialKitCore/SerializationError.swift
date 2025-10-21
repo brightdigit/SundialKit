@@ -160,6 +160,18 @@ public enum SerializationError: Error, Sendable {
   ///
   /// The binary framing or structure does not match expected format.
   case invalidFormat
+
+  /// The type key in the binary message footer is invalid.
+  ///
+  /// The type key must be valid UTF-8 encoded text.
+  case invalidTypeKey
+
+  /// The message type is not a BinaryMessagable type.
+  ///
+  /// Attempted to decode binary data but the registered type does not conform to BinaryMessagable.
+  ///
+  /// - Parameter type: The type key that is not BinaryMessagable.
+  case notBinaryMessagable(String)
 }
 
 // MARK: - LocalizedError Conformance
@@ -196,6 +208,10 @@ extension SerializationError: LocalizedError {
       return "Binary data size is invalid for expected format."
     case .invalidFormat:
       return "Binary message format is invalid."
+    case .invalidTypeKey:
+      return "The type key in the binary message footer is invalid."
+    case .notBinaryMessagable(let type):
+      return "Message type '\(type)' is not a BinaryMessagable type."
     }
   }
 
@@ -230,6 +246,10 @@ extension SerializationError: LocalizedError {
       return "The binary data does not meet size requirements for the format."
     case .invalidFormat:
       return "The binary message framing or structure is malformed."
+    case .invalidTypeKey:
+      return "The type key footer contains invalid UTF-8 data."
+    case .notBinaryMessagable:
+      return "The type cannot decode binary data because it does not conform to BinaryMessagable."
     }
   }
 
@@ -268,6 +288,13 @@ extension SerializationError: LocalizedError {
       return "Verify the binary format requirements and ensure data meets size constraints."
     case .invalidFormat:
       return "Check the binary framing format and ensure type footer is correctly formatted."
+    case .invalidTypeKey:
+      return "Ensure the type key is valid UTF-8 text and the binary footer is not corrupted."
+    case .notBinaryMessagable:
+      return """
+        Ensure the message type conforms to BinaryMessagable protocol, \
+        or use dictionary transport instead of binary.
+        """
     }
   }
 }

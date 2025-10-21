@@ -27,6 +27,7 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+public import Foundation
 public import SundialKitCore
 
 public protocol ConnectivitySession: AnyObject, Sendable {
@@ -44,5 +45,19 @@ public protocol ConnectivitySession: AnyObject, Sendable {
   func sendMessage(
     _ message: ConnectivityMessage,
     _ completion: @escaping (Result<ConnectivityMessage, any Error>) -> Void
+  )
+
+  /// Sends binary message data to the counterpart device.
+  ///
+  /// This method provides direct binary transport for `BinaryMessagable` types.
+  /// The binary data should include a type discrimination footer created by
+  /// `BinaryMessageEncoder.encode(_:)`.
+  ///
+  /// - Parameters:
+  ///   - data: The binary message data with type footer
+  ///   - completion: Handler called with the result (reply data or error)
+  func sendMessageData(
+    _ data: Data,
+    _ completion: @escaping (Result<Data, any Error>) -> Void
   )
 }

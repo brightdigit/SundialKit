@@ -1,5 +1,5 @@
 //
-//  NeverConnectivitySession.swift
+//  SendOptions.swift
 //  SundialKit
 //
 //  Created by Leo Dion.
@@ -27,53 +27,22 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-public import Foundation
-public import SundialKitCore
+/// Options for controlling message sending behavior.
+public struct SendOptions: OptionSet, Sendable {
+  public let rawValue: Int
 
-public final class NeverConnectivitySession: NSObject, ConnectivitySession {
-  public var delegate: (any ConnectivitySessionDelegate)? {
-    get {
-      nil
-    }
-    // swiftlint:disable:next unused_setter_value
-    set {}
+  /// Creates a new send options value with the given raw value.
+  /// - Parameter rawValue: The raw integer value.
+  public init(rawValue: Int) {
+    self.rawValue = rawValue
   }
 
-  public var isReachable: Bool {
-    false
-  }
-
-  public var isPaired: Bool {
-    false
-  }
-
-  public var isPairedAppInstalled: Bool {
-    false
-  }
-
-  public var activationState: ActivationState {
-    .notActivated
-  }
-
-  public func activate() throws {
-    throw SundialError.sessionNotSupported
-  }
-
-  public func updateApplicationContext(_: ConnectivityMessage) throws {
-    throw SundialError.sessionNotSupported
-  }
-
-  public func sendMessage(
-    _: ConnectivityMessage,
-    _ completion: @escaping (Result<ConnectivityMessage, any Error>) -> Void
-  ) {
-    completion(.failure(SundialError.sessionNotSupported))
-  }
-
-  public func sendMessageData(
-    _: Data,
-    _ completion: @escaping (Result<Data, any Error>) -> Void
-  ) {
-    completion(.failure(SundialError.sessionNotSupported))
-  }
+  /// Force dictionary transport even for BinaryMessagable types.
+  ///
+  /// By default, `BinaryMessagable` types use binary transport (`sendMessageData`).
+  /// This option forces dictionary transport (`sendMessage`) instead, useful for:
+  /// - Testing dictionary fallback behavior
+  /// - Debugging serialization issues
+  /// - Working with systems that don't support binary transport
+  public static let forceDictionary = SendOptions(rawValue: 1 << 0)
 }

@@ -116,14 +116,23 @@ public final class ConnectivityObserver: ConnectivitySessionDelegate {
   /// Publisher for activation completion events (with success state or error)
   public let activationCompleted = PassthroughSubject<Result<ActivationState, Error>, Never>()
 
+  /// Publisher for typed decoded messages
+  ///
+  /// Requires a `MessageDecoder` to be configured during initialization.
+  /// Both dictionary and binary messages are automatically decoded into
+  /// their typed `Messagable` forms.
+  public let typedMessageReceived = PassthroughSubject<Messagable, Never>()
+
   // MARK: - Private Properties
 
   private let session: any ConnectivitySession
+  private let messageDecoder: MessageDecoder?
 
   // MARK: - Initialization
 
-  public init(session: any ConnectivitySession) {
+  public init(session: any ConnectivitySession, messageDecoder: MessageDecoder? = nil) {
     self.session = session
+    self.messageDecoder = messageDecoder
     session.delegate = self
   }
 
@@ -131,15 +140,17 @@ public final class ConnectivityObserver: ConnectivitySessionDelegate {
     @available(macOS, unavailable)
     @available(tvOS, unavailable)
     /// Creates a `ConnectivityObserver` which uses WatchConnectivity
-    public convenience init() {
-      self.init(session: WatchConnectivitySession())
+    /// - Parameter messageDecoder: Optional decoder for automatic message decoding
+    public convenience init(messageDecoder: MessageDecoder? = nil) {
+      self.init(session: WatchConnectivitySession(), messageDecoder: messageDecoder)
     }
   #else
     @available(macOS, unavailable)
     @available(tvOS, unavailable)
     /// Creates a `ConnectivityObserver` with a never-available session
-    public convenience init() {
-      self.init(session: NeverConnectivitySession())
+    /// - Parameter messageDecoder: Optional decoder for automatic message decoding
+    public convenience init(messageDecoder: MessageDecoder? = nil) {
+      self.init(session: NeverConnectivitySession(), messageDecoder: messageDecoder)
     }
   #endif
 
@@ -174,7 +185,7 @@ public final class ConnectivityObserver: ConnectivitySessionDelegate {
       // Use application context for background delivery
       do {
         try session.updateApplicationContext(message)
-        let sendResult = ConnectivitySendResult(message: message, context: .applicationContext)
+        let sendResult = ConnectivitySendResult(message: message, context: .applicationContext(transport: .dictionary))
 
         // Notify subscribers
         self.sendResult.send(sendResult)
@@ -197,6 +208,83 @@ public final class ConnectivityObserver: ConnectivitySessionDelegate {
       self.sendResult.send(sendResult)
 
       throw error
+    }
+  }
+
+  /// Sends a typed message with automatic transport selection
+  ///
+  /// Automatically chooses the best transport based on message type:
+  /// - `BinaryMessagable` types use binary transport (unless `forceDictionary` option is set)
+  /// - `Messagable` types use dictionary transport
+  ///
+  /// ## Example
+  ///
+  /// ```swift
+  /// // Binary transport (efficient)
+  /// let sensor = SensorData(temperature: 72.5)
+  /// let result = try await observer.send(sensor)
+  ///
+  /// // Dictionary transport
+  /// let status = StatusMessage(text: "ready")
+  /// let result = try await observer.send(status)
+  ///
+  /// // Force dictionary for testing
+  /// let result = try await observer.send(sensor, options: .forceDictionary)
+  /// ```
+  ///
+  /// - Parameters:
+  ///   - message: The typed message to send
+  ///   - options: Send options (e.g., `.forceDictionary`)
+  /// - Returns: The send result with transport indication
+  /// - Throws: Error if the message cannot be sent
+  public func send(_ message: some Messagable, options: SendOptions = []) async throws -> ConnectivitySendResult {
+    // Determine transport based on type and options
+    let useBinary = message is BinaryMessagable && !options.contains(.forceDictionary)
+
+    if useBinary {
+      // Binary transport
+      let binaryMessage = message as! BinaryMessagable
+      let data = try BinaryMessageEncoder.encode(binaryMessage)
+
+      if session.isReachable {
+        return try await withCheckedThrowingContinuation { continuation in
+          session.sendMessageData(data) { result in
+            switch result {
+            case .success:
+              // Note: Binary messages don't have reply data in current WatchConnectivity API
+              let sendResult = ConnectivitySendResult(
+                message: message.message(),
+                context: .reply([:], transport: .binary)
+              )
+              Task { @MainActor in
+                self.sendResult.send(sendResult)
+              }
+              continuation.resume(returning: sendResult)
+            case .failure(let error):
+              let sendResult = ConnectivitySendResult(
+                message: message.message(),
+                context: .failure(error)
+              )
+              Task { @MainActor in
+                self.sendResult.send(sendResult)
+              }
+              continuation.resume(throwing: error)
+            }
+          }
+        }
+      } else {
+        // Binary messages require reachability - can't use application context
+        let error = SundialError.missingCompanion
+        let sendResult = ConnectivitySendResult(
+          message: message.message(),
+          context: .failure(error)
+        )
+        self.sendResult.send(sendResult)
+        throw error
+      }
+    } else {
+      // Dictionary transport
+      return try await sendMessage(message.message())
     }
   }
 
@@ -258,8 +346,20 @@ public final class ConnectivityObserver: ConnectivitySessionDelegate {
     replyHandler: @escaping @Sendable ([String: any Sendable]) -> Void
   ) {
     Task { @MainActor in
+      // Send to raw publisher
       let result = ConnectivityReceiveResult(message: message, context: .replyWith(replyHandler))
       self.messageReceived.send(result)
+
+      // Decode and send to typed publisher
+      if let decoder = self.messageDecoder {
+        do {
+          let decoded = try decoder.decode(message)
+          self.typedMessageReceived.send(decoded)
+        } catch {
+          // Decoding failed - log but don't crash (raw publisher still gets the message)
+          print("Failed to decode message: \(error)")
+        }
+      }
     }
   }
 
@@ -269,9 +369,40 @@ public final class ConnectivityObserver: ConnectivitySessionDelegate {
     error: (any Error)?
   ) {
     Task { @MainActor in
+      // Send to raw publisher
       let result = ConnectivityReceiveResult(
         message: applicationContext, context: .applicationContext)
       self.messageReceived.send(result)
+
+      // Decode and send to typed publisher
+      if let decoder = self.messageDecoder {
+        do {
+          let decoded = try decoder.decode(applicationContext)
+          self.typedMessageReceived.send(decoded)
+        } catch {
+          // Decoding failed - log but don't crash (raw publisher still gets the message)
+          print("Failed to decode application context: \(error)")
+        }
+      }
+    }
+  }
+
+  nonisolated public func session(
+    _ session: any ConnectivitySession,
+    didReceiveMessageData messageData: Data,
+    replyHandler: @escaping @Sendable (Data) -> Void
+  ) {
+    Task { @MainActor in
+      // Decode and send to typed publisher
+      if let decoder = self.messageDecoder {
+        do {
+          let decoded = try decoder.decodeBinary(messageData)
+          self.typedMessageReceived.send(decoded)
+        } catch {
+          // Decoding failed - log the error
+          print("Failed to decode binary message: \(error)")
+        }
+      }
     }
   }
 }

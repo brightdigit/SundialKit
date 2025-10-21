@@ -73,6 +73,7 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
   // MARK: - Private Properties
 
   internal let session: any ConnectivitySession
+  private let messageDecoder: MessageDecoder?
 
   // Current state
   private var currentActivationState: ActivationState?
@@ -89,13 +90,15 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
   private var pairedContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
   private var messageReceivedContinuations:
     [UUID: AsyncStream<ConnectivityReceiveResult>.Continuation] = [:]
+  private var typedMessageContinuations: [UUID: AsyncStream<Messagable>.Continuation] = [:]
   private var sendResultContinuations: [UUID: AsyncStream<ConnectivitySendResult>.Continuation] =
     [:]
 
   // MARK: - Initialization
 
-  internal init(session: any ConnectivitySession) {
+  internal init(session: any ConnectivitySession, messageDecoder: MessageDecoder? = nil) {
     self.session = session
+    self.messageDecoder = messageDecoder
     session.delegate = self
   }
 
@@ -103,15 +106,17 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
     @available(macOS, unavailable)
     @available(tvOS, unavailable)
     /// Creates a `ConnectivityObserver` which uses WatchConnectivity
-    public init() {
-      self.init(session: WatchConnectivitySession())
+    /// - Parameter messageDecoder: Optional decoder for automatic message decoding
+    public init(messageDecoder: MessageDecoder? = nil) {
+      self.init(session: WatchConnectivitySession(), messageDecoder: messageDecoder)
     }
   #else
     @available(macOS, unavailable)
     @available(tvOS, unavailable)
     /// Creates a `ConnectivityObserver` with a never-available session
-    public init() {
-      self.init(session: NeverConnectivitySession())
+    /// - Parameter messageDecoder: Optional decoder for automatic message decoding
+    public init(messageDecoder: MessageDecoder? = nil) {
+      self.init(session: NeverConnectivitySession(), messageDecoder: messageDecoder)
     }
   #endif
 
@@ -253,6 +258,24 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
     }
   }
 
+  /// AsyncStream of typed decoded messages
+  ///
+  /// Requires a `MessageDecoder` to be configured during initialization.
+  /// Both dictionary and binary messages are automatically decoded into
+  /// their typed `Messagable` forms.
+  ///
+  /// - Returns: Stream that yields decoded messages as they are received
+  public func typedMessageStream() -> AsyncStream<Messagable> {
+    AsyncStream { continuation in
+      let id = UUID()
+      typedMessageContinuations[id] = continuation
+
+      continuation.onTermination = { [weak self] _ in
+        Task { await self?.removeTypedMessageContinuation(id: id) }
+      }
+    }
+  }
+
   /// AsyncStream of send results
   /// - Returns: Stream that yields send results as messages are sent
   public func sendResultStream() -> AsyncStream<ConnectivitySendResult> {
@@ -289,7 +312,7 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
       // Use application context for background delivery
       do {
         try session.updateApplicationContext(message)
-        let sendResult = ConnectivitySendResult(message: message, context: .applicationContext)
+        let sendResult = ConnectivitySendResult(message: message, context: .applicationContext(transport: .dictionary))
 
         // Notify send result stream subscribers
         await notifySendResult(sendResult)
@@ -312,6 +335,79 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
       await notifySendResult(sendResult)
 
       throw error
+    }
+  }
+
+  /// Sends a typed message with automatic transport selection
+  ///
+  /// Automatically chooses the best transport based on message type:
+  /// - `BinaryMessagable` types use binary transport (unless `forceDictionary` option is set)
+  /// - `Messagable` types use dictionary transport
+  ///
+  /// ## Example
+  ///
+  /// ```swift
+  /// // Binary transport (efficient)
+  /// let sensor = SensorData(temperature: 72.5)
+  /// let result = try await observer.send(sensor)
+  ///
+  /// // Dictionary transport
+  /// let status = StatusMessage(text: "ready")
+  /// let result = try await observer.send(status)
+  ///
+  /// // Force dictionary for testing
+  /// let result = try await observer.send(sensor, options: .forceDictionary)
+  /// ```
+  ///
+  /// - Parameters:
+  ///   - message: The typed message to send
+  ///   - options: Send options (e.g., `.forceDictionary`)
+  /// - Returns: The send result with transport indication
+  /// - Throws: Error if the message cannot be sent
+  public func send(_ message: some Messagable, options: SendOptions = []) async throws -> ConnectivitySendResult {
+    // Determine transport based on type and options
+    let useBinary = message is BinaryMessagable && !options.contains(.forceDictionary)
+
+    if useBinary {
+      // Binary transport
+      let binaryMessage = message as! BinaryMessagable
+      let data = try BinaryMessageEncoder.encode(binaryMessage)
+
+      if session.isReachable {
+        return try await withCheckedThrowingContinuation { continuation in
+          session.sendMessageData(data) { result in
+            switch result {
+            case .success:
+              // Note: Binary messages don't have reply data in current WatchConnectivity API
+              let sendResult = ConnectivitySendResult(
+                message: message.message(),
+                context: .reply([:], transport: .binary)
+              )
+              Task { await self.notifySendResult(sendResult) }
+              continuation.resume(returning: sendResult)
+            case .failure(let error):
+              let sendResult = ConnectivitySendResult(
+                message: message.message(),
+                context: .failure(error)
+              )
+              Task { await self.notifySendResult(sendResult) }
+              continuation.resume(throwing: error)
+            }
+          }
+        }
+      } else {
+        // Binary messages require reachability - can't use application context
+        let error = SundialError.missingCompanion
+        let sendResult = ConnectivitySendResult(
+          message: message.message(),
+          context: .failure(error)
+        )
+        await notifySendResult(sendResult)
+        throw error
+      }
+    } else {
+      // Dictionary transport
+      return try await sendMessage(message.message())
     }
   }
 
@@ -358,6 +454,16 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
   ) {
     Task {
       await handleApplicationContext(applicationContext, error: error)
+    }
+  }
+
+  nonisolated public func session(
+    _ session: any ConnectivitySession,
+    didReceiveMessageData messageData: Data,
+    replyHandler: @escaping @Sendable (Data) -> Void
+  ) {
+    Task {
+      await handleBinaryMessage(messageData, replyHandler: replyHandler)
     }
   }
 
@@ -433,19 +539,60 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
     _ message: ConnectivityMessage,
     replyHandler: @escaping @Sendable ([String: any Sendable]) -> Void
   ) {
+    // Send to raw stream subscribers
     let result = ConnectivityReceiveResult(message: message, context: .replyWith(replyHandler))
-
     for continuation in messageReceivedContinuations.values {
       continuation.yield(result)
+    }
+
+    // Decode and send to typed stream subscribers
+    if let decoder = messageDecoder {
+      do {
+        let decoded = try decoder.decode(message)
+        for continuation in typedMessageContinuations.values {
+          continuation.yield(decoded)
+        }
+      } catch {
+        // Decoding failed - log but don't crash (raw stream still gets the message)
+        print("Failed to decode message: \(error)")
+      }
     }
   }
 
   private func handleApplicationContext(_ applicationContext: ConnectivityMessage, error: Error?) {
+    // Send to raw stream subscribers
     let result = ConnectivityReceiveResult(
       message: applicationContext, context: .applicationContext)
-
     for continuation in messageReceivedContinuations.values {
       continuation.yield(result)
+    }
+
+    // Decode and send to typed stream subscribers
+    if let decoder = messageDecoder {
+      do {
+        let decoded = try decoder.decode(applicationContext)
+        for continuation in typedMessageContinuations.values {
+          continuation.yield(decoded)
+        }
+      } catch {
+        // Decoding failed - log but don't crash (raw stream still gets the message)
+        print("Failed to decode application context: \(error)")
+      }
+    }
+  }
+
+  private func handleBinaryMessage(_ data: Data, replyHandler: @escaping @Sendable (Data) -> Void) {
+    // Decode and send to typed stream subscribers
+    if let decoder = messageDecoder {
+      do {
+        let decoded = try decoder.decodeBinary(data)
+        for continuation in typedMessageContinuations.values {
+          continuation.yield(decoded)
+        }
+      } catch {
+        // Decoding failed - log the error
+        print("Failed to decode binary message: \(error)")
+      }
     }
   }
 
@@ -479,6 +626,10 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
 
   private func removeMessageReceivedContinuation(id: UUID) {
     messageReceivedContinuations.removeValue(forKey: id)
+  }
+
+  private func removeTypedMessageContinuation(id: UUID) {
+    typedMessageContinuations.removeValue(forKey: id)
   }
 
   private func removeSendResultContinuation(id: UUID) {

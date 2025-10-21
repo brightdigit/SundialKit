@@ -32,20 +32,22 @@ public import SundialKitCore
 /// Result from sending a message
 public enum ConnectivitySendContext: Sendable {
   /// Sent via application context
-  case applicationContext
+  case applicationContext(transport: MessageTransport)
   /// Sent via message with reply received
-  case reply(ConnectivityMessage)
+  case reply(ConnectivityMessage, transport: MessageTransport)
   /// Failure
   case failure(any Error)
 }
 
 extension ConnectivitySendContext {
   /// Creates a send context from a result.
-  /// - Parameter result: The result of sending a message
-  public init(_ result: Result<ConnectivityMessage, any Error>) {
+  /// - Parameters:
+  ///   - result: The result of sending a message
+  ///   - transport: The transport mechanism used (defaults to `.dictionary`)
+  public init(_ result: Result<ConnectivityMessage, any Error>, transport: MessageTransport = .dictionary) {
     switch result {
     case .success(let message):
-      self = .reply(message)
+      self = .reply(message, transport: transport)
 
     case .failure(let error):
       self = .failure(error)

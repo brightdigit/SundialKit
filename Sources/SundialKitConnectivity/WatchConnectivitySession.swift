@@ -92,6 +92,19 @@
       }
     }
 
+    public func sendMessageData(
+      _ data: Data,
+      _ completion: @escaping (Result<Data, Error>) -> Void
+    ) {
+      session.sendMessageData(
+        data
+      ) { responseData in
+        completion(.success(responseData))
+      } errorHandler: { error in
+        completion(.failure(error))
+      }
+    }
+
     public func activate() throws {
       guard WCSession.isSupported() else {
         throw SundialError.sessionNotSupported
@@ -182,6 +195,14 @@
         didReceiveApplicationContext: sendableContext,
         error: error
       )
+    }
+
+    internal func session(
+      _: WCSession,
+      didReceiveMessageData messageData: Data,
+      replyHandler: @escaping (Data) -> Void
+    ) {
+      delegate?.session(self, didReceiveMessageData: messageData, replyHandler: replyHandler)
     }
   }
 
