@@ -13,32 +13,32 @@ import Testing
 @testable import SundialKitConnectivity
 
 // Test message using simple binary encoding
-struct TestBinaryMessage: BinaryMessagable {
-  let value: UInt32
+internal struct TestBinaryMessage: BinaryMessagable {
+  internal let value: UInt32
 
   // Regular initializer for creating messages
-  init(value: UInt32) {
+  internal init(value: UInt32) {
     self.value = value
   }
 
-  // Binary encoding (no type info)
-  func encode() throws -> Data {
-    withUnsafeBytes(of: value) { Data($0) }
-  }
-
   // Binary decoding (no type info)
-  init(from data: Data) throws {
+  internal init(from data: Data) throws {
     guard data.count == MemoryLayout<UInt32>.size else {
       throw SerializationError.invalidDataSize
     }
     value = data.withUnsafeBytes { $0.load(as: UInt32.self) }
   }
+
+  // Binary encoding (no type info)
+  internal func encode() throws -> Data {
+    withUnsafeBytes(of: value) { Data($0) }
+  }
 }
 
 @Suite("BinaryMessagable Tests")
-struct BinaryMessagableTests {
+internal struct BinaryMessagableTests {
   @Test("Binary message automatically implements Messagable")
-  func binaryAutomaticallyImplementsMessagable() throws {
+  internal func binaryAutomaticallyImplementsMessagable() throws {
     let original = TestBinaryMessage(value: 42)
 
     // Should have parameters() auto-implemented
@@ -51,13 +51,13 @@ struct BinaryMessagableTests {
   }
 
   @Test("Binary message has default key from type name")
-  func binaryMessageDefaultKey() {
+  internal func binaryMessageDefaultKey() {
     #expect(TestBinaryMessage.key == "TestBinaryMessage")
   }
 
   @Test("Binary message encoding and decoding roundtrip")
-  func binaryEncodingDecoding() throws {
-    let original = TestBinaryMessage(value: 12345)
+  internal func binaryEncodingDecoding() throws {
+    let original = TestBinaryMessage(value: 12_345)
 
     // Encode to binary
     let data = try original.encode()
@@ -69,7 +69,7 @@ struct BinaryMessagableTests {
   }
 
   @Test("Binary message works with MessageDecoder")
-  func binaryMessageDecoder() throws {
+  internal func binaryMessageDecoder() throws {
     let decoder = MessageDecoder(messagableTypes: [TestBinaryMessage.self])
     let original = TestBinaryMessage(value: 999)
 
@@ -84,7 +84,7 @@ struct BinaryMessagableTests {
   }
 
   @Test("Binary message throws on invalid data size")
-  func binaryMessageInvalidSize() {
+  internal func binaryMessageInvalidSize() {
     let invalidData = Data([1, 2])  // Too small
 
     #expect(throws: SerializationError.self) {
@@ -93,7 +93,7 @@ struct BinaryMessagableTests {
   }
 
   @Test("Binary message throws on missing binary data in parameters")
-  func binaryMessageMissingData() {
+  internal func binaryMessageMissingData() {
     let emptyParams: [String: any Sendable] = [:]
 
     #expect(throws: SerializationError.self) {

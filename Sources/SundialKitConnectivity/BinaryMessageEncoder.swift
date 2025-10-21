@@ -46,7 +46,6 @@ public import SundialKitCore
 /// This allows WatchConnectivity's `sendMessageData` to transmit pure binary
 /// payloads while maintaining type discrimination for `MessageDecoder`.
 public enum BinaryMessageEncoder {
-
   /// Encodes a BinaryMessagable into Data with type discrimination footer.
   ///
   /// - Parameter message: The message to encode

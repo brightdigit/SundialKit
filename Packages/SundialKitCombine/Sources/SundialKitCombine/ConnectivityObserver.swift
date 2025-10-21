@@ -185,7 +185,8 @@ public final class ConnectivityObserver: ConnectivitySessionDelegate {
       // Use application context for background delivery
       do {
         try session.updateApplicationContext(message)
-        let sendResult = ConnectivitySendResult(message: message, context: .applicationContext(transport: .dictionary))
+        let sendResult = ConnectivitySendResult(
+          message: message, context: .applicationContext(transport: .dictionary))
 
         // Notify subscribers
         self.sendResult.send(sendResult)
@@ -237,13 +238,13 @@ public final class ConnectivityObserver: ConnectivitySessionDelegate {
   ///   - options: Send options (e.g., `.forceDictionary`)
   /// - Returns: The send result with transport indication
   /// - Throws: Error if the message cannot be sent
-  public func send(_ message: some Messagable, options: SendOptions = []) async throws -> ConnectivitySendResult {
-    // Determine transport based on type and options
-    let useBinary = message is BinaryMessagable && !options.contains(.forceDictionary)
+  public func send(_ message: some Messagable, options: SendOptions = []) async throws
+    -> ConnectivitySendResult
+  {
 
-    if useBinary {
+    if  let binaryMessage = message as? BinaryMessagable, !options.contains(.forceDictionary){
       // Binary transport
-      let binaryMessage = message as! BinaryMessagable
+      
       let data = try BinaryMessageEncoder.encode(binaryMessage)
 
       if session.isReachable {

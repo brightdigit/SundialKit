@@ -59,15 +59,6 @@ public import SundialKitCore
 /// }
 /// ```
 public protocol BinaryMessagable: Messagable {
-  /// Encode the message to pure binary data (no type information).
-  ///
-  /// The framework handles adding type discrimination via footer when sending
-  /// via `sendMessageData`. Users should return pure binary format (Protobuf, etc.).
-  ///
-  /// - Returns: Pure binary data representation.
-  /// - Throws: SerializationError if encoding fails.
-  func encode() throws -> Data
-
   /// Decode from pure binary data (no type information).
   ///
   /// The framework strips type footer before calling this initializer.
@@ -76,6 +67,15 @@ public protocol BinaryMessagable: Messagable {
   /// - Parameter data: Pure binary data representation.
   /// - Throws: SerializationError if decoding fails.
   init(from data: Data) throws
+
+  /// Encode the message to pure binary data (no type information).
+  ///
+  /// The framework handles adding type discrimination via footer when sending
+  /// via `sendMessageData`. Users should return pure binary format (Protobuf, etc.).
+  ///
+  /// - Returns: Pure binary data representation.
+  /// - Throws: SerializationError if encoding fails.
+  func encode() throws -> Data
 }
 
 // Default key implementation using type name
@@ -88,17 +88,19 @@ extension BinaryMessagable {
 
 // Automatic Messagable conformance for backward compatibility
 extension BinaryMessagable {
-  /// Auto-implemented: wraps binary data in parameters dictionary
-  public func parameters() -> [String: any Sendable] {
-    guard let data = try? encode() else { return [:] }
-    return [MessagableKeys.dataKey: data]
-  }
-
   /// Auto-implemented: extracts binary data from parameters and decodes
   public init(from parameters: [String: any Sendable]) throws {
     guard let data = parameters[MessagableKeys.dataKey] as? Data else {
       throw SerializationError.missingBinaryData
     }
     try self.init(from: data)
+  }
+
+  /// Auto-implemented: wraps binary data in parameters dictionary
+  public func parameters() -> [String: any Sendable] {
+    guard let data = try? encode() else {
+      return [:]
+    }
+    return [MessagableKeys.dataKey: data]
   }
 }

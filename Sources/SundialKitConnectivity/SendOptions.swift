@@ -29,14 +29,6 @@
 
 /// Options for controlling message sending behavior.
 public struct SendOptions: OptionSet, Sendable {
-  public let rawValue: Int
-
-  /// Creates a new send options value with the given raw value.
-  /// - Parameter rawValue: The raw integer value.
-  public init(rawValue: Int) {
-    self.rawValue = rawValue
-  }
-
   /// Force dictionary transport even for BinaryMessagable types.
   ///
   /// By default, `BinaryMessagable` types use binary transport (`sendMessageData`).
@@ -45,4 +37,12 @@ public struct SendOptions: OptionSet, Sendable {
   /// - Debugging serialization issues
   /// - Working with systems that don't support binary transport
   public static let forceDictionary = SendOptions(rawValue: 1 << 0)
+
+  public let rawValue: Int
+
+  /// Creates a new send options value with the given raw value.
+  /// - Parameter rawValue: The raw integer value.
+  public init(rawValue: Int) {
+    self.rawValue = rawValue
+  }
 }

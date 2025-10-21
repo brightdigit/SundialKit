@@ -34,7 +34,7 @@ public import SundialKitCore
 ///
 /// Typically you don't need to implement this and
 /// can use [`NWPathMonitor`](../network/nwpathmonitor)
-public protocol PathMonitor {
+public protocol PathMonitor : Sendable {
   /// The type of path accepted by the `PathMonitor`.
   associatedtype PathType: NetworkPath & Sendable
   /// Sets the handler for when the `PathType` updates.

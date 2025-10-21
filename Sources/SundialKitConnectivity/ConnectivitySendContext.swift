@@ -44,7 +44,9 @@ extension ConnectivitySendContext {
   /// - Parameters:
   ///   - result: The result of sending a message
   ///   - transport: The transport mechanism used (defaults to `.dictionary`)
-  public init(_ result: Result<ConnectivityMessage, any Error>, transport: MessageTransport = .dictionary) {
+  public init(
+    _ result: Result<ConnectivityMessage, any Error>, transport: MessageTransport = .dictionary
+  ) {
     switch result {
     case .success(let message):
       self = .reply(message, transport: transport)

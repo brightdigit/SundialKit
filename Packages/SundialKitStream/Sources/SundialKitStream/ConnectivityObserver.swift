@@ -84,7 +84,8 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
 
   // Stream continuations for active subscribers
   private var activationContinuations: [UUID: AsyncStream<ActivationState>.Continuation] = [:]
-  private var activationCompletionContinuations: [UUID: AsyncStream<Result<ActivationState, Error>>.Continuation] = [:]
+  private var activationCompletionContinuations:
+    [UUID: AsyncStream<Result<ActivationState, Error>>.Continuation] = [:]
   private var reachabilityContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
   private var pairedAppInstalledContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
   private var pairedContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
@@ -312,7 +313,8 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
       // Use application context for background delivery
       do {
         try session.updateApplicationContext(message)
-        let sendResult = ConnectivitySendResult(message: message, context: .applicationContext(transport: .dictionary))
+        let sendResult = ConnectivitySendResult(
+          message: message, context: .applicationContext(transport: .dictionary))
 
         // Notify send result stream subscribers
         await notifySendResult(sendResult)
@@ -364,7 +366,9 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
   ///   - options: Send options (e.g., `.forceDictionary`)
   /// - Returns: The send result with transport indication
   /// - Throws: Error if the message cannot be sent
-  public func send(_ message: some Messagable, options: SendOptions = []) async throws -> ConnectivitySendResult {
+  public func send(_ message: some Messagable, options: SendOptions = []) async throws
+    -> ConnectivitySendResult
+  {
     // Determine transport based on type and options
     let useBinary = message is BinaryMessagable && !options.contains(.forceDictionary)
 
@@ -485,11 +489,12 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
     }
 
     // Notify activation completion subscribers with Result
-    let result: Result<ActivationState, Error> = if let error = error {
-      .failure(error)
-    } else {
-      .success(state)
-    }
+    let result: Result<ActivationState, Error> =
+      if let error = error {
+        .failure(error)
+      } else {
+        .success(state)
+      }
     for continuation in activationCompletionContinuations.values {
       continuation.yield(result)
     }

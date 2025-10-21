@@ -8,8 +8,8 @@
 
 import Testing
 
-@testable import SundialKitCore
 @testable import SundialKitConnectivity
+@testable import SundialKitCore
 
 @Suite("Connectivity Receive Context Tests")
 internal struct ConnectivityReceiveContextTests {

@@ -9,7 +9,7 @@ import Foundation
 @testable import SundialKitCore
 @testable import SundialKitNetwork
 
-internal class MockPathMonitor: PathMonitor {
+internal final class MockPathMonitor: PathMonitor, @unchecked Sendable {
   internal typealias PathType = MockPath
 
   internal let id: UUID
