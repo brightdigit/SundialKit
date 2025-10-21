@@ -77,37 +77,104 @@ public import Foundation
 ///     }
 /// }
 /// ```
-public enum SerializationError: Error, Sendable {
+public struct SerializationError: Error, Sendable {
+  /// The kind of serialization error.
+  public let kind: ErrorKind
+
+  /// Additional context information for the error.
+  public let context: ErrorContext
+
+  /// The specific type of serialization error.
+  public enum ErrorKind: Sendable {
+    case encodingFailed
+    case unsupportedType
+    case invalidMessageFormat
+    case decodingFailed
+    case missingRequiredKey
+    case typeMismatch
+    case invalidData
+    case corruptedData
+    case missingTypeKey
+    case missingBinaryData
+    case unknownMessageType
+    case missingField
+    case invalidDataSize
+    case invalidFormat
+    case invalidTypeKey
+    case notBinaryMessagable
+  }
+
+  /// Context data associated with the error.
+  public struct ErrorContext: Sendable {
+    public let reason: String?
+    public let type: String?
+    public let key: String?
+    public let expected: String?
+    public let actual: String?
+    public let field: String?
+
+    public init(
+      reason: String? = nil,
+      type: String? = nil,
+      key: String? = nil,
+      expected: String? = nil,
+      actual: String? = nil,
+      field: String? = nil
+    ) {
+      self.reason = reason
+      self.type = type
+      self.key = key
+      self.expected = expected
+      self.actual = actual
+      self.field = field
+    }
+  }
+
+  private init(kind: ErrorKind, context: ErrorContext) {
+    self.kind = kind
+    self.context = context
+  }
+
   // MARK: - Encoding Errors
 
   /// Failed to encode a message for transmission.
   ///
   /// - Parameter reason: A description of why encoding failed.
-  case encodingFailed(String)
+  public static func encodingFailed(_ reason: String) -> SerializationError {
+    SerializationError(kind: .encodingFailed, context: ErrorContext(reason: reason))
+  }
 
   /// The message contains a type that cannot be serialized.
   ///
   /// WatchConnectivity requires all message data to be property list types.
   ///
   /// - Parameter type: The name of the unsupported type.
-  case unsupportedType(String)
+  public static func unsupportedType(_ type: String) -> SerializationError {
+    SerializationError(kind: .unsupportedType, context: ErrorContext(type: type))
+  }
 
   /// The message format is invalid for serialization.
   ///
   /// The message structure does not conform to expected format requirements.
-  case invalidMessageFormat
+  public static var invalidMessageFormat: SerializationError {
+    SerializationError(kind: .invalidMessageFormat, context: ErrorContext())
+  }
 
   // MARK: - Decoding Errors
 
   /// Failed to decode a received message.
   ///
   /// - Parameter reason: A description of why decoding failed.
-  case decodingFailed(String)
+  public static func decodingFailed(_ reason: String) -> SerializationError {
+    SerializationError(kind: .decodingFailed, context: ErrorContext(reason: reason))
+  }
 
   /// A required key is missing from the message dictionary.
   ///
   /// - Parameter key: The name of the missing key.
-  case missingRequiredKey(String)
+  public static func missingRequiredKey(_ key: String) -> SerializationError {
+    SerializationError(kind: .missingRequiredKey, context: ErrorContext(key: key))
+  }
 
   /// The value for a key has an unexpected type.
   ///
@@ -115,186 +182,247 @@ public enum SerializationError: Error, Sendable {
   ///   - key: The dictionary key with the type mismatch.
   ///   - expected: The expected type name.
   ///   - actual: The actual type found.
-  case typeMismatch(key: String, expected: String, actual: String)
+  public static func typeMismatch(key: String, expected: String, actual: String)
+    -> SerializationError
+  {
+    SerializationError(
+      kind: .typeMismatch,
+      context: ErrorContext(key: key, expected: expected, actual: actual)
+    )
+  }
 
   // MARK: - Data Errors
 
   /// The provided data is invalid or cannot be processed.
   ///
   /// The data format is unrecognized or does not match expected structure.
-  case invalidData
+  public static var invalidData: SerializationError {
+    SerializationError(kind: .invalidData, context: ErrorContext())
+  }
 
   /// The data appears to be corrupted or incomplete.
   ///
   /// The data may have been truncated during transmission or storage.
-  case corruptedData
+  public static var corruptedData: SerializationError {
+    SerializationError(kind: .corruptedData, context: ErrorContext())
+  }
 
   // MARK: - Binary Messaging Errors
 
   /// The message type key is missing from the connectivity message.
   ///
   /// All messages must include a type discriminator for proper routing.
-  case missingTypeKey
+  public static var missingTypeKey: SerializationError {
+    SerializationError(kind: .missingTypeKey, context: ErrorContext())
+  }
 
   /// Binary data is missing from a binary message.
   ///
   /// BinaryMessagable types require binary data in the message parameters.
-  case missingBinaryData
+  public static var missingBinaryData: SerializationError {
+    SerializationError(kind: .missingBinaryData, context: ErrorContext())
+  }
 
   /// The specified message type is not registered with the decoder.
   ///
   /// - Parameter type: The unknown message type key.
-  case unknownMessageType(String)
+  public static func unknownMessageType(_ type: String) -> SerializationError {
+    SerializationError(kind: .unknownMessageType, context: ErrorContext(type: type))
+  }
 
   /// A required field is missing from the message parameters.
   ///
   /// - Parameter field: The name of the missing field.
-  case missingField(String)
+  public static func missingField(_ field: String) -> SerializationError {
+    SerializationError(kind: .missingField, context: ErrorContext(field: field))
+  }
 
   /// The binary data size is invalid for the expected format.
   ///
   /// Binary formats often have fixed or minimum size requirements.
-  case invalidDataSize
+  public static var invalidDataSize: SerializationError {
+    SerializationError(kind: .invalidDataSize, context: ErrorContext())
+  }
 
   /// The binary message format is invalid.
   ///
   /// The binary framing or structure does not match expected format.
-  case invalidFormat
+  public static var invalidFormat: SerializationError {
+    SerializationError(kind: .invalidFormat, context: ErrorContext())
+  }
 
   /// The type key in the binary message footer is invalid.
   ///
   /// The type key must be valid UTF-8 encoded text.
-  case invalidTypeKey
+  public static var invalidTypeKey: SerializationError {
+    SerializationError(kind: .invalidTypeKey, context: ErrorContext())
+  }
 
   /// The message type is not a BinaryMessagable type.
   ///
   /// Attempted to decode binary data but the registered type does not conform to BinaryMessagable.
   ///
   /// - Parameter type: The type key that is not BinaryMessagable.
-  case notBinaryMessagable(String)
+  public static func notBinaryMessagable(_ type: String) -> SerializationError {
+    SerializationError(kind: .notBinaryMessagable, context: ErrorContext(type: type))
+  }
 }
 
 // MARK: - LocalizedError Conformance
 
+extension SerializationError {
+  /// Internal structure to hold localized error information.
+  private struct ErrorInfo {
+    let descriptionTemplate: String
+    let reason: String
+    let suggestion: String
+  }
+
+  /// Dictionary mapping error kinds to their localized information.
+  private static let errorInfoMap: [ErrorKind: ErrorInfo] = [
+    .encodingFailed: ErrorInfo(
+      descriptionTemplate: "Failed to encode message: %@",
+      reason: "The message could not be converted to a transmittable format.",
+      suggestion: "Ensure all message data uses supported types and check for circular references."
+    ),
+    .unsupportedType: ErrorInfo(
+      descriptionTemplate: "Unsupported type '%@' in message data.",
+      reason: "The message contains types that are not supported by the serialization format.",
+      suggestion: """
+        Convert custom types to property list types \
+        (String, Number, Date, Data, Array, Dictionary) before encoding.
+        """
+    ),
+    .invalidMessageFormat: ErrorInfo(
+      descriptionTemplate: "Invalid message format for serialization.",
+      reason: "The message structure does not conform to required format.",
+      suggestion: "Review message structure and ensure it conforms to the expected format."
+    ),
+    .decodingFailed: ErrorInfo(
+      descriptionTemplate: "Failed to decode message: %@",
+      reason: "The received message could not be parsed into the expected format.",
+      suggestion: "Verify the message was encoded correctly and check for version compatibility."
+    ),
+    .missingRequiredKey: ErrorInfo(
+      descriptionTemplate: "Required key '%@' is missing from message.",
+      reason: "A required field is not present in the message.",
+      suggestion: "Ensure the sender includes all required fields in the message."
+    ),
+    .typeMismatch: ErrorInfo(
+      descriptionTemplate: "Type mismatch for key '%@': expected %@, got %@.",
+      reason: "A field has a different type than expected.",
+      suggestion:
+        "Verify the message format matches the expected schema and check for type conversion issues."
+    ),
+    .invalidData: ErrorInfo(
+      descriptionTemplate: "The provided data is invalid.",
+      reason: "The data format is unrecognized or malformed.",
+      suggestion: "Check that the data source is providing data in the expected format."
+    ),
+    .corruptedData: ErrorInfo(
+      descriptionTemplate: "The data appears to be corrupted.",
+      reason: "The data may have been damaged during transmission or storage.",
+      suggestion: "Verify data integrity and consider requesting a fresh copy of the data."
+    ),
+    .missingTypeKey: ErrorInfo(
+      descriptionTemplate: "Message type key is missing.",
+      reason: "The message does not include a type discriminator for routing.",
+      suggestion: "Ensure all messages include the '__type' key for proper routing."
+    ),
+    .missingBinaryData: ErrorInfo(
+      descriptionTemplate: "Binary data is missing from binary message.",
+      reason: "The binary message parameters do not include required binary data.",
+      suggestion: "Ensure binary messages include the '__data' key with valid Data content."
+    ),
+    .unknownMessageType: ErrorInfo(
+      descriptionTemplate: "Unknown message type '%@'.",
+      reason: "The message type is not recognized by the decoder.",
+      suggestion: "Register the message type with MessageDecoder or verify the type key is correct."
+    ),
+    .missingField: ErrorInfo(
+      descriptionTemplate: "Required field '%@' is missing.",
+      reason: "A required parameter field is not present in the message.",
+      suggestion: "Ensure the sender includes all required parameter fields in the message."
+    ),
+    .invalidDataSize: ErrorInfo(
+      descriptionTemplate: "Binary data size is invalid for expected format.",
+      reason: "The binary data does not meet size requirements for the format.",
+      suggestion: "Verify the binary format requirements and ensure data meets size constraints."
+    ),
+    .invalidFormat: ErrorInfo(
+      descriptionTemplate: "Binary message format is invalid.",
+      reason: "The binary message framing or structure is malformed.",
+      suggestion: "Check the binary framing format and ensure type footer is correctly formatted."
+    ),
+    .invalidTypeKey: ErrorInfo(
+      descriptionTemplate: "The type key in the binary message footer is invalid.",
+      reason: "The type key footer contains invalid UTF-8 data.",
+      suggestion: "Ensure the type key is valid UTF-8 text and the binary footer is not corrupted."
+    ),
+    .notBinaryMessagable: ErrorInfo(
+      descriptionTemplate: "Message type '%@' is not a BinaryMessagable type.",
+      reason: "The type cannot decode binary data because it does not conform to BinaryMessagable.",
+      suggestion: """
+        Ensure the message type conforms to BinaryMessagable protocol, \
+        or use dictionary transport instead of binary.
+        """
+    ),
+  ]
+
+  /// Returns the error info from the dictionary.
+  private var errorInfo: ErrorInfo {
+    Self.errorInfoMap[kind]!
+  }
+}
+
 extension SerializationError: LocalizedError {
   /// A localized message describing what error occurred.
   public var errorDescription: String? {
-    switch self {
-    case .encodingFailed(let reason):
-      return "Failed to encode message: \(reason)"
-    case .unsupportedType(let type):
-      return "Unsupported type '\(type)' in message data."
+    let template = errorInfo.descriptionTemplate
+    switch kind {
+    case .encodingFailed:
+      return String(format: template, context.reason ?? "")
+    case .unsupportedType:
+      return String(format: template, context.type ?? "")
     case .invalidMessageFormat:
-      return "Invalid message format for serialization."
-    case .decodingFailed(let reason):
-      return "Failed to decode message: \(reason)"
-    case .missingRequiredKey(let key):
-      return "Required key '\(key)' is missing from message."
-    case .typeMismatch(let key, let expected, let actual):
-      return "Type mismatch for key '\(key)': expected \(expected), got \(actual)."
+      return template
+    case .decodingFailed:
+      return String(format: template, context.reason ?? "")
+    case .missingRequiredKey:
+      return String(format: template, context.key ?? "")
+    case .typeMismatch:
+      return String(
+        format: template, context.key ?? "", context.expected ?? "", context.actual ?? "")
     case .invalidData:
-      return "The provided data is invalid."
+      return template
     case .corruptedData:
-      return "The data appears to be corrupted."
+      return template
     case .missingTypeKey:
-      return "Message type key is missing."
+      return template
     case .missingBinaryData:
-      return "Binary data is missing from binary message."
-    case .unknownMessageType(let type):
-      return "Unknown message type '\(type)'."
-    case .missingField(let field):
-      return "Required field '\(field)' is missing."
+      return template
+    case .unknownMessageType:
+      return String(format: template, context.type ?? "")
+    case .missingField:
+      return String(format: template, context.field ?? "")
     case .invalidDataSize:
-      return "Binary data size is invalid for expected format."
+      return template
     case .invalidFormat:
-      return "Binary message format is invalid."
+      return template
     case .invalidTypeKey:
-      return "The type key in the binary message footer is invalid."
-    case .notBinaryMessagable(let type):
-      return "Message type '\(type)' is not a BinaryMessagable type."
+      return template
+    case .notBinaryMessagable:
+      return String(format: template, context.type ?? "")
     }
   }
 
   /// A localized message describing the reason for the failure.
   public var failureReason: String? {
-    switch self {
-    case .encodingFailed:
-      return "The message could not be converted to a transmittable format."
-    case .unsupportedType:
-      return "The message contains types that are not supported by the serialization format."
-    case .invalidMessageFormat:
-      return "The message structure does not conform to required format."
-    case .decodingFailed:
-      return "The received message could not be parsed into the expected format."
-    case .missingRequiredKey:
-      return "A required field is not present in the message."
-    case .typeMismatch:
-      return "A field has a different type than expected."
-    case .invalidData:
-      return "The data format is unrecognized or malformed."
-    case .corruptedData:
-      return "The data may have been damaged during transmission or storage."
-    case .missingTypeKey:
-      return "The message does not include a type discriminator for routing."
-    case .missingBinaryData:
-      return "The binary message parameters do not include required binary data."
-    case .unknownMessageType:
-      return "The message type is not recognized by the decoder."
-    case .missingField:
-      return "A required parameter field is not present in the message."
-    case .invalidDataSize:
-      return "The binary data does not meet size requirements for the format."
-    case .invalidFormat:
-      return "The binary message framing or structure is malformed."
-    case .invalidTypeKey:
-      return "The type key footer contains invalid UTF-8 data."
-    case .notBinaryMessagable:
-      return "The type cannot decode binary data because it does not conform to BinaryMessagable."
-    }
+    errorInfo.reason
   }
 
   /// A localized message describing how to recover from the failure.
   public var recoverySuggestion: String? {
-    switch self {
-    case .encodingFailed:
-      return "Ensure all message data uses supported types and check for circular references."
-    case .unsupportedType:
-      return """
-        Convert custom types to property list types \
-        (String, Number, Date, Data, Array, Dictionary) before encoding.
-        """
-    case .invalidMessageFormat:
-      return "Review message structure and ensure it conforms to the expected format."
-    case .decodingFailed:
-      return "Verify the message was encoded correctly and check for version compatibility."
-    case .missingRequiredKey:
-      return "Ensure the sender includes all required fields in the message."
-    case .typeMismatch:
-      return
-        "Verify the message format matches the expected schema and check for type conversion issues."
-    case .invalidData:
-      return "Check that the data source is providing data in the expected format."
-    case .corruptedData:
-      return "Verify data integrity and consider requesting a fresh copy of the data."
-    case .missingTypeKey:
-      return "Ensure all messages include the '__type' key for proper routing."
-    case .missingBinaryData:
-      return "Ensure binary messages include the '__data' key with valid Data content."
-    case .unknownMessageType:
-      return "Register the message type with MessageDecoder or verify the type key is correct."
-    case .missingField:
-      return "Ensure the sender includes all required parameter fields in the message."
-    case .invalidDataSize:
-      return "Verify the binary format requirements and ensure data meets size constraints."
-    case .invalidFormat:
-      return "Check the binary framing format and ensure type footer is correctly formatted."
-    case .invalidTypeKey:
-      return "Ensure the type key is valid UTF-8 text and the binary footer is not corrupted."
-    case .notBinaryMessagable:
-      return """
-        Ensure the message type conforms to BinaryMessagable protocol, \
-        or use dictionary transport instead of binary.
-        """
-    }
+    errorInfo.suggestion
   }
 }
