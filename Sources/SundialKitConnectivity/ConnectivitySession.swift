@@ -30,7 +30,7 @@
 public import Foundation
 public import SundialKitCore
 
-public protocol ConnectivitySession: AnyObject, Sendable {
+public protocol ConnectivitySession: AnyObject {
   var delegate: (any ConnectivitySessionDelegate)? { get set }
   var isReachable: Bool { get }
 

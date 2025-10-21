@@ -1,7 +1,8 @@
+import Foundation
 @testable import SundialKitConnectivity
 @testable import SundialKitCore
 
-internal final class MockSession: ConnectivitySession, @unchecked Sendable {
+internal final class MockSession: ConnectivitySession {
   internal var lastMessageSent: ConnectivityMessage?
   internal var lastAppContext: ConnectivityMessage?
   // swiftlint:disable:next implicitly_unwrapped_optional
@@ -60,6 +61,21 @@ internal final class MockSession: ConnectivitySession, @unchecked Sendable {
   ) {
     lastMessageSent = message
     replyHandler(nextReplyResult)
+  }
+
+  internal func sendMessageData(
+    _ data: Data,
+    _ completion: @escaping (Result<Data, any Error>) -> Void
+  ) {
+    // Mock implementation - just return empty data on success
+    switch nextReplyResult {
+    case .success:
+      completion(.success(Data()))
+    case .failure(let error):
+      completion(.failure(error))
+    case .none:
+      completion(.success(Data()))
+    }
   }
 
   internal func receiveMessage(
