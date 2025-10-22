@@ -30,7 +30,7 @@
 public import Foundation
 public import SundialKitCore
 
-public final class NeverConnectivitySession: NSObject, ConnectivitySession {
+public final class NeverConnectivitySession: NSObject, ConnectivitySession, @unchecked Sendable {
   public var delegate: (any ConnectivitySessionDelegate)? {
     get {
       nil

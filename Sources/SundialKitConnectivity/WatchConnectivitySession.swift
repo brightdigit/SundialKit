@@ -35,7 +35,9 @@
   internal typealias WatchConnectivitySessionProtocol =
     ConnectivitySession & WCSessionDelegate
 
-  public final class WatchConnectivitySession: NSObject, WatchConnectivitySessionProtocol {
+  public final class WatchConnectivitySession: NSObject, WatchConnectivitySessionProtocol,
+    @unchecked Sendable
+  {
     private let session: WCSession
 
     public var delegate: ConnectivitySessionDelegate?

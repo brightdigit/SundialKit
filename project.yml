@@ -4,12 +4,8 @@ settings:
 packages:
   SundialKit:
     path: .
-  SundialKitBinary:
-    path: Packages/SundialKitBinary
   SundialKitCombine:
     path: Packages/SundialKitCombine
-  SundialKitMessagable:
-    path: Packages/SundialKitMessagable
   SundialKitStream:
     path: Packages/SundialKitStream
 aggregateTargets:

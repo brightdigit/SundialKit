@@ -47,9 +47,9 @@ let swiftSettings: [SwiftSetting] = [
 let package = Package(
   name: "SundialKitCombine",
   platforms: [
-    .iOS(.v13),
-    .watchOS(.v6),
-    .tvOS(.v13),
+    .iOS(.v16),
+    .watchOS(.v9),
+    .tvOS(.v16),
     .macOS(.v10_15)
   ],
   products: [

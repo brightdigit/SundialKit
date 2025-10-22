@@ -89,21 +89,21 @@ public final class ConnectivityObserver: ConnectivitySessionDelegate {
   // MARK: - Published Properties
 
   /// Current activation state
-  @Published public private(set) var activationState: ActivationState = .notActivated
+  @Published public internal(set) var activationState: ActivationState = .notActivated
 
   /// Whether the counterpart device is reachable
-  @Published public private(set) var isReachable: Bool = false
+  @Published public internal(set) var isReachable: Bool = false
 
   /// Whether the companion app is installed (watchOS app on paired iPhone, or iOS app on paired Watch)
-  @Published public private(set) var isPairedAppInstalled: Bool = false
+  @Published public internal(set) var isPairedAppInstalled: Bool = false
 
   #if os(iOS)
     /// Whether an Apple Watch is paired (iOS only)
-    @Published public private(set) var isPaired: Bool = false
+    @Published public internal(set) var isPaired: Bool = false
   #endif
 
   /// Last activation error (nil if no error occurred)
-  @Published public private(set) var activationError: (any Error)?
+  @Published public internal(set) var activationError: (any Error)?
 
   // MARK: - Event Publishers
 
@@ -126,7 +126,7 @@ public final class ConnectivityObserver: ConnectivitySessionDelegate {
   // MARK: - Private Properties
 
   private let session: any ConnectivitySession
-  private let messageDecoder: MessageDecoder?
+  internal let messageDecoder: MessageDecoder?
 
   // MARK: - Initialization
 
@@ -186,7 +186,8 @@ public final class ConnectivityObserver: ConnectivitySessionDelegate {
       do {
         try session.updateApplicationContext(message)
         let sendResult = ConnectivitySendResult(
-          message: message, context: .applicationContext(transport: .dictionary))
+          message: message, context: .applicationContext(transport: .dictionary)
+        )
 
         // Notify subscribers
         self.sendResult.send(sendResult)
@@ -241,10 +242,9 @@ public final class ConnectivityObserver: ConnectivitySessionDelegate {
   public func send(_ message: some Messagable, options: SendOptions = []) async throws
     -> ConnectivitySendResult
   {
-
-    if  let binaryMessage = message as? BinaryMessagable, !options.contains(.forceDictionary){
+    if let binaryMessage = message as? BinaryMessagable, !options.contains(.forceDictionary) {
       // Binary transport
-      
+
       let data = try BinaryMessageEncoder.encode(binaryMessage)
 
       if session.isReachable {
@@ -286,124 +286,6 @@ public final class ConnectivityObserver: ConnectivitySessionDelegate {
     } else {
       // Dictionary transport
       return try await sendMessage(message.message())
-    }
-  }
-
-  // MARK: - ConnectivitySessionDelegate
-
-  nonisolated public func session(
-    _ session: any ConnectivitySession,
-    activationDidCompleteWith state: ActivationState,
-    error: (any Error)?
-  ) {
-    Task { @MainActor in
-      self.activationState = state
-      self.activationError = error
-      self.isReachable = session.isReachable
-      self.isPairedAppInstalled = session.isPairedAppInstalled
-      #if os(iOS)
-        self.isPaired = session.isPaired
-      #endif
-
-      // Publish activation completion event
-      if let error = error {
-        self.activationCompleted.send(.failure(error))
-      } else {
-        self.activationCompleted.send(.success(state))
-      }
-    }
-  }
-
-  nonisolated public func sessionDidBecomeInactive(_ session: any ConnectivitySession) {
-    Task { @MainActor in
-      self.activationState = session.activationState
-    }
-  }
-
-  nonisolated public func sessionDidDeactivate(_ session: any ConnectivitySession) {
-    Task { @MainActor in
-      self.activationState = session.activationState
-    }
-  }
-
-  nonisolated public func sessionReachabilityDidChange(_ session: any ConnectivitySession) {
-    Task { @MainActor in
-      self.isReachable = session.isReachable
-    }
-  }
-
-  nonisolated public func sessionCompanionStateDidChange(_ session: any ConnectivitySession) {
-    Task { @MainActor in
-      self.isPairedAppInstalled = session.isPairedAppInstalled
-      #if os(iOS)
-        self.isPaired = session.isPaired
-      #endif
-    }
-  }
-
-  nonisolated public func session(
-    _ session: any ConnectivitySession,
-    didReceiveMessage message: ConnectivityMessage,
-    replyHandler: @escaping @Sendable ([String: any Sendable]) -> Void
-  ) {
-    Task { @MainActor in
-      // Send to raw publisher
-      let result = ConnectivityReceiveResult(message: message, context: .replyWith(replyHandler))
-      self.messageReceived.send(result)
-
-      // Decode and send to typed publisher
-      if let decoder = self.messageDecoder {
-        do {
-          let decoded = try decoder.decode(message)
-          self.typedMessageReceived.send(decoded)
-        } catch {
-          // Decoding failed - log but don't crash (raw publisher still gets the message)
-          print("Failed to decode message: \(error)")
-        }
-      }
-    }
-  }
-
-  nonisolated public func session(
-    _ session: any ConnectivitySession,
-    didReceiveApplicationContext applicationContext: ConnectivityMessage,
-    error: (any Error)?
-  ) {
-    Task { @MainActor in
-      // Send to raw publisher
-      let result = ConnectivityReceiveResult(
-        message: applicationContext, context: .applicationContext)
-      self.messageReceived.send(result)
-
-      // Decode and send to typed publisher
-      if let decoder = self.messageDecoder {
-        do {
-          let decoded = try decoder.decode(applicationContext)
-          self.typedMessageReceived.send(decoded)
-        } catch {
-          // Decoding failed - log but don't crash (raw publisher still gets the message)
-          print("Failed to decode application context: \(error)")
-        }
-      }
-    }
-  }
-
-  nonisolated public func session(
-    _ session: any ConnectivitySession,
-    didReceiveMessageData messageData: Data,
-    replyHandler: @escaping @Sendable (Data) -> Void
-  ) {
-    Task { @MainActor in
-      // Decode and send to typed publisher
-      if let decoder = self.messageDecoder {
-        do {
-          let decoded = try decoder.decodeBinary(messageData)
-          self.typedMessageReceived.send(decoded)
-        } catch {
-          // Decoding failed - log the error
-          print("Failed to decode binary message: \(error)")
-        }
-      }
     }
   }
 }

@@ -30,7 +30,6 @@
 #if canImport(Network)
   public import Network
 
-  @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
   extension NWPathMonitor: PathMonitor {
     public func onPathUpdate(_ handler: @escaping @Sendable (NWPath) -> Void) {
       pathUpdateHandler = handler

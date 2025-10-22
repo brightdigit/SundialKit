@@ -314,7 +314,8 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
       do {
         try session.updateApplicationContext(message)
         let sendResult = ConnectivitySendResult(
-          message: message, context: .applicationContext(transport: .dictionary))
+          message: message, context: .applicationContext(transport: .dictionary)
+        )
 
         // Notify send result stream subscribers
         await notifySendResult(sendResult)
@@ -370,11 +371,10 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
     -> ConnectivitySendResult
   {
     // Determine transport based on type and options
-    let useBinary = message is BinaryMessagable && !options.contains(.forceDictionary)
-
-    if useBinary {
+    if let binaryMessage = message as? BinaryMessagable,
+      !options.contains(.forceDictionary)
+    {
       // Binary transport
-      let binaryMessage = message as! BinaryMessagable
       let data = try BinaryMessageEncoder.encode(binaryMessage)
 
       if session.isReachable {
@@ -567,7 +567,8 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
   private func handleApplicationContext(_ applicationContext: ConnectivityMessage, error: Error?) {
     // Send to raw stream subscribers
     let result = ConnectivityReceiveResult(
-      message: applicationContext, context: .applicationContext)
+      message: applicationContext, context: .applicationContext
+    )
     for continuation in messageReceivedContinuations.values {
       continuation.yield(result)
     }

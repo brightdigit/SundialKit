@@ -58,18 +58,14 @@ public import SundialKitNetwork
 @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
 public actor NetworkObserver<MonitorType: PathMonitor, PingType: NetworkPing> {
   // MARK: - Private Properties
-
   private let ping: PingType?
   private let monitor: MonitorType
   private var currentPath: MonitorType.PathType?
   private var currentPingStatus: PingType.StatusType?
-
-  // Stream continuations for active subscribers
   private var pathContinuations: [UUID: AsyncStream<MonitorType.PathType>.Continuation] = [:]
   private var pingStatusContinuations: [UUID: AsyncStream<PingType.StatusType>.Continuation] = [:]
 
   // MARK: - Initialization
-
   internal init(monitor: MonitorType, pingOrNil: PingType?) {
     self.monitor = monitor
     self.ping = pingOrNil
@@ -81,16 +77,11 @@ public actor NetworkObserver<MonitorType: PathMonitor, PingType: NetworkPing> {
   }
 
   // MARK: - Public API
-
   /// Starts monitoring network connectivity
   /// - Parameter queue: The dispatch queue for network monitoring
   public func start(queue: DispatchQueue) {
     monitor.start(queue: queue)
-
-    // TODO: Setup ping monitoring if ping is provided
-    // This will require updating NetworkPing protocol to support callbacks
   }
-
   /// Cancels network monitoring
   public func cancel() {
     monitor.cancel()
@@ -107,22 +98,18 @@ public actor NetworkObserver<MonitorType: PathMonitor, PingType: NetworkPing> {
     pingStatusContinuations.removeAll()
   }
 
-  /// Gets the current network path snapshot
-  /// - Returns: The current path, or nil if not yet received
+  /// Current network path snapshot
   public func getCurrentPath() -> MonitorType.PathType? {
     currentPath
   }
 
-  /// Gets the current ping status snapshot
-  /// - Returns: The current ping status, or nil if not yet received
+  /// Current ping status snapshot
   public func getCurrentPingStatus() -> PingType.StatusType? {
     currentPingStatus
   }
 
   // MARK: - AsyncStream APIs
-
-  /// AsyncStream of path updates
-  /// - Returns: Stream that yields path updates as they occur
+  /// Stream of path updates
   public func pathUpdates() -> AsyncStream<MonitorType.PathType> {
     AsyncStream { continuation in
       let id = UUID()
@@ -139,7 +126,7 @@ public actor NetworkObserver<MonitorType: PathMonitor, PingType: NetworkPing> {
     }
   }
 
-  /// Convenient stream of path status changes
+  /// Stream of path status changes
   public var pathStatusStream: AsyncStream<PathStatus> {
     AsyncStream { continuation in
       Task {
@@ -151,7 +138,7 @@ public actor NetworkObserver<MonitorType: PathMonitor, PingType: NetworkPing> {
     }
   }
 
-  /// Convenient stream of expensive state changes
+  /// Stream of expensive state changes
   public var isExpensiveStream: AsyncStream<Bool> {
     AsyncStream { continuation in
       Task {
@@ -163,7 +150,7 @@ public actor NetworkObserver<MonitorType: PathMonitor, PingType: NetworkPing> {
     }
   }
 
-  /// Convenient stream of constrained state changes
+  /// Stream of constrained state changes
   public var isConstrainedStream: AsyncStream<Bool> {
     AsyncStream { continuation in
       Task {
@@ -175,8 +162,7 @@ public actor NetworkObserver<MonitorType: PathMonitor, PingType: NetworkPing> {
     }
   }
 
-  /// AsyncStream of ping status updates
-  /// - Returns: Stream that yields ping status as it changes
+  /// Stream of ping status updates
   public func pingStatusUpdates() -> AsyncStream<PingType.StatusType> {
     AsyncStream { continuation in
       let id = UUID()
@@ -194,7 +180,6 @@ public actor NetworkObserver<MonitorType: PathMonitor, PingType: NetworkPing> {
   }
 
   // MARK: - Internal Handlers
-
   private func handlePathUpdate(_ path: MonitorType.PathType) {
     currentPath = path
 
@@ -223,11 +208,9 @@ public actor NetworkObserver<MonitorType: PathMonitor, PingType: NetworkPing> {
 }
 
 // MARK: - Convenience Initializers
-
 @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
 extension NetworkObserver where PingType == NeverPing {
-  /// Creates `NetworkObserver` without a `NetworkPing` object
-  /// - Parameter monitor: The `PathMonitor` to monitor the network
+  /// Creates `NetworkObserver` without ping
   public init(monitor: MonitorType) {
     self.init(monitor: monitor, pingOrNil: nil)
   }
@@ -235,10 +218,7 @@ extension NetworkObserver where PingType == NeverPing {
 
 @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
 extension NetworkObserver {
-  /// Creates `NetworkObserver` with a `NetworkPing` object
-  /// - Parameters:
-  ///   - monitor: The `PathMonitor` to monitor the network
-  ///   - ping: The `NetworkPing` to ping periodically
+  /// Creates `NetworkObserver` with ping
   public init(monitor: MonitorType, ping: PingType) {
     self.init(monitor: monitor, pingOrNil: ping)
   }

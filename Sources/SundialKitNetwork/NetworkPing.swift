@@ -92,7 +92,7 @@ extension NetworkPing {
 }
 
 #if canImport(Combine)
-  @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+
   extension NetworkPing {
     // swiftlint:disable:next explicit_acl
     func publish<PathStatusPublisher: Publisher>(

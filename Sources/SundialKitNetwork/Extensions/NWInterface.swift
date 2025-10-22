@@ -32,7 +32,7 @@ public import SundialKitCore
 #if canImport(Network)
 
   public import Network
-  @available(macOS 10.14, *)
+
   // swiftlint:disable:next file_types_order
   extension NWInterface.InterfaceType {
     // swiftlint:disable:next explicit_acl
@@ -59,7 +59,6 @@ public import SundialKitCore
     }
   }
 
-  @available(macOS 10.14, *)
   extension NWInterface: Interfaceable {
     public var typeValue: Int {
       type.value

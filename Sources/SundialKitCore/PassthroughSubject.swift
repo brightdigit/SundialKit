@@ -30,7 +30,6 @@
 #if canImport(Combine)
   public import Combine
 
-  @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
   extension PassthroughSubject {
     /// Creates a publisher that emits values from a specific key path of the subject's output.
     ///
