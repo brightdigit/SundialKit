@@ -9,8 +9,8 @@ import Foundation
 @testable import SundialKitCore
 @testable import SundialKitNetwork
 
-internal class MockNetworkPing: NetworkPing {
-  internal struct StatusType {}
+internal final class MockNetworkPing: NetworkPing, @unchecked Sendable {
+  internal struct StatusType: Sendable {}
   internal private(set) var lastShoundPingStatus: StatusType?
   internal let id: UUID
   internal let timeInterval: TimeInterval

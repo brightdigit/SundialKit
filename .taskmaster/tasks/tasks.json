@@ -2,7 +2,7 @@
   "master": {
     "tasks": [
       {
-        "id": 1,
+        "id": "1",
         "title": "Create SundialKitCore protocols and types",
         "description": "Define core protocols (NetworkMonitoring, ConnectivityManagement) and value types with Sendable conformance for plugin system",
         "status": "done",
@@ -74,10 +74,10 @@
         "expansionPrompt": "Break down into: 1) Define NetworkMonitoring protocol with all required methods and properties, 2) Define ConnectivityManagement protocol with messaging interfaces, 3) Create PathStatus enum with nested types (Interface OptionSet, UnsatisfiedReason), 4) Implement typed error enums (NetworkError, ConnectivityError, SerializationError) with WCError mapping helpers, 5) Add Sendable conformance and documentation to all types"
       },
       {
-        "id": 2,
+        "id": "2",
         "title": "Extract NetworkMonitor from NetworkObserver",
         "description": "Create non-reactive NetworkMonitor class in SundialKitNetwork target by extracting core logic from v1.0.0 NetworkObserver in Sources/SundialKit/Network/NetworkObserver.swift",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "1"
         ],
@@ -91,9 +91,10 @@
             "description": "Create the foundational NetworkMonitor class in SundialKitNetwork target with proper imports, class declaration, and NetworkMonitoring protocol conformance",
             "dependencies": [],
             "details": "Create Sources/SundialKitNetwork/NetworkMonitor.swift file. Import Foundation and Network frameworks. Declare public class NetworkMonitor implementing NetworkMonitoring protocol from SundialKitCore. Add private properties for pathMonitor (PathMonitor protocol), networkPing (optional NetworkPing), observerQueue (DispatchQueue), and state storage properties (currentPathStatus, currentIsExpensive, currentIsConstrained). Include thread-safe observer array property using NSLock for synchronization. Add initializer accepting optional PathMonitor and NetworkPing instances similar to NetworkObserver init(monitor:pingOrNil:) from line 109-118.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test class initialization with mock PathMonitor and NetworkPing. Verify protocol conformance. Test property initialization and default values.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-22T15:16:49.574Z"
           },
           {
             "id": 2,
@@ -103,9 +104,10 @@
               1
             ],
             "details": "Extract PathMonitor protocol from Sources/SundialKit/Network/PathMonitor.swift into Sources/SundialKitNetwork/PathMonitor.swift. Create DefaultPathMonitor class wrapping NWPathMonitor based on the extension in Sources/SundialKit/Network/Extensions/NWPathMonitor.swift (lines 34-38). Replace onPathUpdate handler closure approach with direct callback pattern instead of pathUpdateHandler property. Adapt existing NWPathMonitor wrapper removing any Combine-specific logic. Maintain platform availability checks @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *) and proper queue handling. Update NetworkMonitor to use extracted PathMonitor abstraction.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test PathMonitor protocol with mock implementations. Verify DefaultPathMonitor correctly wraps NWPathMonitor. Test queue handling and path update callbacks.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-22T15:16:49.576Z"
           },
           {
             "id": 3,
@@ -116,9 +118,10 @@
               2
             ],
             "details": "Define NetworkStateObserver protocol in SundialKitCore with methods: networkStateDidChange(pathStatus:isExpensive:isConstrained:). Create WeakObserver wrapper class to hold weak references preventing retain cycles. Implement thread-safe observer management using NSLock: addObserver(), removeObserver(), and private notifyObservers() methods. Ensure all state updates acquire lock before modification. Implement cleanup mechanism to remove deallocated observers. Add observer notification logic to PathMonitor update handler ensuring observers are called on main queue or specified queue. This replaces the pathSubject.map().subscribe() pattern from NetworkObserver lines 113-115.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test concurrent observer addition/removal. Verify weak references don't create retain cycles. Test observer notifications on state changes. Validate thread safety with multiple concurrent operations.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-22T15:16:49.578Z"
           },
           {
             "id": 4,
@@ -130,9 +133,10 @@
               3
             ],
             "details": "Extract NetworkPing protocol from Sources/SundialKit/Network/NetworkPing.swift and remove Combine extensions (lines 93-124). Remove PassthroughSubject pingStatusSubject and replace with direct callback pattern or observer notification. Replace Timer.publish().autoconnect().prepend() pattern (lines 104-112) with Timer.scheduledTimer or DispatchSourceTimer. Remove Publishers.CombineLatest and flatMap operators (lines 114-121) with direct scheduling logic. Add pingStatus property to NetworkMonitor state. Integrate ping results into observer notifications. Handle ping failures and timeout scenarios. Ensure optional ping support - NetworkMonitor should function without NetworkPing instance. Maintain existing ping interval and timeout configurations from timeInterval property.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test NetworkMonitor with and without NetworkPing. Verify ping scheduling and result handling. Test timeout scenarios and failure cases. Mock NetworkPing for controlled testing.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-22T15:16:49.579Z"
           },
           {
             "id": 5,
@@ -145,9 +149,10 @@
               4
             ],
             "details": "Remove all Combine imports from NetworkMonitor. Replace NetworkObserver's PassthroughSubjects (lines 71, 76-79): pathStatusSubject, isExpensiveSubject, isConstrainedSubject, pingStatusSubject with private(set) stored properties: currentPathStatus: PathStatus, currentIsExpensive: Bool, currentIsConstrained: Bool, currentPingStatus. Remove AnyCancellable arrays (lines 72, 74) and cancellable management. Remove pathSubject.map().subscribe() chains (lines 113-115) and replace with direct property assignment in path update handler. Ensure state updates trigger observer notifications instead of publisher events. Update all internal state management to use direct property assignment with proper thread synchronization. Maintain state consistency during updates.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify no Combine imports remain. Test state updates trigger observer notifications. Validate property access thread safety. Test state consistency during rapid updates.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-22T15:16:49.580Z"
           },
           {
             "id": 6,
@@ -161,9 +166,10 @@
               5
             ],
             "details": "Implement pathStatus() -> PathStatus method returning current path status. Implement isExpensive() -> Bool and isConstrained() -> Bool query methods. Adapt start(queue: DispatchQueue) method from NetworkObserver (lines 122-128) removing timerCancellable and ping.publish() calls, replacing with direct Timer scheduling. Implement stop() method based on cancel() (lines 131-138) for cancelling PathMonitor, stopping NetworkPing timers, and clearing observers. Add isMonitoring property tracking active state. Ensure proper cleanup in deinit clearing all timers and observers. Handle edge cases like multiple start/stop calls. Implement any additional NetworkMonitoring protocol requirements from SundialKitCore. Maintain onUpdate(path:) functionality (lines 140-142) adapted for observer pattern.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test start/stop lifecycle with various scenarios. Verify state query methods return correct values. Test cleanup on deinit. Validate behavior with multiple start/stop calls.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-22T15:16:49.581Z"
           },
           {
             "id": 7,
@@ -173,9 +179,10 @@
               6
             ],
             "details": "Create Tests/SundialKitNetworkTests/NetworkMonitorTests.swift using Swift Testing framework. Port test patterns from Tests/SundialKitTests/Network/NetworkObserverTests.swift adapting for observer pattern. Implement MockPathMonitor conforming to PathMonitor protocol with controllable behavior (based on existing MockPathMonitor). Create MockNetworkPing for testing ping integration (based on existing MockNetworkPing). Write tests for: initialization with various configurations, observer registration and notification, state transitions and updates, thread safety with concurrent operations, PathMonitor integration, NetworkPing optional behavior, lifecycle management (start/stop/deinit), error handling and edge cases. Adapt existing test methods like testStart(), testCancel(), testPathStatusPublisher() for observer pattern instead of publishers. Ensure minimum 80% code coverage. Test platform-specific behavior where applicable.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": null,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-22T15:21:42.102Z"
           },
           {
             "id": 8,
@@ -185,17 +192,19 @@
               7
             ],
             "details": "Update Package.swift to add SundialKitNetwork target definition. Add dependencies on SundialKitCore for protocols. Configure platform restrictions matching current SundialKit (.iOS(.v13), .watchOS(.v6), .tvOS(.v13), .macOS(.v10_13)). Add SundialKitNetwork to library products. Create corresponding test target SundialKitNetworkTests with dependency on SundialKitNetwork. Ensure Network framework is properly linked for NWPathMonitor usage. Remove Network components from main SundialKit target preparation for separation.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test package builds successfully. Verify target dependencies resolve correctly. Test on all supported platforms.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-22T15:22:06.963Z"
           }
         ],
         "complexity": 6,
         "recommendedSubtasks": 7,
-        "expansionPrompt": "Break down into: 1) Create NetworkMonitor class structure implementing NetworkMonitoring protocol, 2) Extract PathMonitor abstraction and NWPathMonitor implementation from existing code, 3) Implement observer pattern with weak references and thread-safe state management, 4) Extract and adapt NetworkPing integration logic, 5) Remove Combine dependencies and replace with stored properties, 6) Implement state query methods and lifecycle management, 7) Create comprehensive unit tests with mocks"
+        "expansionPrompt": "Break down into: 1) Create NetworkMonitor class structure implementing NetworkMonitoring protocol, 2) Extract PathMonitor abstraction and NWPathMonitor implementation from existing code, 3) Implement observer pattern with weak references and thread-safe state management, 4) Extract and adapt NetworkPing integration logic, 5) Remove Combine dependencies and replace with stored properties, 6) Implement state query methods and lifecycle management, 7) Create comprehensive unit tests with mocks",
+        "updatedAt": "2025-10-22T15:22:06.963Z"
       },
       {
-        "id": 3,
+        "id": "3",
         "title": "Extract ConnectivityManager from ConnectivityObserver",
         "description": "Create non-reactive ConnectivityManager class in SundialKitConnectivity target for WatchConnectivity management",
         "status": "pending",
@@ -306,7 +315,7 @@
         "expansionPrompt": "Break down into: 1) Create ConnectivityManager class implementing ConnectivityManagement protocol, 2) Extract ConnectivitySession abstraction over WCSession from existing code, 3) Implement platform-specific delegate methods with iOS/watchOS guards, 4) Bridge delegate-based activation to async/await with continuations and timeout handling, 5) Extract message routing logic (sendMessage with updateApplicationContext fallback), 6) Implement observer pattern for state change notifications, 7) Handle error mapping from WCError to ConnectivityError, 8) Create comprehensive platform-specific tests"
       },
       {
-        "id": 4,
+        "id": "4",
         "title": "Create SundialKit umbrella target",
         "description": "Configure umbrella target that re-exports SundialKitCore, SundialKitNetwork, and SundialKitConnectivity for convenience",
         "details": "Create SundialKit umbrella target:\n1. Update Package.swift to define SundialKit product\n2. Create SundialKit.swift with @_exported imports:\n   - @_exported import SundialKitCore\n   - @_exported import SundialKitNetwork  \n   - @_exported import SundialKitConnectivity\n3. Configure platform restrictions (iOS 13+, watchOS 6+ - most restrictive)\n4. No additional code - pure re-export target\n5. Update documentation to explain import options:\n   - Individual imports for selective features\n   - SundialKit import for everything\n6. Verify all public APIs are accessible through umbrella import\n\nPackage.swift configuration:\n- Product definition with all three targets\n- Proper dependency declarations\n- Platform version specifications",
@@ -359,7 +368,7 @@
         "expansionPrompt": "Break down into: 1) Update Package.swift to define SundialKit product with proper dependencies and platform restrictions, 2) Create SundialKit.swift file with @_exported imports for all three modules, 3) Write tests to verify all public APIs are accessible through umbrella import"
       },
       {
-        "id": 5,
+        "id": "5",
         "title": "Implement SundialKitCombine compatibility plugin",
         "description": "Create Combine-based plugin package providing v1.0.0 API compatibility with NetworkObserver and ConnectivityObserver",
         "status": "pending",
@@ -448,7 +457,7 @@
         "expansionPrompt": "Break down into: 1) Create NetworkObserver wrapper around NetworkMonitor with @Published properties, 2) Implement all v1.0.0 publishers using PassthroughSubject utilities, 3) Create ConnectivityObserver wrapper around ConnectivityManager, 4) Implement message publishers (sendingMessageSubject, messageReceivedPublisher, replyMessagePublisher), 5) Bridge observer callbacks to Combine publishers, 6) Verify complete v1.0.0 API compatibility with existing tests"
       },
       {
-        "id": 6,
+        "id": "6",
         "title": "Implement SundialKitMessagable compatibility plugin",
         "description": "Create dictionary-based messaging plugin maintaining v1.0.0 Messagable protocol and MessageDecoder with GitHub Issue #34 for Component: Messagable Plugin",
         "status": "pending",
@@ -511,7 +520,7 @@
         "expansionPrompt": "Break down into: 1) Port Messagable protocol with all required methods from v1.0.0, 2) Port MessageDecoder class with type registry implementation, 3) Add ConnectivityMessage typealias and helper extensions, 4) Create comprehensive tests for encoding/decoding and backwards compatibility"
       },
       {
-        "id": 7,
+        "id": "7",
         "title": "Implement SundialKitStream modern async plugin",
         "description": "Create actor-based AsyncStream plugin with NetworkStream and ConnectivityStream using Swift 6.1 strict concurrency",
         "details": "Create modern SundialKitStream plugin with Swift 6.1:\n1. actor NetworkStream implementation:\n   - Wrap NetworkMonitor with actor isolation\n   - pathStatusStream: AsyncStream<PathStatus>\n   - isExpensiveStream: AsyncStream<Bool>\n   - isConstrainedStream: AsyncStream<Bool>\n   - async func currentStatus() -> PathStatus\n   - Implement NetworkStateObserver, bridge to AsyncStream\n2. actor ConnectivityStream implementation:\n   - Wrap ConnectivityManager with actor isolation\n   - activationStateStream: AsyncStream<ActivationState>\n   - isReachableStream: AsyncStream<Bool>\n   - messageStream: AsyncStream<ReceivedMessage>\n   - async func send<M>(_ message: M) throws\n   - async func activate() throws(ConnectivityError)\n3. Full Swift 6.1 strict concurrency enabled\n4. No @available guards - declare platforms in Package.swift\n5. Thread-safe by default via actor isolation\n6. No swift-async-algorithms dependency\n\nPlatform: iOS 13+, macOS 10.15+, watchOS 6+, tvOS 13+",
@@ -619,7 +628,7 @@
         "expansionPrompt": "Break down into: 1) Create actor NetworkStream with proper isolation, 2) Implement AsyncStream bridges for network state properties, 3) Create actor ConnectivityStream with message handling, 4) Implement AsyncStream for connectivity state and messages, 5) Add async send and activate methods with typed throws, 6) Ensure Swift 6.1 strict concurrency compliance, 7) Write actor isolation and stream tests"
       },
       {
-        "id": 8,
+        "id": "8",
         "title": "Implement SundialKitBinary serialization plugin",
         "description": "Create format-agnostic binary serialization plugin with BinarySerializable protocol for efficient WatchConnectivity messaging",
         "details": "Create SundialKitBinary plugin for binary messaging:\n1. Define BinarySerializable protocol:\n   - func binaryData() throws -> Data\n   - init(binaryData: Data) throws\n   - Sendable conformance required\n2. WatchConnectivity integration:\n   - Use sendMessageData(_:replyHandler:) when reachable\n   - Fallback to updateApplicationContext with base64 encoding\n   - Message size validation (65KB limit)\n   - Throw ConnectivityError.messageTooBig if exceeded\n3. Type-safe message handling:\n   - Generic send<M: BinarySerializable>(_ message: M) async throws\n   - Generic request<Req, Res>(_ message: Req, expecting: Res.Type, timeout: TimeInterval) async throws -> Res\n   - Automatic serialization/deserialization\n4. Error handling:\n   - SerializationError for encoding/decoding failures\n   - ConnectivityError for delivery failures\n5. Swift 6.1 with strict concurrency\n6. No external dependencies - format agnostic\n\nExample formats: JSON (Codable), Protobuf, MessagePack, CBOR",
@@ -706,7 +715,7 @@
         "expansionPrompt": "Break down into: 1) Define BinarySerializable protocol with Data conversion methods, 2) Implement WatchConnectivity integration with sendMessageData, 3) Add fallback mechanism using base64 encoding for updateApplicationContext, 4) Implement generic send and request methods with type safety, 5) Add message size validation and error handling, 6) Create tests for various binary formats and edge cases"
       },
       {
-        "id": 9,
+        "id": "9",
         "title": "Migrate all tests to Swift Testing",
         "description": "Convert entire test suite from XCTest to Swift Testing framework across all packages (requires Swift 6.1+ - Swift 5.9/5.10/6.0 support dropped)",
         "status": "pending",
@@ -821,7 +830,7 @@
         "expansionPrompt": "Break down into: 1) Migrate SundialKitCore tests to Swift Testing with @Test and @Suite, 2) Migrate NetworkMonitor tests including mock implementations, 3) Migrate ConnectivityManager tests with platform-specific scenarios, 4) Convert SundialKitCombine plugin tests, 5) Convert SundialKitMessagable plugin tests, 6) Convert SundialKitStream plugin tests, 7) Convert SundialKitBinary plugin tests, 8) Update CI/CD configuration for Swift Testing, 9) Create testing utilities and documentation"
       },
       {
-        "id": 10,
+        "id": "10",
         "title": "Create documentation and example applications",
         "description": "Develop comprehensive documentation, migration guides, and example apps demonstrating all v2.0.0 features and migration paths",
         "details": "Documentation and examples:\n1. API Documentation:\n   - DocC documentation for all packages\n   - Inline code documentation\n   - Architecture diagrams\n   - Plugin development guide\n2. Migration Documentation:\n   - MIGRATION.md with step-by-step guide\n   - Compatibility matrix (v1 vs v2)\n   - Common migration patterns\n   - Troubleshooting guide\n3. Example Applications:\n   - V1 compatibility app (Combine + Messagable)\n   - Modern async/await app (Stream)\n   - Binary messaging examples (JSON, custom)\n   - Mixed approach app (Combine + Binary)\n   - iPhone/Watch communication demo\n4. README Updates:\n   - Main README.md with quick start\n   - PLUGINS.md explaining architecture\n   - Update CLAUDE.md for AI assistance\n5. Binary Format Examples:\n   - JSON via Codable\n   - Protobuf integration guide\n   - MessagePack example\n   - Custom binary format\n6. Real-world integration:\n   - Bitness app case study\n   - Performance comparisons\n   - Best practices from production use",
@@ -938,7 +947,7 @@
         "expansionPrompt": "Break down into: 1) Create DocC documentation for all public APIs, 2) Write MIGRATION.md with step-by-step v1 to v2 guide, 3) Create v1 compatibility example app using Combine and Messagable plugins, 4) Create modern async/await example using Stream plugin, 5) Create binary messaging examples with multiple formats, 6) Develop iPhone/Watch communication demo app, 7) Update README and PLUGINS documentation, 8) Create real-world integration guide with performance comparisons"
       },
       {
-        "id": 11,
+        "id": "11",
         "title": "Set up multi-repository structure with git subrepo",
         "description": "Set up git-subrepo for the 4 plugin repositories (SundialKitStream, SundialKitBinary, SundialKitCombine, SundialKitMessagable) that will be linked to the main SundialKit monorepo",
         "status": "done",
@@ -1030,7 +1039,7 @@
         "updatedAt": "2025-10-12T21:30:05.278Z"
       },
       {
-        "id": 12,
+        "id": "12",
         "title": "Remove git subrepos and finalize repository structure",
         "description": "After migration is complete, remove git subrepo tracking from the umbrella repository to transition to standard package dependencies",
         "details": "",
@@ -1112,17 +1121,17 @@
         ]
       },
       {
-        "id": 13,
+        "id": "13",
         "title": "Migrate Sundial demo application to SundialKit v2.0.0 monorepo",
         "description": "Import the Sundial iOS/watchOS demo application from the external repository into the SundialKit monorepo, migrating it from XcodeGen to Swift Package Manager and updating all APIs to use SundialKit v2.0.0 with both SundialKitCombine and SundialKitStream implementations.",
         "details": "Migrate Sundial demo application to demonstrate SundialKit v2.0.0 capabilities:\n\n1. Repository Import and Structure:\n   - Clone https://github.com/brightdigit/Sundial and analyze current implementation\n   - Create Examples/SundialDemo/ directory structure in monorepo:\n     - Examples/SundialDemo/Shared/ (shared code between iOS/watchOS)\n     - Examples/SundialDemo/iOS/ (iPhone-specific code)\n     - Examples/SundialDemo/watchOS/ (Apple Watch-specific code)\n     - Examples/SundialDemo/SundialDemoCombine/ (v1 compatibility version)\n     - Examples/SundialDemo/SundialDemoStream/ (modern async/await version)\n   - Import source files from Sundial repository, preserving SwiftUI views and app structure\n\n2. Swift Package Manager Migration:\n   - Convert XcodeGen project.yml to Package.swift executable targets\n   - Define two example products in Package.swift:\n     ```swift\n     .executable(name: \"SundialDemoCombine\", targets: [\"SundialDemoCombine\"])\n     .executable(name: \"SundialDemoStream\", targets: [\"SundialDemoStream\"])\n     ```\n   - Configure target dependencies:\n     - SundialDemoCombine: depends on SundialKit, SundialKitCombine, SundialKitMessagable\n     - SundialDemoStream: depends on SundialKit, SundialKitStream, SundialKitBinary\n   - Maintain iOS 14.8+ and watchOS 7.4+ deployment targets\n   - Configure resource bundles for assets and localization\n\n3. SundialKitCombine Version (v1 API compatibility):\n   - Update imports to use SundialKitCombine.NetworkObserver\n   - Maintain existing Combine-based architecture\n   - Use SundialKitMessagable for color message passing\n   - Minimal code changes from original v1.0.0 implementation\n   - Preserve @Published properties and publisher chains\n   - Example message handling:\n     ```swift\n     connectivityObserver.messageReceived\n       .compactMap { ColorMessage(from: $0.message) }\n       .assign(to: &$receivedColor)\n     ```\n\n4. SundialKitStream Version (modern async/await):\n   - Refactor to use actor-based NetworkStream and ConnectivityStream\n   - Replace Combine publishers with AsyncStream APIs\n   - Implement async message handling:\n     ```swift\n     Task {\n       for await message in connectivityStream.messageStream() {\n         if let colorData = message[\"color\"] as? Data {\n           await MainActor.run {\n             self.receivedColor = Color(data: colorData)\n           }\n         }\n       }\n     }\n     ```\n   - Use SundialKitBinary for efficient binary color serialization\n   - Demonstrate proper actor isolation and Swift 6.1 concurrency\n\n5. Feature Implementation:\n   - Real-time iPhone ↔ Apple Watch communication\n   - Network status monitoring (cellular, wifi, expensive, constrained)\n   - WatchConnectivity reachability status\n   - Color picker on iPhone, display on Watch (and vice versa)\n   - Connection status indicators\n   - Error handling and recovery UI\n\n6. Swift 6.1 Strict Concurrency:\n   - Add @MainActor to all SwiftUI views\n   - Ensure Sendable conformance for all shared types\n   - Eliminate data races and actor isolation violations\n   - Use #if compiler(>=6.1) for version-specific code\n   - Enable complete concurrency checking in Package.swift\n\n7. Documentation:\n   - Create Examples/SundialDemo/README.md with:\n     - Feature overview and screenshots\n     - Building and running instructions\n     - Architecture comparison (Combine vs Stream)\n     - Code walkthrough of key components\n   - Add demo references to main SundialKit README.md\n   - Include inline documentation explaining v2.0.0 API usage\n\n8. Testing and CI/CD:\n   - Create unit tests for demo business logic\n   - Add UI tests for critical user flows\n   - Update GitHub Actions to build demo apps\n   - Ensure demos compile on all supported platforms\n   - Add demo build step to release workflow",
         "testStrategy": "Comprehensive testing of migrated demo application:\n\n1. Build Verification:\n   - Both SundialDemoCombine and SundialDemoStream targets build successfully\n   - No compiler warnings with Swift 6.1 strict concurrency\n   - Runs on iOS 14.8+ and watchOS 7.4+ simulators/devices\n\n2. Feature Testing:\n   - iPhone app launches and displays network status correctly\n   - Watch app launches and shows connectivity state\n   - Color selection on iPhone appears on paired Watch\n   - Color selection on Watch appears on paired iPhone\n   - Reachability status updates when Watch app backgrounded/foregrounded\n   - Network status changes reflected in UI (airplane mode, wifi toggle)\n\n3. API Migration Verification:\n   - SundialDemoCombine uses v1-compatible APIs without deprecation warnings\n   - SundialDemoStream properly uses async/await patterns\n   - No @unchecked Sendable or unsafe concurrency patterns\n   - Message encoding/decoding works correctly in both versions\n\n4. Performance Testing:\n   - Message latency between devices < 100ms when reachable\n   - No memory leaks in either implementation\n   - Smooth UI updates without dropped frames\n   - Binary serialization (Stream version) more efficient than dictionary (Combine version)\n\n5. Documentation Review:\n   - README provides clear setup instructions\n   - Code comments explain v2.0.0 patterns\n   - Architecture differences clearly documented\n   - Screenshots match actual app appearance\n\n6. CI/CD Integration:\n   - GitHub Actions successfully builds both demo targets\n   - Tests pass on all supported platform versions\n   - Demo apps included in release artifacts",
         "status": "pending",
         "dependencies": [
-          5,
-          6,
-          7,
-          8
+          "5",
+          "6",
+          "7",
+          "8"
         ],
         "priority": "medium",
         "subtasks": []
@@ -1130,15 +1139,12 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-12T21:30:05.279Z",
-      "taskCount": 12,
-      "completedCount": 1,
+      "lastModified": "2025-10-22T15:22:06.964Z",
+      "taskCount": 13,
+      "completedCount": 3,
       "tags": [
         "master"
-      ],
-      "created": "2025-10-14T19:49:05.655Z",
-      "description": "Tasks for master context",
-      "updated": "2025-10-22T14:46:28.585Z"
+      ]
     }
   }
 }
