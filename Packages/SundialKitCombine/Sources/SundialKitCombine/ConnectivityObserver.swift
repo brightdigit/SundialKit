@@ -27,6 +27,7 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+#if canImport(Combine)
 public import Combine
 public import Foundation
 public import SundialKitConnectivity
@@ -289,3 +290,4 @@ public final class ConnectivityObserver: ConnectivitySessionDelegate {
     }
   }
 }
+#endif

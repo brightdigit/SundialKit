@@ -27,6 +27,7 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+#if canImport(Combine)
 public import Combine
 public import Foundation
 public import SundialKitCore
@@ -157,3 +158,4 @@ extension NetworkObserver where PingType == NeverPing {
     self.init(monitor: monitor, ping: nil, queue: queue)
   }
 }
+#endif
