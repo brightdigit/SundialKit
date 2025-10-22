@@ -16,12 +16,18 @@ For easier use in reactive user interfaces, especially with `SwiftUI` and `Combi
    - Send messages back and forth between iPhone and Apple Watch
    - Abstract messages for easier _encoding_ and _decoding_
 
-### Requirements 
+### Requirements
 
-**Apple Platforms**
+**v2.0.0+ (Current)**
+
+- Xcode 16.0 or later
+- Swift 6.1 or later
+- iOS 13.0 / watchOS 6.0 / tvOS 13.0 / macOS 10.13 or later deployment targets
+
+**v1.x (Legacy)**
 
 - Xcode 13.2.1 or later
-- Swift 5.5.2 or later
+- Swift 5.9+
 - iOS 13.0 / watchOS 6.0 / tvOS 13.0 / macOS 11 or later deployment targets
 
 ### Installation

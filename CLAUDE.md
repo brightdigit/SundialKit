@@ -345,10 +345,11 @@ Task {
 SundialKit v2.0.0 uses a **monorepo-first development approach** with git-subrepo:
 
 **Repository Structure:**
-- **Main Monorepo** (`brightdigit/SundialKit`): Contains SundialKitCore, SundialKitNetwork, SundialKitConnectivity, and SundialKit umbrella
-- **Plugin Subrepos** (in `Packages/`): SundialKitStream, SundialKitBinary, SundialKitCombine, SundialKitMessagable
+- **Main Monorepo** (`brightdigit/SundialKit`): Contains SundialKitCore, SundialKitNetwork, SundialKitConnectivity, SundialKit umbrella, SundialKitBinary, and SundialKitMessagable
+- **Plugin Subrepos** (in `Packages/`): SundialKitStream, SundialKitCombine
   - Linked via git-subrepo to separate repositories
   - Tracked on `v1.0.0` branch during development
+- **Built-in Plugins**: SundialKitBinary and SundialKitMessagable are implemented directly in the monorepo as built-in features
 - **After v2.0.0**: Sever subrepo ties and finalize distribution strategy
 
 **Benefits:**
@@ -389,9 +390,11 @@ git subrepo status <subdir>
 
 **Plugin Subrepo Locations:**
 - `Packages/SundialKitStream` → `git@github.com:brightdigit/SundialKitStream.git` (branch: v1.0.0)
-- `Packages/SundialKitBinary` → `git@github.com:brightdigit/SundialKitBinary.git` (branch: v1.0.0)
 - `Packages/SundialKitCombine` → `git@github.com:brightdigit/SundialKitCombine.git` (branch: v1.0.0)
-- `Packages/SundialKitMessagable` → `git@github.com:brightdigit/SundialKitMessagable.git` (branch: v1.0.0)
+
+**Built-in Plugins (not subrepos):**
+- SundialKitBinary - Implemented directly in main monorepo
+- SundialKitMessagable - Implemented directly in main monorepo
 
 **The .gitrepo File:**
 Each subrepo directory contains a `.gitrepo` file that stores metadata about the upstream repository:
@@ -420,11 +423,11 @@ Each subrepo directory contains a `.gitrepo` file that stores metadata about the
    # Pull latest changes from plugin repo
    git subrepo pull Packages/SundialKitStream
 
-   # Or update all plugins
+   # Or update all subrepo plugins
    git subrepo pull Packages/SundialKitStream
-   git subrepo pull Packages/SundialKitBinary
    git subrepo pull Packages/SundialKitCombine
-   git subrepo pull Packages/SundialKitMessagable
+
+   # Note: SundialKitBinary and SundialKitMessagable are built-in (not subrepos)
    ```
 
 3. **Checking Subrepo Status:**
@@ -460,10 +463,10 @@ This project uses GitHub Issues and Pull Requests integrated with Task Master:
 - `component:core` - SundialKitCore protocols and types
 - `component:network` - SundialKitNetwork implementation
 - `component:watchconnectivity` - SundialKitConnectivity implementation
-- `component:combine` - SundialKitCombine plugin (v1 compatibility)
-- `component:messagable` - SundialKitMessagable plugin (v1 compatibility)
-- `component:stream` - SundialKitStream plugin (modern async/await)
-- `component:binary` - SundialKitBinary plugin (modern serialization)
+- `component:combine` - SundialKitCombine plugin (v1 compatibility, subrepo)
+- `component:messagable` - SundialKitMessagable built-in (v1 compatibility, monorepo)
+- `component:stream` - SundialKitStream plugin (modern async/await, subrepo)
+- `component:binary` - SundialKitBinary built-in (modern serialization, monorepo)
 - `component:infrastructure` - Build, CI/CD, tooling, git-subrepo
 - `component:docs` - Documentation and examples
 - `component:tests` - Testing infrastructure and Swift Testing migration

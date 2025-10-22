@@ -336,10 +336,10 @@ SundialKit uses git-subrepo for managing plugin packages. Reference: https://git
 ```
 Packages/
 ├── SundialKitStream/       # → brightdigit/SundialKitStream (branch: v1.0.0)
-├── SundialKitBinary/       # → brightdigit/SundialKitBinary (branch: v1.0.0)
-├── SundialKitCombine/      # → brightdigit/SundialKitCombine (branch: v1.0.0)
-└── SundialKitMessagable/   # → brightdigit/SundialKitMessagable (branch: v1.0.0)
+└── SundialKitCombine/      # → brightdigit/SundialKitCombine (branch: v1.0.0)
 ```
+
+**Note:** SundialKitBinary and SundialKitMessagable are implemented directly in the monorepo (not as subrepos) since they will be built-in features rather than separate packages.
 
 **Essential git-subrepo Commands:**
 
