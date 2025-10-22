@@ -1,6 +1,48 @@
-// swift-tools-version: 5.9
-// swiftlint:disable explicit_top_level_acl explicit_acl
+// swift-tools-version: 6.1
+// swiftlint:disable explicit_acl explicit_top_level_acl
+
 import PackageDescription
+
+// MARK: - Swift Settings Configuration
+
+let swiftSettings: [SwiftSetting] = [
+  // Swift 6.2 Upcoming Features
+  .enableUpcomingFeature("ExistentialAny"),
+  .enableUpcomingFeature("InternalImportsByDefault"),
+  .enableUpcomingFeature("MemberImportVisibility"),
+  .enableUpcomingFeature("FullTypedThrows"),
+
+  // Experimental Features
+  .enableExperimentalFeature("BitwiseCopyable"),
+  .enableExperimentalFeature("BorrowingSwitch"),
+  .enableExperimentalFeature("ExtensionMacros"),
+  .enableExperimentalFeature("FreestandingExpressionMacros"),
+  .enableExperimentalFeature("InitAccessors"),
+  .enableExperimentalFeature("IsolatedAny"),
+  .enableExperimentalFeature("MoveOnlyClasses"),
+  .enableExperimentalFeature("MoveOnlyEnumDeinits"),
+  .enableExperimentalFeature("MoveOnlyPartialConsumption"),
+  .enableExperimentalFeature("MoveOnlyResilientTypes"),
+  .enableExperimentalFeature("MoveOnlyTuples"),
+  .enableExperimentalFeature("NoncopyableGenerics"),
+  .enableExperimentalFeature("RawLayout"),
+  .enableExperimentalFeature("ReferenceBindings"),
+  .enableExperimentalFeature("SendingArgsAndResults"),
+  .enableExperimentalFeature("SymbolLinkageMarkers"),
+  .enableExperimentalFeature("TransferringArgsAndResults"),
+  .enableExperimentalFeature("VariadicGenerics"),
+  .enableExperimentalFeature("WarnUnsafeReflection"),
+
+  // Enhanced compiler checking
+  .unsafeFlags([
+    "-warn-concurrency",
+    "-enable-actor-data-race-checks",
+    "-strict-concurrency=complete",
+    "-enable-testing",
+    "-Xfrontend", "-warn-long-function-bodies=100",
+    "-Xfrontend", "-warn-long-expression-type-checking=100"
+  ])
+]
 
 let package = Package(
   name: "SundialKit",
@@ -11,20 +53,74 @@ let package = Package(
     .macOS(.v10_13)
   ],
   products: [
+    // Core protocols and types
+    .library(
+      name: "SundialKitCore",
+      targets: ["SundialKitCore"]
+    ),
+    // Network monitoring implementation
+    .library(
+      name: "SundialKitNetwork",
+      targets: ["SundialKitNetwork"]
+    ),
+    // WatchConnectivity implementation
+    .library(
+      name: "SundialKitConnectivity",
+      targets: ["SundialKitConnectivity"]
+    ),
+    // Umbrella product re-exporting all modules
     .library(
       name: "SundialKit",
       targets: ["SundialKit"]
     )
   ],
   targets: [
+    // MARK: - Core Module
     .target(
-      name: "SundialKit",
-      dependencies: []
+      name: "SundialKitCore",
+      dependencies: [],
+      swiftSettings: swiftSettings
     ),
     .testTarget(
-      name: "SundialKitTests",
-      dependencies: ["SundialKit"]
+      name: "SundialKitCoreTests",
+      dependencies: ["SundialKitCore", "SundialKitNetwork"],
+      swiftSettings: swiftSettings
+    ),
+
+    // MARK: - Network Module
+    .target(
+      name: "SundialKitNetwork",
+      dependencies: ["SundialKitCore"],
+      swiftSettings: swiftSettings
+    ),
+    .testTarget(
+      name: "SundialKitNetworkTests",
+      dependencies: ["SundialKitNetwork"],
+      swiftSettings: swiftSettings
+    ),
+
+    // MARK: - Connectivity Module
+    .target(
+      name: "SundialKitConnectivity",
+      dependencies: ["SundialKitCore"],
+      swiftSettings: swiftSettings
+    ),
+    .testTarget(
+      name: "SundialKitConnectivityTests",
+      dependencies: ["SundialKitConnectivity"],
+      swiftSettings: swiftSettings
+    ),
+
+    // MARK: - Umbrella Module
+    .target(
+      name: "SundialKit",
+      dependencies: [
+        "SundialKitCore",
+        "SundialKitNetwork",
+        "SundialKitConnectivity"
+      ],
+      swiftSettings: swiftSettings
     )
   ]
 )
-// swiftlint:enable explicit_top_level_acl explicit_acl
+// swiftlint:enable explicit_acl explicit_top_level_acl

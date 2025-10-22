@@ -3,7 +3,7 @@
 </p>
 <h1 align="center"> SundialKit </h1>
 
-Reactive communications library across Apple platforms.
+Swift 6.1+ reactive communications library with modern concurrency support for Apple platforms.
 
 [![SwiftPM](https://img.shields.io/badge/SPM-Linux%20%7C%20iOS%20%7C%20macOS%20%7C%20watchOS%20%7C%20tvOS-success?logo=swift)](https://swift.org)
 [![Twitter](https://img.shields.io/badge/twitter-@brightdigit-blue.svg?style=flat)](http://twitter.com/brightdigit)
@@ -37,105 +37,247 @@ Reactive communications library across Apple platforms.
 
 # Introduction
 
-For easier use in reactive user interfaces, especially with `SwiftUI` and `Combine`, I've created a library which abstracts and maps common connectivity APIs. Particularly in my app Heartwitch, I mapped the functionality of _WatchConnectivity_ and _Network_ over to track the user's ability to connect to the Internet as well as the ability for their iPhone to connect to their Apple Watch via _WatchConnectivity_
+**SundialKit v2.0.0** is a modern Swift 6.1+ library that provides reactive interfaces for network connectivity and device communication across Apple platforms. Originally created for my app Heartwitch, SundialKit abstracts and simplifies Apple's _Network_ and _WatchConnectivity_ frameworks with a clean, layered architecture.
 
-# Features 
+## What's New in v2.0.0
 
-Here's what's currently implemented with this library:
+- **Swift 6.1 Strict Concurrency**: Full compliance with Swift 6 concurrency model
+- **Three-Layer Architecture**: Protocols, wrappers, and observation layers cleanly separated
+- **Multiple Concurrency Models**: Choose between modern async/await (SundialKitStream) or Combine (SundialKitCombine)
+- **Zero @unchecked Sendable in Plugins**: Actor-based and @MainActor patterns ensure thread safety
+- **Modular Design**: Import only what you need - core protocols, network monitoring, or connectivity
+- **Swift Testing**: Modern test framework support (v2.0.0+)
 
-- [x] Monitor network connectivity and quality
-- [x] Communicate between iPhone and Apple Watch
-  - [x] Monitor connectivity between devices
-  - [x] Send messages back and forth between iPhone and Apple Watch
-  - [x] Abstract messages for easier _encoding_ and _decoding_
+# Features
+
+**Core Features:**
+- [x] Monitor network connectivity and quality using Apple's Network framework
+- [x] Communicate between iPhone and Apple Watch via WatchConnectivity
+- [x] Monitor device connectivity and pairing status
+- [x] Send and receive messages between devices
+- [x] Type-safe message encoding/decoding with Messagable protocol
+
+**v2.0.0 Features:**
+- [x] **SundialKitStream**: Actor-based observers with AsyncStream APIs
+- [x] **SundialKitCombine**: @MainActor observers with Combine publishers
+- [x] Protocol-oriented architecture for maximum flexibility
+- [x] Sendable-safe types throughout
+- [x] Comprehensive error handling with typed errors
 
 # Installation
 
-Swift Package Manager is Apple's decentralized dependency manager to integrate libraries to your Swift projects. It is now fully integrated with Xcode 15+.
+Swift Package Manager is Apple's decentralized dependency manager to integrate libraries to your Swift projects. It is now fully integrated with Xcode 16+.
 
-To integrate **SundialKit** into your project using SPM, specify it in your Package.swift file:
+## Choose Your Concurrency Model
+
+SundialKit v2.0.0 offers two observation plugins - choose based on your project needs:
+
+### Option A: Modern Async/Await (Recommended)
+
+For new projects using async/await and Swift concurrency:
 
 ```swift
 let package = Package(
-  ...
+  name: "YourPackage",
+  platforms: [.iOS(.v16), .watchOS(.v9), .tvOS(.v16), .macOS(.v13)],
   dependencies: [
-    .package(url: "https://github.com/brightdigit/SundialKit.git", from: "1.0.0-beta.1")
+    .package(url: "https://github.com/brightdigit/SundialKit.git", from: "2.0.0")
   ],
   targets: [
-      .target(
-          name: "YourTarget",
-          dependencies: ["SundialKit", ...]),
-      ...
+    .target(
+      name: "YourTarget",
+      dependencies: [
+        .product(name: "SundialKitStream", package: "SundialKit"),
+        .product(name: "SundialKitNetwork", package: "SundialKit"),
+        .product(name: "SundialKitConnectivity", package: "SundialKit")
+      ]
+    )
   ]
 )
 ```
 
+### Option B: Combine + SwiftUI
+
+For projects using Combine or needing backward compatibility with iOS 13+:
+
+```swift
+let package = Package(
+  name: "YourPackage",
+  platforms: [.iOS(.v13), .watchOS(.v6), .tvOS(.v13), .macOS(.v10_15)],
+  dependencies: [
+    .package(url: "https://github.com/brightdigit/SundialKit.git", from: "2.0.0")
+  ],
+  targets: [
+    .target(
+      name: "YourTarget",
+      dependencies: [
+        .product(name: "SundialKitCombine", package: "SundialKit"),
+        .product(name: "SundialKitNetwork", package: "SundialKit"),
+        .product(name: "SundialKitConnectivity", package: "SundialKit")
+      ]
+    )
+  ]
+)
+```
+
+### Core Protocols Only
+
+For building your own observers:
+
+```swift
+.product(name: "SundialKitCore", package: "SundialKit")
+```
+
 ## Requirements
 
+### v2.0.0+
+- **Swift**: 6.1+ (strict concurrency enabled)
+- **Xcode**: 16.0+
+- **Platforms**:
+  - SundialKitStream: iOS 16+, watchOS 9+, tvOS 16+, macOS 13+
+  - SundialKitCombine: iOS 13+, watchOS 6+, tvOS 13+, macOS 10.15+
+  - Core modules: iOS 13+, watchOS 6+, tvOS 13+, macOS 10.13+
+
+### v1.x (Legacy)
 - **Swift**: 5.9+
 - **Xcode**: 15.0+
 - **Platforms**: iOS 13+, watchOS 6+, tvOS 13+, macOS 10.13+
 
-# Usage 
+# Usage
+
+SundialKit v2.0.0 provides two ways to monitor network connectivity and device communication. Choose the approach that fits your project:
 
 ## Listening to Networking Changes
 
-In the past `Reachability` or `AFNetworking` has been used to judge the network connectivity of a device. **SundialKit** uses the `Network` framework to listen to changes in connectivity providing all the information available.
+**SundialKit** uses Apple's `Network` framework to monitor network connectivity, providing detailed information about network status, quality, and interface types.
 
-**SundialKit** provides a `NetworkObserver` which allows you to listen to a variety of publishers related to the network. This is especially useful if you are using `SwiftUI` in particular. With `SwiftUI`, you can create an `ObservableObject` which contains a `NetworkObserver`:
+### Option A: Using SundialKitStream (Async/Await)
+
+For modern Swift concurrency with async/await:
 
 ```swift
 import SwiftUI
-import SundialKit
+import SundialKitStream
+import SundialKitNetwork
 
-class NetworkConnectivityObject : ObservableObject {
-  // our NetworkObserver
-  let connectivityObserver = NetworkObserver()
-  
-  // our published property for pathStatus initially set to `.unknown`
-  @Published var pathStatus : PathStatus = .unknown
+@MainActor
+@Observable
+class NetworkConnectivityModel {
+  var pathStatus: PathStatus = .unknown
+  var isExpensive: Bool = false
+  var isConstrained: Bool = false
 
-  init () {
-    // set the pathStatus changes to our published property
-    connectivityObserver
-      .pathStatusPublisher
-      .receive(on: DispatchQueue.main)
-      .assign(to: &self.$pathStatus)
-  }
-  
-  // need to start listening
-  func start () {
-    self.connectivityObserver.start(queue: .global())
-  }
-}
-```
+  private let observer = NetworkObserver(
+    monitor: NWPathMonitorAdapter(),
+    ping: nil
+  )
 
-There are 3 important pieces:
+  func start() {
+    // Start monitoring on a background queue
+    observer.start(queue: .global())
 
-1. The `NetworkObserver` called `connectivityObserver`
-2. On `init`, we use `Combine` to listen to the publisher and store each new `pathStatus` to our `@Published` property.
-3. A `start` method which needs to be called to start listening to the `NetworkObserver`.
-
-Therefore for our `SwiftUI` `View`, we need to `start` listening `onAppear` and can use the `pathStatus` property in the `View`:
-
-```swift
-
-struct NetworkObserverView: View {
-  @StateObject var connectivityObject = NetworkConnectivityObject()
-    var body: some View {
-      // Use the `message` property to display text of the `pathStatus`
-      Text(self.connectivityObject.pathStatus.message).onAppear{
-        // start the NetworkObserver
-        self.connectivityObject.start()
+    // Listen to path status updates using AsyncStream
+    Task {
+      for await status in observer.pathStatusStream {
+        self.pathStatus = status
       }
     }
+
+    // Listen to expensive network status
+    Task {
+      for await expensive in observer.isExpensiveStream {
+        self.isExpensive = expensive
+      }
+    }
+
+    // Listen to constrained network status
+    Task {
+      for await constrained in observer.isConstrainedStream {
+        self.isConstrained = constrained
+      }
+    }
+  }
+}
+
+struct NetworkView: View {
+  @State private var model = NetworkConnectivityModel()
+
+  var body: some View {
+    VStack {
+      Text("Status: \(model.pathStatus.description)")
+      Text("Expensive: \(model.isExpensive ? "Yes" : "No")")
+      Text("Constrained: \(model.isConstrained ? "Yes" : "No")")
+    }
+    .task {
+      model.start()
+    }
+  }
 }
 ```
 
-Besides `pathStatus`, you also have access to:
+### Option B: Using SundialKitCombine (Combine + SwiftUI)
 
-* `isExpensive`
-* `isConstrained`
+For projects using Combine or requiring iOS 13+ compatibility:
+
+```swift
+import SwiftUI
+import SundialKitCombine
+import SundialKitNetwork
+import Combine
+
+@MainActor
+class NetworkConnectivityObject: ObservableObject {
+  // NetworkObserver is @MainActor, so all access is on main thread
+  let observer = NetworkObserver(
+    monitor: NWPathMonitorAdapter(),
+    ping: nil
+  )
+
+  // Access pathStatus directly via @Published property
+  @Published var pathStatus: PathStatus = .unknown
+  @Published var isExpensive: Bool = false
+  @Published var isConstrained: Bool = false
+
+  private var cancellables = Set<AnyCancellable>()
+
+  init() {
+    // Observer's @Published properties automatically update on MainActor
+    observer.$pathStatus
+      .assign(to: &$pathStatus)
+
+    observer.$isExpensive
+      .assign(to: &$isExpensive)
+
+    observer.$isConstrained
+      .assign(to: &$isConstrained)
+  }
+
+  func start() {
+    // Start monitoring (defaults to main queue for @MainActor observer)
+    observer.start()
+  }
+}
+
+struct NetworkView: View {
+  @StateObject var connectivity = NetworkConnectivityObject()
+
+  var body: some View {
+    VStack {
+      Text("Status: \(connectivity.pathStatus.description)")
+      Text("Expensive: \(connectivity.isExpensive ? "Yes" : "No")")
+      Text("Constrained: \(connectivity.isConstrained ? "Yes" : "No")")
+    }
+    .onAppear {
+      connectivity.start()
+    }
+  }
+}
+```
+
+**Available Network Properties:**
+- `pathStatus`: Overall network status (satisfied, unsatisfied, requiresConnection, unknown)
+- `isExpensive`: Whether the connection is expensive (e.g., cellular data)
+- `isConstrained`: Whether the connection has constraints (e.g., low data mode)
 
 ### Verify Connectivity with ``NetworkPing``
 

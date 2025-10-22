@@ -59,13 +59,15 @@ let package = Package(
     )
   ],
   dependencies: [
-    .package(path: "../../")
+    .package(name: "SundialKit", path: "../../")
   ],
   targets: [
     .target(
       name: "SundialKitStream",
       dependencies: [
-        .product(name: "SundialKit", package: "SundialKit")
+        .product(name: "SundialKitCore", package: "SundialKit"),
+        .product(name: "SundialKitNetwork", package: "SundialKit"),
+        .product(name: "SundialKitConnectivity", package: "SundialKit")
       ],
       swiftSettings: swiftSettings
     ),

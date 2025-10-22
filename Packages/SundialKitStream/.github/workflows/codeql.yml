@@ -49,6 +49,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Ensure remote dependencies
+      run: ./Scripts/ensure-remote-deps.sh
+
     - name: Setup Xcode
       run: sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
 

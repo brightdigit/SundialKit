@@ -4,10 +4,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-SundialKit is a reactive communications library for Apple platforms that provides:
+SundialKit v2.0.0 is a Swift 6.1+ communications library for Apple platforms with a modern three-layer architecture:
+
+**Layer 1: Core Protocols** (SundialKitCore, SundialKitNetwork, SundialKitConnectivity)
+- Protocol-based abstractions over Apple's Network and WatchConnectivity frameworks
+- Minimal concurrency annotations (Sendable constraints)
+- No observer patterns - pure wrappers
+
+**Layer 2: Observation Plugins** (Choose your concurrency model)
+- **SundialKitStream**: Modern actor-based observers with AsyncStream APIs
+- **SundialKitCombine**: @MainActor-based observers with Combine publishers
+
+**Key Features:**
 - Network connectivity monitoring using Apple's Network framework
 - WatchConnectivity abstraction for iPhone/Apple Watch communication
-- Combine-based reactive publishers for SwiftUI integration
+- Multiple concurrency models: Choose actors or @MainActor based on your needs
+- Swift 6.1 strict concurrency compliant (zero @unchecked Sendable in plugins)
+- Full async/await support alongside Combine publishers
 
 ## Build & Test Commands
 
@@ -49,30 +62,94 @@ FORMAT_ONLY=1 ./Scripts/lint.sh     # Format only
 
 ## Architecture
 
-### Two Main Subsystems
+### Three-Layer Architecture (v2.0.0)
 
-**1. Network Module** (`Sources/SundialKit/Network/`)
-- **NetworkObserver**: Main observable class for network connectivity
-  - Wraps `PathMonitor` (abstraction over `NWPathMonitor`)
-  - Optionally integrates `NetworkPing` for periodic connectivity verification
-  - Publishes: `pathStatus`, `isExpensive`, `isConstrained`, `pingStatus`
-  - Must call `start(queue:)` to begin monitoring
+SundialKit v2.0.0 uses a layered architecture separating protocols, wrappers, and observation patterns:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Layer 1: SundialKitCore (Protocols)                         │
+│ - PathMonitor, NetworkPing, ConnectivitySession protocols   │
+│ - Sendable-safe type aliases and errors                     │
+│ - No observers, no concurrency primitives                   │
+└─────────────────────────────────────────────────────────────┘
+         │
+    ┌────┴────┐
+    │         │
+┌───┴────────┐ ┌──┴──────────────┐
+│ Layer 1:   │ │ Layer 1:        │
+│ Network    │ │ Connectivity    │
+│            │ │                 │
+│ Raw        │ │ Raw             │
+│ wrappers   │ │ wrappers        │
+│ over       │ │ over            │
+│ NWPath     │ │ WCSession       │
+│ Monitor    │ │                 │
+└────────────┘ └─────────────────┘
+    │                  │
+    └────┬─────────────┘
+         │
+    ┌────┴────┐
+    │         │
+┌───┴────────┐│       ┌──────────────┐
+│ Layer 2:   ││       │ Layer 2:     │
+│ Stream     ││       │ Combine      │
+│            ││       │              │
+│ Actors +   ││       │ @MainActor + │
+│ AsyncStream││       │ Publishers   │
+│ (modern)   ││       │ (SwiftUI)    │
+└────────────┘│       └──────────────┘
+```
+
+#### Layer 1: Core Protocols & Wrappers
+
+**SundialKitCore** (`Sources/SundialKitCore/`)
+- Protocol definitions: `PathMonitor`, `NetworkPing`, `ConnectivitySession`, `ConnectivitySessionDelegate`
+- Type-safe aliases: `ConnectivityMessage = [String: any Sendable]`
+- Typed errors: `ConnectivityError`, `NetworkError`, `SerializationError`
+- No concrete implementations, no observers
+
+**SundialKitNetwork** (`Sources/SundialKitNetwork/`)
+- Concrete implementations: `NWPathMonitor` extensions, `NeverPing`
+- Protocol wrappers around Apple's Network framework
 - **PathStatus**: Enum representing network state (satisfied, unsatisfied, requiresConnection, unknown)
   - Contains `Interface` OptionSet (cellular, wifi, wiredEthernet, loopback, other)
   - Contains `UnsatisfiedReason` enum for failure details
 
-**2. WatchConnectivity Module** (`Sources/SundialKit/WatchConnectivity/`)
-- **ConnectivityObserver**: Main observable class for iPhone ↔ Apple Watch communication
-  - Wraps `ConnectivitySession` (abstraction over `WCSession`)
-  - Implements `ConnectivitySessionDelegate` pattern
-  - Publishes: `activationState`, `isReachable`, `isPaired`, `isPairedAppInstalled`
-  - Message publishing: `messageReceivedPublisher`, `replyMessagePublisher`
-  - Message sending: `sendingMessageSubject` (PassthroughSubject)
-  - Must call `activate()` to start the session
-  - Automatically handles message routing:
-    - Uses `sendMessage` when reachable
-    - Falls back to `updateApplicationContext` when not reachable but paired app installed
-    - Returns error when companion not available
+**SundialKitConnectivity** (`Sources/SundialKitConnectivity/`)
+- Concrete implementations: `WatchConnectivitySession`, `NeverConnectivitySession`
+- Protocol wrappers around Apple's WatchConnectivity framework
+- Delegate pattern support via `ConnectivitySessionDelegate`
+- Message encoding/decoding via `Messagable` protocol
+
+#### Layer 2: Observation Plugins (Choose One)
+
+**SundialKitStream** (`Packages/SundialKitStream/`) - Modern Async/Await
+- **NetworkObserver**: Actor-based network monitoring
+  - Generic over `PathMonitor` and `NetworkPing` protocols
+  - AsyncStream APIs: `pathUpdates()`, `pathStatusStream`, `isExpensiveStream`, `pingStatusStream`
+  - Call `start(queue:)` to begin monitoring
+  - Zero @unchecked Sendable (naturally Sendable actors)
+
+- **ConnectivityObserver**: Actor-based WatchConnectivity
+  - AsyncStream APIs: `activationStates()`, `messageStream()`, `reachabilityStream()`
+  - Async methods: `activate()`, `sendMessage(_:)` returns `ConnectivitySendResult`
+  - Automatic message routing (sendMessage when reachable, updateApplicationContext when not)
+  - Zero @unchecked Sendable (naturally Sendable actors)
+
+**SundialKitCombine** (`Packages/SundialKitCombine/`) - Combine + SwiftUI
+- **NetworkObserver**: @MainActor-based network monitoring
+  - Generic over `PathMonitor` and `NetworkPing & Sendable` protocols
+  - @Published properties: `pathStatus`, `isExpensive`, `isConstrained`, `pingStatus`
+  - Call `start(queue:)` to begin monitoring (defaults to `.main`)
+  - Zero @unchecked Sendable (@MainActor isolation)
+
+- **ConnectivityObserver**: @MainActor-based WatchConnectivity
+  - @Published properties: `activationState`, `isReachable`, `isPairedAppInstalled`
+  - PassthroughSubject publishers: `messageReceived`, `sendResult`
+  - Async methods: `activate()`, `sendMessage(_:)` returns `ConnectivitySendResult`
+  - Automatic message routing
+  - Zero @unchecked Sendable (@MainActor isolation)
 
 ### Message Encoding/Decoding
 
@@ -89,6 +166,7 @@ FORMAT_ONLY=1 ./Scripts/lint.sh     # Format only
 ### Testing Architecture
 
 - All tests in `Tests/SundialKitTests/`
+- **Testing Framework**: Swift Testing (requires Swift 6.1+) - v2.0.0 migration from XCTest
 - Mock implementations prefixed with "Mock" (MockSession, MockPathMonitor, MockNetworkPing, MockMessage)
 - Protocol-based abstractions enable dependency injection for testing
 - Never* types (NeverPing, NeverConnectivitySession) used for platforms without certain capabilities
@@ -102,9 +180,11 @@ FORMAT_ONLY=1 ./Scripts/lint.sh     # Format only
 
 ## Platform Support
 
-- Minimum versions: iOS 13, watchOS 6, tvOS 13, macOS 10.13
+- **Swift Version**: Swift 6.1+ required (v2.0.0+)
+- **Deployment Targets**: iOS 13, watchOS 6, tvOS 13, macOS 10.13
 - Requires Combine framework (macOS 10.15+, iOS 13+, watchOS 6+, tvOS 13+)
 - WatchConnectivity only available on iOS and watchOS (not macOS/tvOS)
+- **Note**: v2.0.0 dropped support for Swift 5.9, 5.10, and 6.0 to enable Swift Testing framework migration
 
 ## Development Notes
 
@@ -112,13 +192,151 @@ FORMAT_ONLY=1 ./Scripts/lint.sh     # Format only
 Development tools (formatter, linter, unused code detector) are managed via Mint and defined in `Mintfile`. The `Scripts/lint.sh` script orchestrates formatting, linting, and code quality checks. Use `make lint` for local development.
 
 ### Important Type Aliases
-- `ConnectivityMessage` = `[String:Any]` (WatchConnectivity-compatible dictionary)
-- `SuccessfulSubject<Output>` = `PassthroughSubject<Output, Never>`
+- `ConnectivityMessage` = `[String: any Sendable]` (Sendable-safe WatchConnectivity dictionary)
+- `ConnectivityHandler` = `@Sendable (ConnectivityMessage) -> Void`
+- `SuccessfulSubject<Output>` = `PassthroughSubject<Output, Never>` (in SundialKitCore for legacy support)
+
+### Usage Examples
+
+#### Network Monitoring with SundialKitStream (Async/Await)
+
+```swift
+import SundialKitStream
+import SundialKitNetwork
+
+// Create observer (actor-based)
+let observer = NetworkObserver(
+  monitor: NWPathMonitorAdapter(),
+  ping: nil  // or provide a NetworkPing implementation
+)
+
+// Start monitoring
+observer.start(queue: .global())
+
+// Consume path updates using AsyncStream
+Task {
+  for await status in observer.pathStatusStream {
+    print("Network status: \(status)")
+  }
+}
+
+// Or get raw path updates
+Task {
+  for await path in observer.pathUpdates() {
+    print("Path: \(path)")
+  }
+}
+```
+
+#### Network Monitoring with SundialKitCombine (Combine + SwiftUI)
+
+```swift
+import SundialKitCombine
+import SundialKitNetwork
+import Combine
+
+// Create observer (@MainActor-based)
+let observer = NetworkObserver(
+  monitor: NWPathMonitorAdapter(),
+  ping: nil
+)
+
+// Start monitoring on main queue
+observer.start()
+
+// Use @Published properties in SwiftUI
+var cancellables = Set<AnyCancellable>()
+
+observer.$pathStatus
+  .sink { status in
+    print("Network status: \(status)")
+  }
+  .store(in: &cancellables)
+
+observer.$isExpensive
+  .sink { isExpensive in
+    print("Is expensive: \(isExpensive)")
+  }
+  .store(in: &cancellables)
+```
+
+#### WatchConnectivity with SundialKitStream (Async/Await)
+
+```swift
+import SundialKitStream
+import SundialKitConnectivity
+
+// Create observer (actor-based)
+let observer = ConnectivityObserver()
+
+// Activate session
+try await observer.activate()
+
+// Listen for messages using AsyncStream
+Task {
+  for await result in observer.messageStream() {
+    switch result.context {
+    case .replyWith(let handler):
+      print("Message: \(result.message)")
+      handler(["response": "acknowledged"])
+    case .applicationContext:
+      print("Context update: \(result.message)")
+    }
+  }
+}
+
+// Send messages
+let result = try await observer.sendMessage(["key": "value"])
+print("Sent via: \(result.context)")
+```
+
+#### WatchConnectivity with SundialKitCombine (Combine + SwiftUI)
+
+```swift
+import SundialKitCombine
+import SundialKitConnectivity
+import Combine
+
+// Create observer (@MainActor-based)
+let observer = ConnectivityObserver()
+
+// Activate session
+try observer.activate()
+
+// Use publishers
+var cancellables = Set<AnyCancellable>()
+
+observer.messageReceived
+  .sink { result in
+    switch result.context {
+    case .replyWith(let handler):
+      print("Message: \(result.message)")
+      handler(["response": "acknowledged"])
+    case .applicationContext:
+      print("Context update: \(result.message)")
+    }
+  }
+  .store(in: &cancellables)
+
+observer.$activationState
+  .sink { state in
+    print("State: \(state)")
+  }
+  .store(in: &cancellables)
+
+// Send messages asynchronously
+Task {
+  let result = try await observer.sendMessage(["key": "value"])
+  print("Sent via: \(result.context)")
+}
+```
 
 ### Common Pitfalls
-- NetworkObserver and ConnectivityObserver require explicit start/activate calls
-- Platform-specific APIs guarded with `@available` and `#if` (watch behavior on iOS vs watchOS)
-- Messages must be property list types for WatchConnectivity compatibility
+- **Observers require explicit start/activate**: Both NetworkObserver and ConnectivityObserver need `start(queue:)` or `activate()` calls
+- **Platform-specific APIs**: WatchConnectivity guarded with `@available` and `#if` (behavior differs on iOS vs watchOS)
+- **Messages must be property list types**: ConnectivityMessage values must be Sendable property list types
+- **Actor isolation**: When using SundialKitStream, remember to use `await` for actor-isolated properties and methods
+- **Main thread access**: When using SundialKitCombine, all observer access is on MainActor (safe for UI updates)
 
 ## Repository Structure & GitHub Workflow Integration
 

@@ -25,7 +25,12 @@ for arg in "$@"; do
   esac
 done
 
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Determine project root - use SRCROOT if available (set by Xcode), otherwise calculate it
+if [ -n "${SRCROOT:-}" ]; then
+  PROJECT_ROOT="$SRCROOT"
+else
+  PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+fi
 SUBREPOS=("SundialKitStream" "SundialKitBinary" "SundialKitCombine" "SundialKitMessagable")
 
 echo "╔════════════════════════════════════════════════════════════════╗"
@@ -48,9 +53,18 @@ run_lint() {
     return 0
   fi
 
-  pushd "$package_dir" > /dev/null
+  # Export SRCROOT for the lint script to use
+  # This tells lint.sh where its package root is
+  export SRCROOT="$package_dir"
 
-  if ./Scripts/lint.sh; then
+  # Run the lint script from within the package directory
+  # Use a subshell to avoid affecting the parent shell's directory
+  (
+    cd "$package_dir" && bash Scripts/lint.sh
+  )
+
+  local lint_result=$?
+  if [ $lint_result -eq 0 ]; then
     echo "✅ $package_name: Linting passed"
     SUCCESS_PACKAGES+=("$package_name")
   else
@@ -58,8 +72,8 @@ run_lint() {
     FAILED_PACKAGES+=("$package_name")
   fi
 
-  popd > /dev/null
   echo ""
+  return $lint_result
 }
 
 # Lint main directory
