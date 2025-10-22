@@ -33,6 +33,20 @@ import Testing
 @testable import SundialKitCore
 @testable import SundialKitNetwork
 
+// MARK: - Task.sleep Polyfill for watchOS < 9.0
+
+extension Task where Success == Never, Failure == Never {
+  /// Suspends the current task for the given duration.
+  /// - Parameter duration: The duration to sleep for.
+  fileprivate static func sleep(forMilliseconds milliseconds: UInt64) async throws {
+    if #available(watchOS 9.0, *) {
+      try await self.sleep(for: .milliseconds(milliseconds))
+    } else {
+      try await self.sleep(nanoseconds: milliseconds * 1_000_000)
+    }
+  }
+}
+
 // MARK: - Test Observer
 
 private final class TestObserver: NetworkStateObserver, @unchecked Sendable {
@@ -57,7 +71,6 @@ private final class TestObserver: NetworkStateObserver, @unchecked Sendable {
 
 @Suite("NetworkMonitor Tests")
 struct NetworkMonitorTests {
-
   // MARK: - Initialization Tests
 
   @Test("NetworkMonitor initializes with unknown state")
@@ -100,7 +113,7 @@ struct NetworkMonitorTests {
     monitor.start(queue: queue)
 
     // Give it a moment to process
-    try await Task.sleep(for: .milliseconds(100))
+    try await Task.sleep(forMilliseconds: 100)
 
     #expect(pathMonitor.dispatchQueueLabel == "test.queue")
     #expect(pathMonitor.pathUpdate != nil)
@@ -114,7 +127,7 @@ struct NetworkMonitorTests {
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
 
     monitor.start(queue: .global())
-    try await Task.sleep(for: .milliseconds(100))
+    try await Task.sleep(forMilliseconds: 100)
 
     monitor.stop()
 
@@ -127,7 +140,7 @@ struct NetworkMonitorTests {
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
 
     monitor.start(queue: .global())
-    try await Task.sleep(for: .milliseconds(50))
+    try await Task.sleep(forMilliseconds: 50)
 
     // Second start should be ignored
     monitor.start(queue: .global())
@@ -155,7 +168,7 @@ struct NetworkMonitorTests {
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
 
     monitor.start(queue: .global())
-    try await Task.sleep(for: .milliseconds(100))
+    try await Task.sleep(forMilliseconds: 100)
 
     // Send new path update
     let newPath = MockPath(
@@ -165,7 +178,7 @@ struct NetworkMonitorTests {
     )
     pathMonitor.sendPath(newPath)
 
-    try await Task.sleep(for: .milliseconds(50))
+    try await Task.sleep(forMilliseconds: 50)
 
     #expect(monitor.pathStatus == .satisfied(.cellular))
     #expect(monitor.isExpensive == true)
@@ -178,7 +191,7 @@ struct NetworkMonitorTests {
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
 
     monitor.start(queue: .global())
-    try await Task.sleep(for: .milliseconds(100))
+    try await Task.sleep(forMilliseconds: 100)
 
     let newPath = MockPath(
       isConstrained: true,
@@ -187,7 +200,7 @@ struct NetworkMonitorTests {
     )
     pathMonitor.sendPath(newPath)
 
-    try await Task.sleep(for: .milliseconds(50))
+    try await Task.sleep(forMilliseconds: 50)
 
     #expect(monitor.isConstrained == true)
   }
@@ -203,7 +216,7 @@ struct NetworkMonitorTests {
     monitor.addObserver(observer)
     monitor.start(queue: .global())
 
-    try await Task.sleep(for: .milliseconds(100))
+    try await Task.sleep(forMilliseconds: 100)
 
     // Send update
     let newPath = MockPath(
@@ -213,9 +226,9 @@ struct NetworkMonitorTests {
     )
     pathMonitor.sendPath(newPath)
 
-    try await Task.sleep(for: .milliseconds(50))
+    try await Task.sleep(forMilliseconds: 50)
 
-    #expect(observer.pathStatusUpdates.count > 0)
+    #expect(!observer.pathStatusUpdates.isEmpty)
     #expect(observer.pathStatusUpdates.last == .satisfied(.cellular))
   }
 
@@ -228,7 +241,7 @@ struct NetworkMonitorTests {
     monitor.addObserver(observer)
     monitor.start(queue: .global())
 
-    try await Task.sleep(for: .milliseconds(100))
+    try await Task.sleep(forMilliseconds: 100)
 
     let newPath = MockPath(
       isConstrained: false,
@@ -237,7 +250,7 @@ struct NetworkMonitorTests {
     )
     pathMonitor.sendPath(newPath)
 
-    try await Task.sleep(for: .milliseconds(50))
+    try await Task.sleep(forMilliseconds: 50)
 
     #expect(observer.expensiveUpdates.contains(true))
   }
@@ -251,7 +264,7 @@ struct NetworkMonitorTests {
     monitor.addObserver(observer)
     monitor.start(queue: .global())
 
-    try await Task.sleep(for: .milliseconds(100))
+    try await Task.sleep(forMilliseconds: 100)
 
     let newPath = MockPath(
       isConstrained: true,
@@ -260,7 +273,7 @@ struct NetworkMonitorTests {
     )
     pathMonitor.sendPath(newPath)
 
-    try await Task.sleep(for: .milliseconds(50))
+    try await Task.sleep(forMilliseconds: 50)
 
     #expect(observer.constrainedUpdates.contains(true))
   }
@@ -274,7 +287,7 @@ struct NetworkMonitorTests {
     monitor.addObserver(observer)
     monitor.start(queue: .global())
 
-    try await Task.sleep(for: .milliseconds(100))
+    try await Task.sleep(forMilliseconds: 100)
 
     monitor.removeObserver(observer)
 
@@ -286,7 +299,7 @@ struct NetworkMonitorTests {
     )
     pathMonitor.sendPath(newPath)
 
-    try await Task.sleep(for: .milliseconds(50))
+    try await Task.sleep(forMilliseconds: 50)
 
     // Observer should not have received the cellular update
     let hasCellularUpdate = observer.pathStatusUpdates.contains { status in
@@ -308,7 +321,7 @@ struct NetworkMonitorTests {
     monitor.addObserver(observer)  // Add again
     monitor.start(queue: .global())
 
-    try await Task.sleep(for: .milliseconds(100))
+    try await Task.sleep(forMilliseconds: 100)
 
     let newPath = MockPath(
       isConstrained: false,
@@ -317,7 +330,7 @@ struct NetworkMonitorTests {
     )
     pathMonitor.sendPath(newPath)
 
-    try await Task.sleep(for: .milliseconds(50))
+    try await Task.sleep(forMilliseconds: 50)
 
     // Should only have one notification, not two
     let cellularCount = observer.pathStatusUpdates.filter { status in
@@ -390,7 +403,7 @@ struct NetworkMonitorTests {
     monitor.start(queue: .global())
 
     // Wait for potential ping to execute
-    try await Task.sleep(for: .milliseconds(200))
+    try await Task.sleep(forMilliseconds: 200)
 
     monitor.stop()
 

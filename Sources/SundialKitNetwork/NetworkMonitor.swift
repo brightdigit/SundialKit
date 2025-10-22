@@ -88,7 +88,6 @@ public final class NetworkMonitor<
   Monitor: PathMonitor,
   Ping: NetworkPing & Sendable
 >: NetworkMonitoring, @unchecked Sendable where Monitor.PathType: NetworkPath {
-
   // MARK: - Private Properties
 
   private let pathMonitor: Monitor

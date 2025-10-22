@@ -31,16 +31,12 @@
   import Network
   public import SundialKitCore
 
-  @available(macOS 10.14, *)
   extension PathStatus {
     /// Creates a `PathStatus`.
     /// - Parameters:
     ///   - status: The `NWPath.Status`
     ///   - interfaces: The `Interfacable` objects.
-    @available(macOS, obsoleted: 11.0)
-    @available(iOS, obsoleted: 14.2)
-    @available(watchOS, obsoleted: 7.0)
-    @available(tvOS, obsoleted: 14.2)
+
     // swiftlint:disable:next explicit_acl
     init(
       _ status: NWPath.Status,
