@@ -88,23 +88,27 @@ public final class NetworkMonitor<
   Monitor: PathMonitor,
   Ping: NetworkPing & Sendable
 >: NetworkMonitoring, @unchecked Sendable where Monitor.PathType: NetworkPath {
-  // MARK: - Private Properties
+  // MARK: - Helper Types
+  private final class WeakObserverBox {
+    weak var observer: NetworkStateObserver?
+    init(_ observer: NetworkStateObserver) {
+      self.observer = observer
+    }
+  }
 
+  // MARK: - Private Properties
   private let pathMonitor: Monitor
   private let networkPing: Ping?
   private let lock = NSLock()
-
   private var _pathStatus: PathStatus = .unknown
   private var _isExpensive: Bool = false
   private var _isConstrained: Bool = false
   private var isMonitoring: Bool = false
-
   private var observers: [WeakObserverBox] = []
   private var pingTimer: DispatchSourceTimer?
   private var pingQueue: DispatchQueue?
 
   // MARK: - Public Properties (NetworkMonitoring)
-
   /// The current status of the network path.
   public var pathStatus: PathStatus {
     lock.lock()
@@ -127,9 +131,7 @@ public final class NetworkMonitor<
   }
 
   // MARK: - Initialization
-
   /// Creates a new network monitor.
-  ///
   /// - Parameters:
   ///   - monitor: The path monitor to use for tracking network changes
   ///   - ping: Optional network ping for connectivity verification
@@ -139,11 +141,8 @@ public final class NetworkMonitor<
   }
 
   // MARK: - Observer Management
-
   /// Adds an observer to receive network state change notifications.
-  ///
   /// Observers are held weakly to prevent retain cycles.
-  ///
   /// - Parameter observer: The observer to add
   public func addObserver(_ observer: NetworkStateObserver) {
     lock.lock()
@@ -159,7 +158,6 @@ public final class NetworkMonitor<
   }
 
   /// Removes an observer from receiving network state change notifications.
-  ///
   /// - Parameter observer: The observer to remove
   public func removeObserver(_ observer: NetworkStateObserver) {
     lock.lock()
@@ -169,9 +167,7 @@ public final class NetworkMonitor<
   }
 
   // MARK: - Lifecycle (NetworkMonitoring)
-
   /// Starts monitoring network connectivity.
-  ///
   /// - Parameter queue: The dispatch queue on which to deliver network updates
   public func start(queue: DispatchQueue) {
     lock.lock()
@@ -289,16 +285,6 @@ public final class NetworkMonitor<
     lock.unlock()
 
     timer?.cancel()
-  }
-
-  // MARK: - Helper Types
-
-  private final class WeakObserverBox {
-    weak var observer: NetworkStateObserver?
-
-    init(_ observer: NetworkStateObserver) {
-      self.observer = observer
-    }
   }
 }
 

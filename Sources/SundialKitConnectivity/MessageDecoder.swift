@@ -61,11 +61,11 @@ public import SundialKitCore
 /// let message = try messageDecoder.decode(connectivityMessage)
 /// ```
 public struct MessageDecoder {
-  private let messagableTypes: [String: Messagable.Type]
+  private let messagableTypes: [String: any Messagable.Type]
 
   /// Creates a `MessageDecoder` based on a list of `Messagable` types.
   /// - Parameter messagableTypes: A list of `Messagable` types.
-  public init(messagableTypes: [Messagable.Type]) {
+  public init(messagableTypes: [any Messagable.Type]) {
     self.messagableTypes = Dictionary(
       uniqueKeysWithValues: messagableTypes.map {
         ($0.key, $0)
@@ -77,7 +77,7 @@ public struct MessageDecoder {
   /// - Parameter message: The `ConnectivityMessage` dictionary.
   /// - Returns: The decoded `Messagable` object.
   /// - Throws: SerializationError if decoding fails.
-  public func decode(_ message: ConnectivityMessage) throws -> Messagable {
+  public func decode(_ message: ConnectivityMessage) throws -> any Messagable {
     guard let typeKey = message[MessagableKeys.typeKey] as? String else {
       throw SerializationError.missingTypeKey
     }
@@ -112,7 +112,7 @@ public struct MessageDecoder {
   /// - Parameter data: Binary data with type footer
   /// - Returns: The decoded `Messagable` object (guaranteed to be `BinaryMessagable`)
   /// - Throws: SerializationError if decoding fails or type is not BinaryMessagable
-  public func decodeBinary(_ data: Data) throws -> Messagable {
+  public func decodeBinary(_ data: Data) throws -> any Messagable {
     // Extract type key and payload from binary footer
     let (typeKey, payload) = try BinaryMessageEncoder.decode(data)
 

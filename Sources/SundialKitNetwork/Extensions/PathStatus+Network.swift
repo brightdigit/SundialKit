@@ -36,7 +36,6 @@
     /// - Parameters:
     ///   - status: The `NWPath.Status`
     ///   - interfaces: The `Interfacable` objects.
-
     // swiftlint:disable:next explicit_acl
     init(
       _ status: NWPath.Status,

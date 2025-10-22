@@ -59,7 +59,7 @@ public import SundialKitCore
 /// let messageDecoder = MessageDecoder(messagableTypes: [Message.self])
 /// let message = try messageDecoder.decode(connectivityMessage)
 /// ```
-public protocol Messagable {
+public protocol Messagable: Sendable {
   /// The unique key or type name to use for decoding.
   /// Defaults to the type name if not explicitly provided.
   static var key: String { get }
