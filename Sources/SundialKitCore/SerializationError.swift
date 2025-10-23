@@ -27,7 +27,7 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-public import Foundation
+import Foundation
 
 /// Errors that can occur during message serialization and deserialization.
 ///
@@ -56,13 +56,28 @@ public struct SerializationError: Error, Sendable {
 
   /// Context data associated with the error.
   public struct ErrorContext: Sendable {
+    /// Human-readable reason for the error.
     public let reason: String?
+    /// The type involved in the error.
     public let type: String?
+    /// The dictionary key involved in the error.
     public let key: String?
+    /// The expected type or value.
     public let expected: String?
+    /// The actual type or value encountered.
     public let actual: String?
+    /// The specific field that caused the error.
     public let field: String?
 
+    /// Creates error context with detailed information.
+    ///
+    /// - Parameters:
+    ///   - reason: Human-readable reason for the error
+    ///   - type: The type involved in the error
+    ///   - key: The dictionary key involved in the error
+    ///   - expected: The expected type or value
+    ///   - actual: The actual type or value encountered
+    ///   - field: The specific field that caused the error
     public init(
       reason: String? = nil,
       type: String? = nil,

@@ -33,6 +33,7 @@ public import SundialKitCore
   public import Network
 
   extension NWPath: NetworkPath {
+    /// The current network path status with interface and reason information.
     public var pathStatus: PathStatus {
       if #available(iOS 14.2, watchOS 7.1, macOS 11.0, tvOS 14.2, *) {
         return PathStatus(

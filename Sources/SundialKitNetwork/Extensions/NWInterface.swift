@@ -60,6 +60,7 @@ public import SundialKitCore
   }
 
   extension NWInterface: Interfaceable {
+    /// The integer value representing the interface type.
     public var typeValue: Int {
       type.value
     }

@@ -30,7 +30,12 @@
 public import Foundation
 public import SundialKitCore
 
+/// A no-op implementation of `ConnectivitySession` for platforms without WatchConnectivity.
+///
+/// Used on macOS and tvOS where WatchConnectivity is not available.
+/// All operations throw or return inactive/unavailable states.
 public final class NeverConnectivitySession: NSObject, ConnectivitySession, @unchecked Sendable {
+  /// The delegate (always nil for this implementation).
   public var delegate: (any ConnectivitySessionDelegate)? {
     get {
       nil
@@ -39,30 +44,46 @@ public final class NeverConnectivitySession: NSObject, ConnectivitySession, @unc
     set {}
   }
 
+  /// Whether the counterpart is reachable (always false).
   public var isReachable: Bool {
     false
   }
 
+  /// Whether devices are paired (always false).
   public var isPaired: Bool {
     false
   }
 
+  /// Whether the counterpart app is installed (always false).
   public var isPairedAppInstalled: Bool {
     false
   }
 
+  /// The activation state (always notActivated).
   public var activationState: ActivationState {
     .notActivated
   }
 
+  /// Attempts to activate the session (always throws).
+  ///
+  /// - Throws: `SundialError.sessionNotSupported`
   public func activate() throws {
     throw SundialError.sessionNotSupported
   }
 
+  /// Attempts to update application context (always throws).
+  ///
+  /// - Parameter context: The context to update (ignored)
+  /// - Throws: `SundialError.sessionNotSupported`
   public func updateApplicationContext(_: ConnectivityMessage) throws {
     throw SundialError.sessionNotSupported
   }
 
+  /// Attempts to send a message (always fails).
+  ///
+  /// - Parameters:
+  ///   - message: The message to send (ignored)
+  ///   - completion: Handler called with failure
   public func sendMessage(
     _: ConnectivityMessage,
     _ completion: @escaping (Result<ConnectivityMessage, any Error>) -> Void
@@ -70,6 +91,11 @@ public final class NeverConnectivitySession: NSObject, ConnectivitySession, @unc
     completion(.failure(SundialError.sessionNotSupported))
   }
 
+  /// Attempts to send binary message data (always fails).
+  ///
+  /// - Parameters:
+  ///   - data: The data to send (ignored)
+  ///   - completion: Handler called with failure
   public func sendMessageData(
     _: Data,
     _ completion: @escaping (Result<Data, any Error>) -> Void

@@ -38,6 +38,7 @@ public struct SendOptions: OptionSet, Sendable {
   /// - Working with systems that don't support binary transport
   public static let forceDictionary = SendOptions(rawValue: 1 << 0)
 
+  /// The raw integer value of the option set.
   public let rawValue: Int
 
   /// Creates a new send options value with the given raw value.

@@ -35,26 +35,35 @@
   internal typealias WatchConnectivitySessionProtocol =
     ConnectivitySession & WCSessionDelegate
 
+  /// Concrete implementation of `ConnectivitySession` wrapping Apple's `WCSession`.
+  ///
+  /// Provides a Sendable-safe bridge between WatchConnectivity's delegate-based API
+  /// and the protocol-oriented `ConnectivitySession` interface.
   public final class WatchConnectivitySession: NSObject, WatchConnectivitySessionProtocol,
     @unchecked Sendable
   {
     private let session: WCSession
 
+    /// The delegate to receive session lifecycle and message events.
     public var delegate: ConnectivitySessionDelegate?
 
+    /// Whether the counterpart device is currently reachable for immediate message delivery.
     public var isReachable: Bool {
       session.isReachable
     }
 
+    /// Whether the iPhone is paired with an Apple Watch (iOS only).
     @available(watchOS, unavailable)
     public var isPaired: Bool {
       session.isPaired
     }
 
+    /// Whether the counterpart app is installed on the paired device.
     public var isPairedAppInstalled: Bool {
       session.isPairedAppInstalled
     }
 
+    /// The current activation state of the session.
     public var activationState: ActivationState {
       guard let state = ActivationState(rawValue: session.activationState.rawValue) else {
         preconditionFailure()
@@ -73,10 +82,25 @@
       self.init(session: .default)
     }
 
+    /// Updates the application context to be sent to the counterpart device.
+    ///
+    /// The context is delivered opportunistically when the counterpart wakes up.
+    /// Only the most recent context is preserved; previous contexts are replaced.
+    ///
+    /// - Parameter context: The dictionary to send as application context
+    /// - Throws: An error if the context update fails
     public func updateApplicationContext(_ context: ConnectivityMessage) throws {
       try session.updateApplicationContext(context as [String: Any])
     }
 
+    /// Sends a message to the counterpart device with an optional reply.
+    ///
+    /// Requires the counterpart device to be reachable. Messages are delivered
+    /// immediately and can include a reply from the counterpart.
+    ///
+    /// - Parameters:
+    ///   - message: The dictionary message to send
+    ///   - completion: Handler called with the reply or error
     public func sendMessage(
       _ message: ConnectivityMessage,
       _ completion: @escaping (Result<ConnectivityMessage, Error>) -> Void
@@ -84,14 +108,23 @@
       session.sendMessage(
         message as [String: Any]
       ) { response in
-        // swiftlint:disable:next force_cast
-        let sendableResponse: ConnectivityMessage = response.mapValues { $0 as! any Sendable }
+        // WatchConnectivity only supports property list types which are inherently Sendable
+        let sendableResponse: ConnectivityMessage = response as! ConnectivityMessage
         completion(.success(sendableResponse))
       } errorHandler: { error in
         completion(.failure(error))
       }
     }
 
+    /// Sends binary message data to the counterpart device.
+    ///
+    /// This method provides direct binary transport for `BinaryMessagable` types.
+    /// The binary data should include a type discrimination footer created by
+    /// `BinaryMessageEncoder.encode(_:)`.
+    ///
+    /// - Parameters:
+    ///   - data: The binary message data with type footer
+    ///   - completion: Handler called with the result (reply data or error)
     public func sendMessageData(
       _ data: Data,
       _ completion: @escaping (Result<Data, Error>) -> Void
@@ -105,6 +138,11 @@
       }
     }
 
+    /// Activates the session to begin communication with the counterpart device.
+    ///
+    /// Must be called before any message exchange can occur.
+    ///
+    /// - Throws: `SundialError.sessionNotSupported` if WatchConnectivity is not supported
     public func activate() throws {
       guard WCSession.isSupported() else {
         throw SundialError.sessionNotSupported
@@ -160,8 +198,8 @@
       didReceiveMessage message: [String: Any],
       replyHandler: @escaping ([String: Any]) -> Void
     ) {
-      // swiftlint:disable:next force_cast
-      let sendableMessage: ConnectivityMessage = message.mapValues { $0 as! any Sendable }
+      // WatchConnectivity only supports property list types which are inherently Sendable
+      let sendableMessage: ConnectivityMessage = message as! ConnectivityMessage
       let handler = unsafeBitCast(replyHandler, to: ConnectivityHandler.self)
       delegate?.session(self, didReceiveMessage: sendableMessage, replyHandler: handler)
     }
@@ -170,10 +208,8 @@
       _: WCSession,
       didReceiveApplicationContext applicationContext: [String: Any]
     ) {
-      let sendableContext: ConnectivityMessage = applicationContext.mapValues {
-        // swiftlint:disable:next force_cast
-        $0 as! any Sendable
-      }
+      // WatchConnectivity only supports property list types which are inherently Sendable
+      let sendableContext: ConnectivityMessage = applicationContext as! ConnectivityMessage
       delegate?.session(
         self,
         didReceiveApplicationContext: sendableContext,
@@ -186,10 +222,8 @@
       didReceiveApplicationContext applicationContext: [String: Any],
       error: Error?
     ) {
-      let sendableContext: ConnectivityMessage = applicationContext.mapValues {
-        // swiftlint:disable:next force_cast
-        $0 as! any Sendable
-      }
+      // WatchConnectivity only supports property list types which are inherently Sendable
+      let sendableContext: ConnectivityMessage = applicationContext as! ConnectivityMessage
       delegate?.session(
         self,
         didReceiveApplicationContext: sendableContext,

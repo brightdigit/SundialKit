@@ -30,6 +30,11 @@
 public import Foundation
 public import SundialKitCore
 
+/// Protocol abstraction over Apple's WatchConnectivity framework.
+///
+/// Provides a Sendable-safe interface for managing communication between
+/// iOS and watchOS counterpart devices, including message exchange and
+/// session lifecycle management.
 public protocol ConnectivitySession: AnyObject, Sendable {
   var delegate: (any ConnectivitySessionDelegate)? { get set }
   var isReachable: Bool { get }

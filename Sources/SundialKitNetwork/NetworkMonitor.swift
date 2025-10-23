@@ -88,46 +88,35 @@ public final class NetworkMonitor<
   Monitor: PathMonitor,
   Ping: NetworkPing & Sendable
 >: NetworkMonitoring, @unchecked Sendable where Monitor.PathType: NetworkPath {
-  // MARK: - Helper Types
-  private final class WeakObserverBox {
-    weak var observer: NetworkStateObserver?
-    init(_ observer: NetworkStateObserver) {
-      self.observer = observer
-    }
-  }
-
   // MARK: - Private Properties
   private let pathMonitor: Monitor
   private let networkPing: Ping?
   private let lock = NSLock()
-  private var _pathStatus: PathStatus = .unknown
-  private var _isExpensive: Bool = false
-  private var _isConstrained: Bool = false
+  private var state: NetworkState = .initial
   private var isMonitoring: Bool = false
-  private var observers: [WeakObserverBox] = []
-  private var pingTimer: DispatchSourceTimer?
-  private var pingQueue: DispatchQueue?
+  private let observers = ObserverRegistry<any NetworkStateObserver>()
+  private var pingCoordinator: PingCoordinator<Ping>?
 
   // MARK: - Public Properties (NetworkMonitoring)
   /// The current status of the network path.
   public var pathStatus: PathStatus {
     lock.lock()
     defer { lock.unlock() }
-    return _pathStatus
+    return state.pathStatus
   }
 
   /// Indicates whether the network connection is expensive.
   public var isExpensive: Bool {
     lock.lock()
     defer { lock.unlock() }
-    return _isExpensive
+    return state.isExpensive
   }
 
   /// Indicates whether the network connection is constrained.
   public var isConstrained: Bool {
     lock.lock()
     defer { lock.unlock() }
-    return _isConstrained
+    return state.isConstrained
   }
 
   // MARK: - Initialization
@@ -144,26 +133,14 @@ public final class NetworkMonitor<
   /// Adds an observer to receive network state change notifications.
   /// Observers are held weakly to prevent retain cycles.
   /// - Parameter observer: The observer to add
-  public func addObserver(_ observer: NetworkStateObserver) {
-    lock.lock()
-    defer { lock.unlock() }
-
-    // Remove nil observers
-    observers = observers.filter { $0.observer != nil }
-
-    // Add new observer if not already present
-    if !observers.contains(where: { $0.observer === observer }) {
-      observers.append(WeakObserverBox(observer))
-    }
+  public func addObserver(_ observer: any NetworkStateObserver) {
+    observers.add(observer)
   }
 
   /// Removes an observer from receiving network state change notifications.
   /// - Parameter observer: The observer to remove
-  public func removeObserver(_ observer: NetworkStateObserver) {
-    lock.lock()
-    defer { lock.unlock() }
-
-    observers = observers.filter { $0.observer !== observer && $0.observer != nil }
+  public func removeObserver(_ observer: any NetworkStateObserver) {
+    observers.remove(observer)
   }
 
   // MARK: - Lifecycle (NetworkMonitoring)
@@ -186,7 +163,14 @@ public final class NetworkMonitor<
 
     // Set up ping monitoring if available
     if let ping = networkPing {
-      setupPingMonitoring(ping: ping, queue: queue)
+      let coordinator = PingCoordinator(ping: ping) { [weak self] in
+        self?.pathStatus ?? .unknown
+      }
+      coordinator.start(queue: queue)
+
+      lock.lock()
+      pingCoordinator = coordinator
+      lock.unlock()
     }
   }
 
@@ -198,93 +182,44 @@ public final class NetworkMonitor<
       return
     }
     isMonitoring = false
+    let coordinator = pingCoordinator
+    pingCoordinator = nil
     lock.unlock()
 
     pathMonitor.cancel()
-    stopPingMonitoring()
+    coordinator?.stop()
   }
 
   // MARK: - Private Methods
 
   private func handlePathUpdate(_ path: Monitor.PathType) {
-    let newStatus = path.pathStatus
-    let newExpensive = path.isExpensive
-    let newConstrained = path.isConstrained
-
-    var statusChanged = false
-    var expensiveChanged = false
-    var constrainedChanged = false
+    let newState = NetworkState(
+      pathStatus: path.pathStatus,
+      isExpensive: path.isExpensive,
+      isConstrained: path.isConstrained
+    )
 
     lock.lock()
-    if _pathStatus != newStatus {
-      _pathStatus = newStatus
-      statusChanged = true
-    }
-    if _isExpensive != newExpensive {
-      _isExpensive = newExpensive
-      expensiveChanged = true
-    }
-    if _isConstrained != newConstrained {
-      _isConstrained = newConstrained
-      constrainedChanged = true
-    }
-
-    let currentObservers = observers.compactMap { $0.observer }
+    let oldState = state
+    state = newState
     lock.unlock()
 
     // Notify observers outside of lock
-    if statusChanged {
-      currentObservers.forEach { $0.networkMonitor(didUpdatePathStatus: newStatus) }
+    if oldState.pathStatus != newState.pathStatus {
+      observers.notify { observer in
+        observer.networkMonitor(didUpdatePathStatus: newState.pathStatus)
+      }
     }
-    if expensiveChanged {
-      currentObservers.forEach { $0.networkMonitor(didUpdateExpensive: newExpensive) }
+    if oldState.isExpensive != newState.isExpensive {
+      observers.notify { observer in
+        observer.networkMonitor(didUpdateExpensive: newState.isExpensive)
+      }
     }
-    if constrainedChanged {
-      currentObservers.forEach { $0.networkMonitor(didUpdateConstrained: newConstrained) }
+    if oldState.isConstrained != newState.isConstrained {
+      observers.notify { observer in
+        observer.networkMonitor(didUpdateConstrained: newState.isConstrained)
+      }
     }
-  }
-
-  private func setupPingMonitoring(ping: Ping, queue: DispatchQueue) {
-    pingQueue = queue
-
-    // Use DispatchSourceTimer for better Sendable compliance
-    let timer = DispatchSource.makeTimerSource(queue: queue)
-    timer.schedule(deadline: .now(), repeating: ping.timeInterval)
-    timer.setEventHandler { [weak self] in
-      self?.performPing(ping)
-    }
-
-    lock.lock()
-    pingTimer = timer
-    lock.unlock()
-
-    timer.resume()
-
-    // Perform initial ping
-    performPing(ping)
-  }
-
-  private func performPing(_ ping: Ping) {
-    let currentStatus = pathStatus
-
-    guard ping.shouldPing(onStatus: currentStatus) else {
-      return
-    }
-
-    ping.onPing { [weak self] _ in
-      // Ping completed - could update internal state if needed
-      // For now, just ensuring the ping executes
-      _ = self?.pathStatus
-    }
-  }
-
-  private func stopPingMonitoring() {
-    lock.lock()
-    let timer = pingTimer
-    pingTimer = nil
-    lock.unlock()
-
-    timer?.cancel()
   }
 }
 
