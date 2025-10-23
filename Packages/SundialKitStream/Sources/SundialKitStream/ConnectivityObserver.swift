@@ -74,30 +74,21 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
 
   internal let session: any ConnectivitySession
   private let messageRouter: MessageRouter
-  private let messageDecoder: MessageDecoder?
-
-  // Current state
-  private var state: ConnectivityState = .initial
-
-  // Stream continuations for active subscribers
-  private var activationContinuations: [UUID: AsyncStream<ActivationState>.Continuation] = [:]
-  private var activationCompletionContinuations:
-    [UUID: AsyncStream<Result<ActivationState, any Error>>.Continuation] = [:]
-  private var reachabilityContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
-  private var pairedAppInstalledContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
-  private var pairedContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
-  private var messageReceivedContinuations:
-    [UUID: AsyncStream<ConnectivityReceiveResult>.Continuation] = [:]
-  private var typedMessageContinuations: [UUID: AsyncStream<any Messagable>.Continuation] = [:]
-  private var sendResultContinuations: [UUID: AsyncStream<ConnectivitySendResult>.Continuation] =
-    [:]
+  private let continuationManager: StreamContinuationManager
+  private let stateManager: ConnectivityStateManager
+  private let messageDistributor: MessageDistributor
 
   // MARK: - Initialization
 
   internal init(session: any ConnectivitySession, messageDecoder: MessageDecoder? = nil) {
     self.session = session
     self.messageRouter = MessageRouter(session: session)
-    self.messageDecoder = messageDecoder
+    self.continuationManager = StreamContinuationManager()
+    self.stateManager = ConnectivityStateManager(continuationManager: continuationManager)
+    self.messageDistributor = MessageDistributor(
+      continuationManager: continuationManager,
+      messageDecoder: messageDecoder
+    )
     session.delegate = self
   }
 
@@ -129,34 +120,34 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
 
   /// Gets the current activation state snapshot
   /// - Returns: The current activation state, or nil if not yet activated
-  public func getCurrentActivationState() -> ActivationState? {
-    state.activationState
+  public func getCurrentActivationState() async -> ActivationState? {
+    await stateManager.activationState
   }
 
   /// Gets the last activation error
   /// - Returns: The last activation error, or nil if no error occurred
-  public func getCurrentActivationError() -> (any Error)? {
-    state.activationError
+  public func getCurrentActivationError() async -> (any Error)? {
+    await stateManager.activationError
   }
 
   /// Gets the current reachability status
   /// - Returns: Whether the counterpart is reachable
-  public func isReachable() -> Bool {
-    state.isReachable
+  public func isReachable() async -> Bool {
+    await stateManager.isReachable
   }
 
   /// Gets the current paired app installed status
   /// - Returns: Whether the companion app is installed
-  public func isPairedAppInstalled() -> Bool {
-    state.isPairedAppInstalled
+  public func isPairedAppInstalled() async -> Bool {
+    await stateManager.isPairedAppInstalled
   }
 
   #if os(iOS)
     /// Gets the current paired status (iOS only)
     /// - Returns: Whether an Apple Watch is paired
     @available(watchOS, unavailable)
-    public func isPaired() -> Bool {
-      state.isPaired
+    public func isPaired() async -> Bool {
+      await stateManager.isPaired
     }
   #endif
 
@@ -167,15 +158,17 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
   public func activationStates() -> AsyncStream<ActivationState> {
     AsyncStream { continuation in
       let id = UUID()
-      activationContinuations[id] = continuation
+      Task {
+        await continuationManager.registerActivation(id: id, continuation: continuation)
 
-      // Send current value immediately if available
-      if let currentActivationState = state.activationState {
-        continuation.yield(currentActivationState)
+        // Send current value immediately if available
+        if let currentActivationState = await stateManager.activationState {
+          continuation.yield(currentActivationState)
+        }
       }
 
       continuation.onTermination = { [weak self] _ in
-        Task { await self?.removeActivationContinuation(id: id) }
+        Task { await self?.continuationManager.removeActivation(id: id) }
       }
     }
   }
@@ -185,10 +178,12 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
   public func activationCompletionStream() -> AsyncStream<Result<ActivationState, Error>> {
     AsyncStream { continuation in
       let id = UUID()
-      activationCompletionContinuations[id] = continuation
+      Task {
+        await continuationManager.registerActivationCompletion(id: id, continuation: continuation)
+      }
 
       continuation.onTermination = { [weak self] _ in
-        Task { await self?.removeActivationCompletionContinuation(id: id) }
+        Task { await self?.continuationManager.removeActivationCompletion(id: id) }
       }
     }
   }
@@ -198,13 +193,16 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
   public func reachabilityUpdates() -> AsyncStream<Bool> {
     AsyncStream { continuation in
       let id = UUID()
-      reachabilityContinuations[id] = continuation
+      Task {
+        await continuationManager.registerReachability(id: id, continuation: continuation)
 
-      // Send current value immediately
-      continuation.yield(state.isReachable)
+        // Send current value immediately
+        let isReachable = await stateManager.isReachable
+        continuation.yield(isReachable)
+      }
 
       continuation.onTermination = { [weak self] _ in
-        Task { await self?.removeReachabilityContinuation(id: id) }
+        Task { await self?.continuationManager.removeReachability(id: id) }
       }
     }
   }
@@ -214,13 +212,16 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
   public func pairedAppInstalledUpdates() -> AsyncStream<Bool> {
     AsyncStream { continuation in
       let id = UUID()
-      pairedAppInstalledContinuations[id] = continuation
+      Task {
+        await continuationManager.registerPairedAppInstalled(id: id, continuation: continuation)
 
-      // Send current value immediately
-      continuation.yield(state.isPairedAppInstalled)
+        // Send current value immediately
+        let isPairedAppInstalled = await stateManager.isPairedAppInstalled
+        continuation.yield(isPairedAppInstalled)
+      }
 
       continuation.onTermination = { [weak self] _ in
-        Task { await self?.removePairedAppInstalledContinuation(id: id) }
+        Task { await self?.continuationManager.removePairedAppInstalled(id: id) }
       }
     }
   }
@@ -232,13 +233,16 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
     public func pairedUpdates() -> AsyncStream<Bool> {
       AsyncStream { continuation in
         let id = UUID()
-        pairedContinuations[id] = continuation
+        Task {
+          await continuationManager.registerPaired(id: id, continuation: continuation)
 
-        // Send current value immediately
-        continuation.yield(currentIsPaired)
+          // Send current value immediately
+          let isPaired = await stateManager.isPaired
+          continuation.yield(isPaired)
+        }
 
         continuation.onTermination = { [weak self] _ in
-          Task { await self?.removePairedContinuation(id: id) }
+          Task { await self?.continuationManager.removePaired(id: id) }
         }
       }
     }
@@ -249,10 +253,12 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
   public func messageStream() -> AsyncStream<ConnectivityReceiveResult> {
     AsyncStream { continuation in
       let id = UUID()
-      messageReceivedContinuations[id] = continuation
+      Task {
+        await continuationManager.registerMessageReceived(id: id, continuation: continuation)
+      }
 
       continuation.onTermination = { [weak self] _ in
-        Task { await self?.removeMessageReceivedContinuation(id: id) }
+        Task { await self?.continuationManager.removeMessageReceived(id: id) }
       }
     }
   }
@@ -267,10 +273,12 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
   public func typedMessageStream() -> AsyncStream<Messagable> {
     AsyncStream { continuation in
       let id = UUID()
-      typedMessageContinuations[id] = continuation
+      Task {
+        await continuationManager.registerTypedMessage(id: id, continuation: continuation)
+      }
 
       continuation.onTermination = { [weak self] _ in
-        Task { await self?.removeTypedMessageContinuation(id: id) }
+        Task { await self?.continuationManager.removeTypedMessage(id: id) }
       }
     }
   }
@@ -280,10 +288,12 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
   public func sendResultStream() -> AsyncStream<ConnectivitySendResult> {
     AsyncStream { continuation in
       let id = UUID()
-      sendResultContinuations[id] = continuation
+      Task {
+        await continuationManager.registerSendResult(id: id, continuation: continuation)
+      }
 
       continuation.onTermination = { [weak self] _ in
-        Task { await self?.removeSendResultContinuation(id: id) }
+        Task { await self?.continuationManager.removeSendResult(id: id) }
       }
     }
   }
@@ -299,18 +309,14 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
       let sendResult = try await messageRouter.send(message)
 
       // Notify send result stream subscribers
-      for continuation in sendResultContinuations.values {
-        continuation.yield(sendResult)
-      }
+      await messageDistributor.notifySendResult(sendResult)
 
       return sendResult
     } catch {
       let sendResult = ConnectivitySendResult(message: message, context: .failure(error))
 
       // Notify send result stream subscribers
-      for continuation in sendResultContinuations.values {
-        continuation.yield(sendResult)
-      }
+      await messageDistributor.notifySendResult(sendResult)
 
       throw error
     }
@@ -357,9 +363,7 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
         let sendResult = try await messageRouter.sendBinary(data, originalMessage: originalMessage)
 
         // Notify send result stream subscribers
-        for continuation in sendResultContinuations.values {
-          continuation.yield(sendResult)
-        }
+        await messageDistributor.notifySendResult(sendResult)
 
         return sendResult
       } catch {
@@ -369,9 +373,7 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
         )
 
         // Notify send result stream subscribers
-        for continuation in sendResultContinuations.values {
-          continuation.yield(sendResult)
-        }
+        await messageDistributor.notifySendResult(sendResult)
 
         throw error
       }
@@ -439,209 +441,37 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate {
 
   // MARK: - Internal Handlers
 
-  private func handleActivation(_ activationState: ActivationState, error: Error?) {
-    #if os(iOS)
-      self.state = ConnectivityState(
-        activationState: activationState,
-        activationError: error,
-        isReachable: session.isReachable,
-        isPairedAppInstalled: session.isPairedAppInstalled,
-        isPaired: session.isPaired
-      )
-    #else
-      self.state = ConnectivityState(
-        activationState: activationState,
-        activationError: error,
-        isReachable: session.isReachable,
-        isPairedAppInstalled: session.isPairedAppInstalled,
-        isPaired: false
-      )
-    #endif
-
-    // Notify all activation state subscribers
-    for continuation in activationContinuations.values {
-      continuation.yield(activationState)
-    }
-
-    // Notify activation completion subscribers with Result
-    let result: Result<ActivationState, Error> =
-      if let error = error {
-        .failure(error)
-      } else {
-        .success(activationState)
-      }
-    for continuation in activationCompletionContinuations.values {
-      continuation.yield(result)
-    }
-
-    for continuation in reachabilityContinuations.values {
-      continuation.yield(state.isReachable)
-    }
-
-    for continuation in pairedAppInstalledContinuations.values {
-      continuation.yield(state.isPairedAppInstalled)
-    }
-
-    #if os(iOS)
-      for continuation in pairedContinuations.values {
-        continuation.yield(state.isPaired)
-      }
-    #endif
+  private func handleActivation(_ activationState: ActivationState, error: Error?) async {
+    await stateManager.handleActivation(activationState, error: error)
   }
 
-  private func handleReachabilityChange(_ isReachable: Bool) {
-    #if os(iOS)
-      state = ConnectivityState(
-        activationState: state.activationState,
-        activationError: state.activationError,
-        isReachable: isReachable,
-        isPairedAppInstalled: state.isPairedAppInstalled,
-        isPaired: state.isPaired
-      )
-    #else
-      state = ConnectivityState(
-        activationState: state.activationState,
-        activationError: state.activationError,
-        isReachable: isReachable,
-        isPairedAppInstalled: state.isPairedAppInstalled,
-        isPaired: false
-      )
-    #endif
-
-    for continuation in reachabilityContinuations.values {
-      continuation.yield(isReachable)
-    }
+  private func handleReachabilityChange(_ isReachable: Bool) async {
+    await stateManager.updateReachability(isReachable)
   }
 
-  private func handleCompanionStateChange(_ session: any ConnectivitySession) {
-    #if os(iOS)
-      state = ConnectivityState(
-        activationState: state.activationState,
-        activationError: state.activationError,
-        isReachable: state.isReachable,
-        isPairedAppInstalled: session.isPairedAppInstalled,
-        isPaired: session.isPaired
-      )
-    #else
-      state = ConnectivityState(
-        activationState: state.activationState,
-        activationError: state.activationError,
-        isReachable: state.isReachable,
-        isPairedAppInstalled: session.isPairedAppInstalled,
-        isPaired: false
-      )
-    #endif
-
-    for continuation in pairedAppInstalledContinuations.values {
-      continuation.yield(state.isPairedAppInstalled)
-    }
-
-    #if os(iOS)
-      for continuation in pairedContinuations.values {
-        continuation.yield(state.isPaired)
-      }
-    #endif
+  private func handleCompanionStateChange(_ session: any ConnectivitySession) async {
+    await stateManager.updateCompanionState(
+      isPairedAppInstalled: session.isPairedAppInstalled,
+      isPaired: session.isPaired
+    )
   }
 
   private func handleMessage(
     _ message: ConnectivityMessage,
     replyHandler: @escaping @Sendable ([String: any Sendable]) -> Void
-  ) {
-    // Send to raw stream subscribers
-    let result = ConnectivityReceiveResult(message: message, context: .replyWith(replyHandler))
-    for continuation in messageReceivedContinuations.values {
-      continuation.yield(result)
-    }
-
-    // Decode and send to typed stream subscribers
-    if let decoder = messageDecoder {
-      do {
-        let decoded = try decoder.decode(message)
-        for continuation in typedMessageContinuations.values {
-          continuation.yield(decoded)
-        }
-      } catch {
-        // Decoding failed - log but don't crash (raw stream still gets the message)
-        print("Failed to decode message: \(error)")
-      }
-    }
+  ) async {
+    await messageDistributor.handleMessage(message, replyHandler: replyHandler)
   }
 
-  private func handleApplicationContext(_ applicationContext: ConnectivityMessage, error: Error?) {
-    // Send to raw stream subscribers
-    let result = ConnectivityReceiveResult(
-      message: applicationContext, context: .applicationContext
-    )
-    for continuation in messageReceivedContinuations.values {
-      continuation.yield(result)
-    }
-
-    // Decode and send to typed stream subscribers if no error
-    if error == nil, let decoder = messageDecoder {
-      do {
-        let decoded = try decoder.decode(applicationContext)
-        for continuation in typedMessageContinuations.values {
-          continuation.yield(decoded)
-        }
-      } catch {
-        // Decoding failed - log but don't crash (raw stream still gets the message)
-        print("Failed to decode application context: \(error)")
-      }
-    }
+  private func handleApplicationContext(_ applicationContext: ConnectivityMessage, error: Error?)
+    async
+  {
+    await messageDistributor.handleApplicationContext(applicationContext, error: error)
   }
 
-  private func handleBinaryMessage(_ data: Data, replyHandler: @escaping @Sendable (Data) -> Void) {
-    // Decode and send to typed stream subscribers
-    if let decoder = messageDecoder {
-      do {
-        let decoded = try decoder.decodeBinary(data)
-        for continuation in typedMessageContinuations.values {
-          continuation.yield(decoded)
-        }
-      } catch {
-        // Decoding failed - log the error
-        print("Failed to decode binary message: \(error)")
-      }
-    }
-  }
-
-  private func notifySendResult(_ result: ConnectivitySendResult) {
-    for continuation in sendResultContinuations.values {
-      continuation.yield(result)
-    }
-  }
-
-  // MARK: - Continuation Management
-
-  private func removeActivationContinuation(id: UUID) {
-    activationContinuations.removeValue(forKey: id)
-  }
-
-  private func removeActivationCompletionContinuation(id: UUID) {
-    activationCompletionContinuations.removeValue(forKey: id)
-  }
-
-  private func removeReachabilityContinuation(id: UUID) {
-    reachabilityContinuations.removeValue(forKey: id)
-  }
-
-  private func removePairedAppInstalledContinuation(id: UUID) {
-    pairedAppInstalledContinuations.removeValue(forKey: id)
-  }
-
-  private func removePairedContinuation(id: UUID) {
-    pairedContinuations.removeValue(forKey: id)
-  }
-
-  private func removeMessageReceivedContinuation(id: UUID) {
-    messageReceivedContinuations.removeValue(forKey: id)
-  }
-
-  private func removeTypedMessageContinuation(id: UUID) {
-    typedMessageContinuations.removeValue(forKey: id)
-  }
-
-  private func removeSendResultContinuation(id: UUID) {
-    sendResultContinuations.removeValue(forKey: id)
+  private func handleBinaryMessage(_ data: Data, replyHandler: @escaping @Sendable (Data) -> Void)
+    async
+  {
+    await messageDistributor.handleBinaryMessage(data, replyHandler: replyHandler)
   }
 }

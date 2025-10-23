@@ -60,7 +60,7 @@ public import SundialKitCore
 /// let messageDecoder = MessageDecoder(messagableTypes: [Message.self])
 /// let message = try messageDecoder.decode(connectivityMessage)
 /// ```
-public struct MessageDecoder {
+public struct MessageDecoder: Sendable {
   private let messagableTypes: [String: any Messagable.Type]
 
   /// Creates a `MessageDecoder` based on a list of `Messagable` types.
