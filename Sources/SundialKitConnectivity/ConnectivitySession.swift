@@ -39,9 +39,7 @@ public protocol ConnectivitySession: AnyObject, Sendable {
   var delegate: (any ConnectivitySessionDelegate)? { get set }
   var isReachable: Bool { get }
 
-  #if os(iOS)
-    var isPaired: Bool { get }
-  #endif
+  var isPaired: Bool { get }
   var isPairedAppInstalled: Bool { get }
   var activationState: ActivationState { get }
 

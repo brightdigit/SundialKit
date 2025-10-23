@@ -152,7 +152,7 @@ internal actor ConnectivityStateManager {
         activationError: state.activationError,
         isReachable: state.isReachable,
         isPairedAppInstalled: isPairedAppInstalled,
-        isPaired: false
+        isPaired: true
       )
     #endif
 

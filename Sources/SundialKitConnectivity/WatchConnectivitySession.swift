@@ -53,9 +53,12 @@
     }
 
     /// Whether the iPhone is paired with an Apple Watch (iOS only).
-    @available(watchOS, unavailable)
     public var isPaired: Bool {
-      session.isPaired
+      #if os(watchOS)
+        true
+      #else
+        session.isPaired
+      #endif
     }
 
     /// Whether the counterpart app is installed on the paired device.
@@ -109,7 +112,7 @@
         message as [String: Any]
       ) { response in
         // WatchConnectivity only supports property list types which are inherently Sendable
-        let sendableResponse: ConnectivityMessage = response as! ConnectivityMessage
+        let sendableResponse = ConnectivityMessage(forceCasting: response)
         completion(.success(sendableResponse))
       } errorHandler: { error in
         completion(.failure(error))
@@ -199,7 +202,7 @@
       replyHandler: @escaping ([String: Any]) -> Void
     ) {
       // WatchConnectivity only supports property list types which are inherently Sendable
-      let sendableMessage: ConnectivityMessage = message as! ConnectivityMessage
+      let sendableMessage = ConnectivityMessage(forceCasting: message)
       let handler = unsafeBitCast(replyHandler, to: ConnectivityHandler.self)
       delegate?.session(self, didReceiveMessage: sendableMessage, replyHandler: handler)
     }
@@ -209,7 +212,7 @@
       didReceiveApplicationContext applicationContext: [String: Any]
     ) {
       // WatchConnectivity only supports property list types which are inherently Sendable
-      let sendableContext: ConnectivityMessage = applicationContext as! ConnectivityMessage
+      let sendableContext = ConnectivityMessage(forceCasting: applicationContext)
       delegate?.session(
         self,
         didReceiveApplicationContext: sendableContext,
@@ -223,7 +226,7 @@
       error: Error?
     ) {
       // WatchConnectivity only supports property list types which are inherently Sendable
-      let sendableContext: ConnectivityMessage = applicationContext as! ConnectivityMessage
+      let sendableContext = ConnectivityMessage(forceCasting: applicationContext)
       delegate?.session(
         self,
         didReceiveApplicationContext: sendableContext,
