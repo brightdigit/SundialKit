@@ -141,3 +141,4 @@ xcuserdata
 **/*.pxd/QuickLook/*.*
 #**/*.appiconset/*.png
 #PLists/**/*.plist
+swiftpm

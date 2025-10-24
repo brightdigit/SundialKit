@@ -1,12 +1,12 @@
 import SundialKit
 import SwiftUI
 
-extension WCMessage {
+extension ConnectivityMessage {
   enum Properties {
     static let colorValue = "colorValue"
   }
 
-  static func message(fromColor color: Color) -> WCMessage? {
+  static func message(fromColor color: Color) -> ConnectivityMessage? {
     guard let value = color.value else {
       return nil
     }

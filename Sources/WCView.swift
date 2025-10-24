@@ -1,7 +1,7 @@
 import SwiftUI
 import WatchConnectivity
 
-struct ContentView: View {
+struct WCView: View {
   @EnvironmentObject var object: SundailObject
   #if os(iOS)
     static let padding = 20.0
@@ -24,8 +24,10 @@ struct ContentView: View {
   var body: some View {
     #if os(watchOS)
       watchOSBody.onAppear(perform: self.object.forceActivate)
-    #else
+    #elseif os(iOS)
       iOSBody.onAppear(perform: self.object.forceActivate)
+    #else
+      Never()
     #endif
   }
 
@@ -53,6 +55,7 @@ struct ContentView: View {
     }
   }
 
+  #if os(watchOS)
   var watchOSBody: some View {
     VStack {
       HStack {
@@ -60,7 +63,10 @@ struct ContentView: View {
           Rectangle().fill(object.lastColorReceived).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit)
         }
         VStack {
-          Rectangle().fill(object.lastColorSent).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit)
+            ZStack{
+              Rectangle().fill(object.lastColorSentWaiting).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit)
+              Rectangle().fill(object.lastColorSentReplied).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit).padding(16.0)
+            }
         }
       }
       HStack {
@@ -89,7 +95,9 @@ struct ContentView: View {
       }.padding()
     }
   }
+  #endif
 
+  #if os(iOS)
   var iOSBody: some View {
     Form {
       Section(header: Text("Color Status")) {
@@ -104,7 +112,10 @@ struct ContentView: View {
               }
             }
             VStack {
-              Rectangle().fill(object.lastColorSent).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit)
+              ZStack{
+                Rectangle().fill(object.lastColorSentWaiting).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit)
+                Rectangle().fill(object.lastColorSentReplied).cornerRadius(8.0).aspectRatio(1.0, contentMode: .fit).padding(25.0)
+              }
               HStack {
                 Image(systemName: "iphone.radiowaves.left.and.right")
                 Text("Sent").font(.system(size: 12.0))
@@ -114,7 +125,6 @@ struct ContentView: View {
           }
         }.padding()
       }
-      #if os(iOS)
         Section(header: Text("Communication Status")) {
           List {
             HStack {
@@ -140,23 +150,23 @@ struct ContentView: View {
             }.opacity(self.object.lastError != nil ? 1.0 : 0.2)
           }
         }
-      #endif
       Section(header: Text("send color")) {
         HStack {
           ForEach(0 ..< 6) { index in
             Rectangle().fill(Self.colors[index]).aspectRatio(contentMode: .fit).cornerRadius(4.0).onTapGesture {
-              print("Tapd Updated: \(String(Self.colors[index].value!, radix: 16, uppercase: true))")
               object.sendColor(Self.colors[index])
             }
           }
         }.buttonStyle(self.borderlessButtonStyle()).padding()
       }
     }
+    
   }
+#endif
 }
 
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
-    ContentView().environmentObject(SundailObject())
+    WCView().environmentObject(SundailObject())
   }
 }
