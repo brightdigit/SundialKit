@@ -31,12 +31,19 @@
   public import Foundation
   public import SundialKitCore
   import WatchConnectivity
+public import SundialKitNetwork
 
   /// Non-reactive manager for WatchConnectivity sessions.
   ///
   /// `ConnectivityManager` provides a protocol-based abstraction over Apple's
   /// WatchConnectivity framework without Combine dependencies. It manages session
   /// lifecycle, message routing, and state changes through an observer pattern.
+  ///
+  /// ## Thread Safety
+  ///
+  /// This actor ensures thread-safe access to session state. Public methods are
+  /// `nonisolated` where appropriate and use Tasks internally for actor-isolated
+  /// operations, providing a synchronous API while maintaining thread safety.
   ///
   /// ## Usage
   ///
@@ -57,14 +64,17 @@
   /// ```
   @available(macOS, unavailable)
   @available(tvOS, unavailable)
-  public final class ConnectivityManager: ConnectivityManagement, ConnectivitySessionDelegate {
+  public actor ConnectivityManager:
+    ConnectivityManagement,
+    ConnectivityMessaging,
+    ConnectivityObserverManaging,
+    ConnectivityDelegateHandling,
+    ConnectivitySessionDelegate
+  {
     // MARK: - Properties
 
     /// The underlying connectivity session.
-    private let session: any ConnectivitySession
-
-    /// Lock for thread-safe access to mutable state.
-    private let lock = NSLock()
+    public let session: any ConnectivitySession
 
     /// Storage for activation continuation during async activation.
     private var activationContinuation: CheckedContinuation<Void, any Error>?
@@ -72,53 +82,24 @@
     /// Storage for activation timeout task.
     private var activationTimeoutTask: Task<Void, Never>?
 
-    /// Current activation state of the session.
-    private var internalActivationState: ActivationState = .notActivated
 
-    /// Current reachability status.
-    private var internalIsReachable = false
-
-    /// Whether the companion app is installed.
-    private var internalIsPairedAppInstalled = false
-
-    #if os(iOS)
-      /// Whether an Apple Watch is paired (iOS only).
-      private var internalIsPaired = false
-    #endif
-
-    /// Weak references to registered observers.
-    private var observers = NSHashTable<AnyObject>.weakObjects()
+    /// Registry for managing observer references.
+    public let observerRegistry = ObserverRegistry<any ConnectivityStateObserver>()
 
     // MARK: - ConnectivityManagement Protocol
 
     /// The current activation state of the connectivity session.
-    public var activationState: ActivationState {
-      lock.lock()
-      defer { lock.unlock() }
-      return internalActivationState
-    }
-
+    public var activationState: ActivationState = .notActivated
+    
     /// Indicates whether the counterpart device is currently reachable.
-    public var isReachable: Bool {
-      lock.lock()
-      defer { lock.unlock() }
-      return internalIsReachable
-    }
+    public var isReachable: Bool  = false
 
     /// Indicates whether the companion app is installed on the paired device.
-    public var isPairedAppInstalled: Bool {
-      lock.lock()
-      defer { lock.unlock() }
-      return internalIsPairedAppInstalled
-    }
+    public  var isPairedAppInstalled: Bool = false
 
     #if os(iOS)
       /// Indicates whether an Apple Watch is currently paired with this iPhone.
-      public var isPaired: Bool {
-        lock.lock()
-        defer { lock.unlock() }
-        return internalIsPaired
-      }
+      public  var isPaired: Bool = false
     #endif
 
     // MARK: - Initialization
@@ -131,16 +112,14 @@
       self.session.delegate = self
 
       // Initialize state from session
-      lock.lock()
-      internalActivationState = session.activationState
-      internalIsReachable = session.isReachable
-      internalIsPairedAppInstalled = session.isPairedAppInstalled
-      internalIsPaired = session.isPaired
-      lock.unlock()
+      self.activationState = session.activationState
+      self.isReachable = session.isReachable
+      self.isPairedAppInstalled = session.isPairedAppInstalled
+      self.isPaired = session.isPaired
     }
 
     /// Creates a connectivity manager with the default WatchConnectivity session.
-    public convenience init() {
+    public init() {
       self.init(session: WatchConnectivitySession())
     }
 
@@ -149,7 +128,7 @@
     /// Activates the connectivity session.
     ///
     /// - Throws: `ConnectivityError` if activation fails.
-    public func activate() throws {
+    public nonisolated func activate() throws {
       try session.activate()
     }
 
@@ -163,71 +142,77 @@
     /// - Throws: `ConnectivityError` if activation fails or times out
     public func activate(timeout: TimeInterval = 30) async throws {
       // Check if already activated
-      if activationState == .activated {
+      if await activationState == .activated {
         return
       }
 
       return try await withCheckedThrowingContinuation { continuation in
-        lock.lock()
-
-        // Check if activation is already in progress
-        if activationContinuation != nil {
-          lock.unlock()
-          continuation.resume(throwing: ConnectivityError.sessionNotActivated)
-          return
-        }
-
-        // Store continuation
-        activationContinuation = continuation
-        lock.unlock()
-
-        // Start timeout task
-        let timeoutTask = Task {
-          try await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
-
-          lock.lock()
-          if let storedContinuation = activationContinuation {
-            activationContinuation = nil
-            activationTimeoutTask = nil
-            lock.unlock()
-            storedContinuation.resume(throwing: ConnectivityError.transferTimedOut)
-          } else {
-            lock.unlock()
+        Task {
+          // Check if activation is already in progress
+          if await activationContinuation != nil {
+            continuation.resume(throwing: ConnectivityError.sessionNotActivated)
+            return
           }
-        }
 
-        // Store timeout task
-        lock.lock()
-        activationTimeoutTask = timeoutTask
-        lock.unlock()
+          // Store continuation
+          await setActivationContinuation(continuation)
 
-        // Activate session
-        do {
-          try session.activate()
-        } catch {
-          lock.lock()
-          if let storedContinuation = activationContinuation {
-            activationContinuation = nil
-            activationTimeoutTask?.cancel()
-            activationTimeoutTask = nil
-            lock.unlock()
+          // Start timeout task
+          let timeoutTask = Task {
+            try await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
 
-            // Map error to ConnectivityError
-            if let wcError = error as? WCError {
-              storedContinuation.resume(throwing: ConnectivityError(wcError: wcError))
-            } else {
-              storedContinuation.resume(throwing: ConnectivityError.sessionNotSupported)
-            }
-          } else {
-            lock.unlock()
+            await handleActivationTimeout()
           }
-        }
 
-        // Note: The continuation will be resumed in the delegate callback
+          // Store timeout task
+          await setActivationTimeoutTask(timeoutTask)
+
+          // Activate session
+          do {
+            try session.activate()
+          } catch {
+            await handleActivationError(error)
+          }
+
+          // Note: The continuation will be resumed in the delegate callback
+        }
       }
     }
 
-    // MARK: - Messaging
+    // MARK: - Private Activation Helpers
+
+    private func setActivationContinuation(_ continuation: CheckedContinuation<Void, any Error>) {
+      activationContinuation = continuation
+    }
+
+    private func setActivationTimeoutTask(_ task: Task<Void, Never>) {
+      activationTimeoutTask = task
+    }
+
+    private func handleActivationTimeout() {
+      if let storedContinuation = activationContinuation {
+        activationContinuation = nil
+        activationTimeoutTask = nil
+        storedContinuation.resume(throwing: ConnectivityError.transferTimedOut)
+      }
+    }
+
+    private func handleActivationError(_ error: any Error) {
+      if let storedContinuation = activationContinuation {
+        activationContinuation = nil
+        activationTimeoutTask?.cancel()
+        activationTimeoutTask = nil
+
+        // Map error to ConnectivityError
+        if let wcError = error as? WCError {
+          storedContinuation.resume(throwing: ConnectivityError(wcError: wcError))
+        } else {
+          storedContinuation.resume(throwing: ConnectivityError.sessionNotSupported)
+        }
+      }
+    }
+
+    // MARK: - ConnectivityMessaging Protocol
 
     /// Sends a message to the counterpart device.
     ///
@@ -235,7 +220,7 @@
     ///   - message: The message dictionary to send.
     ///   - replyHandler: Called when a reply is received.
     ///   - errorHandler: Called if sending fails.
-    public func sendMessage(
+    public nonisolated func sendMessage(
       _ message: ConnectivityMessage,
       replyHandler: @escaping (ConnectivityMessage) -> Void,
       errorHandler: @escaping (any Error) -> Void
@@ -250,110 +235,44 @@
       }
     }
 
-    /// Sends a message with intelligent routing and timeout handling.
-    ///
-    /// This method implements smart message routing:
-    /// - When reachable: Uses `sendMessage` for immediate delivery with reply
-    /// - When not reachable but app installed: Falls back to `updateApplicationContext`
-    /// - When companion unavailable: Throws `ConnectivityError`
-    ///
-    /// - Parameters:
-    ///   - message: The message dictionary to send (max 65KB)
-    ///   - replyTimeout: Maximum time to wait for reply (default: 10 seconds)
-    /// - Returns: The reply message if reachable, empty dictionary if context updated
-    /// - Throws: `ConnectivityError` if message cannot be delivered
-    public func send(
-      message: ConnectivityMessage,
-      replyTimeout: TimeInterval = 10
-    ) async throws -> ConnectivityMessage {
-      // Validate message size (65KB limit for WatchConnectivity)
-      let maxSize = 65_536
-      if let data = try? JSONSerialization.data(withJSONObject: message),
-        data.count > maxSize
-      {
-        throw ConnectivityError.payloadTooLarge
-      }
-
-      // Check reachability
-      if isReachable {
-        // Use sendMessage for immediate delivery with reply
-        return try await withCheckedThrowingContinuation { continuation in
-          var didResume = false
-          let lock = NSLock()
-
-          // Set up timeout
-          let timeoutTask = Task {
-            try await Task.sleep(nanoseconds: UInt64(replyTimeout * 1_000_000_000))
-
-            lock.lock()
-            if !didResume {
-              didResume = true
-              lock.unlock()
-              continuation.resume(throwing: ConnectivityError.messageReplyTimedOut)
-            } else {
-              lock.unlock()
-            }
-          }
-
-          // Send message
-          session.sendMessage(message) { result in
-            lock.lock()
-            if !didResume {
-              didResume = true
-              lock.unlock()
-              timeoutTask.cancel()
-
-              switch result {
-              case .success(let reply):
-                continuation.resume(returning: reply)
-              case .failure(let error):
-                if let wcError = error as? WCError {
-                  continuation.resume(throwing: ConnectivityError(wcError: wcError))
-                } else {
-                  continuation.resume(throwing: ConnectivityError.deliveryFailed)
-                }
-              }
-            } else {
-              lock.unlock()
-            }
-          }
-        }
-      } else if isPairedAppInstalled {
-        // Fallback to updateApplicationContext when not reachable
-        try updateApplicationContext(message)
-        // Return empty dictionary since context update has no reply
-        return [:]
-      } else {
-        // Companion is not available
-        throw ConnectivityError.companionAppNotInstalled
-      }
-    }
-
     /// Updates the application context.
     ///
     /// - Parameter context: The context dictionary to send.
     /// - Throws: `ConnectivityError` if the update fails.
-    public func updateApplicationContext(_ context: ConnectivityMessage) throws {
+    public nonisolated func updateApplicationContext(_ context: ConnectivityMessage) throws {
       try session.updateApplicationContext(context)
     }
 
-    // MARK: - ConnectivitySessionDelegate
+    // MARK: - ConnectivityObserverManaging Protocol
 
-    /// Called when session activation completes.
-    public func session(
-      _ session: any ConnectivitySession,
-      activationDidCompleteWith activationState: ActivationState,
-      error: (any Error)?
-    ) {
-      lock.lock()
-      internalActivationState = activationState
+    /// Adds an observer for state changes.
+    ///
+    /// - Parameter observer: The observer to add.
+    /// - Note: Observers are stored with strong references - caller must manage lifecycle.
+    public nonisolated func addObserver(_ observer: any ConnectivityStateObserver) {
+      Task {
+        await observerRegistry.add(observer)
+      }
+    }
 
+    /// Removes observers matching the predicate.
+    ///
+    /// - Parameter predicate: Closure to identify observers to remove.
+    public nonisolated func removeObservers(where predicate: @Sendable @escaping (any ConnectivityStateObserver) -> Bool) {
+      Task {
+        await observerRegistry.removeAll(where: predicate)
+      }
+    }
+
+    // MARK: - ConnectivityDelegateHandling Protocol
+
+    private func isolatedHandleActivation(_ state: ActivationState, error: (any Error)?) {
+      
       // Resume activation continuation if present
       if let continuation = activationContinuation {
         activationContinuation = nil
         activationTimeoutTask?.cancel()
         activationTimeoutTask = nil
-        lock.unlock()
 
         if let error = error {
           // Map error to ConnectivityError
@@ -362,230 +281,109 @@
           } else {
             continuation.resume(throwing: ConnectivityError.sessionNotSupported)
           }
-        } else if activationState == .activated {
+        } else if state == .activated {
           continuation.resume()
         } else {
           continuation.resume(throwing: ConnectivityError.sessionNotActivated)
         }
-      } else {
-        lock.unlock()
       }
 
       // Notify observers of activation state change
+      notifyActivationStateChanged(state)
+    }
+    /// Handles session activation completion.
+    public nonisolated func handleActivation(_ state: ActivationState, error: (any Error)?) {
+      Task {
+        await self.isolatedHandleActivation(state, error: error)
+      }
+
+    }
+
+    fileprivate func isolatedActiveState(_ activationState: ActivationState) {
+      self.activationState = activationState
+      
+      // Notify observers of activation state change
       notifyActivationStateChanged(activationState)
     }
-
-    /// Called when the session becomes inactive (iOS only).
-    public func sessionDidBecomeInactive(_ session: any ConnectivitySession) {
-      lock.lock()
-      internalActivationState = .inactive
-      lock.unlock()
-
-      // Notify observers of activation state change
-      notifyActivationStateChanged(.inactive)
+    
+    /// Handles session becoming inactive.
+    public nonisolated func handleSessionInactive() {
+      Task {
+        await self.isolatedActiveState(.inactive)
+      }
     }
 
-    /// Called when the session deactivates (iOS only).
-    public func sessionDidDeactivate(_ session: any ConnectivitySession) {
-      lock.lock()
-      internalActivationState = .notActivated
-      lock.unlock()
-
-      // Notify observers of activation state change
-      notifyActivationStateChanged(.notActivated)
+    /// Handles session deactivation.
+    public  nonisolated func handleSessionDeactivate() {
+      Task {
+        await self.isolatedActiveState(.notActivated)
+      }
     }
 
-    /// Called when companion state changes.
-    public func sessionCompanionStateDidChange(_ session: any ConnectivitySession) {
-      lock.lock()
-      internalIsPairedAppInstalled = session.isPairedAppInstalled
-      let appInstalled = internalIsPairedAppInstalled
-      #if os(iOS)
-        internalIsPaired = session.isPaired
-        let paired = internalIsPaired
-      #endif
-      lock.unlock()
+    /// Handles reachability changes.
+    public nonisolated func handleReachabilityChange(_ isReachable: Bool) {
+      Task {
+        await self.isolatedReachabilityChanged(isReachable)
+      }
+    }
+    
+    private func isolatedReachabilityChanged(_ isReachable: Bool) {
+      
+        self.isReachable = isReachable
+        
+        // Notify observers of reachability change
+        notifyReachabilityChanged(isReachable)
+      
+    }
 
+    /// Handles companion device state changes.
+    public nonisolated func handleCompanionStateChange(_ session: any ConnectivitySession) {
+      Task {
+        await self.isolatedSessionStateChanged(session)
+      }
+    }
+    
+    private func isolatedSessionStateChanged(_ session: any ConnectivitySession) {
+      
+      self.isPairedAppInstalled = session.isPairedAppInstalled
+#if os(iOS)
+      self.isPaired = session.isPaired
+#endif
+      
       // Notify observers of companion state changes
-      notifyCompanionAppInstalledChanged(appInstalled)
+      notifyCompanionAppInstalledChanged(isPairedAppInstalled)
       #if os(iOS)
-        notifyPairedStatusChanged(paired)
+        notifyPairedStatusChanged(isPaired)
       #endif
     }
 
-    /// Called when reachability changes.
-    public func sessionReachabilityDidChange(_ session: any ConnectivitySession) {
-      lock.lock()
-      internalIsReachable = session.isReachable
-      let reachable = internalIsReachable
-      lock.unlock()
-
-      // Notify observers of reachability change
-      notifyReachabilityChanged(reachable)
-    }
-
-    /// Called when a message is received.
-    public func session(
-      _ session: any ConnectivitySession,
-      didReceiveMessage message: ConnectivityMessage,
-      replyHandler: @escaping ConnectivityHandler
-    ) {
+    /// Handles received messages.
+    public nonisolated func handleMessageReceived(_ message: ConnectivityMessage) {
       // Notify observers of received message
       notifyMessageReceived(message)
     }
 
-    /// Called when application context is received.
-    public func session(
-      _ session: any ConnectivitySession,
-      didReceiveApplicationContext applicationContext: ConnectivityMessage,
+    /// Handles application context updates.
+    public nonisolated func handleApplicationContextReceived(
+      _ applicationContext: ConnectivityMessage,
       error: (any Error)?
     ) {
       // Only notify if no error
-      guard error == nil else { return }
+      guard error == nil else {
+        return
+      }
 
       // Notify observers of context update
       notifyApplicationContextReceived(applicationContext)
     }
 
-    /// Called when binary message data is received.
-    public func session(
-      _ session: any ConnectivitySession,
-      didReceiveMessageData messageData: Data,
+    /// Handles received binary message data.
+    public nonisolated func handleBinaryMessageReceived(
+      _: Data,
       replyHandler: @escaping @Sendable (Data) -> Void
     ) {
       // Binary messages are not currently forwarded to observers
       // Future enhancement: Could add binary message observer protocol
-    }
-
-    // MARK: - Observer Management
-
-    /// Adds an observer for state changes.
-    ///
-    /// - Parameter observer: The observer to add.
-    /// - Note: Observers are stored with weak references and must conform to
-    ///   `ConnectivityStateObserver`.
-    public func addObserver(_ observer: any ConnectivityStateObserver) {
-      lock.lock()
-      observers.add(observer)
-      lock.unlock()
-    }
-
-    /// Removes an observer.
-    ///
-    /// - Parameter observer: The observer to remove.
-    public func removeObserver(_ observer: any ConnectivityStateObserver) {
-      lock.lock()
-      observers.remove(observer)
-      lock.unlock()
-    }
-
-    // MARK: - Private Notification Methods
-
-    /// Notifies observers of activation state change on main queue.
-    private func notifyActivationStateChanged(_ state: ActivationState) {
-      DispatchQueue.main.async { [weak self] in
-        guard let self = self else { return }
-        lock.lock()
-        let currentObservers = observers.allObjects
-        lock.unlock()
-
-        for observer in currentObservers {
-          guard let stateObserver = observer as? (any ConnectivityStateObserver) else {
-            continue
-          }
-          stateObserver.connectivityManager(self, didChangeActivationState: state)
-        }
-      }
-    }
-
-    /// Notifies observers of reachability change on main queue.
-    private func notifyReachabilityChanged(_ isReachable: Bool) {
-      DispatchQueue.main.async { [weak self] in
-        guard let self = self else { return }
-        lock.lock()
-        let currentObservers = observers.allObjects
-        lock.unlock()
-
-        for observer in currentObservers {
-          guard let stateObserver = observer as? (any ConnectivityStateObserver) else {
-            continue
-          }
-          stateObserver.connectivityManager(self, didChangeReachability: isReachable)
-        }
-      }
-    }
-
-    /// Notifies observers of companion app installation status change on main queue.
-    private func notifyCompanionAppInstalledChanged(_ isInstalled: Bool) {
-      DispatchQueue.main.async { [weak self] in
-        guard let self = self else { return }
-        lock.lock()
-        let currentObservers = observers.allObjects
-        lock.unlock()
-
-        for observer in currentObservers {
-          guard let stateObserver = observer as? (any ConnectivityStateObserver) else {
-            continue
-          }
-          stateObserver.connectivityManager(
-            self,
-            didChangeCompanionAppInstalled: isInstalled
-          )
-        }
-      }
-    }
-
-    #if os(iOS)
-      /// Notifies observers of paired status change on main queue (iOS only).
-      private func notifyPairedStatusChanged(_ isPaired: Bool) {
-        DispatchQueue.main.async { [weak self] in
-          guard let self = self else { return }
-          lock.lock()
-          let currentObservers = observers.allObjects
-          lock.unlock()
-
-          for observer in currentObservers {
-            guard let stateObserver = observer as? (any ConnectivityStateObserver) else {
-              continue
-            }
-            stateObserver.connectivityManager(self, didChangePairedStatus: isPaired)
-          }
-        }
-      }
-    #endif
-
-    /// Notifies observers of received message on main queue.
-    private func notifyMessageReceived(_ message: ConnectivityMessage) {
-      DispatchQueue.main.async { [weak self] in
-        guard let self = self else { return }
-        lock.lock()
-        let currentObservers = observers.allObjects
-        lock.unlock()
-
-        for observer in currentObservers {
-          guard let stateObserver = observer as? (any ConnectivityStateObserver) else {
-            continue
-          }
-          stateObserver.connectivityManager(self, didReceiveMessage: message)
-        }
-      }
-    }
-
-    /// Notifies observers of application context update on main queue.
-    private func notifyApplicationContextReceived(_ context: ConnectivityMessage) {
-      DispatchQueue.main.async { [weak self] in
-        guard let self = self else { return }
-        lock.lock()
-        let currentObservers = observers.allObjects
-        lock.unlock()
-
-        for observer in currentObservers {
-          guard let stateObserver = observer as? (any ConnectivityStateObserver) else {
-            continue
-          }
-          stateObserver.connectivityManager(self, didReceiveApplicationContext: context)
-        }
-      }
     }
   }
 #endif

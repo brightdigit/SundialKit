@@ -38,8 +38,9 @@ public import SundialKitCore
 ///
 /// ## Thread Safety
 ///
-/// `NetworkMonitor` is thread-safe. All property accesses and observer management
-/// use internal locking to prevent data races.
+/// This actor ensures thread-safe access to network state. Public methods are
+/// `nonisolated` and use Tasks internally for actor-isolated operations, providing
+/// a synchronous API while maintaining thread safety
 ///
 /// ## Example Usage
 ///
@@ -63,14 +64,13 @@ public import SundialKitCore
 /// monitor.stop()
 /// #endif
 /// ```
-public final class NetworkMonitor<
+public actor NetworkMonitor<
   Monitor: PathMonitor,
   Ping: NetworkPing & Sendable
->: NetworkMonitoring, @unchecked Sendable where Monitor.PathType: NetworkPath {
+>: NetworkMonitoring where Monitor.PathType: NetworkPath {
   // MARK: - Private Properties
   private let pathMonitor: Monitor
   private let networkPing: Ping?
-  private let lock = NSLock()
   private var state: NetworkState = .initial
   private var isMonitoring: Bool = false
   private let observers = ObserverRegistry<any NetworkStateObserver>()
@@ -78,24 +78,24 @@ public final class NetworkMonitor<
 
   // MARK: - Public Properties (NetworkMonitoring)
   /// The current status of the network path.
-  public var pathStatus: PathStatus {
-    lock.lock()
-    defer { lock.unlock() }
-    return state.pathStatus
+  public nonisolated var pathStatus: PathStatus {
+    get async {
+      await state.pathStatus
+    }
   }
 
   /// Indicates whether the network connection is expensive.
-  public var isExpensive: Bool {
-    lock.lock()
-    defer { lock.unlock() }
-    return state.isExpensive
+  public nonisolated var isExpensive: Bool {
+    get async {
+      await state.isExpensive
+    }
   }
 
   /// Indicates whether the network connection is constrained.
-  public var isConstrained: Bool {
-    lock.lock()
-    defer { lock.unlock() }
-    return state.isConstrained
+  public nonisolated var isConstrained: Bool {
+    get async {
+      await state.isConstrained
+    }
   }
 
   // MARK: - Initialization
@@ -110,60 +110,69 @@ public final class NetworkMonitor<
 
   // MARK: - Observer Management
   /// Adds an observer to receive network state change notifications.
-  /// Observers are held weakly to prevent retain cycles.
+  /// Observers are held strongly - caller must manage lifecycle.
   /// - Parameter observer: The observer to add
-  public func addObserver(_ observer: any NetworkStateObserver) {
-    observers.add(observer)
+  public func addObserver(_ observer: any NetworkStateObserver) async {
+    await observers.add(observer)
   }
 
-  /// Removes an observer from receiving network state change notifications.
-  /// - Parameter observer: The observer to remove
-  public func removeObserver(_ observer: any NetworkStateObserver) {
-    observers.remove(observer)
+  /// Removes observers matching the predicate.
+  /// - Parameter predicate: Closure to identify observers to remove
+  public func removeObservers(where predicate: @Sendable @escaping (any NetworkStateObserver) -> Bool) async {
+    await observers.removeAll(where: predicate)
   }
 
   // MARK: - Lifecycle (NetworkMonitoring)
   /// Starts monitoring network connectivity.
   /// - Parameter queue: The dispatch queue on which to deliver network updates
-  public func start(queue: DispatchQueue) {
-    lock.lock()
+  public nonisolated func start(queue: DispatchQueue) {
+    Task {
+      await startIsolated(queue: queue)
+    }
+  }
+
+  /// Stops monitoring network connectivity.
+  public nonisolated func stop() {
+    Task {
+      await stopIsolated()
+    }
+  }
+
+  // MARK: - Actor-Isolated Lifecycle Methods
+
+  private func startIsolated(queue: DispatchQueue) {
     guard !isMonitoring else {
-      lock.unlock()
       return
     }
     isMonitoring = true
-    lock.unlock()
 
     // Set up path monitoring
     pathMonitor.onPathUpdate { [weak self] path in
-      self?.handlePathUpdate(path)
+      Task {
+        await self?.handlePathUpdate(path)
+      }
     }
     pathMonitor.start(queue: queue)
 
     // Set up ping monitoring if available
     if let ping = networkPing {
-      let coordinator = PingCoordinator(ping: ping) { [weak self] in
-        self?.pathStatus ?? .unknown
+      let currentState = state
+      let coordinator = PingCoordinator(ping: ping) {
+        // Capture state at creation time for synchronous access
+        currentState.pathStatus
       }
       coordinator.start(queue: queue)
-
-      lock.lock()
       pingCoordinator = coordinator
-      lock.unlock()
     }
   }
 
-  /// Stops monitoring network connectivity.
-  public func stop() {
-    lock.lock()
+  private func stopIsolated() {
     guard isMonitoring else {
-      lock.unlock()
       return
     }
     isMonitoring = false
     let coordinator = pingCoordinator
     pingCoordinator = nil
-    lock.unlock()
 
     pathMonitor.cancel()
     coordinator?.stop()
@@ -178,25 +187,23 @@ public final class NetworkMonitor<
       isConstrained: path.isConstrained
     )
 
-    lock.lock()
     let oldState = state
     state = newState
-    lock.unlock()
 
-    // Notify observers outside of lock
+    // Notify observers
     if oldState.pathStatus != newState.pathStatus {
       observers.notify { observer in
-        observer.networkMonitor(didUpdatePathStatus: newState.pathStatus)
+        await observer.networkMonitor(didUpdatePathStatus: newState.pathStatus)
       }
     }
     if oldState.isExpensive != newState.isExpensive {
       observers.notify { observer in
-        observer.networkMonitor(didUpdateExpensive: newState.isExpensive)
+        await observer.networkMonitor(didUpdateExpensive: newState.isExpensive)
       }
     }
     if oldState.isConstrained != newState.isConstrained {
       observers.notify { observer in
-        observer.networkMonitor(didUpdateConstrained: newState.isConstrained)
+        await observer.networkMonitor(didUpdateConstrained: newState.isConstrained)
       }
     }
   }
@@ -208,7 +215,7 @@ extension NetworkMonitor where Ping == NeverPing {
   /// Creates a network monitor without ping support.
   ///
   /// - Parameter monitor: The path monitor to use for tracking network changes
-  public convenience init(monitor: Monitor) {
+  public init(monitor: Monitor) {
     self.init(monitor: monitor, ping: nil)
   }
 }

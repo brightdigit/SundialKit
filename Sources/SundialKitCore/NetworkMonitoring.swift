@@ -74,7 +74,7 @@ public protocol NetworkMonitoring {
   /// unavailable.
   ///
   /// - SeeAlso: ``PathStatus``
-  var pathStatus: PathStatus { get }
+  var pathStatus: PathStatus { get async }
 
   /// Indicates whether the network connection is expensive.
   ///
@@ -85,7 +85,7 @@ public protocol NetworkMonitoring {
   ///
   /// Apps should minimize data usage when this property is `true` to respect
   /// user preferences and data plan limits.
-  var isExpensive: Bool { get }
+  var isExpensive: Bool { get async }
 
   /// Indicates whether the network connection is constrained.
   ///
@@ -97,7 +97,7 @@ public protocol NetworkMonitoring {
   /// - Minimize network usage
   ///
   /// This helps users conserve data and battery life.
-  var isConstrained: Bool { get }
+  var isConstrained: Bool { get async }
 
   /// Starts monitoring network connectivity.
   ///

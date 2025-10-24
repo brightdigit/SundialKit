@@ -35,16 +35,18 @@
   ///
   /// Implement this protocol to receive notifications about changes in
   /// WatchConnectivity session state, reachability, and companion status.
-  /// All delegate methods are called on the main queue.
+  ///
+  /// Observers must be Sendable (actors, @MainActor classes, or value types).
+  /// All delegate methods are nonisolated and called on the main queue.
   @available(macOS, unavailable)
   @available(tvOS, unavailable)
-  public protocol ConnectivityStateObserver: AnyObject {
+  public protocol ConnectivityStateObserver: Sendable {
     /// Called when the activation state changes.
     ///
     /// - Parameters:
     ///   - manager: The connectivity manager
     ///   - activationState: The new activation state
-    func connectivityManager(
+    nonisolated func connectivityManager(
       _ manager: ConnectivityManager,
       didChangeActivationState activationState: ActivationState
     )
@@ -54,7 +56,7 @@
     /// - Parameters:
     ///   - manager: The connectivity manager
     ///   - isReachable: Whether the counterpart is now reachable
-    func connectivityManager(
+    nonisolated func connectivityManager(
       _ manager: ConnectivityManager,
       didChangeReachability isReachable: Bool
     )
@@ -64,7 +66,7 @@
     /// - Parameters:
     ///   - manager: The connectivity manager
     ///   - isInstalled: Whether the companion app is installed
-    func connectivityManager(
+    nonisolated func connectivityManager(
       _ manager: ConnectivityManager,
       didChangeCompanionAppInstalled isInstalled: Bool
     )
@@ -75,7 +77,7 @@
       /// - Parameters:
       ///   - manager: The connectivity manager
       ///   - isPaired: Whether an Apple Watch is paired
-      func connectivityManager(
+      nonisolated func connectivityManager(
         _ manager: ConnectivityManager,
         didChangePairedStatus isPaired: Bool
       )
@@ -86,7 +88,7 @@
     /// - Parameters:
     ///   - manager: The connectivity manager
     ///   - message: The received message
-    func connectivityManager(
+    nonisolated func connectivityManager(
       _ manager: ConnectivityManager,
       didReceiveMessage message: ConnectivityMessage
     )
@@ -96,7 +98,7 @@
     /// - Parameters:
     ///   - manager: The connectivity manager
     ///   - context: The updated application context
-    func connectivityManager(
+    nonisolated func connectivityManager(
       _ manager: ConnectivityManager,
       didReceiveApplicationContext context: ConnectivityMessage
     )
@@ -104,33 +106,51 @@
 
   // Default implementations to make all methods optional
   extension ConnectivityStateObserver {
+    /// Default implementation that does nothing.
+    ///
+    /// Override this method to respond to activation state changes.
     public func connectivityManager(
       _: ConnectivityManager,
       didChangeActivationState _: ActivationState
     ) {}
 
+    /// Default implementation that does nothing.
+    ///
+    /// Override this method to respond to reachability changes.
     public func connectivityManager(
       _: ConnectivityManager,
       didChangeReachability _: Bool
     ) {}
 
+    /// Default implementation that does nothing.
+    ///
+    /// Override this method to respond to companion app installation status changes.
     public func connectivityManager(
       _: ConnectivityManager,
       didChangeCompanionAppInstalled _: Bool
     ) {}
 
     #if os(iOS)
+      /// Default implementation that does nothing.
+      ///
+      /// Override this method to respond to paired status changes (iOS only).
       public func connectivityManager(
         _: ConnectivityManager,
         didChangePairedStatus _: Bool
       ) {}
     #endif
 
+    /// Default implementation that does nothing.
+    ///
+    /// Override this method to respond to received messages.
     public func connectivityManager(
       _: ConnectivityManager,
       didReceiveMessage _: ConnectivityMessage
     ) {}
 
+    /// Default implementation that does nothing.
+    ///
+    /// Override this method to respond to application context updates.
     public func connectivityManager(
       _: ConnectivityManager,
       didReceiveApplicationContext _: ConnectivityMessage

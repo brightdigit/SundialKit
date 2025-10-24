@@ -60,7 +60,6 @@ extension Dictionary where Key == String, Value == any Sendable {
   /// }
   /// ```
   public init(forceCasting dictionary: [String: Any]) {
-    // swiftlint:disable:next force_cast
     self = dictionary.mapValues { $0 as! any Sendable }
   }
 }

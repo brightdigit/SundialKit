@@ -89,7 +89,7 @@
       }
 
       // Give first task time to start
-      try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+      try await Task.sleep(nanoseconds: 100_000_000)  // 0.1 seconds
 
       // Try second activation - should throw immediately
       do {
@@ -233,7 +233,7 @@
 
       // Create a large message that exceeds 65KB
       var largeMessage: ConnectivityMessage = [:]
-      for index in 0..<10000 {
+      for index in 0..<10_000 {
         largeMessage["key\(index)"] = String(repeating: "x", count: 100)
       }
 
@@ -289,7 +289,7 @@
       mockSession.activationState = .activated
 
       // Wait for main queue notification
-      try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+      try await Task.sleep(nanoseconds: 100_000_000)  // 0.1 seconds
 
       #expect(observer.lastActivationState == .activated)
     }
@@ -305,7 +305,7 @@
       mockSession.isReachable = true
 
       // Wait for main queue notification
-      try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+      try await Task.sleep(nanoseconds: 100_000_000)  // 0.1 seconds
 
       #expect(observer.lastReachability == true)
     }
@@ -321,7 +321,7 @@
       mockSession.isPairedAppInstalled = true
 
       // Wait for main queue notification
-      try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+      try await Task.sleep(nanoseconds: 100_000_000)  // 0.1 seconds
 
       #expect(observer.lastCompanionAppInstalled == true)
     }
@@ -338,7 +338,7 @@
         mockSession.isPaired = true
 
         // Wait for main queue notification
-        try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+        try await Task.sleep(nanoseconds: 100_000_000)  // 0.1 seconds
 
         #expect(observer.lastPairedStatus == true)
       }
@@ -356,7 +356,7 @@
       mockSession.receiveMessage(testMessage) { _ in }
 
       // Wait for main queue notification
-      try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+      try await Task.sleep(nanoseconds: 100_000_000)  // 0.1 seconds
 
       #expect(observer.lastMessage?["test"] as? String == "data")
     }
@@ -373,7 +373,7 @@
       mockSession.isReachable = true
 
       // Wait for main queue notification
-      try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+      try await Task.sleep(nanoseconds: 100_000_000)  // 0.1 seconds
 
       // Should not have received notification
       #expect(observer.lastReachability == nil)
@@ -392,109 +392,10 @@
       mockSession.isReachable = true
 
       // Wait for main queue notification
-      try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+      try await Task.sleep(nanoseconds: 100_000_000)  // 0.1 seconds
 
       #expect(observer1.lastReachability == true)
       #expect(observer2.lastReachability == true)
-    }
-  }
-
-  // MARK: - Test Helper Classes
-
-  /// Mock session that doesn't auto-activate to test slow activation scenarios
-  internal final class SlowMockSession: ConnectivitySession, @unchecked Sendable {
-    internal var lastMessageSent: ConnectivityMessage?
-    internal var lastAppContext: ConnectivityMessage?
-    internal var nextReplyResult: Result<ConnectivityMessage, any Error>?
-    internal var nextApplicationContextError: (any Error)?
-    internal var isPaired = false
-    internal var delegate: (any ConnectivitySessionDelegate)?
-    internal var isReachable = false
-    internal var isPairedAppInstalled = false
-
-    internal var activationState: ActivationState = .notActivated {
-      didSet {
-        delegate?.session(self, activationDidCompleteWith: activationState, error: nil)
-      }
-    }
-
-    internal func activate() throws {
-      // Don't automatically change state - tests will do this manually
-    }
-
-    internal func updateApplicationContext(_ context: ConnectivityMessage) throws {
-      if let nextApplicationContextError = nextApplicationContextError {
-        throw nextApplicationContextError
-      }
-      lastAppContext = context
-    }
-
-    internal func sendMessage(
-      _ message: ConnectivityMessage,
-      _ replyHandler: @escaping (Result<ConnectivityMessage, any Error>) -> Void
-    ) {
-      lastMessageSent = message
-      replyHandler(nextReplyResult ?? .success([:]))
-    }
-
-    internal func sendMessageData(
-      _ data: Data,
-      _ completion: @escaping (Result<Data, any Error>) -> Void
-    ) {
-      completion(.success(Data()))
-    }
-  }
-
-  internal final class TestObserver: ConnectivityStateObserver {
-    internal var lastActivationState: ActivationState?
-    internal var lastReachability: Bool?
-    internal var lastCompanionAppInstalled: Bool?
-    internal var lastPairedStatus: Bool?
-    internal var lastMessage: ConnectivityMessage?
-    internal var lastContext: ConnectivityMessage?
-
-    internal func connectivityManager(
-      _: ConnectivityManager,
-      didChangeActivationState activationState: ActivationState
-    ) {
-      lastActivationState = activationState
-    }
-
-    internal func connectivityManager(
-      _: ConnectivityManager,
-      didChangeReachability isReachable: Bool
-    ) {
-      lastReachability = isReachable
-    }
-
-    internal func connectivityManager(
-      _: ConnectivityManager,
-      didChangeCompanionAppInstalled isInstalled: Bool
-    ) {
-      lastCompanionAppInstalled = isInstalled
-    }
-
-    #if os(iOS)
-      internal func connectivityManager(
-        _: ConnectivityManager,
-        didChangePairedStatus isPaired: Bool
-      ) {
-        lastPairedStatus = isPaired
-      }
-    #endif
-
-    internal func connectivityManager(
-      _: ConnectivityManager,
-      didReceiveMessage message: ConnectivityMessage
-    ) {
-      lastMessage = message
-    }
-
-    internal func connectivityManager(
-      _: ConnectivityManager,
-      didReceiveApplicationContext context: ConnectivityMessage
-    ) {
-      lastContext = context
     }
   }
 #endif

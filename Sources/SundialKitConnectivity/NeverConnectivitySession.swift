@@ -34,7 +34,9 @@ public import SundialKitCore
 ///
 /// Used on macOS and tvOS where WatchConnectivity is not available.
 /// All operations throw or return inactive/unavailable states.
-public final class NeverConnectivitySession: NSObject, ConnectivitySession, @unchecked Sendable {
+///
+/// This class is naturally Sendable as all properties are immutable computed properties.
+public final class NeverConnectivitySession: NSObject, ConnectivitySession, Sendable {
   /// The delegate (always nil for this implementation).
   public var delegate: (any ConnectivitySessionDelegate)? {
     get {

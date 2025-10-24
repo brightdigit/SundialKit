@@ -52,6 +52,13 @@ public import SundialKitCore
         self = .localNetworkDenied
 
       @unknown default:
+        if #available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, *) {
+          // On newer platforms, check if this is vpnInactive
+          if reason == .vpnInactive {
+            self = .vpnInactive
+            return
+          }
+        }
         self = .unknown
       }
     }

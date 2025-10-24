@@ -29,20 +29,24 @@
 
 import Foundation
 
-/// A thread-safe registry for managing weak references to observer objects.
+/// A thread-safe registry for managing observer references.
 ///
-/// `ObserverRegistry` provides automatic cleanup of deallocated observers and
-/// thread-safe access to the observer list. Observers are held weakly to prevent
-/// retain cycles.
+/// `ObserverRegistry` provides thread-safe access to the observer list.
+/// Observers are held strongly - callers must manage lifecycle.
+///
+/// ## Thread Safety
+///
+/// This actor ensures thread-safe access to observer state. Public methods are
+/// `nonisolated` and use Tasks internally for actor-isolated operations.
 ///
 /// ## Usage Example
 ///
 /// ```swift
-/// protocol MyObserver: AnyObject {
+/// protocol MyObserver: Sendable {
 ///   func didUpdate(value: Int)
 /// }
 ///
-/// class Subject {
+/// actor Subject {
 ///   private let observers = ObserverRegistry<MyObserver>()
 ///
 ///   func addObserver(_ observer: MyObserver) {
@@ -54,22 +58,10 @@ import Foundation
 ///   }
 /// }
 /// ```
-public final class ObserverRegistry<Observer>: @unchecked Sendable {
-  // MARK: - Helper Types
-
-  /// Weak wrapper for observer references using AnyObject.
-  private final class WeakBox {
-    weak var observer: AnyObject?
-
-    init(_ observer: AnyObject) {
-      self.observer = observer
-    }
-  }
-
+public actor ObserverRegistry<Observer: Sendable> {
   // MARK: - Private Properties
 
-  private let lock = NSLock()
-  private var observers: [WeakBox] = []
+  private var observers: [Observer] = []
 
   // MARK: - Initialization
 
@@ -80,65 +72,44 @@ public final class ObserverRegistry<Observer>: @unchecked Sendable {
 
   /// Adds an observer to the registry.
   ///
-  /// If the observer is already registered, this method has no effect.
-  /// The observer is held weakly to prevent retain cycles.
+  /// The observer is held strongly - caller must manage lifecycle.
   ///
   /// - Parameter observer: The observer to add
   public func add(_ observer: Observer) {
-    guard let anyObject = observer as? AnyObject else {
-      return
-    }
-
-    lock.lock()
-    defer { lock.unlock() }
-
-    // Remove nil observers during cleanup
-    observers = observers.filter { $0.observer != nil }
-
-    // Add new observer if not already present
-    if !observers.contains(where: { $0.observer === anyObject }) {
-      observers.append(WeakBox(anyObject))
-    }
+    observers.append(observer)
   }
 
-  /// Removes an observer from the registry.
+  /// Removes all instances of an observer from the registry.
+  ///
+  /// Note: Requires Observer to be Equatable for removal.
+  /// Consider using a wrapper with identity if needed.
   ///
   /// - Parameter observer: The observer to remove
-  public func remove(_ observer: Observer) {
-    guard let anyObject = observer as? AnyObject else {
-      return
-    }
-
-    lock.lock()
-    defer { lock.unlock() }
-
-    observers = observers.filter { $0.observer !== anyObject && $0.observer != nil }
+  public func removeAll(where predicate: @Sendable (Observer) -> Bool) {
+    observers.removeAll(where: predicate)
   }
 
   /// Notifies all registered observers by executing the provided action.
   ///
-  /// The action is executed outside of the lock to prevent potential deadlocks.
-  /// Deallocated observers are automatically skipped.
-  ///
   /// - Parameter action: The closure to execute for each observer
-  public func notify(_ action: (Observer) -> Void) {
-    let currentObservers = snapshot()
+  public nonisolated func notify(_ action: @Sendable @escaping (Observer) async -> Void) {
+    Task {
+      await notifyIsolated(action)
+    }
+  }
 
-    for observer in currentObservers {
-      action(observer)
+  // MARK: - Actor-Isolated Methods
+
+  private func notifyIsolated(_ action: @Sendable (Observer) async -> Void) async {
+    for observer in observers {
+      await action(observer)
     }
   }
 
   /// Returns a snapshot of all currently registered observers.
   ///
-  /// This method is useful when you need to iterate over observers manually
-  /// or check the current observer count.
-  ///
   /// - Returns: Array of active observers
   public func snapshot() -> [Observer] {
-    lock.lock()
-    defer { lock.unlock() }
-
-    return observers.compactMap { $0.observer as? Observer }
+    observers
   }
 }

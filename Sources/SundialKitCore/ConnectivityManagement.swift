@@ -98,7 +98,7 @@ public protocol ConnectivityManagement {
   /// You must activate the session before sending messages.
   ///
   /// - SeeAlso: ``ActivationState``
-  var activationState: ActivationState { get }
+  var activationState: ActivationState { get async }
   /// Indicates whether the counterpart device is currently reachable.
   ///
   /// A counterpart is reachable when:
@@ -109,7 +109,7 @@ public protocol ConnectivityManagement {
   /// When `true`, you can send messages using ``sendMessage(_:replyHandler:errorHandler:)``
   /// and expect immediate delivery. When `false`, use ``updateApplicationContext(_:)``
   /// to queue data for delivery when the counterpart becomes available.
-  var isReachable: Bool { get }
+  var isReachable: Bool { get async }
 
   /// Indicates whether the companion app is installed on the paired device.
   ///
@@ -118,7 +118,7 @@ public protocol ConnectivityManagement {
   ///
   /// Use this property to determine whether ``updateApplicationContext(_:)`` will
   /// successfully deliver messages when the counterpart is not reachable.
-  var isPairedAppInstalled: Bool { get }
+  var isPairedAppInstalled: Bool { get async }
 
   #if os(iOS)
     /// Indicates whether an Apple Watch is currently paired with this iPhone.
@@ -127,7 +127,7 @@ public protocol ConnectivityManagement {
     /// is paired with the device, regardless of whether the companion app is installed.
     ///
     /// - Note: This property is unavailable on watchOS, tvOS, and macOS.
-    var isPaired: Bool { get }
+    var isPaired: Bool { get async }
   #endif
 
   /// Activates the connectivity session.

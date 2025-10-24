@@ -39,7 +39,7 @@ private protocol TestObserver: AnyObject {
 
 // MARK: - Test Observer Implementation
 
-private final class TestObserverImpl: TestObserver {
+private final class TestObserverImpl: TestObserver, @unchecked Sendable {
   var receivedValues: [Int] = []
 }
 
@@ -48,41 +48,42 @@ private final class TestObserverImpl: TestObserver {
 @Suite("ObserverRegistry Tests")
 struct ObserverRegistryTests {
   @Test("Adding observer registers it in the registry")
-  func testAddObserver() {
+  func testAddObserver() async {
     let registry = ObserverRegistry<TestObserverImpl>()
     let observer = TestObserverImpl()
 
-    registry.add(observer)
+    await registry.add(observer)
 
-    let observers = registry.snapshot()
+    let observers = await registry.snapshot()
     #expect(observers.count == 1)
     #expect(observers.first === observer)
   }
 
-  @Test("Adding same observer twice only registers it once")
-  func testAddDuplicateObserver() {
+  @Test("Adding same observer twice registers it twice")
+  func testAddDuplicateObserver() async {
     let registry = ObserverRegistry<TestObserverImpl>()
     let observer = TestObserverImpl()
 
-    registry.add(observer)
-    registry.add(observer)
+    await registry.add(observer)
+    await registry.add(observer)
 
-    let observers = registry.snapshot()
-    #expect(observers.count == 1)
+    let observers = await registry.snapshot()
+    // With strong references, duplicates are allowed - caller manages lifecycle
+    #expect(observers.count == 2)
   }
 
   @Test("Adding multiple observers registers all of them")
-  func testAddMultipleObservers() {
+  func testAddMultipleObservers() async {
     let registry = ObserverRegistry<TestObserverImpl>()
     let observer1 = TestObserverImpl()
     let observer2 = TestObserverImpl()
     let observer3 = TestObserverImpl()
 
-    registry.add(observer1)
-    registry.add(observer2)
-    registry.add(observer3)
+    await registry.add(observer1)
+    await registry.add(observer2)
+    await registry.add(observer3)
 
-    let observers = registry.snapshot()
+    let observers = await registry.snapshot()
     #expect(observers.count == 3)
     #expect(observers.contains { $0 === observer1 })
     #expect(observers.contains { $0 === observer2 })
@@ -90,134 +91,135 @@ struct ObserverRegistryTests {
   }
 
   @Test("Removing observer unregisters it from the registry")
-  func testRemoveObserver() {
+  func testRemoveObserver() async {
     let registry = ObserverRegistry<TestObserverImpl>()
     let observer = TestObserverImpl()
 
-    registry.add(observer)
-    registry.remove(observer)
+    await registry.add(observer)
+    await registry.removeAll(where: { $0 === observer })
 
-    let observers = registry.snapshot()
+    let observers = await registry.snapshot()
     #expect(observers.isEmpty)
   }
 
   @Test("Removing observer that was not added has no effect")
-  func testRemoveNonExistentObserver() {
+  func testRemoveNonExistentObserver() async {
     let registry = ObserverRegistry<TestObserverImpl>()
     let observer1 = TestObserverImpl()
     let observer2 = TestObserverImpl()
 
-    registry.add(observer1)
-    registry.remove(observer2)
+    await registry.add(observer1)
+    await registry.removeAll(where: { $0 === observer2 })
 
-    let observers = registry.snapshot()
+    let observers = await registry.snapshot()
     #expect(observers.count == 1)
     #expect(observers.first === observer1)
   }
 
   @Test("Removing one observer leaves others intact")
-  func testRemoveOneObserverKeepsOthers() {
+  func testRemoveOneObserverKeepsOthers() async {
     let registry = ObserverRegistry<TestObserverImpl>()
     let observer1 = TestObserverImpl()
     let observer2 = TestObserverImpl()
     let observer3 = TestObserverImpl()
 
-    registry.add(observer1)
-    registry.add(observer2)
-    registry.add(observer3)
+    await registry.add(observer1)
+    await registry.add(observer2)
+    await registry.add(observer3)
 
-    registry.remove(observer2)
+    await registry.removeAll(where: { $0 === observer2 })
 
-    let observers = registry.snapshot()
+    let observers = await registry.snapshot()
     #expect(observers.count == 2)
     #expect(observers.contains { $0 === observer1 })
     #expect(observers.contains { $0 === observer3 })
     #expect(!observers.contains { $0 === observer2 })
   }
 
-  @Test("Weak references are automatically cleaned up")
-  func testWeakReferenceCleansUp() {
+  @Test("Strong references keep observers alive")
+  func testStrongReferencesKeepObserversAlive() async {
     let registry = ObserverRegistry<TestObserverImpl>()
 
     // Create observer in a scope
     do {
       let observer = TestObserverImpl()
-      registry.add(observer)
+      await registry.add(observer)
 
-      let observers = registry.snapshot()
+      let observers = await registry.snapshot()
       #expect(observers.count == 1)
     }
 
-    // Observer should be deallocated now
-    // Trigger cleanup by adding a new observer
+    // With strong references, observer is still kept alive by registry
     let newObserver = TestObserverImpl()
-    registry.add(newObserver)
+    await registry.add(newObserver)
 
-    let observers = registry.snapshot()
-    #expect(observers.count == 1)
-    #expect(observers.first === newObserver)
+    let observers = await registry.snapshot()
+    // Both observers should still be in the registry (strong references)
+    #expect(observers.count == 2)
   }
 
   @Test("Notify executes action for all observers")
-  func testNotify() {
+  func testNotify() async throws {
     let registry = ObserverRegistry<TestObserverImpl>()
     let observer1 = TestObserverImpl()
     let observer2 = TestObserverImpl()
     let observer3 = TestObserverImpl()
 
-    registry.add(observer1)
-    registry.add(observer2)
-    registry.add(observer3)
+    await registry.add(observer1)
+    await registry.add(observer2)
+    await registry.add(observer3)
 
     registry.notify { observer in
       observer.receivedValues.append(42)
     }
+
+    // Wait for async notifications to complete
+    try await Task.sleep(forMilliseconds: 50)
 
     #expect(observer1.receivedValues == [42])
     #expect(observer2.receivedValues == [42])
     #expect(observer3.receivedValues == [42])
   }
 
-  @Test("Notify skips deallocated observers")
-  func testNotifySkipsDeallocatedObservers() {
-    let registry = ObserverRegistry<TestObserverImpl>()
-    let observer1 = TestObserverImpl()
-
-    // Add an observer that will be deallocated
-    do {
-      let observer2 = TestObserverImpl()
-      registry.add(observer2)
-    }
-
-    registry.add(observer1)
-
-    var notificationCount = 0
-    registry.notify { _ in
-      notificationCount += 1
-    }
-
-    // Should only notify the one live observer
-    #expect(notificationCount == 1)
-  }
-
-  @Test("Snapshot returns empty array when no observers")
-  func testSnapshotEmpty() {
-    let registry = ObserverRegistry<TestObserverImpl>()
-
-    let observers = registry.snapshot()
-    #expect(observers.isEmpty)
-  }
-
-  @Test("Snapshot returns current observers")
-  func testSnapshot() {
+  @Test("Notify with strong references keeps all observers")
+  func testNotifyWithStrongReferences() async throws {
     let registry = ObserverRegistry<TestObserverImpl>()
     let observer1 = TestObserverImpl()
     let observer2 = TestObserverImpl()
 
-    registry.add(observer1)
-    registry.add(observer2)
+    await registry.add(observer1)
+    await registry.add(observer2)
 
-    let observers = registry.snapshot()
+    registry.notify { observer in
+      observer.receivedValues.append(99)
+    }
+
+    // Wait for async notifications to complete
+    try await Task.sleep(forMilliseconds: 50)
+
+    // Both observers should receive the notification (strong references)
+    #expect(observer1.receivedValues == [99])
+    #expect(observer2.receivedValues == [99])
+  }
+
+  @Test("Snapshot returns empty array when no observers")
+  func testSnapshotEmpty() async {
+    let registry = ObserverRegistry<TestObserverImpl>()
+
+    let observers = await registry.snapshot()
+    #expect(observers.isEmpty)
+  }
+
+  @Test("Snapshot returns current observers")
+  func testSnapshot() async {
+    let registry = ObserverRegistry<TestObserverImpl>()
+    let observer1 = TestObserverImpl()
+    let observer2 = TestObserverImpl()
+
+    await registry.add(observer1)
+    await registry.add(observer2)
+
+    let observers = await registry.snapshot()
     #expect(observers.count == 2)
     #expect(observers.contains { $0 === observer1 })
     #expect(observers.contains { $0 === observer2 })

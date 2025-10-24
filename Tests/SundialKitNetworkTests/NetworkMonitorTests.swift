@@ -44,32 +44,32 @@ struct NetworkMonitorTests {
   // MARK: - Initialization Tests
 
   @Test("NetworkMonitor initializes with unknown state")
-  func testInitialization() {
+  func testInitialization() async {
     let pathMonitor = MockPathMonitor(id: UUID())
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
 
-    #expect(monitor.pathStatus == .unknown)
-    #expect(monitor.isExpensive == false)
-    #expect(monitor.isConstrained == false)
+    #expect(await monitor.pathStatus == .unknown)
+    #expect(await monitor.isExpensive == false)
+    #expect(await monitor.isConstrained == false)
   }
 
   @Test("NetworkMonitor initializes with ping")
-  func testInitializationWithPing() {
+  func testInitializationWithPing() async {
     let pathMonitor = MockPathMonitor(id: UUID())
     let ping = MockNetworkPing(id: UUID(), timeInterval: 1.0)
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: ping)
 
-    #expect(monitor.pathStatus == .unknown)
-    #expect(monitor.isExpensive == false)
-    #expect(monitor.isConstrained == false)
+    #expect(await monitor.pathStatus == .unknown)
+    #expect(await monitor.isExpensive == false)
+    #expect(await monitor.isConstrained == false)
   }
 
   @Test("NetworkMonitor convenience initializer works")
-  func testConvenienceInitializer() {
+  func testConvenienceInitializer() async {
     let pathMonitor = MockPathMonitor(id: UUID())
     let monitor = NetworkMonitor(monitor: pathMonitor)
 
-    #expect(monitor.pathStatus == .unknown)
+    #expect(await monitor.pathStatus == .unknown)
   }
 
   // MARK: - Lifecycle Tests
@@ -88,7 +88,7 @@ struct NetworkMonitorTests {
     #expect(pathMonitor.dispatchQueueLabel == "test.queue")
     #expect(pathMonitor.pathUpdate != nil)
     // Should have received initial path update
-    #expect(monitor.pathStatus == .satisfied(.wiredEthernet))
+    #expect(await monitor.pathStatus == .satisfied(.wiredEthernet))
   }
 
   @Test("NetworkMonitor stops monitoring")
@@ -100,6 +100,9 @@ struct NetworkMonitorTests {
     try await Task.sleep(forMilliseconds: 100)
 
     monitor.stop()
+
+    // Wait for async stop to complete
+    try await Task.sleep(forMilliseconds: 50)
 
     #expect(pathMonitor.isCancelled == true)
   }
@@ -150,9 +153,9 @@ struct NetworkMonitorTests {
 
     try await Task.sleep(forMilliseconds: 50)
 
-    #expect(monitor.pathStatus == .satisfied(.cellular))
-    #expect(monitor.isExpensive == true)
-    #expect(monitor.isConstrained == false)
+    #expect(await monitor.pathStatus == .satisfied(.cellular))
+    #expect(await monitor.isExpensive == true)
+    #expect(await monitor.isConstrained == false)
   }
 
   @Test("NetworkMonitor updates constrained status")
@@ -172,7 +175,7 @@ struct NetworkMonitorTests {
 
     try await Task.sleep(forMilliseconds: 50)
 
-    #expect(monitor.isConstrained == true)
+    #expect(await monitor.isConstrained == true)
   }
 
   // MARK: - Observer Tests
@@ -183,7 +186,7 @@ struct NetworkMonitorTests {
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
     let observer = TestNetworkStateObserver()
 
-    monitor.addObserver(observer)
+    await monitor.addObserver(observer)
     monitor.start(queue: .global())
 
     try await Task.sleep(forMilliseconds: 100)
@@ -208,7 +211,7 @@ struct NetworkMonitorTests {
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
     let observer = TestNetworkStateObserver()
 
-    monitor.addObserver(observer)
+    await monitor.addObserver(observer)
     monitor.start(queue: .global())
 
     try await Task.sleep(forMilliseconds: 100)
@@ -231,7 +234,7 @@ struct NetworkMonitorTests {
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
     let observer = TestNetworkStateObserver()
 
-    monitor.addObserver(observer)
+    await monitor.addObserver(observer)
     monitor.start(queue: .global())
 
     try await Task.sleep(forMilliseconds: 100)
@@ -254,12 +257,12 @@ struct NetworkMonitorTests {
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
     let observer = TestNetworkStateObserver()
 
-    monitor.addObserver(observer)
+    await monitor.addObserver(observer)
     monitor.start(queue: .global())
 
     try await Task.sleep(forMilliseconds: 100)
 
-    monitor.removeObserver(observer)
+    await monitor.removeObservers { ($0 as? TestNetworkStateObserver) === observer }
 
     // Send update after removal
     let newPath = MockPath(
@@ -281,14 +284,14 @@ struct NetworkMonitorTests {
     #expect(hasCellularUpdate == false)
   }
 
-  @Test("NetworkMonitor doesn't add duplicate observers")
+  @Test("NetworkMonitor allows duplicate observers")
   func testDuplicateObservers() async throws {
     let pathMonitor = MockPathMonitor(id: UUID())
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
     let observer = TestNetworkStateObserver()
 
-    monitor.addObserver(observer)
-    monitor.addObserver(observer)  // Add again
+    await monitor.addObserver(observer)
+    await monitor.addObserver(observer)  // Add again (now allowed with strong references)
     monitor.start(queue: .global())
 
     try await Task.sleep(forMilliseconds: 100)
@@ -302,7 +305,7 @@ struct NetworkMonitorTests {
 
     try await Task.sleep(forMilliseconds: 50)
 
-    // Should only have one notification, not two
+    // With strong references, duplicates receive notifications multiple times
     let cellularCount = observer.pathStatusUpdates.filter { status in
       if case .satisfied(.cellular) = status {
         return true
@@ -310,7 +313,7 @@ struct NetworkMonitorTests {
       return false
     }.count
 
-    #expect(cellularCount <= 1)
+    #expect(cellularCount == 2)  // Observer added twice, receives notification twice
   }
 
   // MARK: - Thread Safety Tests
@@ -325,9 +328,9 @@ struct NetworkMonitorTests {
     await withTaskGroup(of: Void.self) { group in
       for _ in 0..<100 {
         group.addTask {
-          _ = monitor.pathStatus
-          _ = monitor.isExpensive
-          _ = monitor.isConstrained
+          _ = await monitor.pathStatus
+          _ = await monitor.isExpensive
+          _ = await monitor.isConstrained
         }
       }
     }
@@ -347,13 +350,14 @@ struct NetworkMonitorTests {
     await withTaskGroup(of: Void.self) { group in
       for observer in observers {
         group.addTask {
-          monitor.addObserver(observer)
+          await monitor.addObserver(observer)
         }
       }
 
       for observer in observers {
         group.addTask {
-          monitor.removeObserver(observer)
+          let observerToRemove = observer
+          await monitor.removeObservers { ($0 as? TestNetworkStateObserver) === observerToRemove }
         }
       }
     }
