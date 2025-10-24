@@ -53,56 +53,56 @@ internal actor StreamContinuationManager {
 
   // MARK: - Registration
 
-  func registerActivation(
+  internal func registerActivation(
     id: UUID,
     continuation: AsyncStream<ActivationState>.Continuation
   ) {
     activationContinuations[id] = continuation
   }
 
-  func registerActivationCompletion(
+  internal func registerActivationCompletion(
     id: UUID,
     continuation: AsyncStream<Result<ActivationState, any Error>>.Continuation
   ) {
     activationCompletionContinuations[id] = continuation
   }
 
-  func registerReachability(
+  internal func registerReachability(
     id: UUID,
     continuation: AsyncStream<Bool>.Continuation
   ) {
     reachabilityContinuations[id] = continuation
   }
 
-  func registerPairedAppInstalled(
+  internal func registerPairedAppInstalled(
     id: UUID,
     continuation: AsyncStream<Bool>.Continuation
   ) {
     pairedAppInstalledContinuations[id] = continuation
   }
 
-  func registerPaired(
+  internal func registerPaired(
     id: UUID,
     continuation: AsyncStream<Bool>.Continuation
   ) {
     pairedContinuations[id] = continuation
   }
 
-  func registerMessageReceived(
+  internal func registerMessageReceived(
     id: UUID,
     continuation: AsyncStream<ConnectivityReceiveResult>.Continuation
   ) {
     messageReceivedContinuations[id] = continuation
   }
 
-  func registerTypedMessage(
+  internal func registerTypedMessage(
     id: UUID,
     continuation: AsyncStream<any Messagable>.Continuation
   ) {
     typedMessageContinuations[id] = continuation
   }
 
-  func registerSendResult(
+  internal func registerSendResult(
     id: UUID,
     continuation: AsyncStream<ConnectivitySendResult>.Continuation
   ) {
@@ -111,83 +111,83 @@ internal actor StreamContinuationManager {
 
   // MARK: - Removal
 
-  func removeActivation(id: UUID) {
+  internal func removeActivation(id: UUID) {
     activationContinuations.removeValue(forKey: id)
   }
 
-  func removeActivationCompletion(id: UUID) {
+  internal func removeActivationCompletion(id: UUID) {
     activationCompletionContinuations.removeValue(forKey: id)
   }
 
-  func removeReachability(id: UUID) {
+  internal func removeReachability(id: UUID) {
     reachabilityContinuations.removeValue(forKey: id)
   }
 
-  func removePairedAppInstalled(id: UUID) {
+  internal func removePairedAppInstalled(id: UUID) {
     pairedAppInstalledContinuations.removeValue(forKey: id)
   }
 
-  func removePaired(id: UUID) {
+  internal func removePaired(id: UUID) {
     pairedContinuations.removeValue(forKey: id)
   }
 
-  func removeMessageReceived(id: UUID) {
+  internal func removeMessageReceived(id: UUID) {
     messageReceivedContinuations.removeValue(forKey: id)
   }
 
-  func removeTypedMessage(id: UUID) {
+  internal func removeTypedMessage(id: UUID) {
     typedMessageContinuations.removeValue(forKey: id)
   }
 
-  func removeSendResult(id: UUID) {
+  internal func removeSendResult(id: UUID) {
     sendResultContinuations.removeValue(forKey: id)
   }
 
   // MARK: - Yielding Values
 
-  func yieldActivationState(_ state: ActivationState) {
+  internal func yieldActivationState(_ state: ActivationState) {
     for continuation in activationContinuations.values {
       continuation.yield(state)
     }
   }
 
-  func yieldActivationCompletion(_ result: Result<ActivationState, any Error>) {
+  internal func yieldActivationCompletion(_ result: Result<ActivationState, any Error>) {
     for continuation in activationCompletionContinuations.values {
       continuation.yield(result)
     }
   }
 
-  func yieldReachability(_ isReachable: Bool) {
+  internal func yieldReachability(_ isReachable: Bool) {
     for continuation in reachabilityContinuations.values {
       continuation.yield(isReachable)
     }
   }
 
-  func yieldPairedAppInstalled(_ isPairedAppInstalled: Bool) {
+  internal func yieldPairedAppInstalled(_ isPairedAppInstalled: Bool) {
     for continuation in pairedAppInstalledContinuations.values {
       continuation.yield(isPairedAppInstalled)
     }
   }
 
-  func yieldPaired(_ isPaired: Bool) {
+  internal func yieldPaired(_ isPaired: Bool) {
     for continuation in pairedContinuations.values {
       continuation.yield(isPaired)
     }
   }
 
-  func yieldMessageReceived(_ result: ConnectivityReceiveResult) {
+  internal func yieldMessageReceived(_ result: ConnectivityReceiveResult) {
     for continuation in messageReceivedContinuations.values {
       continuation.yield(result)
     }
   }
 
-  func yieldTypedMessage(_ message: any Messagable) {
+  internal func yieldTypedMessage(_ message: any Messagable) {
     for continuation in typedMessageContinuations.values {
       continuation.yield(message)
     }
   }
 
-  func yieldSendResult(_ result: ConnectivitySendResult) {
+  internal func yieldSendResult(_ result: ConnectivitySendResult) {
     for continuation in sendResultContinuations.values {
       continuation.yield(result)
     }

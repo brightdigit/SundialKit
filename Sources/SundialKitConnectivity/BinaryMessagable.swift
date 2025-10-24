@@ -28,7 +28,7 @@
 //
 
 public import Foundation
-public import SundialKitCore
+import SundialKitCore
 
 /// Protocol for binary-encoded messages (Protobuf, MessagePack, custom formats).
 ///

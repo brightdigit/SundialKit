@@ -35,37 +35,7 @@ import Testing
 
 // MARK: - Test Observer
 
-private final class TestObserver: NetworkStateObserver, @unchecked Sendable {
-  var pathStatusUpdates: [PathStatus] = []
-  var expensiveUpdates: [Bool] = []
-  var constrainedUpdates: [Bool] = []
-
-  func networkMonitor(didUpdatePathStatus status: PathStatus) {
-    pathStatusUpdates.append(status)
-  }
-
-  func networkMonitor(didUpdateExpensive isExpensive: Bool) {
-    expensiveUpdates.append(isExpensive)
-  }
-
-  func networkMonitor(didUpdateConstrained isConstrained: Bool) {
-    constrainedUpdates.append(isConstrained)
-  }
-}
-
 // MARK: - Task.sleep Polyfill for watchOS < 9.0
-
-extension Task where Success == Never, Failure == Never {
-  /// Suspends the current task for the given duration.
-  /// - Parameter duration: The duration to sleep for.
-  fileprivate static func sleep(forMilliseconds milliseconds: UInt64) async throws {
-    if #available(watchOS 9.0, *) {
-      try await self.sleep(for: .milliseconds(milliseconds))
-    } else {
-      try await self.sleep(nanoseconds: milliseconds * 1_000_000)
-    }
-  }
-}
 
 // MARK: - NetworkMonitor Tests
 
@@ -211,7 +181,7 @@ struct NetworkMonitorTests {
   func testObserverPathStatusNotification() async throws {
     let pathMonitor = MockPathMonitor(id: UUID())
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
-    let observer = TestObserver()
+    let observer = TestNetworkStateObserver()
 
     monitor.addObserver(observer)
     monitor.start(queue: .global())
@@ -236,7 +206,7 @@ struct NetworkMonitorTests {
   func testObserverExpensiveNotification() async throws {
     let pathMonitor = MockPathMonitor(id: UUID())
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
-    let observer = TestObserver()
+    let observer = TestNetworkStateObserver()
 
     monitor.addObserver(observer)
     monitor.start(queue: .global())
@@ -259,7 +229,7 @@ struct NetworkMonitorTests {
   func testObserverConstrainedNotification() async throws {
     let pathMonitor = MockPathMonitor(id: UUID())
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
-    let observer = TestObserver()
+    let observer = TestNetworkStateObserver()
 
     monitor.addObserver(observer)
     monitor.start(queue: .global())
@@ -282,7 +252,7 @@ struct NetworkMonitorTests {
   func testRemoveObserver() async throws {
     let pathMonitor = MockPathMonitor(id: UUID())
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
-    let observer = TestObserver()
+    let observer = TestNetworkStateObserver()
 
     monitor.addObserver(observer)
     monitor.start(queue: .global())
@@ -315,7 +285,7 @@ struct NetworkMonitorTests {
   func testDuplicateObservers() async throws {
     let pathMonitor = MockPathMonitor(id: UUID())
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
-    let observer = TestObserver()
+    let observer = TestNetworkStateObserver()
 
     monitor.addObserver(observer)
     monitor.addObserver(observer)  // Add again
@@ -370,7 +340,7 @@ struct NetworkMonitorTests {
   func testConcurrentObserverOperations() async {
     let pathMonitor = MockPathMonitor(id: UUID())
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
-    let observers = (0..<10).map { _ in TestObserver() }
+    let observers = (0..<10).map { _ in TestNetworkStateObserver() }
 
     monitor.start(queue: .global())
 

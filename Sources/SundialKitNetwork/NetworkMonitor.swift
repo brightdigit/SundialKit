@@ -30,27 +30,6 @@
 public import Foundation
 public import SundialKitCore
 
-/// A protocol for observing network state changes.
-///
-/// Implement this protocol to receive notifications when network connectivity
-/// changes in a ``NetworkMonitor``.
-public protocol NetworkStateObserver: AnyObject {
-  /// Called when the network path status changes.
-  ///
-  /// - Parameter status: The new path status
-  func networkMonitor(didUpdatePathStatus status: PathStatus)
-
-  /// Called when the expensive network status changes.
-  ///
-  /// - Parameter isExpensive: Whether the connection is expensive
-  func networkMonitor(didUpdateExpensive isExpensive: Bool)
-
-  /// Called when the constrained network status changes.
-  ///
-  /// - Parameter isConstrained: Whether the connection is constrained
-  func networkMonitor(didUpdateConstrained isConstrained: Bool)
-}
-
 /// A non-reactive network monitor that implements the `NetworkMonitoring` protocol.
 ///
 /// `NetworkMonitor` provides network connectivity monitoring without requiring Combine,

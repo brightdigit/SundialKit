@@ -29,15 +29,14 @@
 
 #if canImport(Network)
   import Network
-  public import SundialKitCore
+  import SundialKitCore
 
   extension PathStatus {
     /// Creates a `PathStatus`.
     /// - Parameters:
     ///   - status: The `NWPath.Status`
     ///   - interfaces: The `Interfacable` objects.
-    // swiftlint:disable:next explicit_acl
-    init(
+    internal init(
       _ status: NWPath.Status,
       interfaces: [any Interfaceable]
     ) {

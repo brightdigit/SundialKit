@@ -47,7 +47,7 @@ extension MessageHandling {
   /// - Parameters:
   ///   - message: The received message dictionary
   ///   - replyHandler: Handler to send a reply back to the sender
-  func handleMessage(
+  internal func handleMessage(
     _ message: ConnectivityMessage,
     replyHandler: @escaping @Sendable ([String: any Sendable]) -> Void
   ) async {
@@ -58,7 +58,7 @@ extension MessageHandling {
   /// - Parameters:
   ///   - applicationContext: The updated application context
   ///   - error: Optional error that occurred during context update
-  func handleApplicationContext(_ applicationContext: ConnectivityMessage, error: Error?)
+  internal func handleApplicationContext(_ applicationContext: ConnectivityMessage, error: Error?)
     async
   {
     await messageDistributor.handleApplicationContext(applicationContext, error: error)
@@ -68,7 +68,7 @@ extension MessageHandling {
   /// - Parameters:
   ///   - data: The received binary data
   ///   - replyHandler: Handler to send binary data back to the sender
-  func handleBinaryMessage(_ data: Data, replyHandler: @escaping @Sendable (Data) -> Void)
+  internal func handleBinaryMessage(_ data: Data, replyHandler: @escaping @Sendable (Data) -> Void)
     async
   {
     await messageDistributor.handleBinaryMessage(data, replyHandler: replyHandler)

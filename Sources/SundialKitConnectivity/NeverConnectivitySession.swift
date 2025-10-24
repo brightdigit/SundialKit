@@ -73,17 +73,12 @@ public final class NeverConnectivitySession: NSObject, ConnectivitySession, @unc
 
   /// Attempts to update application context (always throws).
   ///
-  /// - Parameter context: The context to update (ignored)
   /// - Throws: `SundialError.sessionNotSupported`
   public func updateApplicationContext(_: ConnectivityMessage) throws {
     throw SundialError.sessionNotSupported
   }
 
   /// Attempts to send a message (always fails).
-  ///
-  /// - Parameters:
-  ///   - message: The message to send (ignored)
-  ///   - completion: Handler called with failure
   public func sendMessage(
     _: ConnectivityMessage,
     _ completion: @escaping (Result<ConnectivityMessage, any Error>) -> Void
@@ -92,10 +87,6 @@ public final class NeverConnectivitySession: NSObject, ConnectivitySession, @unc
   }
 
   /// Attempts to send binary message data (always fails).
-  ///
-  /// - Parameters:
-  ///   - data: The data to send (ignored)
-  ///   - completion: Handler called with failure
   public func sendMessageData(
     _: Data,
     _ completion: @escaping (Result<Data, any Error>) -> Void

@@ -29,44 +29,6 @@
 
 import Foundation
 
-/// A type alias for messages exchanged via WatchConnectivity.
-///
-/// Represents the dictionary-based message format required by WatchConnectivity.
-/// Messages must contain only property list types (String, Number, Date, Data, Array, Dictionary).
-public typealias ConnectivityMessage = [String: any Sendable]
-
-// swift-format-ignore: NeverForceUnwrap
-extension Dictionary where Key == String, Value == any Sendable {
-  /// Creates a ConnectivityMessage by force casting from `[String: Any]`.
-  ///
-  /// This initializer consolidates force casting logic into a single location,
-  /// making it easier to handle WatchConnectivity APIs that return `[String: Any]`.
-  ///
-  /// - Parameter dictionary: The dictionary to convert. All values must actually
-  ///   conform to `Sendable`, though the type system doesn't enforce this.
-  ///
-  /// - Warning: This initializer force casts the values to `any Sendable`.
-  ///   Use only when you're certain all values conform to `Sendable`,
-  ///   such as when receiving messages from WatchConnectivity APIs.
-  ///
-  /// ## Example
-  ///
-  /// ```swift
-  /// // From WatchConnectivity delegate method
-  /// func session(
-  ///   _ session: WCSession,
-  ///   didReceiveMessage message: [String: Any]
-  /// ) {
-  ///   let connectivityMessage = ConnectivityMessage(forceCasting: message)
-  ///   // Use connectivityMessage safely
-  /// }
-  /// ```
-  public init(forceCasting dictionary: [String: Any]) {
-    // swiftlint:disable:next force_cast
-    self = dictionary.mapValues { $0 as! any Sendable }
-  }
-}
-
 /// A protocol for managing connectivity between iOS and watchOS devices.
 ///
 /// Types conforming to `ConnectivityManagement` provide the ability to establish

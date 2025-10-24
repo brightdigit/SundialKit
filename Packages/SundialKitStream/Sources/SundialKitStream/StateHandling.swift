@@ -75,19 +75,19 @@ extension StateHandling {
   /// - Parameters:
   ///   - activationState: The new activation state
   ///   - error: Optional error that occurred during activation
-  func handleActivation(_ activationState: ActivationState, error: Error?) async {
+  internal func handleActivation(_ activationState: ActivationState, error: Error?) async {
     await stateManager.handleActivation(activationState, error: error)
   }
 
   /// Handles reachability status changes
   /// - Parameter isReachable: Whether the counterpart device is reachable
-  func handleReachabilityChange(_ isReachable: Bool) async {
+  internal func handleReachabilityChange(_ isReachable: Bool) async {
     await stateManager.updateReachability(isReachable)
   }
 
   /// Handles companion state changes (paired status, app installed status)
   /// - Parameter session: The connectivity session with updated state
-  func handleCompanionStateChange(_ session: any ConnectivitySession) async {
+  internal func handleCompanionStateChange(_ session: any ConnectivitySession) async {
     await stateManager.updateCompanionState(
       isPairedAppInstalled: session.isPairedAppInstalled,
       isPaired: session.isPaired

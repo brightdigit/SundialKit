@@ -42,43 +42,43 @@ internal actor ConnectivityStateManager {
   private var state: ConnectivityState = .initial
   private let continuationManager: StreamContinuationManager
 
-  // MARK: - Initialization
-
-  init(continuationManager: StreamContinuationManager) {
-    self.continuationManager = continuationManager
-  }
-
   // MARK: - State Access
 
-  var currentState: ConnectivityState {
+  internal var currentState: ConnectivityState {
     state
   }
 
-  var activationState: ActivationState? {
+  internal var activationState: ActivationState? {
     state.activationState
   }
 
-  var activationError: (any Error)? {
+  internal var activationError: (any Error)? {
     state.activationError
   }
 
-  var isReachable: Bool {
+  internal var isReachable: Bool {
     state.isReachable
   }
 
-  var isPairedAppInstalled: Bool {
+  internal var isPairedAppInstalled: Bool {
     state.isPairedAppInstalled
   }
 
   #if os(iOS)
-    var isPaired: Bool {
+    internal var isPaired: Bool {
       state.isPaired
     }
   #endif
 
+  // MARK: - Initialization
+
+  internal init(continuationManager: StreamContinuationManager) {
+    self.continuationManager = continuationManager
+  }
+
   // MARK: - State Updates
 
-  func handleActivation(_ activationState: ActivationState, error: (any Error)?) async {
+  internal func handleActivation(_ activationState: ActivationState, error: (any Error)?) async {
     #if os(iOS)
       state = ConnectivityState(
         activationState: activationState,
@@ -115,7 +115,7 @@ internal actor ConnectivityStateManager {
     #endif
   }
 
-  func updateReachability(_ isReachable: Bool) async {
+  internal func updateReachability(_ isReachable: Bool) async {
     #if os(iOS)
       state = ConnectivityState(
         activationState: state.activationState,
@@ -137,7 +137,7 @@ internal actor ConnectivityStateManager {
     await continuationManager.yieldReachability(isReachable)
   }
 
-  func updateCompanionState(isPairedAppInstalled: Bool, isPaired: Bool) async {
+  internal func updateCompanionState(isPairedAppInstalled: Bool, isPaired: Bool) async {
     #if os(iOS)
       state = ConnectivityState(
         activationState: state.activationState,

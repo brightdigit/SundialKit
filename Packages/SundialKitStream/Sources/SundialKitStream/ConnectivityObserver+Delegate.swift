@@ -35,32 +35,38 @@ public import SundialKitCore
 extension ConnectivityObserver {
   // MARK: - ConnectivitySessionDelegate (nonisolated to receive callbacks)
 
+  /// Handles session activation completion.
   nonisolated public func session(
-    _ session: any ConnectivitySession,
+    _: any ConnectivitySession,
     activationDidCompleteWith state: ActivationState,
     error: Error?
   ) {
     Task { await handleActivation(state, error: error) }
   }
 
+  /// Handles session becoming inactive.
   nonisolated public func sessionDidBecomeInactive(_ session: any ConnectivitySession) {
     Task { await handleActivation(session.activationState, error: nil) }
   }
 
+  /// Handles session deactivation.
   nonisolated public func sessionDidDeactivate(_ session: any ConnectivitySession) {
     Task { await handleActivation(session.activationState, error: nil) }
   }
 
+  /// Handles reachability changes.
   nonisolated public func sessionReachabilityDidChange(_ session: any ConnectivitySession) {
     Task { await handleReachabilityChange(session.isReachable) }
   }
 
+  /// Handles companion device state changes.
   nonisolated public func sessionCompanionStateDidChange(_ session: any ConnectivitySession) {
     Task { await handleCompanionStateChange(session) }
   }
 
+  /// Handles received messages with reply handler.
   nonisolated public func session(
-    _ session: any ConnectivitySession,
+    _: any ConnectivitySession,
     didReceiveMessage message: ConnectivityMessage,
     replyHandler: @escaping @Sendable ([String: any Sendable]) -> Void
   ) {
@@ -69,8 +75,9 @@ extension ConnectivityObserver {
     }
   }
 
+  /// Handles application context updates.
   nonisolated public func session(
-    _ session: any ConnectivitySession,
+    _: any ConnectivitySession,
     didReceiveApplicationContext applicationContext: ConnectivityMessage,
     error: Error?
   ) {
@@ -79,8 +86,9 @@ extension ConnectivityObserver {
     }
   }
 
+  /// Handles received binary message data.
   nonisolated public func session(
-    _ session: any ConnectivitySession,
+    _: any ConnectivitySession,
     didReceiveMessageData messageData: Data,
     replyHandler: @escaping @Sendable (Data) -> Void
   ) {

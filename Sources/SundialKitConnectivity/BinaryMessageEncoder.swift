@@ -28,7 +28,7 @@
 //
 
 public import Foundation
-public import SundialKitCore
+import SundialKitCore
 
 /// Encodes and decodes binary messages with type discrimination footers.
 ///

@@ -87,6 +87,11 @@
 
     // MARK: - Initialization
 
+    /// MainActor-isolated network observer providing Combine publishers
+    /// - Parameters:
+    ///   - monitor: A ``PathMonitor``.
+    ///   - ping: A ``NetworkPing``
+    ///   - queue: Dispatch Queue to monitor on.
     public init(monitor: MonitorType, ping: PingType?, queue: DispatchQueue = .main) {
       self.monitor = monitor
       self.ping = ping

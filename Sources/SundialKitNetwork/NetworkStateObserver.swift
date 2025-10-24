@@ -1,5 +1,5 @@
 //
-//  NeverPing.swift
+//  NetworkStateObserver.swift
 //  SundialKit
 //
 //  Created by Leo Dion.
@@ -27,29 +27,25 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-public import Foundation
 public import SundialKitCore
 
-/// `NetworkPing` which is never called.
-/// This used for a `NetworkObserver` that doesn't need a continuous ping.
-public struct NeverPing: NetworkPing, Sendable {
-  /// The ping status type (Never, since this implementation never pings).
-  public typealias StatusType = Never
-
-  /// The time interval for pings (NaN, since this implementation never pings).
-  public var timeInterval: TimeInterval {
-    .nan
-  }
-
-  private init() {}
-
-  /// Determines whether a ping should be performed (always returns false).
+/// A protocol for observing network state changes.
+///
+/// Implement this protocol to receive notifications when network connectivity
+/// changes in a ``NetworkMonitor``.
+public protocol NetworkStateObserver: AnyObject {
+  /// Called when the network path status changes.
   ///
-  /// - Returns: Always false
-  public func shouldPing(onStatus _: PathStatus) -> Bool {
-    false
-  }
+  /// - Parameter status: The new path status
+  func networkMonitor(didUpdatePathStatus status: PathStatus)
 
-  /// Sets the ping handler (no-op, since this implementation never pings).
-  public func onPing(_: @escaping (Never) -> Void) {}
+  /// Called when the expensive network status changes.
+  ///
+  /// - Parameter isExpensive: Whether the connection is expensive
+  func networkMonitor(didUpdateExpensive isExpensive: Bool)
+
+  /// Called when the constrained network status changes.
+  ///
+  /// - Parameter isConstrained: Whether the connection is constrained
+  func networkMonitor(didUpdateConstrained isConstrained: Bool)
 }

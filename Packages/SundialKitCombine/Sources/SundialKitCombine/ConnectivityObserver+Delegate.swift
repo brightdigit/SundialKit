@@ -37,6 +37,7 @@
 
   @MainActor
   extension ConnectivityObserver {
+    /// Handles session activation completion.
     nonisolated public func session(
       _ session: any ConnectivitySession,
       activationDidCompleteWith state: ActivationState,
@@ -76,6 +77,7 @@
       }
     }
 
+    /// Handles session deactivation.
     nonisolated public func sessionDidDeactivate(_ session: any ConnectivitySession) {
       // Extract value before crossing isolation boundary
       let activationState = session.activationState
@@ -94,6 +96,7 @@
       }
     }
 
+    /// Handles companion device state changes.
     nonisolated public func sessionCompanionStateDidChange(_ session: any ConnectivitySession) {
       // Extract values before crossing isolation boundary
       let isPairedAppInstalled = session.isPairedAppInstalled
@@ -109,6 +112,7 @@
       }
     }
 
+    /// Handles received message with reply handler.
     nonisolated public func session(
       _ session: any ConnectivitySession,
       didReceiveMessage message: ConnectivityMessage,
@@ -157,6 +161,7 @@
       }
     }
 
+    /// Handles received binary message data with reply handler.
     nonisolated public func session(
       _ session: any ConnectivitySession,
       didReceiveMessageData messageData: Data,

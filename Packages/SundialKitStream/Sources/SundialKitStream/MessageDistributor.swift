@@ -44,7 +44,7 @@ internal actor MessageDistributor {
 
   // MARK: - Initialization
 
-  init(
+  internal init(
     continuationManager: StreamContinuationManager,
     messageDecoder: MessageDecoder?
   ) {
@@ -54,7 +54,7 @@ internal actor MessageDistributor {
 
   // MARK: - Message Handling
 
-  func handleMessage(
+  internal func handleMessage(
     _ message: ConnectivityMessage,
     replyHandler: @escaping @Sendable ([String: any Sendable]) -> Void
   ) async {
@@ -74,7 +74,7 @@ internal actor MessageDistributor {
     }
   }
 
-  func handleApplicationContext(
+  internal func handleApplicationContext(
     _ applicationContext: ConnectivityMessage,
     error: (any Error)?
   ) async {
@@ -97,7 +97,7 @@ internal actor MessageDistributor {
     }
   }
 
-  func handleBinaryMessage(
+  internal func handleBinaryMessage(
     _ data: Data,
     replyHandler: @escaping @Sendable (Data) -> Void
   ) async {
@@ -113,7 +113,7 @@ internal actor MessageDistributor {
     }
   }
 
-  func notifySendResult(_ result: ConnectivitySendResult) async {
+  internal func notifySendResult(_ result: ConnectivitySendResult) async {
     await continuationManager.yieldSendResult(result)
   }
 }

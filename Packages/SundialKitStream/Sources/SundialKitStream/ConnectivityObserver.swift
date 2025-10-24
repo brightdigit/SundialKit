@@ -93,18 +93,18 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
   }
 
   #if canImport(WatchConnectivity)
-    @available(macOS, unavailable)
-    @available(tvOS, unavailable)
     /// Creates a `ConnectivityObserver` which uses WatchConnectivity
     /// - Parameter messageDecoder: Optional decoder for automatic message decoding
+    @available(macOS, unavailable)
+    @available(tvOS, unavailable)
     public init(messageDecoder: MessageDecoder? = nil) {
       self.init(session: WatchConnectivitySession(), messageDecoder: messageDecoder)
     }
   #else
-    @available(macOS, unavailable)
-    @available(tvOS, unavailable)
     /// Creates a `ConnectivityObserver` with a never-available session
     /// - Parameter messageDecoder: Optional decoder for automatic message decoding
+    @available(macOS, unavailable)
+    @available(tvOS, unavailable)
     public init(messageDecoder: MessageDecoder? = nil) {
       self.init(session: NeverConnectivitySession(), messageDecoder: messageDecoder)
     }

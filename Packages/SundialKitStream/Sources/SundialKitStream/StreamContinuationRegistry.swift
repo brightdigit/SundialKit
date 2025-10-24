@@ -53,16 +53,20 @@ import Foundation
 /// ```
 @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
 internal struct StreamContinuationRegistry<Element> where Element: Sendable {
-  // MARK: - Private Properties
+  // MARK: - Properties
 
   private var continuations: [UUID: AsyncStream<Element>.Continuation] = [:]
 
+  /// Returns the number of active continuations.
+  internal var count: Int {
+    continuations.count
+  }
   // MARK: - Initialization
 
   /// Creates a new stream continuation registry.
   internal init() {}
 
-  // MARK: - Stream Management
+  // MARK: - Methods
 
   /// Creates a new AsyncStream and registers its continuation.
   ///
@@ -116,10 +120,5 @@ internal struct StreamContinuationRegistry<Element> where Element: Sendable {
       continuation.finish()
     }
     continuations.removeAll()
-  }
-
-  /// Returns the number of active continuations.
-  internal var count: Int {
-    continuations.count
   }
 }

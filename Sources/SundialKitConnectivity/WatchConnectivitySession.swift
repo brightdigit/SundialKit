@@ -32,9 +32,6 @@
   public import SundialKitCore
   import WatchConnectivity
 
-  internal typealias WatchConnectivitySessionProtocol =
-    ConnectivitySession & WCSessionDelegate
-
   /// Concrete implementation of `ConnectivitySession` wrapping Apple's `WCSession`.
   ///
   /// Provides a Sendable-safe bridge between WatchConnectivity's delegate-based API
@@ -42,38 +39,10 @@
   public final class WatchConnectivitySession: NSObject, WatchConnectivitySessionProtocol,
     @unchecked Sendable
   {
-    private let session: WCSession
+    internal let session: WCSession
 
     /// The delegate to receive session lifecycle and message events.
     public var delegate: ConnectivitySessionDelegate?
-
-    /// Whether the counterpart device is currently reachable for immediate message delivery.
-    public var isReachable: Bool {
-      session.isReachable
-    }
-
-    /// Whether the iPhone is paired with an Apple Watch (iOS only).
-    public var isPaired: Bool {
-      #if os(watchOS)
-        true
-      #else
-        session.isPaired
-      #endif
-    }
-
-    /// Whether the counterpart app is installed on the paired device.
-    public var isPairedAppInstalled: Bool {
-      session.isPairedAppInstalled
-    }
-
-    /// The current activation state of the session.
-    public var activationState: ActivationState {
-      guard let state = ActivationState(rawValue: session.activationState.rawValue) else {
-        preconditionFailure()
-      }
-
-      return state
-    }
 
     internal init(session: WCSession) {
       self.session = session
@@ -83,164 +52,6 @@
 
     override public convenience init() {
       self.init(session: .default)
-    }
-
-    /// Updates the application context to be sent to the counterpart device.
-    ///
-    /// The context is delivered opportunistically when the counterpart wakes up.
-    /// Only the most recent context is preserved; previous contexts are replaced.
-    ///
-    /// - Parameter context: The dictionary to send as application context
-    /// - Throws: An error if the context update fails
-    public func updateApplicationContext(_ context: ConnectivityMessage) throws {
-      try session.updateApplicationContext(context as [String: Any])
-    }
-
-    /// Sends a message to the counterpart device with an optional reply.
-    ///
-    /// Requires the counterpart device to be reachable. Messages are delivered
-    /// immediately and can include a reply from the counterpart.
-    ///
-    /// - Parameters:
-    ///   - message: The dictionary message to send
-    ///   - completion: Handler called with the reply or error
-    public func sendMessage(
-      _ message: ConnectivityMessage,
-      _ completion: @escaping (Result<ConnectivityMessage, Error>) -> Void
-    ) {
-      session.sendMessage(
-        message as [String: Any]
-      ) { response in
-        // WatchConnectivity only supports property list types which are inherently Sendable
-        let sendableResponse = ConnectivityMessage(forceCasting: response)
-        completion(.success(sendableResponse))
-      } errorHandler: { error in
-        completion(.failure(error))
-      }
-    }
-
-    /// Sends binary message data to the counterpart device.
-    ///
-    /// This method provides direct binary transport for `BinaryMessagable` types.
-    /// The binary data should include a type discrimination footer created by
-    /// `BinaryMessageEncoder.encode(_:)`.
-    ///
-    /// - Parameters:
-    ///   - data: The binary message data with type footer
-    ///   - completion: Handler called with the result (reply data or error)
-    public func sendMessageData(
-      _ data: Data,
-      _ completion: @escaping (Result<Data, Error>) -> Void
-    ) {
-      session.sendMessageData(
-        data
-      ) { responseData in
-        completion(.success(responseData))
-      } errorHandler: { error in
-        completion(.failure(error))
-      }
-    }
-
-    /// Activates the session to begin communication with the counterpart device.
-    ///
-    /// Must be called before any message exchange can occur.
-    ///
-    /// - Throws: `SundialError.sessionNotSupported` if WatchConnectivity is not supported
-    public func activate() throws {
-      guard WCSession.isSupported() else {
-        throw SundialError.sessionNotSupported
-      }
-      session.activate()
-    }
-
-    internal func session(
-      _: WCSession,
-      activationDidCompleteWith activationState: WCSessionActivationState,
-      error: Error?
-    ) {
-      guard
-        let activationState: ActivationState =
-          .init(rawValue: activationState.rawValue)
-      else {
-        preconditionFailure()
-      }
-      delegate?.session(
-        self,
-        activationDidCompleteWith: activationState,
-        error: error
-      )
-    }
-
-    #if os(iOS)
-
-      internal func sessionDidBecomeInactive(_: WCSession) {
-        delegate?.sessionDidBecomeInactive(self)
-      }
-
-      internal func sessionDidDeactivate(_: WCSession) {
-        delegate?.sessionDidDeactivate(self)
-      }
-
-      internal func sessionWatchStateDidChange(_: WCSession) {
-        delegate?.sessionCompanionStateDidChange(self)
-      }
-
-    #elseif os(watchOS)
-
-      internal func sessionCompanionAppInstalledDidChange(_: WCSession) {
-        delegate?.sessionCompanionStateDidChange(self)
-      }
-    #endif
-
-    internal func sessionReachabilityDidChange(_: WCSession) {
-      delegate?.sessionReachabilityDidChange(self)
-    }
-
-    internal func session(
-      _: WCSession,
-      didReceiveMessage message: [String: Any],
-      replyHandler: @escaping ([String: Any]) -> Void
-    ) {
-      // WatchConnectivity only supports property list types which are inherently Sendable
-      let sendableMessage = ConnectivityMessage(forceCasting: message)
-      let handler = unsafeBitCast(replyHandler, to: ConnectivityHandler.self)
-      delegate?.session(self, didReceiveMessage: sendableMessage, replyHandler: handler)
-    }
-
-    internal func session(
-      _: WCSession,
-      didReceiveApplicationContext applicationContext: [String: Any]
-    ) {
-      // WatchConnectivity only supports property list types which are inherently Sendable
-      let sendableContext = ConnectivityMessage(forceCasting: applicationContext)
-      delegate?.session(
-        self,
-        didReceiveApplicationContext: sendableContext,
-        error: nil
-      )
-    }
-
-    internal func session(
-      _: WCSession,
-      didReceiveApplicationContext applicationContext: [String: Any],
-      error: Error?
-    ) {
-      // WatchConnectivity only supports property list types which are inherently Sendable
-      let sendableContext = ConnectivityMessage(forceCasting: applicationContext)
-      delegate?.session(
-        self,
-        didReceiveApplicationContext: sendableContext,
-        error: error
-      )
-    }
-
-    internal func session(
-      _: WCSession,
-      didReceiveMessageData messageData: Data,
-      replyHandler: @escaping (Data) -> Void
-    ) {
-      let handler = unsafeBitCast(replyHandler, to: (@Sendable (Data) -> Void).self)
-      delegate?.session(self, didReceiveMessageData: messageData, replyHandler: handler)
     }
   }
 

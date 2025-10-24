@@ -1,5 +1,5 @@
 //
-//  ConnectivityState.swift
+//  NetworkObserver+Init.swift
 //  SundialKitStream
 //
 //  Created by Leo Dion.
@@ -27,36 +27,21 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import SundialKitCore
+public import SundialKitNetwork
 
-/// Immutable value type representing WatchConnectivity session state.
-///
-/// `ConnectivityState` encapsulates the current state of a connectivity session,
-/// including activation status, reachability, and pairing information. This value
-/// type is used internally by `ConnectivityObserver` for state management.
+// MARK: - Convenience Initializers
 @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-internal struct ConnectivityState: Sendable {
-  /// The default initial state before activation.
-  internal static let initial = ConnectivityState(
-    activationState: nil,
-    activationError: nil,
-    isReachable: false,
-    isPairedAppInstalled: false,
-    isPaired: false
-  )
+extension NetworkObserver where PingType == NeverPing {
+  /// Creates `NetworkObserver` without ping
+  public init(monitor: MonitorType) {
+    self.init(monitor: monitor, pingOrNil: nil)
+  }
+}
 
-  /// The current activation state of the session.
-  internal let activationState: ActivationState?
-
-  /// The last error that occurred during activation, if any.
-  internal let activationError: (any Error & Sendable)?
-
-  /// Whether the counterpart device is currently reachable.
-  internal let isReachable: Bool
-
-  /// Whether the counterpart app is installed on the paired device.
-  internal let isPairedAppInstalled: Bool
-
-  /// Whether an Apple Watch is paired with this iPhone (iOS only).
-  internal let isPaired: Bool
+@available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+extension NetworkObserver {
+  /// Creates `NetworkObserver` with ping
+  public init(monitor: MonitorType, ping: PingType) {
+    self.init(monitor: monitor, pingOrNil: ping)
+  }
 }
