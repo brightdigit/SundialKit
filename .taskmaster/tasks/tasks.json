@@ -207,7 +207,7 @@
         "id": 3,
         "title": "Extract ConnectivityManager from ConnectivityObserver",
         "description": "Create non-reactive ConnectivityManager class in SundialKitConnectivity target for WatchConnectivity management",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "1"
         ],
@@ -305,7 +305,7 @@
               7
             ],
             "details": "Create ConnectivityManagerTests using Swift Testing framework with platform-conditional compilation following existing test patterns. Port test structure from ConnectivityObserverMessageTests.swift and ConnectivityObserverPropertyTests.swift. Test activation lifecycle including success, failure, and timeout scenarios. Verify message sending and receiving with MockSession (reuse existing patterns from testCombineSendMessageReachable and testCombineSendMessageAppInstalled). Test reachability state changes and observer notifications. Validate platform-specific delegate methods on iOS. Test error handling and mapping for all error cases. Verify thread safety with concurrent operations. Test message size validation and routing decisions. Include integration tests with MockSession. Ensure 90%+ code coverage matching existing test coverage.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": null,
             "parentId": "undefined"
           }
@@ -1222,7 +1222,7 @@
       ],
       "created": "2025-10-24T16:59:30.071Z",
       "description": "Tasks for master context",
-      "updated": "2025-10-24T18:25:28.406Z"
+      "updated": "2025-10-24T18:39:04.951Z"
     }
   }
 }
