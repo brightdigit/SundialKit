@@ -221,7 +221,7 @@
             "description": "Create the main ConnectivityManager class in SundialKitConnectivity target that implements the ConnectivityManagement protocol from SundialKitCore, establishing the foundational structure for WatchConnectivity management",
             "dependencies": [],
             "details": "Create ConnectivityManager.swift in SundialKitConnectivity/Sources with class definition implementing ConnectivityManagement protocol. Structure similar to existing ConnectivityObserver (Sources/SundialKit/WatchConnectivity/ConnectivityObserver.swift) but without Combine dependencies. Include properties for session management (internal let session: ConnectivitySession), state tracking (activationState, isReachable, isPaired, isPairedAppInstalled), observer storage using weak references, and delegate handling. Implement basic initializer with ConnectivitySession parameter and convenience initializer. Add platform availability guards matching existing @available(macOS, unavailable) @available(tvOS, unavailable) patterns. Remove all PassthroughSubject and AnyCancellable references.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test class initialization, protocol conformance, property initialization, and platform availability on iOS and watchOS simulators",
             "parentId": "undefined"
           },
@@ -233,7 +233,7 @@
               1
             ],
             "details": "Reuse existing ConnectivitySession protocol from Sources/SundialKit/WatchConnectivity/ConnectivitySession.swift with methods for activation, message sending, application context updates, and state queries. Leverage existing WatchConnectivitySession wrapper from Sources/SundialKit/WatchConnectivity/WatchConnectivitySession.swift around WCSession with all delegate methods implemented. The abstraction already includes platform-specific properties (#if os(iOS) var isPaired), thread-safe delegate assignment, and proper session lifecycle management. Continue using MockSession from Tests/SundialKitTests/MockSession.swift for testing purposes. No changes needed to these existing abstractions.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test protocol implementation using existing MockSession, delegate callbacks, verify abstraction maintains same interface as v1",
             "parentId": "undefined"
           },
@@ -245,7 +245,7 @@
               2
             ],
             "details": "Implement ConnectivitySessionDelegate conformance on ConnectivityManager using existing patterns from ConnectivityObserver (lines 126-199). Port methods: session(_:activationDidCompleteWith:error:) with main queue dispatch (lines 141-155), sessionDidBecomeInactive (lines 126-128), sessionDidDeactivate (lines 130-132), sessionCompanionStateDidChange (lines 134-139), sessionReachabilityDidChange (lines 157-161), session(_:didReceiveMessage:replyHandler:) (lines 184-190), session(_:didReceiveApplicationContext:error:) (lines 192-199). Update internal state properties based on delegate callbacks. Use existing DispatchQueue.main.async patterns for thread-safe state updates (lines 135, 146).",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test each delegate method with MockSession, verify platform-specific methods behavior, test state updates from callbacks using existing test patterns",
             "parentId": "undefined"
           },
@@ -257,7 +257,7 @@
               3
             ],
             "details": "Implement async activate() method using withCheckedThrowingContinuation to bridge delegate callbacks from session(_:activationDidCompleteWith:error:). Store continuation as optional property and resume on delegate callback. Add configurable timeout (default 30 seconds) using Task.sleep and cancellation. Handle race conditions between timeout and successful activation. Map activation errors and SundialError.sessionNotSupported to ConnectivityError cases. Ensure continuation is only resumed once to prevent crashes. Clean up stored continuation on completion or timeout. Follow existing session.activate() patterns from ConnectivityObserver.activate() (lines 121-124).",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test successful activation, timeout scenarios, error handling, concurrent activation attempts, and continuation cleanup",
             "parentId": "undefined"
           },
@@ -269,7 +269,7 @@
               4
             ],
             "details": "Port message routing logic from ConnectivityObserver.sendMessage method (lines 163-182). Implement async send(message:replyTimeout:) method that replicates existing routing logic: when session.isReachable (line 164) use session.sendMessage with completion handler (lines 165-167), when not reachable but session.isPairedAppInstalled (line 168) fallback to session.updateApplicationContext (lines 169-176), when companion unavailable throw SundialError.missingCompanion (lines 178-181). Validate message size against 65KB WatchConnectivity limit before sending. Handle reply timeouts using Task-based timing. Map existing SundialError cases to ConnectivityError from SundialKitCore.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test message routing decisions using MockSession patterns from ConnectivityObserverMessageTests.swift, fallback behavior, size validation, timeout handling, and error scenarios",
             "parentId": "undefined"
           },
@@ -281,7 +281,7 @@
               5
             ],
             "details": "Define ConnectivityStateObserver protocol with methods for state change notifications: connectivityStateDidChange, reachabilityDidChange, activationStateDidChange matching the state changes from existing Subject patterns (activationStateSubject line 48, isReachableSubject line 49, isPairedAppInstalledSubject line 50, isPairedSubject line 51). Implement observer management with weak reference array using NSHashTable or similar to prevent retain cycles. Create thread-safe add/remove observer methods using appropriate locking mechanism. Notify observers on main queue when state changes occur from delegate callbacks, replacing the Subject.send calls. Provide granular notification methods for different state aspects. Include automatic cleanup of deallocated observers.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test observer registration/removal, weak reference behavior, notification delivery, thread safety with concurrent observers",
             "parentId": "undefined"
           },
@@ -293,7 +293,7 @@
               6
             ],
             "details": "Implement error mapping to convert existing SundialError cases (sessionNotSupported, missingCompanion from Sources/SundialKit/SundialError.swift) to ConnectivityError enum cases defined in SundialKitCore. Map WCError codes to granular ConnectivityError cases: notReachable, deviceNotPaired, watchAppNotInstalled, notActivated, fileAccessDenied, deliveryFailed, insufficientSpace, sessionMissingDelegate, sessionNotActivated, sessionNotSupported, badPayload, messageReplyFailed, messageReplyTimedOut, transferTimedOut. Preserve original error as underlying error for debugging. Create helper methods for common error scenarios. Include descriptive error messages for each case following LocalizedError protocol patterns.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test all SundialError to ConnectivityError mappings, verify error messages, test error propagation through async methods",
             "parentId": "undefined"
           },
@@ -1221,7 +1221,8 @@
         "master"
       ],
       "created": "2025-10-24T16:59:30.071Z",
-      "description": "Tasks for master context"
+      "description": "Tasks for master context",
+      "updated": "2025-10-24T18:25:28.406Z"
     }
   }
 }
