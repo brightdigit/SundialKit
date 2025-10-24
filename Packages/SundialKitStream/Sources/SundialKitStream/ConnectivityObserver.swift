@@ -75,8 +75,8 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
   internal let session: any ConnectivitySession
   internal let messageRouter: MessageRouter
   internal let continuationManager: StreamContinuationManager
-  internal let stateManager: ConnectivityStateManager
-  internal let messageDistributor: MessageDistributor
+  public let stateManager: ConnectivityStateManager
+  public let messageDistributor: MessageDistributor
 
   // MARK: - Initialization
 

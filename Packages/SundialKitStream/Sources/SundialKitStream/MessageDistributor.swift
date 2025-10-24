@@ -36,7 +36,7 @@ public import SundialKitCore
 /// This type handles message decoding and distribution to both
 /// raw message streams and typed message streams.
 @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-internal actor MessageDistributor {
+public actor MessageDistributor {
   // MARK: - Properties
 
   private let continuationManager: StreamContinuationManager

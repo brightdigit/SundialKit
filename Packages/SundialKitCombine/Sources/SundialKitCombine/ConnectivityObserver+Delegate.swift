@@ -68,6 +68,7 @@
       }
     }
 
+    /// Handles when session becomes inactive.
     nonisolated public func sessionDidBecomeInactive(_ session: any ConnectivitySession) {
       // Extract value before crossing isolation boundary
       let activationState = session.activationState
@@ -87,6 +88,7 @@
       }
     }
 
+    /// Handles when session reachability changes.
     nonisolated public func sessionReachabilityDidChange(_ session: any ConnectivitySession) {
       // Extract value before crossing isolation boundary
       let isReachable = session.isReachable
@@ -136,6 +138,7 @@
       }
     }
 
+    /// Handles received application context.
     nonisolated public func session(
       _ session: any ConnectivitySession,
       didReceiveApplicationContext applicationContext: ConnectivityMessage,

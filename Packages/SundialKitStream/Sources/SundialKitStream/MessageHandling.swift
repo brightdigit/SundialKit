@@ -36,7 +36,7 @@ internal import SundialKitCore
 /// Provides default implementations for common message handling patterns
 /// by delegating to a `MessageDistributor`.
 @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-internal protocol MessageHandling {
+public protocol MessageHandling {
   /// The message distributor responsible for routing messages to subscribers
   var messageDistributor: MessageDistributor { get }
 }

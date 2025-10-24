@@ -36,7 +36,7 @@ public import SundialKitCore
 /// This type coordinates state updates with the StreamContinuationManager,
 /// ensuring all subscribers receive state change notifications.
 @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-internal actor ConnectivityStateManager {
+public actor ConnectivityStateManager {
   // MARK: - Properties
 
   private var state: ConnectivityState = .initial

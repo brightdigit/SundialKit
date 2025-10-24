@@ -1,5 +1,5 @@
 //
-//  ConnectivityObserver+Delegate.swift
+//  StateHandling+MessageHandling.swift
 //  SundialKitStream
 //
 //  Created by Leo Dion.
@@ -31,8 +31,7 @@ public import Foundation
 public import SundialKitConnectivity
 public import SundialKitCore
 
-@available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-extension ConnectivityObserver {
+extension StateHandling where Self: MessageHandling & Sendable {
   // MARK: - ConnectivitySessionDelegate (nonisolated to receive callbacks)
 
   /// Handles session activation completion.

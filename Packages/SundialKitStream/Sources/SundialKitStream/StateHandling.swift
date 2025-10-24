@@ -64,7 +64,7 @@ internal import SundialKitCore
 /// Provides default implementations for common state handling patterns
 /// by delegating to a `ConnectivityStateManager`.
 @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-internal protocol StateHandling {
+public protocol StateHandling {
   /// The state manager responsible for tracking connectivity state
   var stateManager: ConnectivityStateManager { get }
 }
