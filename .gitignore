@@ -142,4 +142,3 @@ xcuserdata
 #**/*.appiconset/*.png
 #PLists/**/*.plist
 swiftpm
-vendor
