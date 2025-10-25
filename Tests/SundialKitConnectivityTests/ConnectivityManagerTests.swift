@@ -13,22 +13,44 @@
   @testable import SundialKitConnectivity
   @testable import SundialKitCore
 
+  // MARK: - Test Helpers
+
+  /// Waits for a condition to become true, polling at regular intervals.
+  ///
+  /// - Parameters:
+  ///   - timeout: Maximum time to wait in seconds (default: 5)
+  ///   - pollInterval: Time between checks in nanoseconds (default: 10ms)
+  ///   - condition: The condition to check
+  /// - Throws: If the timeout expires before the condition becomes true
+  internal func waitUntil(
+    timeout: TimeInterval = 5,
+    pollInterval: UInt64 = 10_000_000,
+    _ condition: @escaping () async -> Bool
+  ) async throws {
+    let deadline = Date().addingTimeInterval(timeout)
+    while Date() < deadline {
+      if await condition() {
+        return
+      }
+      try await Task.sleep(nanoseconds: pollInterval)
+    }
+    Issue.record("Timeout waiting for condition")
+  }
+
   @Suite("ConnectivityManager Tests")
-  @available(macOS, unavailable)
-  @available(tvOS, unavailable)
   internal struct ConnectivityManagerTests {
     // MARK: - Initialization Tests
 
     @Test("Manager initializes with default session")
-    internal func initializeWithDefaultSession() {
+    internal func initializeWithDefaultSession() async {
       let manager = ConnectivityManager()
-      #expect(manager.activationState == .notActivated)
-      #expect(!manager.isReachable)
-      #expect(!manager.isPairedAppInstalled)
+      #expect(await manager.activationState == .notActivated)
+      #expect(await !manager.isReachable)
+      #expect(await !manager.isPairedAppInstalled)
     }
 
     @Test("Manager initializes with custom session")
-    internal func initializeWithCustomSession() {
+    internal func initializeWithCustomSession() async {
       let mockSession = MockSession()
       mockSession.activationState = .activated
       mockSession.isReachable = true
@@ -36,24 +58,27 @@
       mockSession.isPaired = true
 
       let manager = ConnectivityManager(session: mockSession)
-      #expect(manager.activationState == .activated)
-      #expect(manager.isReachable)
-      #expect(manager.isPairedAppInstalled)
+      #expect(await manager.activationState == .activated)
+      #expect(await manager.isReachable)
+      #expect(await manager.isPairedAppInstalled)
       #if os(iOS)
-        #expect(manager.isPaired)
+        #expect(await manager.isPaired)
       #endif
     }
 
     // MARK: - Activation Tests
 
     @Test("Synchronous activation succeeds")
-    internal func synchronousActivationSucceeds() throws {
+    internal func synchronousActivationSucceeds() async throws {
       let mockSession = MockSession()
       let manager = ConnectivityManager(session: mockSession)
 
-      try manager.activate()
+      try (manager.activate as () throws -> Void)()
       #expect(mockSession.activationState == .activated)
-      #expect(manager.activationState == .activated)
+
+      // Wait for delegate callback to propagate through async layers
+      try await Task.sleep(nanoseconds: 200_000_000)  // 1 second
+      #expect(await manager.activationState == .activated)
     }
 
     @Test("Async activation succeeds")
@@ -63,7 +88,10 @@
 
       try await manager.activate(timeout: 5)
       #expect(mockSession.activationState == .activated)
-      #expect(manager.activationState == .activated)
+
+      // Wait for actor state to be updated
+      try await Task.sleep(nanoseconds: 200_000_000)  // 1 second
+      #expect(await manager.activationState == .activated)
     }
 
     @Test("Async activation returns immediately if already activated")
@@ -74,7 +102,7 @@
 
       // Should return immediately without waiting
       try await manager.activate(timeout: 5)
-      #expect(manager.activationState == .activated)
+      #expect(await manager.activationState == .activated)
     }
 
     @Test("Async activation throws on concurrent activation attempts")
@@ -89,7 +117,7 @@
       }
 
       // Give first task time to start
-      try await Task.sleep(nanoseconds: 100_000_000)  // 0.1 seconds
+      try await Task.sleep(nanoseconds: 200_000_000)  // 0.2 seconds
 
       // Try second activation - should throw immediately
       do {
@@ -107,61 +135,64 @@
     // MARK: - State Property Tests
 
     @Test("Activation state updates from delegate")
-    internal func activationStateUpdatesFromDelegate() {
+    internal func activationStateUpdatesFromDelegate() async throws {
       let mockSession = MockSession()
       let manager = ConnectivityManager(session: mockSession)
 
       mockSession.activationState = .activated
-      #expect(manager.activationState == .activated)
+      try await Task.sleep(nanoseconds: 200_000_000)  // 1 second
+      #expect(await manager.activationState == .activated)
 
       mockSession.activationState = .inactive
-      #expect(manager.activationState == .inactive)
+      try await Task.sleep(nanoseconds: 200_000_000)  // 1 second
+      #expect(await manager.activationState == .inactive)
 
       mockSession.activationState = .notActivated
-      #expect(manager.activationState == .notActivated)
+      try await Task.sleep(nanoseconds: 200_000_000)  // 1 second
+      #expect(await manager.activationState == .notActivated)
     }
 
     @Test("Reachability updates from delegate")
-    internal func reachabilityUpdatesFromDelegate() {
+    internal func reachabilityUpdatesFromDelegate() async throws {
       let mockSession = MockSession()
       let manager = ConnectivityManager(session: mockSession)
 
-      #expect(!manager.isReachable)
+      #expect(await !manager.isReachable)
 
       mockSession.isReachable = true
-      #expect(manager.isReachable)
+      try await waitUntil { await manager.isReachable }
 
       mockSession.isReachable = false
-      #expect(!manager.isReachable)
+      try await waitUntil { await !manager.isReachable }
     }
 
     @Test("Paired app installed updates from delegate")
-    internal func pairedAppInstalledUpdatesFromDelegate() {
+    internal func pairedAppInstalledUpdatesFromDelegate() async throws {
       let mockSession = MockSession()
       let manager = ConnectivityManager(session: mockSession)
 
-      #expect(!manager.isPairedAppInstalled)
+      #expect(await !manager.isPairedAppInstalled)
 
       mockSession.isPairedAppInstalled = true
-      #expect(manager.isPairedAppInstalled)
+      try await waitUntil { await manager.isPairedAppInstalled }
 
       mockSession.isPairedAppInstalled = false
-      #expect(!manager.isPairedAppInstalled)
+      try await waitUntil { await !manager.isPairedAppInstalled }
     }
 
     #if os(iOS)
       @Test("Paired status updates from delegate on iOS")
-      internal func pairedStatusUpdatesFromDelegate() {
+      internal func pairedStatusUpdatesFromDelegate() async throws {
         let mockSession = MockSession()
         let manager = ConnectivityManager(session: mockSession)
 
-        #expect(!manager.isPaired)
+        #expect(await !manager.isPaired)
 
         mockSession.isPaired = true
-        #expect(manager.isPaired)
+        try await waitUntil { await manager.isPaired }
 
         mockSession.isPaired = false
-        #expect(!manager.isPaired)
+        try await waitUntil { await !manager.isPaired }
       }
     #endif
 
@@ -289,9 +320,7 @@
       mockSession.activationState = .activated
 
       // Wait for main queue notification
-      try await Task.sleep(nanoseconds: 100_000_000)  // 0.1 seconds
-
-      #expect(observer.lastActivationState == .activated)
+      try await waitUntil { await observer.lastActivationState == .activated }
     }
 
     @Test("Observer receives reachability changes")
@@ -305,9 +334,7 @@
       mockSession.isReachable = true
 
       // Wait for main queue notification
-      try await Task.sleep(nanoseconds: 100_000_000)  // 0.1 seconds
-
-      #expect(observer.lastReachability == true)
+      try await waitUntil { await observer.lastReachability == true }
     }
 
     @Test("Observer receives companion app installed changes")
@@ -321,9 +348,7 @@
       mockSession.isPairedAppInstalled = true
 
       // Wait for main queue notification
-      try await Task.sleep(nanoseconds: 100_000_000)  // 0.1 seconds
-
-      #expect(observer.lastCompanionAppInstalled == true)
+      try await waitUntil { await observer.lastCompanionAppInstalled == true }
     }
 
     #if os(iOS)
@@ -338,9 +363,7 @@
         mockSession.isPaired = true
 
         // Wait for main queue notification
-        try await Task.sleep(nanoseconds: 100_000_000)  // 0.1 seconds
-
-        #expect(observer.lastPairedStatus == true)
+        try await waitUntil { await observer.lastPairedStatus == true }
       }
     #endif
 
@@ -356,9 +379,7 @@
       mockSession.receiveMessage(testMessage) { _ in }
 
       // Wait for main queue notification
-      try await Task.sleep(nanoseconds: 100_000_000)  // 0.1 seconds
-
-      #expect(observer.lastMessage?["test"] as? String == "data")
+      try await waitUntil { await observer.lastMessage?["test"] as? String == "data" }
     }
 
     @Test("Observer can be removed")
@@ -373,10 +394,10 @@
       mockSession.isReachable = true
 
       // Wait for main queue notification
-      try await Task.sleep(nanoseconds: 100_000_000)  // 0.1 seconds
+      try await Task.sleep(nanoseconds: 200_000_000)  // 0.2 seconds
 
       // Should not have received notification
-      #expect(observer.lastReachability == nil)
+      #expect(await observer.lastReachability == nil)
     }
 
     @Test("Multiple observers receive notifications")
@@ -392,10 +413,8 @@
       mockSession.isReachable = true
 
       // Wait for main queue notification
-      try await Task.sleep(nanoseconds: 100_000_000)  // 0.1 seconds
-
-      #expect(observer1.lastReachability == true)
-      #expect(observer2.lastReachability == true)
+      try await waitUntil { await observer1.lastReachability == true }
+      #expect(await observer2.lastReachability == true)
     }
   }
 #endif

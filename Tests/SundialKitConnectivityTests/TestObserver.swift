@@ -15,7 +15,7 @@
   /// Test observer for capturing ConnectivityManager state changes.
   @available(macOS, unavailable)
   @available(tvOS, unavailable)
-  internal final class TestObserver: ConnectivityStateObserver {
+  internal actor TestObserver: ConnectivityStateObserver {
     // swiftlint:disable discouraged_optional_boolean
     internal var lastActivationState: ActivationState?
     internal var lastReachability: Bool?
@@ -25,47 +25,87 @@
     internal var lastMessage: ConnectivityMessage?
     internal var lastContext: ConnectivityMessage?
 
-    internal func connectivityManager(
+    internal nonisolated func connectivityManager(
       _: ConnectivityManager,
       didChangeActivationState activationState: ActivationState
     ) {
-      lastActivationState = activationState
+      Task {
+        await setLastActivationState(activationState)
+      }
     }
 
-    internal func connectivityManager(
+    internal nonisolated func connectivityManager(
       _: ConnectivityManager,
       didChangeReachability isReachable: Bool
     ) {
-      lastReachability = isReachable
+      Task {
+        await setLastReachability(isReachable)
+      }
     }
 
-    internal func connectivityManager(
+    internal nonisolated func connectivityManager(
       _: ConnectivityManager,
       didChangeCompanionAppInstalled isInstalled: Bool
     ) {
+      Task {
+        await setLastCompanionAppInstalled(isInstalled)
+      }
+    }
+
+    #if os(iOS)
+      internal nonisolated func connectivityManager(
+        _: ConnectivityManager,
+        didChangePairedStatus isPaired: Bool
+      ) {
+        Task {
+          await setLastPairedStatus(isPaired)
+        }
+      }
+    #endif
+
+    internal nonisolated func connectivityManager(
+      _: ConnectivityManager,
+      didReceiveMessage message: ConnectivityMessage
+    ) {
+      Task {
+        await setLastMessage(message)
+      }
+    }
+
+    internal nonisolated func connectivityManager(
+      _: ConnectivityManager,
+      didReceiveApplicationContext context: ConnectivityMessage
+    ) {
+      Task {
+        await setLastContext(context)
+      }
+    }
+
+    // MARK: - Actor-Isolated Setters
+
+    private func setLastActivationState(_ state: ActivationState) {
+      lastActivationState = state
+    }
+
+    private func setLastReachability(_ isReachable: Bool) {
+      lastReachability = isReachable
+    }
+
+    private func setLastCompanionAppInstalled(_ isInstalled: Bool) {
       lastCompanionAppInstalled = isInstalled
     }
 
     #if os(iOS)
-      internal func connectivityManager(
-        _: ConnectivityManager,
-        didChangePairedStatus isPaired: Bool
-      ) {
+      private func setLastPairedStatus(_ isPaired: Bool) {
         lastPairedStatus = isPaired
       }
     #endif
 
-    internal func connectivityManager(
-      _: ConnectivityManager,
-      didReceiveMessage message: ConnectivityMessage
-    ) {
+    private func setLastMessage(_ message: ConnectivityMessage) {
       lastMessage = message
     }
 
-    internal func connectivityManager(
-      _: ConnectivityManager,
-      didReceiveApplicationContext context: ConnectivityMessage
-    ) {
+    private func setLastContext(_ context: ConnectivityMessage) {
       lastContext = context
     }
   }

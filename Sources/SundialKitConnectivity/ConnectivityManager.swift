@@ -31,7 +31,6 @@
   public import Foundation
   public import SundialKitCore
   import WatchConnectivity
-public import SundialKitNetwork
 
   /// Non-reactive manager for WatchConnectivity sessions.
   ///
@@ -82,7 +81,6 @@ public import SundialKitNetwork
     /// Storage for activation timeout task.
     private var activationTimeoutTask: Task<Void, Never>?
 
-
     /// Registry for managing observer references.
     public let observerRegistry = ObserverRegistry<any ConnectivityStateObserver>()
 
@@ -90,16 +88,16 @@ public import SundialKitNetwork
 
     /// The current activation state of the connectivity session.
     public var activationState: ActivationState = .notActivated
-    
+
     /// Indicates whether the counterpart device is currently reachable.
-    public var isReachable: Bool  = false
+    public var isReachable: Bool = false
 
     /// Indicates whether the companion app is installed on the paired device.
-    public  var isPairedAppInstalled: Bool = false
+    public var isPairedAppInstalled: Bool = false
 
     #if os(iOS)
       /// Indicates whether an Apple Watch is currently paired with this iPhone.
-      public  var isPaired: Bool = false
+      public var isPaired: Bool = false
     #endif
 
     // MARK: - Initialization
@@ -109,13 +107,15 @@ public import SundialKitNetwork
     /// - Parameter session: The connectivity session to manage.
     public init(session: any ConnectivitySession) {
       self.session = session
-      self.session.delegate = self
 
       // Initialize state from session
       self.activationState = session.activationState
       self.isReachable = session.isReachable
       self.isPairedAppInstalled = session.isPairedAppInstalled
-      self.isPaired = session.isPaired
+      #if os(iOS)
+        self.isPaired = session.isPaired
+      #endif
+      self.session.delegate = self
     }
 
     /// Creates a connectivity manager with the default WatchConnectivity session.
@@ -159,7 +159,7 @@ public import SundialKitNetwork
 
           // Start timeout task
           let timeoutTask = Task {
-            try await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
+            try? await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
 
             await handleActivationTimeout()
           }
@@ -258,7 +258,9 @@ public import SundialKitNetwork
     /// Removes observers matching the predicate.
     ///
     /// - Parameter predicate: Closure to identify observers to remove.
-    public nonisolated func removeObservers(where predicate: @Sendable @escaping (any ConnectivityStateObserver) -> Bool) {
+    public nonisolated func removeObservers(
+      where predicate: @Sendable @escaping (any ConnectivityStateObserver) -> Bool
+    ) {
       Task {
         await observerRegistry.removeAll(where: predicate)
       }
@@ -267,7 +269,9 @@ public import SundialKitNetwork
     // MARK: - ConnectivityDelegateHandling Protocol
 
     private func isolatedHandleActivation(_ state: ActivationState, error: (any Error)?) {
-      
+      // Update activation state
+      self.activationState = state
+
       // Resume activation continuation if present
       if let continuation = activationContinuation {
         activationContinuation = nil
@@ -296,16 +300,15 @@ public import SundialKitNetwork
       Task {
         await self.isolatedHandleActivation(state, error: error)
       }
-
     }
 
     fileprivate func isolatedActiveState(_ activationState: ActivationState) {
       self.activationState = activationState
-      
+
       // Notify observers of activation state change
       notifyActivationStateChanged(activationState)
     }
-    
+
     /// Handles session becoming inactive.
     public nonisolated func handleSessionInactive() {
       Task {
@@ -314,7 +317,7 @@ public import SundialKitNetwork
     }
 
     /// Handles session deactivation.
-    public  nonisolated func handleSessionDeactivate() {
+    public nonisolated func handleSessionDeactivate() {
       Task {
         await self.isolatedActiveState(.notActivated)
       }
@@ -326,14 +329,12 @@ public import SundialKitNetwork
         await self.isolatedReachabilityChanged(isReachable)
       }
     }
-    
+
     private func isolatedReachabilityChanged(_ isReachable: Bool) {
-      
-        self.isReachable = isReachable
-        
-        // Notify observers of reachability change
-        notifyReachabilityChanged(isReachable)
-      
+      self.isReachable = isReachable
+
+      // Notify observers of reachability change
+      notifyReachabilityChanged(isReachable)
     }
 
     /// Handles companion device state changes.
@@ -342,14 +343,13 @@ public import SundialKitNetwork
         await self.isolatedSessionStateChanged(session)
       }
     }
-    
+
     private func isolatedSessionStateChanged(_ session: any ConnectivitySession) {
-      
       self.isPairedAppInstalled = session.isPairedAppInstalled
-#if os(iOS)
-      self.isPaired = session.isPaired
-#endif
-      
+      #if os(iOS)
+        self.isPaired = session.isPaired
+      #endif
+
       // Notify observers of companion state changes
       notifyCompanionAppInstalledChanged(isPairedAppInstalled)
       #if os(iOS)

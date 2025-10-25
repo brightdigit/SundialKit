@@ -30,7 +30,6 @@
 #if canImport(WatchConnectivity)
   public import Foundation
   public import SundialKitCore
-  public import SundialKitNetwork
 
   /// Protocol for managing connectivity state observers.
   ///
@@ -47,10 +46,37 @@
     /// - Parameter observer: The observer to add.
     func addObserver(_ observer: any ConnectivityStateObserver)
 
+    /// Removes a specific observer.
+    ///
+    /// - Parameter observer: The observer to remove.
+    func removeObserver(_ observer: any ConnectivityStateObserver)
+
     /// Removes observers matching the predicate.
     ///
     /// - Parameter predicate: Closure to identify observers to remove.
-    func removeObservers(where predicate: @Sendable @escaping (any ConnectivityStateObserver) -> Bool)
+    func removeObservers(
+      where predicate: @Sendable @escaping (any ConnectivityStateObserver) -> Bool)
+  }
+
+  // MARK: - Default Implementation
+
+  extension ConnectivityObserverManaging {
+    /// Default implementation for removing a specific observer.
+    ///
+    /// Uses identity comparison to match observers.
+    ///
+    /// - Parameter observer: The observer to remove.
+    public func removeObserver(_ observer: any ConnectivityStateObserver) {
+      removeObservers { storedObserver in
+        // Compare by object identity
+        guard let lhs = storedObserver as AnyObject?,
+          let rhs = observer as AnyObject?
+        else {
+          return false
+        }
+        return lhs === rhs
+      }
+    }
   }
 
   // MARK: - Default Notification Methods

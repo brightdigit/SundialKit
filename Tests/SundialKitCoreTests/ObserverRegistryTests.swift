@@ -29,7 +29,7 @@
 
 import Testing
 
-@testable import SundialKitNetwork
+@testable import SundialKitCore
 
 // MARK: - Test Observer Protocol
 

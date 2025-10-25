@@ -118,7 +118,9 @@ public actor NetworkMonitor<
 
   /// Removes observers matching the predicate.
   /// - Parameter predicate: Closure to identify observers to remove
-  public func removeObservers(where predicate: @Sendable @escaping (any NetworkStateObserver) -> Bool) async {
+  public func removeObservers(
+    where predicate: @Sendable @escaping (any NetworkStateObserver) -> Bool
+  ) async {
     await observers.removeAll(where: predicate)
   }
 

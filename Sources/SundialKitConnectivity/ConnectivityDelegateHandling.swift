@@ -112,7 +112,6 @@
 
     /// Called when the session deactivates (iOS only).
     public func sessionDidDeactivate(_: any ConnectivitySession) {
-      
       Task {
         await handleSessionDeactivate()
       }
@@ -120,7 +119,6 @@
 
     /// Called when companion state changes.
     public func sessionCompanionStateDidChange(_ session: any ConnectivitySession) {
-      
       Task {
         await handleCompanionStateChange(session)
       }
@@ -128,7 +126,6 @@
 
     /// Called when reachability changes.
     public func sessionReachabilityDidChange(_ session: any ConnectivitySession) {
-      
       Task {
         await handleReachabilityChange(session.isReachable)
       }
@@ -140,7 +137,6 @@
       didReceiveMessage message: ConnectivityMessage,
       replyHandler: @escaping ConnectivityHandler
     ) {
-      
       Task {
         await handleMessageReceived(message)
       }
@@ -152,7 +148,6 @@
       didReceiveApplicationContext applicationContext: ConnectivityMessage,
       error: (any Error)?
     ) {
-      
       Task {
         await handleApplicationContextReceived(applicationContext, error: error)
       }
@@ -164,7 +159,6 @@
       didReceiveMessageData messageData: Data,
       replyHandler: @escaping @Sendable (Data) -> Void
     ) {
-      
       Task {
         await handleBinaryMessageReceived(messageData, replyHandler: replyHandler)
       }

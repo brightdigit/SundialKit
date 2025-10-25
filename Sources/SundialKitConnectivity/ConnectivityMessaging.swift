@@ -30,7 +30,7 @@
 #if canImport(WatchConnectivity)
   public import Foundation
   public import SundialKitCore
-import WatchConnectivity
+  import WatchConnectivity
 
   /// Protocol defining messaging capabilities for connectivity management.
   ///
@@ -46,7 +46,7 @@ import WatchConnectivity
     var isReachable: Bool { get async }
 
     /// Indicates whether the companion app is installed on the paired device.
-    var isPairedAppInstalled: Bool { get async  }
+    var isPairedAppInstalled: Bool { get async }
 
     /// Sends a message to the counterpart device.
     ///
@@ -117,51 +117,50 @@ import WatchConnectivity
       }
     }
 
-    /// Sends a message with timeout handling.
+    /// Sends a message with timeout handling using structured concurrency.
+    ///
+    /// Uses TaskGroup to race between timeout and message delivery, eliminating
+    /// the need for manual synchronization with locks.
     private func sendWithTimeout(
       message: ConnectivityMessage,
       timeout: TimeInterval
     ) async throws -> ConnectivityMessage {
-      try await withCheckedThrowingContinuation { continuation in
-        var didResume = false
-        let lock = NSLock()
+      let currentSession = await session
 
-        // Set up timeout
-        let timeoutTask = Task {
+      return try await withThrowingTaskGroup(of: ConnectivityMessage.self) { group in
+        // Add timeout task
+        group.addTask {
           try await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
-
-          lock.lock()
-          if !didResume {
-            didResume = true
-            lock.unlock()
-            continuation.resume(throwing: ConnectivityError.messageReplyTimedOut)
-          } else {
-            lock.unlock()
-          }
+          throw ConnectivityError.messageReplyTimedOut
         }
 
-        // Send message
-        session.sendMessage(message) { result in
-          lock.lock()
-          if !didResume {
-            didResume = true
-            lock.unlock()
-            timeoutTask.cancel()
-
-            switch result {
-            case .success(let reply):
-              continuation.resume(returning: reply)
-            case .failure(let error):
-              if let wcError = error as? WCError {
-                continuation.resume(throwing: ConnectivityError(wcError: wcError))
-              } else {
-                continuation.resume(throwing: ConnectivityError.deliveryFailed)
+        // Add message sending task
+        group.addTask {
+          try await withCheckedThrowingContinuation { continuation in
+            currentSession.sendMessage(message) { result in
+              switch result {
+              case .success(let reply):
+                continuation.resume(returning: reply)
+              case .failure(let error):
+                if let wcError = error as? WCError {
+                  continuation.resume(throwing: ConnectivityError(wcError: wcError))
+                } else {
+                  continuation.resume(throwing: ConnectivityError.deliveryFailed)
+                }
               }
             }
-          } else {
-            lock.unlock()
           }
         }
+
+        // Wait for first result (either timeout or message response)
+        guard let result = try await group.next() else {
+          throw ConnectivityError.deliveryFailed
+        }
+
+        // Cancel remaining tasks
+        group.cancelAll()
+
+        return result
       }
     }
   }
