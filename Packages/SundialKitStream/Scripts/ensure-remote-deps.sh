@@ -5,7 +5,7 @@
 set -euo pipefail
 
 REMOTE_URL="https://github.com/brightdigit/SundialKit.git"
-REMOTE_BRANCH="branch: \"30-networkmonitor\""
+REMOTE_BRANCH="branch: \"31-connectivitymanager\""
 LOCAL_PATH="../../"
 
 PACKAGE_FILE="Package.swift"
@@ -25,13 +25,15 @@ fi
 if grep -q "\.package(name: \"SundialKit\", path:" "$PACKAGE_FILE"; then
   echo "🔄 Switching to remote dependency..."
   # Cross-platform sed: use -i with empty string on macOS, without on Linux
+  # Use multiline format to avoid SwiftLint line length warnings
+  REPLACEMENT=".package(\n      name: \"SundialKit\",\n      url: \"$REMOTE_URL\",\n      $REMOTE_BRANCH\n    )"
   if [[ "$OSTYPE" == "darwin"* ]]; then
     sed -i '' \
-      -e 's|\.package(name: "SundialKit", path: "'"$LOCAL_PATH"'")|.package(name: "SundialKit", url: "'"$REMOTE_URL"'", '"$REMOTE_BRANCH"')|g' \
+      -e 's|\.package(name: "SundialKit", path: "'"$LOCAL_PATH"'")|'"$REPLACEMENT"'|g' \
       "$PACKAGE_FILE"
   else
     sed -i \
-      -e 's|\.package(name: "SundialKit", path: "'"$LOCAL_PATH"'")|.package(name: "SundialKit", url: "'"$REMOTE_URL"'", '"$REMOTE_BRANCH"')|g' \
+      -e 's|\.package(name: "SundialKit", path: "'"$LOCAL_PATH"'")|'"$REPLACEMENT"'|g' \
       "$PACKAGE_FILE"
   fi
   echo "✅ Switched to remote dependency"

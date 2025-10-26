@@ -44,6 +44,26 @@ let swiftSettings: [SwiftSetting] = [
   ])
 ]
 
+// MARK: - Architecture Overview
+//
+// SundialKit v2.0.0 follows a three-layer architecture:
+//
+// Layer 1 - Core Modules (this Package.swift):
+//   • SundialKitCore: Protocol definitions and types
+//   • SundialKitNetwork: Network monitoring implementation
+//   • SundialKitConnectivity: WatchConnectivity with built-in features:
+//       - Messagable protocol (dictionary-based messaging)
+//       - BinaryMessagable protocol (binary serialization)
+//       - MessageDecoder (type-safe message decoding)
+//   • SundialKit: Umbrella module re-exporting all three
+//
+// Layer 2 - Plugin Packages (separate repositories via git-subrepo):
+//   • SundialKitCombine: Combine-based observers (Packages/SundialKitCombine/)
+//   • SundialKitStream: Actor-based observers (Packages/SundialKitStream/)
+//
+// Note: Messagable and BinaryMessagable are NOT separate packages.
+// They are built-in features of SundialKitConnectivity.
+
 let package = Package(
   name: "SundialKit",
   platforms: [
@@ -99,7 +119,7 @@ let package = Package(
       swiftSettings: swiftSettings
     ),
 
-    // MARK: - Connectivity Module
+    // MARK: - Connectivity Module (includes built-in Messagable & BinaryMessagable)
     .target(
       name: "SundialKitConnectivity",
       dependencies: ["SundialKitCore"],

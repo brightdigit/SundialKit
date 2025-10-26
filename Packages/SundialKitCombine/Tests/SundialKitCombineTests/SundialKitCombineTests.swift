@@ -4,5 +4,6 @@ import XCTest
 
 internal final class SundialKitCombineTests: XCTestCase {
   internal func testDummy() {
+    XCTAssert(true)
   }
 }

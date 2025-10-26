@@ -30,6 +30,10 @@
 public import Foundation
 public import SundialKitCore
 
+/// Delegate protocol for receiving WatchConnectivity session lifecycle and message events.
+///
+/// Implement this protocol to receive callbacks about session activation, state changes,
+/// and message delivery from a `ConnectivitySession`.
 public protocol ConnectivitySessionDelegate: AnyObject {
   func session(
     _ session: any ConnectivitySession,

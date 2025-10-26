@@ -32,35 +32,38 @@
   public import SundialKitCore
   import WatchConnectivity
 
-  internal typealias WatchConnectivitySessionProtocol =
-    ConnectivitySession & WCSessionDelegate
-
+  /// Concrete implementation of `ConnectivitySession` wrapping Apple's `WCSession`.
+  ///
+  /// Provides a Sendable-safe bridge between WatchConnectivity's delegate-based API
+  /// and the protocol-oriented `ConnectivitySession` interface.
+  ///
+  /// ## Thread Safety
+  ///
+  /// This class uses `@unchecked Sendable` with `NSLock` for synchronization. This is safe because:
+  /// - The `session` property is immutable (let)
+  /// - The mutable `delegate` property is protected by `delegateLock`
+  /// - All delegate accesses acquire the lock before reading/writing
+  /// - WCSession callbacks are thread-safe through proper locking
   public final class WatchConnectivitySession: NSObject, WatchConnectivitySessionProtocol,
     @unchecked Sendable
   {
-    private let session: WCSession
+    internal let session: WCSession
+    #warning("replace with a property wrapper or internal actor")
+    private let delegateLock = NSLock()
+    private var _delegate: ConnectivitySessionDelegate?
 
-    public var delegate: ConnectivitySessionDelegate?
-
-    public var isReachable: Bool {
-      session.isReachable
-    }
-
-    @available(watchOS, unavailable)
-    public var isPaired: Bool {
-      session.isPaired
-    }
-
-    public var isPairedAppInstalled: Bool {
-      session.isPairedAppInstalled
-    }
-
-    public var activationState: ActivationState {
-      guard let state = ActivationState(rawValue: session.activationState.rawValue) else {
-        preconditionFailure()
+    /// The delegate to receive session lifecycle and message events.
+    public var delegate: ConnectivitySessionDelegate? {
+      get {
+        delegateLock.lock()
+        defer { delegateLock.unlock() }
+        return _delegate
       }
-
-      return state
+      set {
+        delegateLock.lock()
+        defer { delegateLock.unlock() }
+        _delegate = newValue
+      }
     }
 
     internal init(session: WCSession) {
@@ -71,139 +74,6 @@
 
     override public convenience init() {
       self.init(session: .default)
-    }
-
-    public func updateApplicationContext(_ context: ConnectivityMessage) throws {
-      try session.updateApplicationContext(context as [String: Any])
-    }
-
-    public func sendMessage(
-      _ message: ConnectivityMessage,
-      _ completion: @escaping (Result<ConnectivityMessage, Error>) -> Void
-    ) {
-      session.sendMessage(
-        message as [String: Any]
-      ) { response in
-        // swiftlint:disable:next force_cast
-        let sendableResponse: ConnectivityMessage = response.mapValues { $0 as! any Sendable }
-        completion(.success(sendableResponse))
-      } errorHandler: { error in
-        completion(.failure(error))
-      }
-    }
-
-    public func sendMessageData(
-      _ data: Data,
-      _ completion: @escaping (Result<Data, Error>) -> Void
-    ) {
-      session.sendMessageData(
-        data
-      ) { responseData in
-        completion(.success(responseData))
-      } errorHandler: { error in
-        completion(.failure(error))
-      }
-    }
-
-    public func activate() throws {
-      guard WCSession.isSupported() else {
-        throw SundialError.sessionNotSupported
-      }
-      session.activate()
-    }
-
-    internal func session(
-      _: WCSession,
-      activationDidCompleteWith activationState: WCSessionActivationState,
-      error: Error?
-    ) {
-      guard
-        let activationState: ActivationState =
-          .init(rawValue: activationState.rawValue)
-      else {
-        preconditionFailure()
-      }
-      delegate?.session(
-        self,
-        activationDidCompleteWith: activationState,
-        error: error
-      )
-    }
-
-    #if os(iOS)
-
-      internal func sessionDidBecomeInactive(_: WCSession) {
-        delegate?.sessionDidBecomeInactive(self)
-      }
-
-      internal func sessionDidDeactivate(_: WCSession) {
-        delegate?.sessionDidDeactivate(self)
-      }
-
-      internal func sessionWatchStateDidChange(_: WCSession) {
-        delegate?.sessionCompanionStateDidChange(self)
-      }
-
-    #elseif os(watchOS)
-
-      internal func sessionCompanionAppInstalledDidChange(_: WCSession) {
-        delegate?.sessionCompanionStateDidChange(self)
-      }
-    #endif
-
-    internal func sessionReachabilityDidChange(_: WCSession) {
-      delegate?.sessionReachabilityDidChange(self)
-    }
-
-    internal func session(
-      _: WCSession,
-      didReceiveMessage message: [String: Any],
-      replyHandler: @escaping ([String: Any]) -> Void
-    ) {
-      // swiftlint:disable:next force_cast
-      let sendableMessage: ConnectivityMessage = message.mapValues { $0 as! any Sendable }
-      let handler = unsafeBitCast(replyHandler, to: ConnectivityHandler.self)
-      delegate?.session(self, didReceiveMessage: sendableMessage, replyHandler: handler)
-    }
-
-    internal func session(
-      _: WCSession,
-      didReceiveApplicationContext applicationContext: [String: Any]
-    ) {
-      let sendableContext: ConnectivityMessage = applicationContext.mapValues {
-        // swiftlint:disable:next force_cast
-        $0 as! any Sendable
-      }
-      delegate?.session(
-        self,
-        didReceiveApplicationContext: sendableContext,
-        error: nil
-      )
-    }
-
-    internal func session(
-      _: WCSession,
-      didReceiveApplicationContext applicationContext: [String: Any],
-      error: Error?
-    ) {
-      let sendableContext: ConnectivityMessage = applicationContext.mapValues {
-        // swiftlint:disable:next force_cast
-        $0 as! any Sendable
-      }
-      delegate?.session(
-        self,
-        didReceiveApplicationContext: sendableContext,
-        error: error
-      )
-    }
-
-    internal func session(
-      _: WCSession,
-      didReceiveMessageData messageData: Data,
-      replyHandler: @escaping (Data) -> Void
-    ) {
-      let handler = unsafeBitCast(replyHandler, to: (@Sendable (Data) -> Void).self)
-      delegate?.session(self, didReceiveMessageData: messageData, replyHandler: handler)
     }
   }
 

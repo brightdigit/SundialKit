@@ -62,6 +62,10 @@ public enum PathStatus: Equatable, Sendable {
     /// Wi-Fi network access has been denied.
     case wifiDenied
 
+    /// VPN is inactive (macOS 15.0+, iOS 18.0+, watchOS 11.0+, tvOS 18.0+).
+    @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, *)
+    case vpnInactive
+
     /// The reason is unknown.
     case unknown
 

@@ -71,7 +71,7 @@ public import SundialKitCore
 ///     IpifyPing(session: .shared, timeInterval: 10.0)
 ///    )
 /// ```
-public protocol NetworkPing {
+public protocol NetworkPing: Sendable {
   /// The resulting status of the ping.
   associatedtype StatusType: Sendable
   /// The amount of time between each verification

@@ -27,7 +27,7 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-public import Foundation
+import Foundation
 
 #if canImport(WatchConnectivity)
   public import WatchConnectivity
@@ -133,6 +133,9 @@ public enum ConnectivityError: Error, Sendable, Hashable {
       .watchOnlyApp: .watchOnlyApp,
     ]
 
+    /// Creates a `ConnectivityError` from a WatchConnectivity framework error.
+    ///
+    /// - Parameter wcError: The `WCError` to convert
     public init(wcError: WCError) {
       guard let mapped = Self.wcErrorMapping[wcError.code] else {
         self = .genericErrorCode(wcError.code.rawValue)

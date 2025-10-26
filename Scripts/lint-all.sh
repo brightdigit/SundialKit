@@ -31,7 +31,7 @@ if [ -n "${SRCROOT:-}" ]; then
 else
   PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 fi
-SUBREPOS=("SundialKitStream" "SundialKitBinary" "SundialKitCombine" "SundialKitMessagable")
+SUBREPOS=("SundialKitStream" "SundialKitCombine")
 
 echo "╔════════════════════════════════════════════════════════════════╗"
 echo "║         SundialKit Monorepo Linting                           ║"

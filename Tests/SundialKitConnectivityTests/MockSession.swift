@@ -6,8 +6,7 @@ import Foundation
 internal final class MockSession: ConnectivitySession, @unchecked Sendable {
   internal var lastMessageSent: ConnectivityMessage?
   internal var lastAppContext: ConnectivityMessage?
-  // swiftlint:disable:next implicitly_unwrapped_optional
-  internal var nextReplyResult: Result<ConnectivityMessage, any Error>!
+  internal var nextReplyResult: Result<ConnectivityMessage, any Error>?
   internal var nextApplicationContextError: (any Error)?
   internal var isPaired = false {
     didSet {
@@ -61,7 +60,7 @@ internal final class MockSession: ConnectivitySession, @unchecked Sendable {
     _ replyHandler: @escaping (Result<ConnectivityMessage, any Error>) -> Void
   ) {
     lastMessageSent = message
-    replyHandler(nextReplyResult)
+    replyHandler(nextReplyResult ?? .success([:]))
   }
 
   internal func sendMessageData(
