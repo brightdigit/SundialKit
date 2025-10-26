@@ -1,0 +1,66 @@
+# Task ID: 1
+# Title: Create SundialKitCore protocols and types
+# Status: done
+# Dependencies: 11
+# Priority: high
+# Description: Define core protocols (NetworkMonitoring, ConnectivityManagement) and value types with Sendable conformance for plugin system
+# Details:
+Create SundialKitCore target with protocol definitions:
+1. NetworkMonitoring protocol with state queries (pathStatus, isExpensive, isConstrained) and lifecycle methods
+2. ConnectivityManagement protocol with state queries and messaging methods
+3. Core value types: PathStatus enum (with Interface OptionSet and UnsatisfiedReason), ActivationState enum
+4. Typed error enums: NetworkError, ConnectivityError (with granular WCError mapping), SerializationError
+5. Mark ALL types as Sendable for Swift 6.1 compatibility (CRITICAL)
+6. NetworkStateObserver and ConnectivityStateObserver protocols for callback-based notifications
+7. Helper method ConnectivityError.init(wcError:) for WCError mapping
+
+Implementation approach:
+- Use Swift 5.9+ for backwards compatibility
+- Foundation-only dependencies
+- Comprehensive documentation for plugin developers
+- Platform support: iOS 13+, watchOS 6+, tvOS 13+, macOS 10.13+
+
+GitHub Issue: #29 tracks this task with component:core label for Core subsystem work. This task creates the foundation protocols that other components (Network, WatchConnectivity) will implement.
+
+Existing codebase analysis:
+- Current Package.swift uses single SundialKit target - will need restructuring for modular architecture
+- PathStatus enum exists in Sources/SundialKit/Network/PathStatus.swift with Interface OptionSet and UnsatisfiedReason
+- ActivationState enum exists in Sources/SundialKit/WatchConnectivity/ActivationState.swift
+- SundialError enum exists but needs expansion to NetworkError, ConnectivityError, SerializationError
+- PathMonitor protocol exists in Sources/SundialKit/Network/PathMonitor.swift but needs to move to Core
+- No current Sendable conformance - all types need Swift 6.1 compatibility
+
+# Test Strategy:
+Swift Testing migration required. Test protocol conformance, Sendable conformance verification, error mapping accuracy, and type safety. Create mock implementations to verify protocol contracts. Verify compilation with Swift 6.1 strict concurrency checking.
+
+# Subtasks:
+## 1. Define NetworkMonitoring protocol with lifecycle methods [done]
+### Dependencies: None
+### Description: Create the NetworkMonitoring protocol in SundialKitCore with all required state query properties and lifecycle methods for network monitoring plugins
+### Details:
+Define NetworkMonitoring protocol with: pathStatus property returning PathStatus enum, isExpensive property for cost tracking, isConstrained property for low data mode, start(queue:) method for beginning monitoring, stop() method for cleanup, and proper async/throws annotations where appropriate. Include comprehensive documentation for plugin developers. Reference existing PathMonitor protocol in Sources/SundialKit/Network/PathMonitor.swift for interface patterns.
+
+## 2. Define ConnectivityManagement protocol with messaging interfaces [done]
+### Dependencies: None
+### Description: Create the ConnectivityManagement protocol with all state queries and messaging methods required for WatchConnectivity plugin implementations
+### Details:
+Define ConnectivityManagement protocol with: activationState property, isReachable property, isPaired property (iOS only with availability annotations), isPairedAppInstalled property (iOS only), sendMessage methods with async/throws, updateApplicationContext method, activate() lifecycle method. Include platform availability annotations and comprehensive documentation. Reference existing WatchConnectivity module structure.
+
+## 3. Create PathStatus enum with Interface and UnsatisfiedReason types [done]
+### Dependencies: None
+### Description: Implement PathStatus enum with nested Interface OptionSet and UnsatisfiedReason enum for comprehensive network state representation
+### Details:
+Migrate existing PathStatus enum from Sources/SundialKit/Network/PathStatus.swift to SundialKitCore. Current implementation has: satisfied(Interface), unsatisfied(UnsatisfiedReason?), requiresConnection, unknown cases. Interface OptionSet includes: cellular, wifi, wiredEthernet, loopback, other. UnsatisfiedReason includes: cellularDenied, localNetworkDenied, notAvailable, wifiDenied, unknown, unsupported. Add Sendable conformance to all types for Swift 6.1 compatibility.
+
+## 4. Implement error enums with WCError mapping helpers [done]
+### Dependencies: None
+### Description: Create NetworkError, ConnectivityError, and SerializationError enums with comprehensive error cases and WCError mapping functionality
+### Details:
+Expand existing SundialError enum from Sources/SundialKit/SundialError.swift into specialized error types. Define NetworkError enum with cases for network-specific failures. Create ConnectivityError enum with granular WCError mapping including: sessionNotActivated, watchAppNotInstalled, notReachable, messageReplyFailed, etc. Add helper initializer ConnectivityError.init(wcError:) for automatic WCError translation. Define SerializationError for encoding/decoding failures. All must conform to Error, Sendable, and LocalizedError.
+
+## 5. Add Sendable conformance and comprehensive documentation [done]
+### Dependencies: 1.1, 1.2, 1.3, 1.4
+### Description: Ensure all types conform to Sendable for Swift 6.1 compatibility and add complete DocC documentation for the entire SundialKitCore module
+### Details:
+Apply Sendable conformance to all protocols, enums, and types in SundialKitCore. Add @unchecked Sendable where necessary with safety documentation. Create comprehensive DocC comments for all public APIs including usage examples, platform availability notes, and migration guidance. Add module-level documentation explaining the plugin architecture and how to implement custom plugins. Migrate existing ActivationState enum from Sources/SundialKit/WatchConnectivity/ActivationState.swift and add Sendable conformance.
+

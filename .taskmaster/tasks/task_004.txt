@@ -1,0 +1,47 @@
+# Task ID: 4
+# Title: Create SundialKit umbrella target
+# Status: pending
+# Dependencies: 1, 2, 3
+# Priority: medium
+# Description: Configure umbrella target that re-exports SundialKitCore, SundialKitNetwork, and SundialKitConnectivity for convenience
+# Details:
+Create SundialKit umbrella target:
+1. Update Package.swift to define SundialKit product
+2. Create SundialKit.swift with @_exported imports:
+   - @_exported import SundialKitCore
+   - @_exported import SundialKitNetwork  
+   - @_exported import SundialKitConnectivity
+3. Configure platform restrictions (iOS 13+, watchOS 6+ - most restrictive)
+4. No additional code - pure re-export target
+5. Update documentation to explain import options:
+   - Individual imports for selective features
+   - SundialKit import for everything
+6. Verify all public APIs are accessible through umbrella import
+
+Package.swift configuration:
+- Product definition with all three targets
+- Proper dependency declarations
+- Platform version specifications
+
+# Test Strategy:
+Swift Testing required. Verify all public APIs accessible through umbrella import, test compilation on all supported platforms, validate no symbol conflicts.
+
+# Subtasks:
+## 1. Update Package.swift to define SundialKit umbrella product [pending]
+### Dependencies: None
+### Description: Modify Package.swift to add the SundialKit product that combines all three module targets with proper dependency declarations and platform restrictions
+### Details:
+Edit Package.swift to add a new product named 'SundialKit' that includes SundialKitCore, SundialKitNetwork, and SundialKitConnectivity as targets. Set platform requirements to iOS 13.0+ and watchOS 6.0+ (the most restrictive of all modules). Ensure the product properly declares its target dependencies and that the SundialKit target itself depends on all three module targets.
+
+## 2. Create SundialKit.swift with @_exported module imports [pending]
+### Dependencies: 4.1
+### Description: Create the main SundialKit.swift file that uses @_exported to re-export all three modules, making their public APIs available through a single import
+### Details:
+Create Sources/SundialKit/SundialKit.swift with three lines: '@_exported import SundialKitCore', '@_exported import SundialKitNetwork', and '@_exported import SundialKitConnectivity'. This file should contain no additional code - it serves purely as a re-export mechanism. The @_exported attribute ensures all public symbols from the imported modules become available to consumers who import SundialKit.
+
+## 3. Write comprehensive tests verifying umbrella import accessibility [pending]
+### Dependencies: 4.2
+### Description: Create test suite that validates all public APIs from Core, Network, and Connectivity modules are accessible through the single SundialKit import
+### Details:
+Create Tests/SundialKitTests/SundialKitUmbrellaTests.swift that imports only SundialKit (not the individual modules) and verifies access to key types from each module: NetworkObserver and PathStatus from Network, ConnectivityObserver and ConnectivityMessage from Connectivity, and core protocols from Core. Test should instantiate or reference each major public type to ensure proper symbol visibility. Include platform conditional compilation to handle iOS vs watchOS differences.
+

@@ -1,0 +1,58 @@
+# Task ID: 8
+# Title: Implement SundialKitBinary serialization plugin
+# Status: done
+# Dependencies: 3
+# Priority: medium
+# Description: Create format-agnostic binary serialization plugin with BinarySerializable protocol for efficient WatchConnectivity messaging
+# Details:
+IMPLEMENTATION COMPLETE - Built-in feature in SundialKitConnectivity (NOT a separate package/plugin).
+
+Implementation Location:
+- Sources/SundialKitConnectivity/BinaryMessagable.swift (protocol definition)
+- Sources/SundialKitConnectivity/BinaryMessageEncoder.swift (encoding with type footer)
+
+Test Location:
+- Tests/SundialKitConnectivityTests/BinaryMessagableTests.swift
+
+This was implemented as a built-in feature of the SundialKitConnectivity module. Extends the Messagable pattern with efficient binary serialization support. Format-agnostic design supports JSON, Protobuf, MessagePack, CBOR, and custom binary formats.
+
+# Test Strategy:
+Swift Testing required. Test various binary formats, message size validation, sendMessageData integration, fallback mechanisms, error scenarios, round-trip serialization.
+
+# Subtasks:
+## 1. Define BinarySerializable protocol with Data conversion methods [done]
+### Dependencies: None
+### Description: Create the foundational BinarySerializable protocol with required methods for binary data conversion and Sendable conformance
+### Details:
+Define BinarySerializable protocol in SundialKitBinary module with: func binaryData() throws -> Data for encoding objects to binary, init(binaryData: Data) throws for decoding from binary, and Sendable conformance for Swift 6.1 concurrency. Include SerializationError enum with cases for encoding/decoding failures. Protocol should be format-agnostic to support JSON, Protobuf, MessagePack, CBOR, etc.
+
+## 2. Implement WatchConnectivity integration with sendMessageData [done]
+### Dependencies: 8.1
+### Description: Create ConnectivityBinaryManager class that integrates with WatchConnectivity's sendMessageData API for efficient binary messaging
+### Details:
+Implement ConnectivityBinaryManager wrapping ConnectivityManager from SundialKitCore. Add sendBinaryData(_:replyHandler:) method using WCSession.sendMessageData when reachable. Handle reply handlers for two-way binary communication. Bridge BinarySerializable protocol to raw Data for sendMessageData. Maintain thread safety and actor isolation for Swift 6.1 strict concurrency.
+
+## 3. Add fallback mechanism using base64 encoding for updateApplicationContext [done]
+### Dependencies: 8.2
+### Description: Implement fallback strategy when device is not reachable using updateApplicationContext with base64-encoded binary data
+### Details:
+Add fallback logic in ConnectivityBinaryManager when isReachable is false. Convert binary Data to base64 string for property list compatibility. Wrap in dictionary with metadata (timestamp, type identifier). Use updateApplicationContext for delivery when paired app is installed but not reachable. Handle decoding on receiver side, converting base64 back to Data. Ensure seamless failover between sendMessageData and updateApplicationContext.
+
+## 4. Implement generic send and request methods with type safety [done]
+### Dependencies: 8.3
+### Description: Create type-safe generic methods for sending and requesting binary messages with automatic serialization/deserialization
+### Details:
+Implement generic send<M: BinarySerializable>(_ message: M) async throws method for one-way messaging. Add request<Req: BinarySerializable, Res: BinarySerializable>(_ message: Req, expecting: Res.Type, timeout: TimeInterval) async throws -> Res for request-response patterns. Use Swift concurrency with async/await. Handle automatic serialization to Data and deserialization from Data. Implement timeout handling with Task cancellation. Bridge completion handlers to async/await using CheckedContinuation.
+
+## 5. Add message size validation and error handling [done]
+### Dependencies: 8.4
+### Description: Implement comprehensive message size validation for WatchConnectivity's 65KB limit and robust error handling
+### Details:
+Add size validation before sending, checking Data.count against 65536 bytes (65KB) limit. Throw ConnectivityError.messageTooBig when exceeded. Implement ConnectivityError enum extending existing errors with binary-specific cases. Add detailed error messages with actual vs maximum size. Consider compression strategies for large messages (document but don't implement). Handle all WatchConnectivity error codes and map to appropriate ConnectivityError cases. Ensure errors propagate correctly through async/await chains.
+
+## 6. Create comprehensive tests for various binary formats and edge cases [done]
+### Dependencies: 8.5
+### Description: Develop extensive test suite covering different binary formats, error scenarios, and integration edge cases
+### Details:
+Create test implementations for JSON (Codable), mock Protobuf, MessagePack simulation, and CBOR-like formats. Test round-trip serialization for each format. Verify size validation with boundary testing. Test concurrent sends and receives. Validate timeout behavior with various durations. Test network state transitions during message sending. Verify fallback mechanism triggers correctly. Test error recovery and retry logic. Include performance tests for serialization overhead. Use Swift Testing framework with @Test attributes.
+

@@ -1,0 +1,48 @@
+# Task ID: 6
+# Title: Implement SundialKitMessagable compatibility plugin
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Create dictionary-based messaging plugin maintaining v1.0.0 Messagable protocol and MessageDecoder with GitHub Issue #34 for Component: Messagable Plugin
+# Details:
+IMPLEMENTATION COMPLETE - Built-in feature in SundialKitConnectivity (NOT a separate package/plugin).
+
+Implementation Location:
+- Sources/SundialKitConnectivity/Messagable.swift (protocol definition)
+- Sources/SundialKitConnectivity/MessageDecoder.swift (type registry)
+- Sources/SundialKitConnectivity/MessagableKeys.swift (constants)
+
+Test Location:
+- Tests/SundialKitConnectivityTests/MessagableTests.swift
+- Tests/SundialKitConnectivityTests/MessageDecoderTests.swift
+
+This was implemented as a built-in feature of the SundialKitConnectivity module alongside WatchConnectivity functionality, maintaining exact v1.0.0 behavior for seamless migration.
+
+# Test Strategy:
+Swift Testing required. Test encoding/decoding round trips using MockMessage pattern, MessageDecoder type resolution with MessagableKeys, property list compliance, backwards compatibility with v1 messages. Port test patterns from MessagableTests.swift and MessageDecoderTests.swift.
+
+# Subtasks:
+## 1. Port Messagable protocol with all v1.0.0 methods [done]
+### Dependencies: None
+### Description: Extract and port the Messagable protocol from Sources/SundialKit/WatchConnectivity/Messagable.swift with exact API compatibility including static key property, init from dictionary, parameters method, and message helper extension
+### Details:
+Create Sources/SundialKitMessagable/Messagable.swift with the complete Messagable protocol definition from Sources/SundialKit/WatchConnectivity/Messagable.swift:30-86. Must include: static var key: String for type identification, init?(from: [String: Any]?) for decoding from dictionary, func parameters() -> [String: Any] for encoding to dictionary, and extension with func message() -> ConnectivityMessage helper that uses MessagableKeys.typeKey and MessagableKeys.parametersKey. Ensure Sendable conformance for Swift 6 compatibility. The message() extension should create a dictionary with Self.key as typeKey and parameters() result as parametersKey.
+
+## 2. Port MessageDecoder class with type registry [done]
+### Dependencies: 6.1
+### Description: Implement MessageDecoder class from Sources/SundialKit/WatchConnectivity/MessageDecoder.swift that maintains a registry of Messagable types and provides type-safe decoding from ConnectivityMessage dictionaries
+### Details:
+Create Sources/SundialKitMessagable/MessageDecoder.swift with MessageDecoder struct from Sources/SundialKit/WatchConnectivity/MessageDecoder.swift:63-90. Initialize with array of Messagable.Type, build internal dictionary keyed by Messagable.key for O(1) lookup using Dictionary(uniqueKeysWithValues:). Implement decode(_: ConnectivityMessage) -> Messagable? method that extracts MessagableKeys.typeKey, looks up type in registry, and calls appropriate init?(from:) with MessagableKeys.parametersKey value. Include proper error handling for missing keys and unknown types. Thread-safety is provided by immutable state after initialization.
+
+## 3. Port ConnectivityMessage typealias and MessagableKeys [done]
+### Dependencies: None
+### Description: Define ConnectivityMessage typealias as [String:Any] and port MessagableKeys internal enum from existing v1.0.0 implementation
+### Details:
+Create Sources/SundialKitMessagable/ConnectivityMessage.swift with public typealias ConnectivityMessage = [String: Any] from Sources/SundialKit/WatchConnectivity/ConnectivityMessage.swift:31. Create Sources/SundialKitMessagable/MessagableKeys.swift with internal enum MessagableKeys from Sources/SundialKit/WatchConnectivity/MessagableKeys.swift:30-33 containing typeKey = "__type" and parametersKey = "__parameters". These keys are used by Messagable.message() extension and MessageDecoder.decode(_:) for consistent message format. Ensure all values in ConnectivityMessage conform to property list types (NSString, NSNumber, NSDate, NSData, NSArray, NSDictionary). Document WatchConnectivity compatibility requirements.
+
+## 4. Create comprehensive backwards compatibility tests [done]
+### Dependencies: 6.1, 6.2, 6.3
+### Description: Implement complete test suite verifying exact v1.0.0 behavior including encoding/decoding round trips and backwards compatibility with existing messages using patterns from MessagableTests.swift and MessageDecoderTests.swift
+### Details:
+Create Tests/SundialKitMessagableTests/ with comprehensive test coverage based on existing patterns from Tests/SundialKitTests/WatchConnectivity/MessagableTests.swift and Tests/SundialKitTests/WatchConnectivity/MessageDecoderTests.swift. Include: TestMessage types matching MockMessage pattern from Tests/SundialKitTests/MockMessage.swift, round-trip encoding/decoding tests using message() and decode(_:), MessageDecoder registry tests with multiple types, property list compliance validation, edge cases (empty messages, nil values, invalid types), performance tests for large message sets. Test that MessagableKeys.typeKey and MessagableKeys.parametersKey are used correctly. Verify that migrating from v1.0.0 to plugin requires zero code changes by using identical test fixtures.
+
