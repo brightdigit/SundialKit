@@ -1,0 +1,43 @@
+// complex_message.proto
+// Complex nested message for performance testing
+
+syntax = "proto3";
+
+package sundial.demo;
+
+import "color_message.proto";
+
+// Complex message with nested types for stress testing
+message ComplexMessage {
+  // Primary color data
+  ColorMessage color = 1;
+
+  // Sensor data array for demonstrating repeated fields
+  message SensorData {
+    float temperature = 1;  // Celsius
+    float humidity = 2;     // Percentage
+    float pressure = 3;     // hPa
+    int64 reading_time_ms = 4;
+  }
+  repeated SensorData sensors = 2;
+
+  // Device metadata
+  message DeviceInfo {
+    string device_id = 1;
+    string os_version = 2;
+    string app_version = 3;
+    string locale = 4;
+    int64 boot_time_ms = 5;
+  }
+  DeviceInfo device_info = 3;
+
+  // Color history for testing arrays
+  repeated ColorMessage color_history = 4;
+
+  // Custom binary payload for arbitrary data
+  bytes custom_data = 5;
+
+  // Message metadata
+  int64 created_at_ms = 6;
+  string message_id = 7;
+}

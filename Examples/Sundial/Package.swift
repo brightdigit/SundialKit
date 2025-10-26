@@ -1,0 +1,112 @@
+// swift-tools-version: 6.1
+
+import PackageDescription
+
+let package = Package(
+  name: "Sundial",
+  platforms: [
+    .iOS(.v16),
+    .watchOS(.v9),
+    .macOS(.v13)
+  ],
+  products: [
+    // Shared library used by both variants
+    .library(
+      name: "SundialDemoShared",
+      targets: ["SundialDemoShared"]
+    ),
+    // Combine variant executable
+    .executable(
+      name: "SundialDemoCombine",
+      targets: ["SundialDemoCombine"]
+    ),
+    // Stream variant executable
+    .executable(
+      name: "SundialDemoStream",
+      targets: ["SundialDemoStream"]
+    )
+  ],
+  dependencies: [
+    // SwiftProtobuf for binary message encoding
+    .package(
+      url: "https://github.com/apple/swift-protobuf.git",
+      from: "1.25.0"
+    ),
+    // SundialKit core (parent package)
+    .package(
+      name: "SundialKit",
+      path: "../.."
+    ),
+    // SundialKitCombine plugin (subrepo)
+    .package(
+      name: "SundialKitCombine",
+      path: "../../Packages/SundialKitCombine"
+    ),
+    // SundialKitStream plugin (subrepo)
+    .package(
+      name: "SundialKitStream",
+      path: "../../Packages/SundialKitStream"
+    )
+  ],
+  targets: [
+    // MARK: - Shared Components
+
+    .target(
+      name: "SundialDemoShared",
+      dependencies: [
+        .product(name: "SwiftProtobuf", package: "swift-protobuf"),
+        .product(name: "SundialKitCore", package: "SundialKit"),
+        .product(name: "SundialKitConnectivity", package: "SundialKit")
+      ],
+      path: "Sources/Shared",
+      exclude: [
+        // Protobuf schemas (compiled separately)
+        "../Protos"
+      ],
+      swiftSettings: [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableExperimentalFeature("StrictConcurrency")
+      ]
+    ),
+
+    // MARK: - Combine Variant
+
+    .executableTarget(
+      name: "SundialDemoCombine",
+      dependencies: [
+        "SundialDemoShared",
+        .product(name: "SundialKitCombine", package: "SundialKitCombine")
+      ],
+      path: "Sources/SundialDemoCombine",
+      swiftSettings: [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableExperimentalFeature("StrictConcurrency")
+      ]
+    ),
+
+    // MARK: - Stream Variant
+
+    .executableTarget(
+      name: "SundialDemoStream",
+      dependencies: [
+        "SundialDemoShared",
+        .product(name: "SundialKitStream", package: "SundialKitStream")
+      ],
+      path: "Sources/SundialDemoStream",
+      swiftSettings: [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableExperimentalFeature("StrictConcurrency")
+      ]
+    ),
+
+    // MARK: - Tests
+
+    .testTarget(
+      name: "SundialDemoTests",
+      dependencies: [
+        "SundialDemoShared"
+      ],
+      path: "Tests"
+    )
+  ]
+)
