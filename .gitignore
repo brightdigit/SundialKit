@@ -188,7 +188,7 @@ dev-debug.log
 !Keys/README.md
 !Keys/*.example.*
 
-# Task files
-# tasks.json
-# tasks/ 
+# Task files (auto-generated from tasks.json)
+.taskmaster/tasks/task_*.txt
+
 .mcp.json

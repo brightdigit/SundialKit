@@ -35,6 +35,14 @@ import SundialKitCore
 /// `PingCoordinator` handles the lifecycle of periodic network pings,
 /// including timer setup, execution, and cleanup. It is used by
 /// `NetworkMonitor` to verify network connectivity.
+///
+/// ## Thread Safety
+///
+/// This class uses `@unchecked Sendable` with careful synchronization. This is safe because:
+/// - The `ping` and `statusProvider` properties are immutable (let)
+/// - The `timer` property is only accessed on the dispatch queue where it was created
+/// - Timer event handlers execute on the same queue, preventing concurrent access
+/// - All timer operations (start/stop) are serialized on the queue
 internal final class PingCoordinator<Ping: NetworkPing & Sendable>: @unchecked Sendable {
   // MARK: - Private Properties
 

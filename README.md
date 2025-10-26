@@ -56,6 +56,7 @@ Swift 6.1+ reactive communications library with modern concurrency support for A
 - [x] Monitor device connectivity and pairing status
 - [x] Send and receive messages between devices
 - [x] Type-safe message encoding/decoding with Messagable protocol
+- [x] Built-in message serialization with Messagable (dictionary-based) and BinaryMessagable protocols
 
 **v2.0.0 Features:**
 - [x] **SundialKitStream**: Actor-based observers with AsyncStream APIs
@@ -119,6 +120,23 @@ let package = Package(
   ]
 )
 ```
+
+### Understanding SundialKit Architecture
+
+SundialKit v2.0.0 has two types of features:
+
+**Built-in Features** (included with core modules):
+- `SundialKitConnectivity` includes built-in message serialization:
+  - **Messagable protocol**: Type-safe dictionary-based messaging
+  - **BinaryMessagable protocol**: Efficient binary message encoding
+  - **MessageDecoder**: Type registry for decoding messages
+  - No additional dependencies needed - included automatically
+
+**Plugin Packages** (separate repositories, choose your concurrency model):
+- `SundialKitCombine`: Combine-based observers with @Published properties
+- `SundialKitStream`: Actor-based observers with AsyncStream APIs
+
+When you import `SundialKitConnectivity`, you automatically get Messagable and BinaryMessagable features.
 
 ### Core Protocols Only
 

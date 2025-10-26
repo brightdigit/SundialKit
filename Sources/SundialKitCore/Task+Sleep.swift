@@ -1,5 +1,5 @@
 //
-//  NetworkStateObserver.swift
+//  Task+Sleep.swift
 //  SundialKit
 //
 //  Created by Leo Dion.
@@ -27,27 +27,14 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-public import SundialKitCore
-
-/// A protocol for observing network state changes.
-///
-/// Implement this protocol to receive notifications when network connectivity
-/// changes in a ``NetworkMonitor``.
-///
-/// Observers must be Sendable (actors, @MainActor classes, or value types).
-public protocol NetworkStateObserver: Sendable {
-  /// Called when the network path status changes.
-  ///
-  /// - Parameter status: The new path status
-  func networkMonitor(didUpdatePathStatus status: PathStatus) async
-
-  /// Called when the expensive network status changes.
-  ///
-  /// - Parameter isExpensive: Whether the connection is expensive
-  func networkMonitor(didUpdateExpensive isExpensive: Bool) async
-
-  /// Called when the constrained network status changes.
-  ///
-  /// - Parameter isConstrained: Whether the connection is constrained
-  func networkMonitor(didUpdateConstrained isConstrained: Bool) async
+extension Task where Success == Never, Failure == Never {
+  /// Suspends the current task for the given duration.
+  /// - Parameter duration: The duration to sleep for.
+  package static func sleep(forMilliseconds milliseconds: UInt64) async throws {
+    if #available(macOS 13.0, iOS 16.0, watchOS 9.0, tvOS 16.0, *) {
+      try await self.sleep(for: .milliseconds(milliseconds))
+    } else {
+      try await self.sleep(nanoseconds: milliseconds * 1_000_000)
+    }
+  }
 }

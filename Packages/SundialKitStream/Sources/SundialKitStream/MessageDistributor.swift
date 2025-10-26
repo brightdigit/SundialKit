@@ -69,6 +69,7 @@ public actor MessageDistributor {
         await continuationManager.yieldTypedMessage(decoded)
       } catch {
         // Decoding failed - log but don't crash (raw stream still gets the message)
+        #warning("Error silently swallowed - replace print() with proper logging (OSLog/Logger)")
         print("Failed to decode message: \(error)")
       }
     }
@@ -92,6 +93,7 @@ public actor MessageDistributor {
         await continuationManager.yieldTypedMessage(decoded)
       } catch {
         // Decoding failed - log but don't crash (raw stream still gets the message)
+        #warning("Error silently swallowed - replace print() with proper logging (OSLog/Logger)")
         print("Failed to decode application context: \(error)")
       }
     }
@@ -108,6 +110,7 @@ public actor MessageDistributor {
         await continuationManager.yieldTypedMessage(decoded)
       } catch {
         // Decoding failed - log the error
+        #warning("Error silently swallowed - replace print() with proper logging (OSLog/Logger)")
         print("Failed to decode binary message: \(error)")
       }
     }
