@@ -1140,7 +1140,7 @@
             "description": "Use git subtree add to import the complete Sundial repository at https://github.com/brightdigit/Sundial into Examples/Sundial/ while preserving all git history, commits, authors, and timestamps for future reference and maintaining historical context",
             "dependencies": [],
             "details": "Execute git subtree add --prefix=Examples/Sundial https://github.com/brightdigit/Sundial.git main to import the repository with complete history preservation. Verify history import by running git log --oneline --graph Examples/Sundial and git log --follow Examples/Sundial/project.yml to confirm all historical commits are accessible. Analyze the imported structure including iOS app, watchOS app, XcodeGen configuration (project.yml), target definitions, and build settings. Document the current v1.0.0 API usage patterns including NetworkObserver, ConnectivityObserver, and message passing implementation for migration reference",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify git log shows all original commits with correct authors and timestamps, confirm git blame displays original contributors for existing code, validate complete file structure from Sundial repository is present in Examples/Sundial/"
           },
           {
@@ -1151,7 +1151,7 @@
               1
             ],
             "details": "Verify the imported demo application builds and runs with existing SundialKit umbrella package using XcodeGen. Test core functionality: iPhone app launching and displaying network status, Apple Watch app showing connectivity state, color selection transmission between devices, reachability status updates, and network state changes reflection in UI. Document current API usage patterns including import statements, observer instantiation, publisher subscriptions, and message handling. Create integration test checklist for validating functionality after core component changes. Establish performance baseline measurements for comparison during v2.0.0 migration",
-            "status": "pending",
+            "status": "deferred",
             "testStrategy": "Demo builds without errors using XcodeGen, runs on iOS 14.8+ and watchOS 7.4+ simulators, color transmission works between iPhone and Watch, network status updates correctly reflect system changes"
           },
           {
@@ -1162,7 +1162,7 @@
               2
             ],
             "details": "Add executable product definition to root Package.swift: .executable(name: \"SundialDemo\", targets: [\"SundialDemo\"]). Define corresponding target with dependency on SundialKit umbrella package and proper source path pointing to Examples/Sundial/. Set deployment targets to match existing iOS 14.8+ and watchOS 7.4+ requirements. Configure basic resource handling for assets and localization files. Ensure both XcodeGen and SPM build systems can coexist without conflicts. Test that swift build works for basic compilation while XcodeGen remains the primary development environment",
-            "status": "pending",
+            "status": "cancelled",
             "testStrategy": "swift build compiles SundialDemo target successfully, XcodeGen project generation still works without conflicts, both build systems produce equivalent binary functionality"
           },
           {
@@ -1173,7 +1173,7 @@
               3
             ],
             "details": "Create Tests/SundialDemoTests/ directory with integration test suite covering: network monitoring state changes, WatchConnectivity session activation and reachability, message encoding/decoding for color data, UI state updates in response to connectivity changes, error handling for connection failures, and cross-platform communication flows. Use existing SundialKit test patterns and Mock* implementations where appropriate. Configure test targets in both Package.swift and XcodeGen project for parallel test execution. Include performance benchmarks for message latency and UI responsiveness to establish baseline measurements for v2.0.0 comparison",
-            "status": "pending",
+            "status": "deferred",
             "testStrategy": "All integration tests pass consistently, achieve 80%+ code coverage for demo business logic, performance benchmarks complete within expected thresholds, tests run successfully in both SPM and XcodeGen environments"
           },
           {
