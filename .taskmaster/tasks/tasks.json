@@ -326,7 +326,7 @@
           "2",
           "3"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -334,7 +334,7 @@
             "description": "Modify Package.swift to add the SundialKit product that combines all three module targets with proper dependency declarations and platform restrictions",
             "dependencies": [],
             "details": "Edit Package.swift to add a new product named 'SundialKit' that includes SundialKitCore, SundialKitNetwork, and SundialKitConnectivity as targets. Set platform requirements to iOS 13.0+ and watchOS 6.0+ (the most restrictive of all modules). Ensure the product properly declares its target dependencies and that the SundialKit target itself depends on all three module targets.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify Package.swift compiles without errors using 'swift build' and that the SundialKit product appears in the package manifest",
             "parentId": "undefined"
           },
@@ -346,7 +346,7 @@
               1
             ],
             "details": "Create Sources/SundialKit/SundialKit.swift with three lines: '@_exported import SundialKitCore', '@_exported import SundialKitNetwork', and '@_exported import SundialKitConnectivity'. This file should contain no additional code - it serves purely as a re-export mechanism. The @_exported attribute ensures all public symbols from the imported modules become available to consumers who import SundialKit.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Build the target and verify no compilation errors occur with the @_exported imports",
             "parentId": "undefined"
           },
@@ -358,7 +358,7 @@
               2
             ],
             "details": "Create Tests/SundialKitTests/SundialKitUmbrellaTests.swift that imports only SundialKit (not the individual modules) and verifies access to key types from each module: NetworkObserver and PathStatus from Network, ConnectivityObserver and ConnectivityMessage from Connectivity, and core protocols from Core. Test should instantiate or reference each major public type to ensure proper symbol visibility. Include platform conditional compilation to handle iOS vs watchOS differences.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Run 'swift test' to ensure all public APIs are accessible through the umbrella import without needing individual module imports",
             "parentId": "undefined"
           }
@@ -371,7 +371,7 @@
         "id": 5,
         "title": "Implement SundialKitCombine compatibility plugin",
         "description": "Create Combine-based plugin package providing v1.0.0 API compatibility with NetworkObserver and ConnectivityObserver",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "2",
           "3"
@@ -386,7 +386,7 @@
             "description": "Set up the SundialKitCombine Swift package with proper directory structure and create the NetworkObserver class that wraps NetworkMonitor from SundialKitCore",
             "dependencies": [],
             "details": "Create Package.swift with SundialKitCombine target, add dependency on SundialKitCore. Create NetworkObserver class with @Published properties for pathStatus, isExpensive, and isConstrained. Initialize with NetworkMonitor instance and set up property observation bridges. Reference current NetworkObserver implementation at Sources/SundialKit/Network/NetworkObserver.swift for API compatibility.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test that NetworkObserver initializes correctly, properties are properly published, and NetworkMonitor is correctly wrapped",
             "parentId": "undefined"
           },
@@ -398,7 +398,7 @@
               1
             ],
             "details": "Create Combine publishers for each observable property using @Published projectedValue. Port the PassthroughSubject extension with anyPublisher(for:) helper from Sources/SundialKit/PassthroughSubject.swift (lines 36-40). Implement NetworkStateObserver conformance to bridge state changes from NetworkMonitor to Combine publishers. Maintain exact API from current NetworkObserver (lines 90-107).",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify all publishers emit correct values when underlying NetworkMonitor state changes, test PassthroughSubject utility methods work as in v1.0.0",
             "parentId": "undefined"
           },
@@ -410,7 +410,7 @@
               1
             ],
             "details": "Create ConnectivityObserver with @Published properties: activationState, isReachable, isPaired, isPairedAppInstalled. Initialize with ConnectivityManager instance. Set up property bridges to observe ConnectivityManager state changes and update @Published properties accordingly. Reference current ConnectivityObserver API at Sources/SundialKit/WatchConnectivity/ConnectivityObserver.swift.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test ConnectivityObserver initialization, verify all @Published properties update correctly when ConnectivityManager state changes",
             "parentId": "undefined"
           },
@@ -422,7 +422,7 @@
               3
             ],
             "details": "Create sendingMessageSubject as PassthroughSubject<ConnectivityMessage, Never> (matching line 43 in current implementation). Implement messageReceivedPublisher and replyMessagePublisher using PassthroughSubject (lines 77-85). Bridge ConnectivityManager's message callbacks to emit on appropriate publishers. Ensure sendingMessageSubject triggers actual message sending through ConnectivityManager, following current sendMessage implementation (lines 163-182).",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test message sending through sendingMessageSubject, verify messageReceivedPublisher emits on message receipt, test replyMessagePublisher handles reply messages correctly",
             "parentId": "undefined"
           },
@@ -435,7 +435,7 @@
               4
             ],
             "details": "Implement observer protocol methods to receive state changes and messages from NetworkMonitor and ConnectivityManager. Convert all callback data to appropriate Combine publisher emissions. Ensure thread safety and proper memory management with weak self captures in closures. Handle platform-specific callbacks appropriately. Reference current delegate pattern implementation (lines 126-199 in ConnectivityObserver.swift).",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test all observer callbacks trigger correct publisher emissions, verify no memory leaks or retain cycles, test thread safety under concurrent access",
             "parentId": "undefined"
           },
@@ -447,7 +447,7 @@
               5
             ],
             "details": "Import all v1.0.0 tests into SundialKitCombine test target. Update import statements from SundialKit to SundialKitCombine. Run full test suite without any modifications to test code. Document any missing APIs or behavioral differences. Add @available guards for platform compatibility as needed. Reference existing test files: Tests/SundialKitTests/Network/NetworkObserverTests.swift, Tests/SundialKitTests/WatchConnectivity/ConnectivityObserverPropertyTests.swift, Tests/SundialKitTests/WatchConnectivity/ConnectivityObserverMessageTests.swift, Tests/SundialKitTests/PassthroughSubjectTests.swift.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Execute complete v1.0.0 test suite, ensure 100% pass rate with no test modifications required, verify identical behavior between v1.0.0 and plugin implementation",
             "parentId": "undefined"
           }
@@ -530,7 +530,7 @@
           "2",
           "3"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -538,7 +538,7 @@
             "description": "Implement the core NetworkStream actor that wraps NetworkMonitor with proper actor isolation, ensuring thread-safe access to all network state",
             "dependencies": [],
             "details": "Create NetworkStream actor in SundialKitStream target. Define actor NetworkStream with private let networkMonitor: NetworkMonitor. Implement actor isolation boundaries for all state access. Add private continuation storage for AsyncStream management. Implement proper initialization with NetworkMonitor dependency injection. Ensure all public APIs are properly isolated to the actor context.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test actor isolation using Task.detached contexts, verify concurrent access safety, test initialization and dependency injection",
             "parentId": "undefined"
           },
@@ -550,7 +550,7 @@
               1
             ],
             "details": "Implement pathStatusStream: AsyncStream<PathStatus> using AsyncStream.makeStream(). Create isExpensiveStream and isConstrainedStream similarly. Implement NetworkStateObserver conformance to receive updates from NetworkMonitor. Bridge observer callbacks to AsyncStream continuations. Handle continuation lifecycle with proper cleanup on stream termination. Implement async func currentStatus() -> PathStatus for synchronous state access.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test stream delivery of state changes, verify proper cleanup on cancellation, test multiple concurrent consumers",
             "parentId": "undefined"
           },
@@ -560,7 +560,7 @@
             "description": "Implement the core ConnectivityStream actor that wraps ConnectivityManager with actor isolation for thread-safe WatchConnectivity operations",
             "dependencies": [],
             "details": "Create ConnectivityStream actor in SundialKitStream target. Define actor ConnectivityStream with private let connectivityManager: ConnectivityManager. Implement actor isolation for all connectivity state and message handling. Add private continuation storage for multiple AsyncStream instances. Handle message queue buffering for async delivery. Ensure proper actor context isolation for all public methods.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test actor isolation with concurrent operations, verify message queue handling, test initialization with mock ConnectivityManager",
             "parentId": "undefined"
           },
@@ -572,7 +572,7 @@
               3
             ],
             "details": "Implement activationStateStream: AsyncStream<ActivationState> using AsyncStream.makeStream(). Create isReachableStream: AsyncStream<Bool> for reachability state. Implement messageStream: AsyncStream<ReceivedMessage> for incoming messages. Create ConnectivityStateObserver conformance to receive updates. Bridge observer callbacks to appropriate stream continuations. Handle multiple consumers and continuation lifecycle properly.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test stream delivery timing, verify state synchronization, test message stream buffering and delivery order",
             "parentId": "undefined"
           },
@@ -585,7 +585,7 @@
               4
             ],
             "details": "Implement async func send<M>(_ message: M) throws(ConnectivityError) where M: Sendable. Convert synchronous ConnectivityManager.send to async with proper error propagation. Implement async func activate() throws(ConnectivityError) for session activation. Use Swift 6.1 typed throws syntax for ConnectivityError. Handle timeout scenarios with withTaskCancellationHandler. Ensure proper actor isolation for all async operations.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test typed error throwing, verify timeout handling, test cancellation behavior, test message sending success and failure paths",
             "parentId": "undefined"
           },
@@ -601,7 +601,7 @@
               5
             ],
             "details": "Enable strict concurrency checking in Package.swift with swiftLanguageVersions: [.v6_1]. Ensure all types conform to Sendable where appropriate. Fix any concurrency warnings or errors. Verify actor isolation boundaries are properly maintained. Check that all closures and continuations are properly isolated. Remove any @unchecked Sendable usage. Validate no data races are possible.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Build with strict concurrency enabled, run thread sanitizer tests, verify no runtime concurrency issues",
             "parentId": "undefined"
           },
@@ -618,7 +618,7 @@
               6
             ],
             "details": "Write NetworkStreamTests using Swift Testing framework. Test actor isolation with concurrent access patterns. Verify AsyncStream delivery and cleanup behavior. Write ConnectivityStreamTests for message handling and state streams. Test error propagation with typed throws. Verify proper cleanup and resource management. Test stream cancellation and continuation lifecycle. Add performance tests for concurrent operations.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Use Swift Testing expectations for async tests, verify with thread sanitizer, test resource cleanup with weak references",
             "parentId": "undefined"
           }
@@ -1222,7 +1222,7 @@
       ],
       "created": "2025-10-24T16:59:30.071Z",
       "description": "Tasks for master context",
-      "updated": "2025-10-26T15:41:48.411Z"
+      "updated": "2025-10-26T19:43:54.126Z"
     }
   }
 }
