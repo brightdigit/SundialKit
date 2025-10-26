@@ -48,6 +48,7 @@
     @unchecked Sendable
   {
     internal let session: WCSession
+    #warning("replace with a property wrapper or internal actor")
     private let delegateLock = NSLock()
     private var _delegate: ConnectivitySessionDelegate?
 

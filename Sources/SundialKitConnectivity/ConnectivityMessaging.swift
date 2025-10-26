@@ -130,7 +130,7 @@
       return try await withThrowingTaskGroup(of: ConnectivityMessage.self) { group in
         // Add timeout task
         group.addTask {
-          try await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
+          try await Task.sleep(forMilliseconds: UInt64(timeout * 1_000))
           throw ConnectivityError.messageReplyTimedOut
         }
 

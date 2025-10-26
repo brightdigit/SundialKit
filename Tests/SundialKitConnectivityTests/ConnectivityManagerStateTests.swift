@@ -21,15 +21,15 @@
       let manager = ConnectivityManager(session: mockSession)
 
       mockSession.activationState = .activated
-      try await Task.sleep(nanoseconds: 200_000_000)  // 1 second
+      try await Task.sleep(forMilliseconds: 200)  // 0.2 seconds
       #expect(await manager.activationState == .activated)
 
       mockSession.activationState = .inactive
-      try await Task.sleep(nanoseconds: 200_000_000)  // 1 second
+      try await Task.sleep(forMilliseconds: 200)  // 0.2 seconds
       #expect(await manager.activationState == .inactive)
 
       mockSession.activationState = .notActivated
-      try await Task.sleep(nanoseconds: 200_000_000)  // 1 second
+      try await Task.sleep(forMilliseconds: 200)  // 0.2 seconds
       #expect(await manager.activationState == .notActivated)
     }
 

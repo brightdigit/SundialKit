@@ -100,7 +100,7 @@
       mockSession.isReachable = true
 
       // Wait for main queue notification
-      try await Task.sleep(nanoseconds: 200_000_000)  // 0.2 seconds
+      try await Task.sleep(forMilliseconds: 200)  // 0.2 seconds
 
       // Should not have received notification
       #expect(await observer.lastReachability == nil)

@@ -62,7 +62,7 @@
 
           // Start timeout task
           let timeoutTask = Task {
-            try? await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
+            try? await Task.sleep(forMilliseconds: UInt64(timeout * 1_000))
 
             await handleActivationTimeout()
           }
