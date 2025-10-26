@@ -28,7 +28,7 @@
 //
 
 #if canImport(WatchConnectivity)
-  public import Foundation
+  import Foundation
   public import SundialKitCore
   import WatchConnectivity
 
@@ -68,6 +68,7 @@
     ConnectivityMessaging,
     ConnectivityObserverManaging,
     ConnectivityDelegateHandling,
+    ConnectivityActivation,
     ConnectivitySessionDelegate
   {
     // MARK: - Properties
@@ -76,10 +77,10 @@
     public let session: any ConnectivitySession
 
     /// Storage for activation continuation during async activation.
-    private var activationContinuation: CheckedContinuation<Void, any Error>?
+    public var activationContinuation: CheckedContinuation<Void, any Error>?
 
     /// Storage for activation timeout task.
-    private var activationTimeoutTask: Task<Void, Never>?
+    public var activationTimeoutTask: Task<Void, Never>?
 
     /// Registry for managing observer references.
     public let observerRegistry = ObserverRegistry<any ConnectivityStateObserver>()
@@ -123,73 +124,26 @@
       self.init(session: WatchConnectivitySession())
     }
 
-    // MARK: - Session Lifecycle
+    // MARK: - ConnectivityActivation Protocol Helpers
 
-    /// Activates the connectivity session.
+    /// Sets the activation continuation.
     ///
-    /// - Throws: `ConnectivityError` if activation fails.
-    public nonisolated func activate() throws {
-      try session.activate()
-    }
-
-    /// Activates the connectivity session asynchronously with timeout.
-    ///
-    /// This method bridges the delegate-based activation callback to async/await.
-    /// It waits for the session to activate or throws an error if activation fails
-    /// or times out.
-    ///
-    /// - Parameter timeout: Maximum time to wait for activation (default: 30 seconds)
-    /// - Throws: `ConnectivityError` if activation fails or times out
-    public func activate(timeout: TimeInterval = 30) async throws {
-      // Check if already activated
-      if await activationState == .activated {
-        return
-      }
-
-      return try await withCheckedThrowingContinuation { continuation in
-        Task {
-          // Check if activation is already in progress
-          if await activationContinuation != nil {
-            continuation.resume(throwing: ConnectivityError.sessionNotActivated)
-            return
-          }
-
-          // Store continuation
-          await setActivationContinuation(continuation)
-
-          // Start timeout task
-          let timeoutTask = Task {
-            try? await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
-
-            await handleActivationTimeout()
-          }
-
-          // Store timeout task
-          await setActivationTimeoutTask(timeoutTask)
-
-          // Activate session
-          do {
-            try session.activate()
-          } catch {
-            await handleActivationError(error)
-          }
-
-          // Note: The continuation will be resumed in the delegate callback
-        }
-      }
-    }
-
-    // MARK: - Private Activation Helpers
-
-    private func setActivationContinuation(_ continuation: CheckedContinuation<Void, any Error>) {
+    /// - Parameter continuation: The continuation to store.
+    public func setActivationContinuation(
+      _ continuation: CheckedContinuation<Void, any Error>
+    ) {
       activationContinuation = continuation
     }
 
-    private func setActivationTimeoutTask(_ task: Task<Void, Never>) {
+    /// Sets the activation timeout task.
+    ///
+    /// - Parameter task: The timeout task to store.
+    public func setActivationTimeoutTask(_ task: Task<Void, Never>) {
       activationTimeoutTask = task
     }
 
-    private func handleActivationTimeout() {
+    /// Handles activation timeout by resuming the stored continuation with an error.
+    public func handleActivationTimeout() {
       if let storedContinuation = activationContinuation {
         activationContinuation = nil
         activationTimeoutTask = nil
@@ -197,7 +151,10 @@
       }
     }
 
-    private func handleActivationError(_ error: any Error) {
+    /// Handles activation errors by resuming the stored continuation.
+    ///
+    /// - Parameter error: The error that occurred during activation.
+    public func handleActivationError(_ error: any Error) {
       if let storedContinuation = activationContinuation {
         activationContinuation = nil
         activationTimeoutTask?.cancel()
@@ -210,180 +167,6 @@
           storedContinuation.resume(throwing: ConnectivityError.sessionNotSupported)
         }
       }
-    }
-
-    // MARK: - ConnectivityMessaging Protocol
-
-    /// Sends a message to the counterpart device.
-    ///
-    /// - Parameters:
-    ///   - message: The message dictionary to send.
-    ///   - replyHandler: Called when a reply is received.
-    ///   - errorHandler: Called if sending fails.
-    public nonisolated func sendMessage(
-      _ message: ConnectivityMessage,
-      replyHandler: @escaping (ConnectivityMessage) -> Void,
-      errorHandler: @escaping (any Error) -> Void
-    ) {
-      session.sendMessage(message) { result in
-        switch result {
-        case .success(let reply):
-          replyHandler(reply)
-        case .failure(let error):
-          errorHandler(error)
-        }
-      }
-    }
-
-    /// Updates the application context.
-    ///
-    /// - Parameter context: The context dictionary to send.
-    /// - Throws: `ConnectivityError` if the update fails.
-    public nonisolated func updateApplicationContext(_ context: ConnectivityMessage) throws {
-      try session.updateApplicationContext(context)
-    }
-
-    // MARK: - ConnectivityObserverManaging Protocol
-
-    /// Adds an observer for state changes.
-    ///
-    /// - Parameter observer: The observer to add.
-    /// - Note: Observers are stored with strong references - caller must manage lifecycle.
-    public nonisolated func addObserver(_ observer: any ConnectivityStateObserver) {
-      Task {
-        await observerRegistry.add(observer)
-      }
-    }
-
-    /// Removes observers matching the predicate.
-    ///
-    /// - Parameter predicate: Closure to identify observers to remove.
-    public nonisolated func removeObservers(
-      where predicate: @Sendable @escaping (any ConnectivityStateObserver) -> Bool
-    ) {
-      Task {
-        await observerRegistry.removeAll(where: predicate)
-      }
-    }
-
-    // MARK: - ConnectivityDelegateHandling Protocol
-
-    private func isolatedHandleActivation(_ state: ActivationState, error: (any Error)?) {
-      // Update activation state
-      self.activationState = state
-
-      // Resume activation continuation if present
-      if let continuation = activationContinuation {
-        activationContinuation = nil
-        activationTimeoutTask?.cancel()
-        activationTimeoutTask = nil
-
-        if let error = error {
-          // Map error to ConnectivityError
-          if let wcError = error as? WCError {
-            continuation.resume(throwing: ConnectivityError(wcError: wcError))
-          } else {
-            continuation.resume(throwing: ConnectivityError.sessionNotSupported)
-          }
-        } else if state == .activated {
-          continuation.resume()
-        } else {
-          continuation.resume(throwing: ConnectivityError.sessionNotActivated)
-        }
-      }
-
-      // Notify observers of activation state change
-      notifyActivationStateChanged(state)
-    }
-    /// Handles session activation completion.
-    public nonisolated func handleActivation(_ state: ActivationState, error: (any Error)?) {
-      Task {
-        await self.isolatedHandleActivation(state, error: error)
-      }
-    }
-
-    fileprivate func isolatedActiveState(_ activationState: ActivationState) {
-      self.activationState = activationState
-
-      // Notify observers of activation state change
-      notifyActivationStateChanged(activationState)
-    }
-
-    /// Handles session becoming inactive.
-    public nonisolated func handleSessionInactive() {
-      Task {
-        await self.isolatedActiveState(.inactive)
-      }
-    }
-
-    /// Handles session deactivation.
-    public nonisolated func handleSessionDeactivate() {
-      Task {
-        await self.isolatedActiveState(.notActivated)
-      }
-    }
-
-    /// Handles reachability changes.
-    public nonisolated func handleReachabilityChange(_ isReachable: Bool) {
-      Task {
-        await self.isolatedReachabilityChanged(isReachable)
-      }
-    }
-
-    private func isolatedReachabilityChanged(_ isReachable: Bool) {
-      self.isReachable = isReachable
-
-      // Notify observers of reachability change
-      notifyReachabilityChanged(isReachable)
-    }
-
-    /// Handles companion device state changes.
-    public nonisolated func handleCompanionStateChange(_ session: any ConnectivitySession) {
-      Task {
-        await self.isolatedSessionStateChanged(session)
-      }
-    }
-
-    private func isolatedSessionStateChanged(_ session: any ConnectivitySession) {
-      self.isPairedAppInstalled = session.isPairedAppInstalled
-      #if os(iOS)
-        self.isPaired = session.isPaired
-      #endif
-
-      // Notify observers of companion state changes
-      notifyCompanionAppInstalledChanged(isPairedAppInstalled)
-      #if os(iOS)
-        notifyPairedStatusChanged(isPaired)
-      #endif
-    }
-
-    /// Handles received messages.
-    public nonisolated func handleMessageReceived(_ message: ConnectivityMessage) {
-      // Notify observers of received message
-      notifyMessageReceived(message)
-    }
-
-    /// Handles application context updates.
-    public nonisolated func handleApplicationContextReceived(
-      _ applicationContext: ConnectivityMessage,
-      error: (any Error)?
-    ) {
-      // Only notify if no error
-      guard error == nil else {
-        return
-      }
-
-      // Notify observers of context update
-      notifyApplicationContextReceived(applicationContext)
-    }
-
-    /// Handles received binary message data.
-    public nonisolated func handleBinaryMessageReceived(
-      _: Data,
-      replyHandler: @escaping @Sendable (Data) -> Void
-    ) {
-      // Binary messages are not currently forwarded to observers
-      // Future enhancement: Could add binary message observer protocol
     }
   }
 #endif

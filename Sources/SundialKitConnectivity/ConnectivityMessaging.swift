@@ -40,7 +40,7 @@
   @available(tvOS, unavailable)
   public protocol ConnectivityMessaging {
     /// The underlying connectivity session.
-    var session: any ConnectivitySession { get async }
+    var session: any ConnectivitySession { get }
 
     /// Indicates whether the counterpart device is currently reachable.
     var isReachable: Bool { get async }
