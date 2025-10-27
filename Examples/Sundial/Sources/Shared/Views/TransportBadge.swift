@@ -59,7 +59,7 @@ public struct TransportBadge: View {
   }
 
   private var grayBackgroundColor: Color {
-    #if os(iOS) || os(watchOS)
+    #if os(iOS) 
       Color(uiColor: .systemGray6)
     #elseif os(macOS)
       Color(nsColor: .controlBackgroundColor)

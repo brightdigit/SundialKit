@@ -46,7 +46,7 @@ struct MessageLabView: View {
   @StateObject private var viewModel = MessageLabViewModel()
 
   private var grayBackgroundColor: Color {
-    #if os(iOS) || os(watchOS)
+    #if os(iOS) 
       Color(uiColor: .systemGray6)
     #elseif os(macOS)
       Color(nsColor: .controlBackgroundColor)
@@ -105,8 +105,14 @@ struct MessageLabView: View {
           .buttonStyle(.bordered)
         }
 
-        ColorPicker("Color", selection: $viewModel.selectedColor, supportsOpacity: true)
-          .labelsHidden()
+        #if os(watchOS)
+          // watchOS: Use color grid since ColorPicker is not available
+          colorGridPicker
+        #else
+          // iOS/macOS: Use standard ColorPicker
+          ColorPicker("Color", selection: $viewModel.selectedColor, supportsOpacity: true)
+            .labelsHidden()
+        #endif
 
         ColorPreview(
           color: viewModel.selectedColor,
@@ -345,12 +351,45 @@ struct MessageLabView: View {
 
   // MARK: - Computed Properties
 
+  #if os(watchOS)
+    private var colorGridPicker: some View {
+      let colors: [Color] = [
+        .red, .orange, .yellow, .green, .blue, .purple,
+        .pink, .cyan, .mint, .indigo, .brown, .gray
+      ]
+
+      return LazyVGrid(columns: [GridItem(.adaptive(minimum: 40))], spacing: 8) {
+        ForEach(colors.indices, id: \.self) { index in
+          Circle()
+            .fill(colors[index])
+            .frame(width: 40, height: 40)
+            .overlay(
+              Circle()
+                .strokeBorder(Color.white, lineWidth: viewModel.selectedColor.isSimilar(to: colors[index]) ? 3 : 0)
+            )
+            .onTapGesture {
+              viewModel.selectedColor = colors[index]
+            }
+        }
+      }
+    }
+  #endif
+
   private var complexityLabel: String {
     if viewModel.complexityLevel < 0.5 {
       return "ColorMessage (16 bytes)"
     } else {
       return "ComplexMessage (256+ bytes)"
     }
+  }
+}
+
+// MARK: - Color Comparison Extension
+
+private extension Color {
+  func isSimilar(to other: Color) -> Bool {
+    // Simple comparison for predefined colors
+    self == other
   }
 }
 

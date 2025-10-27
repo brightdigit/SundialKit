@@ -90,7 +90,7 @@ public struct ConnectionStatusView: View {
   }
 
   private var backgroundColor: Color {
-    #if os(iOS) || os(watchOS)
+    #if os(iOS)
       Color(uiColor: .systemGray6)
     #elseif os(macOS)
       Color(nsColor: .controlBackgroundColor)

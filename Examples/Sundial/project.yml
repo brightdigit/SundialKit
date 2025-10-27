@@ -13,6 +13,7 @@ settings:
   base:
     SWIFT_VERSION: "6.1"
     ENABLE_USER_SCRIPT_SANDBOXING: NO
+    DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM}
 
 # Reference the local Swift Package
 packages:
@@ -35,6 +36,8 @@ targets:
     dependencies:
       - package: Sundial
         product: SundialDemoCombine
+      - target: SundialCombine-watchOS
+        embed: true
     info:
       path: Resources/iOS/Info.plist
       properties:
@@ -79,7 +82,7 @@ targets:
       - package: Sundial
         product: SundialDemoCombine
     info:
-      path: Resources/watchOS/Info.plist
+      path: Resources/watchOS/Info-Combine.plist
       properties:
         WKApplication: true
         WKCompanionAppBundleIdentifier: com.brightdigit.sundial.combine.ios
@@ -89,7 +92,7 @@ targets:
     settings:
       base:
         PRODUCT_NAME: SundialCombine
-        PRODUCT_BUNDLE_IDENTIFIER: com.brightdigit.sundial.combine.watchos
+        PRODUCT_BUNDLE_IDENTIFIER: com.brightdigit.sundial.combine.ios.watchkitapp
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         SWIFT_EMIT_LOC_STRINGS: YES
         ENABLE_EXPERIMENTAL_FEATURE: StrictConcurrency
@@ -112,6 +115,8 @@ targets:
     dependencies:
       - package: Sundial
         product: SundialDemoStream
+      - target: SundialStream-watchOS
+        embed: true
     info:
       path: Resources/iOS/Info.plist
       properties:
@@ -156,7 +161,7 @@ targets:
       - package: Sundial
         product: SundialDemoStream
     info:
-      path: Resources/watchOS/Info.plist
+      path: Resources/watchOS/Info-Stream.plist
       properties:
         WKApplication: true
         WKCompanionAppBundleIdentifier: com.brightdigit.sundial.stream.ios
@@ -166,10 +171,31 @@ targets:
     settings:
       base:
         PRODUCT_NAME: SundialStream
-        PRODUCT_BUNDLE_IDENTIFIER: com.brightdigit.sundial.stream.watchos
+        PRODUCT_BUNDLE_IDENTIFIER: com.brightdigit.sundial.stream.ios.watchkitapp
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         SWIFT_EMIT_LOC_STRINGS: YES
         ENABLE_EXPERIMENTAL_FEATURE: StrictConcurrency
         ENABLE_UPCOMING_FEATURE: ExistentialAny
         TARGETED_DEVICE_FAMILY: "4"
         SDKROOT: watchos
+
+schemes:
+  SundialCombine:
+    build:
+      targets:
+        SundialCombine-iOS: all
+        SundialCombine-watchOS: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+
+  SundialStream:
+    build:
+      targets:
+        SundialStream-iOS: all
+        SundialStream-watchOS: all
+    run:
+      config: Debug
+    archive:
+      config: Release

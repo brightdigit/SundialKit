@@ -83,7 +83,7 @@ public struct MetricCard: View {
   }
 
   private var backgroundColor: Color {
-    #if os(iOS) || os(watchOS)
+    #if os(iOS)
       Color(uiColor: .systemBackground)
     #elseif os(macOS)
       Color(nsColor: .windowBackgroundColor)

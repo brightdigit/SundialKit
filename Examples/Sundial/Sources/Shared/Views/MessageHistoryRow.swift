@@ -83,7 +83,7 @@ public struct MessageHistoryRow: View {
   }
 
   private var backgroundColor: Color {
-    #if os(iOS) || os(watchOS)
+    #if os(iOS) 
       Color(uiColor: .systemGray6).opacity(0.5)
     #elseif os(macOS)
       Color(nsColor: .controlBackgroundColor).opacity(0.5)

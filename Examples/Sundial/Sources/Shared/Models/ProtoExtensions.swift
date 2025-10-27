@@ -133,9 +133,13 @@ extension Sundial_Demo_ComplexMessage {
 
     // Add device info
     var deviceInfo = Sundial_Demo_ComplexMessage.DeviceInfo()
-    #if os(iOS) || os(watchOS)
+    #if os(watchOS)
+    
       deviceInfo.deviceID =
-        UIDevice.current.identifierForVendor?.uuidString ?? "unknown"
+        WKInterfaceDevice.current().identifierForVendor?.uuidString ?? "unknown"
+    deviceInfo.osVersion = WKInterfaceDevice.current().systemVersion
+    #elseif os(iOS)
+    deviceInfo.deviceID = UIDevice.current.identifierForVendor?.uuidString ?? "unknown"
       deviceInfo.osVersion = UIDevice.current.systemVersion
     #elseif os(macOS)
       deviceInfo.deviceID = "mac-device"
