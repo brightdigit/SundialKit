@@ -25,29 +25,29 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
 
 /// Simple color message with timestamp
 /// Compact binary representation for efficient transmission
-struct Sundial_Demo_ColorMessage: Sendable {
+public struct Sundial_Demo_ColorMessage: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// RGBA color components (0.0 to 1.0)
-  var red: Float = 0
+  public var red: Float = 0
 
-  var green: Float = 0
+  public var green: Float = 0
 
-  var blue: Float = 0
+  public var blue: Float = 0
 
-  var alpha: Float = 0
+  public var alpha: Float = 0
 
   /// Timestamp when color was created (milliseconds since epoch)
-  var timestampMs: Int64 = 0
+  public var timestampMs: Int64 = 0
 
   /// Optional source identifier (e.g., "iPhone", "Watch")
-  var source: String = String()
+  public var source: String = String()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
@@ -55,10 +55,10 @@ struct Sundial_Demo_ColorMessage: Sendable {
 fileprivate let _protobuf_package = "sundial.demo"
 
 extension Sundial_Demo_ColorMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".ColorMessage"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}red\0\u{1}green\0\u{1}blue\0\u{1}alpha\0\u{3}timestamp_ms\0\u{1}source\0")
+  public static let protoMessageName: String = _protobuf_package + ".ColorMessage"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}red\0\u{1}green\0\u{1}blue\0\u{1}alpha\0\u{3}timestamp_ms\0\u{1}source\0")
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -75,7 +75,7 @@ extension Sundial_Demo_ColorMessage: SwiftProtobuf.Message, SwiftProtobuf._Messa
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.red.bitPattern != 0 {
       try visitor.visitSingularFloatField(value: self.red, fieldNumber: 1)
     }
@@ -97,7 +97,7 @@ extension Sundial_Demo_ColorMessage: SwiftProtobuf.Message, SwiftProtobuf._Messa
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Sundial_Demo_ColorMessage, rhs: Sundial_Demo_ColorMessage) -> Bool {
+  public static func ==(lhs: Sundial_Demo_ColorMessage, rhs: Sundial_Demo_ColorMessage) -> Bool {
     if lhs.red != rhs.red {return false}
     if lhs.green != rhs.green {return false}
     if lhs.blue != rhs.blue {return false}

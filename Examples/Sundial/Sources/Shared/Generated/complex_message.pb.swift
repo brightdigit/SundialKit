@@ -25,89 +25,89 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
 }
 
 /// Complex message with nested types for stress testing
-struct Sundial_Demo_ComplexMessage: Sendable {
+public struct Sundial_Demo_ComplexMessage: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// Primary color data
-  var color: Sundial_Demo_ColorMessage {
+  public var color: Sundial_Demo_ColorMessage {
     get {return _color ?? Sundial_Demo_ColorMessage()}
     set {_color = newValue}
   }
   /// Returns true if `color` has been explicitly set.
-  var hasColor: Bool {return self._color != nil}
+  public var hasColor: Bool {return self._color != nil}
   /// Clears the value of `color`. Subsequent reads from it will return its default value.
-  mutating func clearColor() {self._color = nil}
+  public mutating func clearColor() {self._color = nil}
 
-  var sensors: [Sundial_Demo_ComplexMessage.SensorData] = []
+  public var sensors: [Sundial_Demo_ComplexMessage.SensorData] = []
 
-  var deviceInfo: Sundial_Demo_ComplexMessage.DeviceInfo {
+  public var deviceInfo: Sundial_Demo_ComplexMessage.DeviceInfo {
     get {return _deviceInfo ?? Sundial_Demo_ComplexMessage.DeviceInfo()}
     set {_deviceInfo = newValue}
   }
   /// Returns true if `deviceInfo` has been explicitly set.
-  var hasDeviceInfo: Bool {return self._deviceInfo != nil}
+  public var hasDeviceInfo: Bool {return self._deviceInfo != nil}
   /// Clears the value of `deviceInfo`. Subsequent reads from it will return its default value.
-  mutating func clearDeviceInfo() {self._deviceInfo = nil}
+  public mutating func clearDeviceInfo() {self._deviceInfo = nil}
 
   /// Color history for testing arrays
-  var colorHistory: [Sundial_Demo_ColorMessage] = []
+  public var colorHistory: [Sundial_Demo_ColorMessage] = []
 
   /// Custom binary payload for arbitrary data
-  var customData: Data = Data()
+  public var customData: Data = Data()
 
   /// Message metadata
-  var createdAtMs: Int64 = 0
+  public var createdAtMs: Int64 = 0
 
-  var messageID: String = String()
+  public var messageID: String = String()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// Sensor data array for demonstrating repeated fields
-  struct SensorData: Sendable {
+  public struct SensorData: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     /// Celsius
-    var temperature: Float = 0
+    public var temperature: Float = 0
 
     /// Percentage
-    var humidity: Float = 0
+    public var humidity: Float = 0
 
     /// hPa
-    var pressure: Float = 0
+    public var pressure: Float = 0
 
-    var readingTimeMs: Int64 = 0
+    public var readingTimeMs: Int64 = 0
 
-    var unknownFields = SwiftProtobuf.UnknownStorage()
+    public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
+    public init() {}
   }
 
   /// Device metadata
-  struct DeviceInfo: Sendable {
+  public struct DeviceInfo: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
-    var deviceID: String = String()
+    public var deviceID: String = String()
 
-    var osVersion: String = String()
+    public var osVersion: String = String()
 
-    var appVersion: String = String()
+    public var appVersion: String = String()
 
-    var locale: String = String()
+    public var locale: String = String()
 
-    var bootTimeMs: Int64 = 0
+    public var bootTimeMs: Int64 = 0
 
-    var unknownFields = SwiftProtobuf.UnknownStorage()
+    public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
+    public init() {}
   }
 
-  init() {}
+  public init() {}
 
   fileprivate var _color: Sundial_Demo_ColorMessage? = nil
   fileprivate var _deviceInfo: Sundial_Demo_ComplexMessage.DeviceInfo? = nil
@@ -118,10 +118,10 @@ struct Sundial_Demo_ComplexMessage: Sendable {
 fileprivate let _protobuf_package = "sundial.demo"
 
 extension Sundial_Demo_ComplexMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".ComplexMessage"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}color\0\u{1}sensors\0\u{3}device_info\0\u{3}color_history\0\u{3}custom_data\0\u{3}created_at_ms\0\u{3}message_id\0")
+  public static let protoMessageName: String = _protobuf_package + ".ComplexMessage"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}color\0\u{1}sensors\0\u{3}device_info\0\u{3}color_history\0\u{3}custom_data\0\u{3}created_at_ms\0\u{3}message_id\0")
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -139,7 +139,7 @@ extension Sundial_Demo_ComplexMessage: SwiftProtobuf.Message, SwiftProtobuf._Mes
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -168,7 +168,7 @@ extension Sundial_Demo_ComplexMessage: SwiftProtobuf.Message, SwiftProtobuf._Mes
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Sundial_Demo_ComplexMessage, rhs: Sundial_Demo_ComplexMessage) -> Bool {
+  public static func ==(lhs: Sundial_Demo_ComplexMessage, rhs: Sundial_Demo_ComplexMessage) -> Bool {
     if lhs._color != rhs._color {return false}
     if lhs.sensors != rhs.sensors {return false}
     if lhs._deviceInfo != rhs._deviceInfo {return false}
@@ -182,10 +182,10 @@ extension Sundial_Demo_ComplexMessage: SwiftProtobuf.Message, SwiftProtobuf._Mes
 }
 
 extension Sundial_Demo_ComplexMessage.SensorData: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = Sundial_Demo_ComplexMessage.protoMessageName + ".SensorData"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}temperature\0\u{1}humidity\0\u{1}pressure\0\u{3}reading_time_ms\0")
+  public static let protoMessageName: String = Sundial_Demo_ComplexMessage.protoMessageName + ".SensorData"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}temperature\0\u{1}humidity\0\u{1}pressure\0\u{3}reading_time_ms\0")
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -200,7 +200,7 @@ extension Sundial_Demo_ComplexMessage.SensorData: SwiftProtobuf.Message, SwiftPr
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.temperature.bitPattern != 0 {
       try visitor.visitSingularFloatField(value: self.temperature, fieldNumber: 1)
     }
@@ -216,7 +216,7 @@ extension Sundial_Demo_ComplexMessage.SensorData: SwiftProtobuf.Message, SwiftPr
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Sundial_Demo_ComplexMessage.SensorData, rhs: Sundial_Demo_ComplexMessage.SensorData) -> Bool {
+  public static func ==(lhs: Sundial_Demo_ComplexMessage.SensorData, rhs: Sundial_Demo_ComplexMessage.SensorData) -> Bool {
     if lhs.temperature != rhs.temperature {return false}
     if lhs.humidity != rhs.humidity {return false}
     if lhs.pressure != rhs.pressure {return false}
@@ -227,10 +227,10 @@ extension Sundial_Demo_ComplexMessage.SensorData: SwiftProtobuf.Message, SwiftPr
 }
 
 extension Sundial_Demo_ComplexMessage.DeviceInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = Sundial_Demo_ComplexMessage.protoMessageName + ".DeviceInfo"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}device_id\0\u{3}os_version\0\u{3}app_version\0\u{1}locale\0\u{3}boot_time_ms\0")
+  public static let protoMessageName: String = Sundial_Demo_ComplexMessage.protoMessageName + ".DeviceInfo"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}device_id\0\u{3}os_version\0\u{3}app_version\0\u{1}locale\0\u{3}boot_time_ms\0")
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -246,7 +246,7 @@ extension Sundial_Demo_ComplexMessage.DeviceInfo: SwiftProtobuf.Message, SwiftPr
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.deviceID.isEmpty {
       try visitor.visitSingularStringField(value: self.deviceID, fieldNumber: 1)
     }
@@ -265,7 +265,7 @@ extension Sundial_Demo_ComplexMessage.DeviceInfo: SwiftProtobuf.Message, SwiftPr
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Sundial_Demo_ComplexMessage.DeviceInfo, rhs: Sundial_Demo_ComplexMessage.DeviceInfo) -> Bool {
+  public static func ==(lhs: Sundial_Demo_ComplexMessage.DeviceInfo, rhs: Sundial_Demo_ComplexMessage.DeviceInfo) -> Bool {
     if lhs.deviceID != rhs.deviceID {return false}
     if lhs.osVersion != rhs.osVersion {return false}
     if lhs.appVersion != rhs.appVersion {return false}

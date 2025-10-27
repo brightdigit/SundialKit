@@ -72,8 +72,9 @@ echo ""
 
 # Run protoc with Mint-managed plugin in PATH
 # Mint installs protoc-gen-swift to .mint/bin/ which protoc will find via PATH
+# Visibility=Public ensures generated types are accessible from other modules
 PATH="$MINT_PATH/bin:$PATH" protoc \
-  --swift_out="$OUTPUT_DIR" \
+  --swift_out=Visibility=Public:"$OUTPUT_DIR" \
   --proto_path="$PROTO_DIR" \
   "$PROTO_DIR"/*.proto
 

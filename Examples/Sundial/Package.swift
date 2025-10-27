@@ -15,13 +15,13 @@ let package = Package(
       name: "SundialDemoShared",
       targets: ["SundialDemoShared"]
     ),
-    // Combine variant executable
-    .executable(
+    // Combine variant library (used by iOS/watchOS app targets)
+    .library(
       name: "SundialDemoCombine",
       targets: ["SundialDemoCombine"]
     ),
-    // Stream variant executable
-    .executable(
+    // Stream variant library (used by iOS/watchOS app targets)
+    .library(
       name: "SundialDemoStream",
       targets: ["SundialDemoStream"]
     )
@@ -59,10 +59,6 @@ let package = Package(
         .product(name: "SundialKitConnectivity", package: "SundialKit")
       ],
       path: "Sources/Shared",
-      exclude: [
-        // Protobuf schemas (compiled separately)
-        "../Protos"
-      ],
       swiftSettings: [
         .enableUpcomingFeature("ExistentialAny"),
         .enableExperimentalFeature("StrictConcurrency")
@@ -71,7 +67,7 @@ let package = Package(
 
     // MARK: - Combine Variant
 
-    .executableTarget(
+    .target(
       name: "SundialDemoCombine",
       dependencies: [
         "SundialDemoShared",
@@ -86,7 +82,7 @@ let package = Package(
 
     // MARK: - Stream Variant
 
-    .executableTarget(
+    .target(
       name: "SundialDemoStream",
       dependencies: [
         "SundialDemoShared",

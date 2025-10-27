@@ -42,9 +42,10 @@ import SwiftUI
 ///
 /// Compare with SundialDemoStream for modern async/await implementation.
 @available(iOS 16.0, watchOS 9.0, *)
-@main
-struct SundialApp: App {
-  var body: some Scene {
+public struct SundialApp: App {
+  public init() {}
+
+  public var body: some Scene {
     WindowGroup {
       ContentView()
     }

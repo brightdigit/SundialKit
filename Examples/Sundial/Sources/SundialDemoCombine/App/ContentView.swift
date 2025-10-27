@@ -55,8 +55,10 @@ import SwiftUI
 ///    - Message transmission log
 ///    - Error reporting
 @available(iOS 16.0, watchOS 9.0, *)
-struct ContentView: View {
-  var body: some View {
+public struct ContentView: View {
+  public init() {}
+
+  public var body: some View {
     TabView {
       MessageLabView()
         .tabItem {

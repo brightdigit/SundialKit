@@ -153,15 +153,16 @@ final class MessageLabViewModel: ObservableObject {
 
     do {
       let message = try buildMessage()
-      let data = try message.encode()
+      
+      //let data = try message.encode()
 
-      let result = try await connectivityObserver.sendMessage(data)
+      let result = try await connectivityObserver.send(message)
 
       // Update state
       lastSentColor = (selectedColor, Date())
       messagesSent += 1
 
-      print("Sent \(data.count) bytes via \(result.context)")
+      //print("Sent \(data.count) bytes via \(result.context)")
     } catch {
       lastError = error.localizedDescription
       print("Send error: \(error)")

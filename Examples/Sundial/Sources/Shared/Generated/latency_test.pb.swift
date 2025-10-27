@@ -25,27 +25,27 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
 }
 
 /// Request message for latency ping/pong testing
-struct Sundial_Demo_LatencyTestRequest: Sendable {
+public struct Sundial_Demo_LatencyTestRequest: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// Timestamp when request was sent (milliseconds since epoch)
-  var sendTimestampMs: Int64 = 0
+  public var sendTimestampMs: Int64 = 0
 
   /// Sequence number for matching requests/replies
-  var sequenceNumber: Int64 = 0
+  public var sequenceNumber: Int64 = 0
 
   /// Variable-size payload for testing different message sizes
-  var payload: Data = Data()
+  public var payload: Data = Data()
 
-  var payloadSize: Sundial_Demo_LatencyTestRequest.PayloadSize = .small
+  public var payloadSize: Sundial_Demo_LatencyTestRequest.PayloadSize = .small
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// Size category for classification
-  enum PayloadSize: SwiftProtobuf.Enum, Swift.CaseIterable {
-    typealias RawValue = Int
+  public enum PayloadSize: SwiftProtobuf.Enum, Swift.CaseIterable {
+    public typealias RawValue = Int
 
     /// < 100 bytes
     case small // = 0
@@ -57,11 +57,11 @@ struct Sundial_Demo_LatencyTestRequest: Sendable {
     case large // = 2
     case UNRECOGNIZED(Int)
 
-    init() {
+    public init() {
       self = .small
     }
 
-    init?(rawValue: Int) {
+    public init?(rawValue: Int) {
       switch rawValue {
       case 0: self = .small
       case 1: self = .medium
@@ -70,7 +70,7 @@ struct Sundial_Demo_LatencyTestRequest: Sendable {
       }
     }
 
-    var rawValue: Int {
+    public var rawValue: Int {
       switch self {
       case .small: return 0
       case .medium: return 1
@@ -80,7 +80,7 @@ struct Sundial_Demo_LatencyTestRequest: Sendable {
     }
 
     // The compiler won't synthesize support with the UNRECOGNIZED case.
-    static let allCases: [Sundial_Demo_LatencyTestRequest.PayloadSize] = [
+    public static let allCases: [Sundial_Demo_LatencyTestRequest.PayloadSize] = [
       .small,
       .medium,
       .large,
@@ -88,68 +88,68 @@ struct Sundial_Demo_LatencyTestRequest: Sendable {
 
   }
 
-  init() {}
+  public init() {}
 }
 
 /// Reply message with timing information
-struct Sundial_Demo_LatencyTestReply: Sendable {
+public struct Sundial_Demo_LatencyTestReply: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// When the request was received
-  var receiveTimestampMs: Int64 = 0
+  public var receiveTimestampMs: Int64 = 0
 
   /// When the reply was sent
-  var replyTimestampMs: Int64 = 0
+  public var replyTimestampMs: Int64 = 0
 
   /// Sequence number matching the request
-  var sequenceNumber: Int64 = 0
+  public var sequenceNumber: Int64 = 0
 
   /// Processing time on receiver (microseconds)
-  var processingTimeUs: Int64 = 0
+  public var processingTimeUs: Int64 = 0
 
   /// Echo back the original payload
-  var payload: Data = Data()
+  public var payload: Data = Data()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
 /// Aggregated latency statistics
-struct Sundial_Demo_LatencyStats: Sendable {
+public struct Sundial_Demo_LatencyStats: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// Average round-trip time (milliseconds)
-  var averageRttMs: Double = 0
+  public var averageRttMs: Double = 0
 
   /// Minimum RTT
-  var minRttMs: Double = 0
+  public var minRttMs: Double = 0
 
   /// Maximum RTT
-  var maxRttMs: Double = 0
+  public var maxRttMs: Double = 0
 
   /// Standard deviation
-  var stdDevMs: Double = 0
+  public var stdDevMs: Double = 0
 
   /// Number of successful messages
-  var successCount: Int32 = 0
+  public var successCount: Int32 = 0
 
   /// Number of failed messages
-  var failureCount: Int32 = 0
+  public var failureCount: Int32 = 0
 
   /// Success rate (0.0 to 1.0)
-  var successRate: Double = 0
+  public var successRate: Double = 0
 
   /// Test duration (milliseconds)
-  var durationMs: Int64 = 0
+  public var durationMs: Int64 = 0
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
@@ -157,10 +157,10 @@ struct Sundial_Demo_LatencyStats: Sendable {
 fileprivate let _protobuf_package = "sundial.demo"
 
 extension Sundial_Demo_LatencyTestRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".LatencyTestRequest"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}send_timestamp_ms\0\u{3}sequence_number\0\u{1}payload\0\u{3}payload_size\0")
+  public static let protoMessageName: String = _protobuf_package + ".LatencyTestRequest"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}send_timestamp_ms\0\u{3}sequence_number\0\u{1}payload\0\u{3}payload_size\0")
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -175,7 +175,7 @@ extension Sundial_Demo_LatencyTestRequest: SwiftProtobuf.Message, SwiftProtobuf.
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.sendTimestampMs != 0 {
       try visitor.visitSingularInt64Field(value: self.sendTimestampMs, fieldNumber: 1)
     }
@@ -191,7 +191,7 @@ extension Sundial_Demo_LatencyTestRequest: SwiftProtobuf.Message, SwiftProtobuf.
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Sundial_Demo_LatencyTestRequest, rhs: Sundial_Demo_LatencyTestRequest) -> Bool {
+  public static func ==(lhs: Sundial_Demo_LatencyTestRequest, rhs: Sundial_Demo_LatencyTestRequest) -> Bool {
     if lhs.sendTimestampMs != rhs.sendTimestampMs {return false}
     if lhs.sequenceNumber != rhs.sequenceNumber {return false}
     if lhs.payload != rhs.payload {return false}
@@ -202,14 +202,14 @@ extension Sundial_Demo_LatencyTestRequest: SwiftProtobuf.Message, SwiftProtobuf.
 }
 
 extension Sundial_Demo_LatencyTestRequest.PayloadSize: SwiftProtobuf._ProtoNameProviding {
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0SMALL\0\u{1}MEDIUM\0\u{1}LARGE\0")
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0SMALL\0\u{1}MEDIUM\0\u{1}LARGE\0")
 }
 
 extension Sundial_Demo_LatencyTestReply: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".LatencyTestReply"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}receive_timestamp_ms\0\u{3}reply_timestamp_ms\0\u{3}sequence_number\0\u{3}processing_time_us\0\u{1}payload\0")
+  public static let protoMessageName: String = _protobuf_package + ".LatencyTestReply"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}receive_timestamp_ms\0\u{3}reply_timestamp_ms\0\u{3}sequence_number\0\u{3}processing_time_us\0\u{1}payload\0")
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -225,7 +225,7 @@ extension Sundial_Demo_LatencyTestReply: SwiftProtobuf.Message, SwiftProtobuf._M
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.receiveTimestampMs != 0 {
       try visitor.visitSingularInt64Field(value: self.receiveTimestampMs, fieldNumber: 1)
     }
@@ -244,7 +244,7 @@ extension Sundial_Demo_LatencyTestReply: SwiftProtobuf.Message, SwiftProtobuf._M
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Sundial_Demo_LatencyTestReply, rhs: Sundial_Demo_LatencyTestReply) -> Bool {
+  public static func ==(lhs: Sundial_Demo_LatencyTestReply, rhs: Sundial_Demo_LatencyTestReply) -> Bool {
     if lhs.receiveTimestampMs != rhs.receiveTimestampMs {return false}
     if lhs.replyTimestampMs != rhs.replyTimestampMs {return false}
     if lhs.sequenceNumber != rhs.sequenceNumber {return false}
@@ -256,10 +256,10 @@ extension Sundial_Demo_LatencyTestReply: SwiftProtobuf.Message, SwiftProtobuf._M
 }
 
 extension Sundial_Demo_LatencyStats: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".LatencyStats"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}average_rtt_ms\0\u{3}min_rtt_ms\0\u{3}max_rtt_ms\0\u{3}std_dev_ms\0\u{3}success_count\0\u{3}failure_count\0\u{3}success_rate\0\u{3}duration_ms\0")
+  public static let protoMessageName: String = _protobuf_package + ".LatencyStats"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}average_rtt_ms\0\u{3}min_rtt_ms\0\u{3}max_rtt_ms\0\u{3}std_dev_ms\0\u{3}success_count\0\u{3}failure_count\0\u{3}success_rate\0\u{3}duration_ms\0")
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -278,7 +278,7 @@ extension Sundial_Demo_LatencyStats: SwiftProtobuf.Message, SwiftProtobuf._Messa
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.averageRttMs.bitPattern != 0 {
       try visitor.visitSingularDoubleField(value: self.averageRttMs, fieldNumber: 1)
     }
@@ -306,7 +306,7 @@ extension Sundial_Demo_LatencyStats: SwiftProtobuf.Message, SwiftProtobuf._Messa
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Sundial_Demo_LatencyStats, rhs: Sundial_Demo_LatencyStats) -> Bool {
+  public static func ==(lhs: Sundial_Demo_LatencyStats, rhs: Sundial_Demo_LatencyStats) -> Bool {
     if lhs.averageRttMs != rhs.averageRttMs {return false}
     if lhs.minRttMs != rhs.minRttMs {return false}
     if lhs.maxRttMs != rhs.maxRttMs {return false}
