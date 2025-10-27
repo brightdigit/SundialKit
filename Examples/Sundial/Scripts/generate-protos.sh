@@ -23,18 +23,43 @@ OUTPUT_DIR="$PROJECT_DIR/Sources/Shared/Generated"
 
 echo -e "${GREEN}Generating Swift code from Protocol Buffers...${NC}"
 
-# Check if protoc is installed
-if ! command -v protoc &> /dev/null; then
-    echo -e "${RED}Error: protoc not found${NC}"
-    echo "Install with: brew install protobuf swift-protobuf"
+# Detect OS and set Mint path
+if [ "$(uname)" = "Darwin" ]; then
+    DEFAULT_MINT_PATH="/opt/homebrew/bin/mint"
+elif [ "$(uname)" = "Linux" ] && [ -n "$GITHUB_ACTIONS" ]; then
+    DEFAULT_MINT_PATH="$GITHUB_WORKSPACE/Mint/.mint/bin/mint"
+elif [ "$(uname)" = "Linux" ]; then
+    DEFAULT_MINT_PATH="/usr/local/bin/mint"
+else
+    echo -e "${RED}Unsupported operating system${NC}"
     exit 1
 fi
 
-# Check if swift-protobuf plugin is available
-if ! command -v protoc-gen-swift &> /dev/null; then
-    echo -e "${YELLOW}Warning: protoc-gen-swift not found${NC}"
-    echo "Install with: brew install swift-protobuf"
-    echo "Or build from source: https://github.com/apple/swift-protobuf"
+# Use environment MINT_CMD if set, otherwise use default path
+MINT_CMD=${MINT_CMD:-$DEFAULT_MINT_PATH}
+
+# Check if Mint is installed
+if ! command -v "$MINT_CMD" &> /dev/null; then
+    echo -e "${RED}Error: Mint not found at $MINT_CMD${NC}"
+    echo "Install with: brew install mint"
+    exit 1
+fi
+
+# Set up Mint environment
+export MINT_PATH="$PROJECT_DIR/.mint"
+MINT_ARGS="-n -m $PROJECT_DIR/Mintfile --silent"
+MINT_RUN="$MINT_CMD run $MINT_ARGS"
+
+# Bootstrap Mint packages
+echo "Installing swift-protobuf via Mint..."
+$MINT_CMD bootstrap -m "$PROJECT_DIR/Mintfile"
+
+# Check if protoc is installed
+if ! command -v protoc &> /dev/null; then
+    echo -e "${RED}Error: protoc not found${NC}"
+    echo "Install with: brew install protobuf"
+    echo "Or download from: https://github.com/protocolbuffers/protobuf/releases"
+    exit 1
 fi
 
 # Create output directory
@@ -45,7 +70,9 @@ echo "Input:  $PROTO_DIR"
 echo "Output: $OUTPUT_DIR"
 echo ""
 
-protoc \
+# Run protoc with Mint-managed plugin in PATH
+# Mint installs protoc-gen-swift to .mint/bin/ which protoc will find via PATH
+PATH="$MINT_PATH/bin:$PATH" protoc \
   --swift_out="$OUTPUT_DIR" \
   --proto_path="$PROTO_DIR" \
   "$PROTO_DIR"/*.proto
