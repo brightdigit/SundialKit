@@ -217,18 +217,21 @@ final class MessageLabViewModel: ObservableObject {
     primaryColor.blue = Float(components.blue)
     primaryColor.alpha = Float(components.alpha)
     primaryColor.timestampMs = Date().millisecondsSince1970
-    message.primaryColor = primaryColor
+    message.color = primaryColor
 
     // Device info
     var deviceInfo = Sundial_Demo_ComplexMessage.DeviceInfo()
     #if os(iOS)
-      deviceInfo.platform = "iOS"
+      deviceInfo.deviceID = "iOS-Device"
     #elseif os(watchOS)
-      deviceInfo.platform = "watchOS"
+      deviceInfo.deviceID = "watchOS-Device"
     #else
-      deviceInfo.platform = "Unknown"
+      deviceInfo.deviceID = "Unknown-Device"
     #endif
     deviceInfo.osVersion = "17.0"
+    deviceInfo.appVersion = "1.0.0"
+    deviceInfo.locale = Locale.current.identifier
+    deviceInfo.bootTimeMs = Date().millisecondsSince1970
     message.deviceInfo = deviceInfo
 
     // Color history (3 random colors)
@@ -242,13 +245,18 @@ final class MessageLabViewModel: ObservableObject {
       return historyColor
     }
 
-    // Sensor data (5 random values)
-    message.sensorData = (0..<5).map { _ in
-      Float.random(in: -100...100)
+    // Sensor data (5 random readings)
+    message.sensors = (0..<5).map { _ in
+      var sensor = Sundial_Demo_ComplexMessage.SensorData()
+      sensor.temperature = Float.random(in: -10...40)  // Celsius
+      sensor.humidity = Float.random(in: 0...100)      // Percentage
+      sensor.pressure = Float.random(in: 980...1050)   // hPa
+      sensor.readingTimeMs = Date().millisecondsSince1970
+      return sensor
     }
 
     message.messageID = "msg_\(UUID().uuidString.prefix(8))"
-    message.timestampMs = Date().millisecondsSince1970
+    message.createdAtMs = Date().millisecondsSince1970
 
     return message
   }

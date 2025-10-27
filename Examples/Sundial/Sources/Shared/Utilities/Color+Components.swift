@@ -59,6 +59,11 @@
       #endif
     }
 
+    /// Alias for components property
+    var rgbaComponents: Components {
+      components
+    }
+
     /// Create color from components
     init(components: Components) {
       self.init(
