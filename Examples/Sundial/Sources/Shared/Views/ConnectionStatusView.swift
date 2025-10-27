@@ -89,6 +89,16 @@ public struct ConnectionStatusView: View {
     return isReachable ? "Reachable" : "Not Reachable"
   }
 
+  private var backgroundColor: Color {
+    #if os(iOS) || os(watchOS)
+      Color(uiColor: .systemGray6)
+    #elseif os(macOS)
+      Color(nsColor: .controlBackgroundColor)
+    #else
+      Color.gray.opacity(0.2)
+    #endif
+  }
+
   public var body: some View {
     HStack(spacing: 12) {
       // Status indicator
@@ -119,7 +129,7 @@ public struct ConnectionStatusView: View {
     .padding(.vertical, 8)
     .background(
       Rectangle()
-        .fill(Color(.systemGray6))
+        .fill(backgroundColor)
     )
   }
 }

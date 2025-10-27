@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 /// Transport methods available for WatchConnectivity messaging
 public enum TransportMethod: String, Sendable, Codable, CaseIterable, Identifiable {
@@ -54,6 +55,23 @@ public enum TransportMethod: String, Sendable, Codable, CaseIterable, Identifiab
       "tray.and.arrow.down"
     case .sendMessageData:
       "bolt.circle"
+    }
+  }
+
+  /// Convenience alias for iconName
+  public var icon: String {
+    iconName
+  }
+
+  /// Color associated with this transport method
+  public var color: Color {
+    switch self {
+    case .sendMessage:
+      .blue
+    case .updateApplicationContext:
+      .orange
+    case .sendMessageData:
+      .green
     }
   }
 

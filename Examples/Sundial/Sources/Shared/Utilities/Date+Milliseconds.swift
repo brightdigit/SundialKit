@@ -14,6 +14,11 @@ public extension Date {
     Int64(timeIntervalSince1970 * 1000)
   }
 
+  /// Convenience alias for timeIntervalSince1970Milliseconds
+  var millisecondsSince1970: Int64 {
+    timeIntervalSince1970Milliseconds
+  }
+
   /// Create a Date from milliseconds since Unix epoch
   init(millisecondsSince1970: Int64) {
     self.init(timeIntervalSince1970: Double(millisecondsSince1970) / 1000.0)

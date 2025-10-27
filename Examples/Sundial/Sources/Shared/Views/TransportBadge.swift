@@ -58,6 +58,16 @@ public struct TransportBadge: View {
     self.isActive = isActive
   }
 
+  private var grayBackgroundColor: Color {
+    #if os(iOS) || os(watchOS)
+      Color(uiColor: .systemGray6)
+    #elseif os(macOS)
+      Color(nsColor: .controlBackgroundColor)
+    #else
+      Color.gray.opacity(0.2)
+    #endif
+  }
+
   public var body: some View {
     HStack(spacing: 6) {
       // Icon
@@ -73,7 +83,7 @@ public struct TransportBadge: View {
     .padding(.vertical, 6)
     .background(
       Capsule()
-        .fill(isActive ? method.color.opacity(0.2) : Color(.systemGray6))
+        .fill(isActive ? method.color.opacity(0.2) : grayBackgroundColor)
     )
     .overlay(
       Capsule()

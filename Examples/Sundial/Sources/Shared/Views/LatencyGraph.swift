@@ -63,6 +63,16 @@ public struct LatencyGraph: View {
     self.height = height
   }
 
+  private var backgroundColor: Color {
+    #if os(iOS) || os(watchOS)
+      Color(uiColor: .systemBackground)
+    #elseif os(macOS)
+      Color(nsColor: .windowBackgroundColor)
+    #else
+      Color.white
+    #endif
+  }
+
   public var body: some View {
     VStack(alignment: .leading, spacing: 8) {
       if measurements.isEmpty {
@@ -164,7 +174,6 @@ public struct LatencyGraph: View {
         // Empty state
         LatencyGraph(measurements: [], height: 150)
           .padding()
-          .background(Color(.systemBackground))
 
         // With measurements
         LatencyGraph(
@@ -172,23 +181,30 @@ public struct LatencyGraph: View {
           height: 200
         )
         .padding()
-        .background(Color(.systemBackground))
       }
       .previewLayout(.sizeThatFits)
     }
 
     static var sampleMeasurements: [LatencyTracker.Measurement] {
-      (0..<15).map { index in
-        LatencyTracker.Measurement(
+      var measurements: [LatencyTracker.Measurement] = []
+      for index in 0..<15 {
+        let baseTime = Double(-index * 2)
+        let sendTime = Date().addingTimeInterval(baseTime)
+        let receiveTime = Date().addingTimeInterval(baseTime + 0.023)
+        let method: TransportMethod = index % 3 == 0 ? .sendMessage : .sendMessageData
+
+        let measurement = LatencyTracker.Measurement(
           sequenceNumber: index,
-          sendTime: Date().addingTimeInterval(Double(-index * 2)),
-          receiveTime: Date().addingTimeInterval(Double(-index * 2 + 0.023)),
-          transportMethod: index % 3 == 0 ? .sendMessage : .sendMessageData,
+          sendTime: sendTime,
+          receiveTime: receiveTime,
+          transportMethod: method,
           payloadSize: 256,
           encodeTime: 0.002,
           decodeTime: 0.001
         )
+        measurements.append(measurement)
       }
+      return measurements
     }
   }
 #endif

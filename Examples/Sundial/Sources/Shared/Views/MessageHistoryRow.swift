@@ -82,6 +82,16 @@ public struct MessageHistoryRow: View {
     self.success = success
   }
 
+  private var backgroundColor: Color {
+    #if os(iOS) || os(watchOS)
+      Color(uiColor: .systemGray6).opacity(0.5)
+    #elseif os(macOS)
+      Color(nsColor: .controlBackgroundColor).opacity(0.5)
+    #else
+      Color.gray.opacity(0.1)
+    #endif
+  }
+
   private var sizeFormatted: String {
     let kb = Double(size) / 1024.0
     if kb < 1 {
@@ -144,7 +154,7 @@ public struct MessageHistoryRow: View {
     .padding(.horizontal, 8)
     .background(
       RoundedRectangle(cornerRadius: 8)
-        .fill(Color(.systemGray6).opacity(0.5))
+        .fill(backgroundColor)
     )
   }
 }
