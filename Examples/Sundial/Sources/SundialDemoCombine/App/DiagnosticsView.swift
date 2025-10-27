@@ -1,5 +1,5 @@
 //
-//  SundialApp.swift
+//  DiagnosticsView.swift
 //  Sundial
 //
 //  Created on 10/27/25.
@@ -29,25 +29,30 @@
 
 import SwiftUI
 
-/// Main entry point for the Sundial Demo (Combine variant).
-///
-/// This variant demonstrates SundialKit v2.0.0 with SundialKitCombine plugin,
-/// using @MainActor + Combine publishers for reactive state management.
-///
-/// Architecture:
-/// - @MainActor-based observers (NetworkObserver, ConnectivityObserver)
-/// - @Published properties for SwiftUI binding
-/// - Combine publishers for event streams
-/// - Compatible with SundialKit v1.0.0 patterns
-///
-/// Compare with SundialDemoStream for modern async/await implementation.
+/// Tab 4: Diagnostics
 @available(iOS 16.0, watchOS 9.0, *)
-public struct SundialApp: App {
-  public init() {}
+struct DiagnosticsView: View {
+  var body: some View {
+    NavigationView {
+      VStack {
+        Image(systemName: "wrench.and.screwdriver")
+          .font(.largeTitle)
+          .foregroundColor(.purple)
 
-  public var body: some Scene {
-    WindowGroup {
-      SundialTabView()
+        Text("Diagnostics")
+          .font(.title2)
+          .fontWeight(.semibold)
+
+        Text("Coming soon")
+          .font(.caption)
+          .foregroundColor(.secondary)
+      }
+      .navigationTitle("Diagnostics")
     }
   }
+}
+
+@available(iOS 17.0, watchOS 10.0, *)
+#Preview {
+  DiagnosticsView()
 }

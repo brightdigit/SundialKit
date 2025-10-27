@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  SundialTabView.swift
 //  Sundial
 //
 //  Created on 10/27/25.
@@ -55,7 +55,7 @@ import SwiftUI
 ///    - Message transmission log
 ///    - Error reporting
 @available(iOS 16.0, watchOS 9.0, *)
-public struct ContentView: View {
+public struct SundialTabView: View {
   public init() {}
 
   public var body: some View {
@@ -83,84 +83,7 @@ public struct ContentView: View {
   }
 }
 
-// MARK: - Placeholder Views (To be implemented)
-
-/// Tab 2: Latency Dashboard
-@available(iOS 16.0, watchOS 9.0, *)
-struct LatencyDashboardView: View {
-  var body: some View {
-    NavigationView {
-      VStack {
-        Image(systemName: "clock")
-          .font(.largeTitle)
-          .foregroundColor(.orange)
-
-        Text("Latency Dashboard")
-          .font(.title2)
-          .fontWeight(.semibold)
-
-        Text("Coming soon")
-          .font(.caption)
-          .foregroundColor(.secondary)
-      }
-      .navigationTitle("Latency")
-    }
-  }
+@available(iOS 17.0, watchOS 10.0, *)
+#Preview {
+  SundialTabView()
 }
-
-/// Tab 3: Protocol Comparison
-@available(iOS 16.0, watchOS 9.0, *)
-struct ProtocolComparisonView: View {
-  var body: some View {
-    NavigationView {
-      VStack {
-        Image(systemName: "chart.bar")
-          .font(.largeTitle)
-          .foregroundColor(.green)
-
-        Text("Protocol Comparison")
-          .font(.title2)
-          .fontWeight(.semibold)
-
-        Text("Coming soon")
-          .font(.caption)
-          .foregroundColor(.secondary)
-      }
-      .navigationTitle("Protocol")
-    }
-  }
-}
-
-/// Tab 4: Diagnostics
-@available(iOS 16.0, watchOS 9.0, *)
-struct DiagnosticsView: View {
-  var body: some View {
-    NavigationView {
-      VStack {
-        Image(systemName: "wrench.and.screwdriver")
-          .font(.largeTitle)
-          .foregroundColor(.purple)
-
-        Text("Diagnostics")
-          .font(.title2)
-          .fontWeight(.semibold)
-
-        Text("Coming soon")
-          .font(.caption)
-          .foregroundColor(.secondary)
-      }
-      .navigationTitle("Diagnostics")
-    }
-  }
-}
-
-#if DEBUG
-  // MARK: - Previews
-
-  @available(iOS 16.0, watchOS 9.0, *)
-  struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-      ContentView()
-    }
-  }
-#endif
