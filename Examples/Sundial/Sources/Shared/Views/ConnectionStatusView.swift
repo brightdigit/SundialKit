@@ -106,15 +106,31 @@ public struct ConnectionStatusView: View {
         Image(systemName: statusIcon)
           .font(.caption)
           .foregroundColor(statusColor)
-
+        #if !os(watchOS)
         Text(statusText)
           .font(.caption)
           .fontWeight(.medium)
           .foregroundColor(statusColor)
+        #endif
       }
 
       Spacer()
 
+      #if os(watchOS)
+      // Compact watchOS layout - just symbols and time
+      HStack(spacing: 4) {
+        // Session state as symbol
+        Image(systemName: activationState.lowercased() == "activated" ? "circle.fill" : "circle")
+          .font(.system(size: 6))
+          .foregroundColor(activationState.lowercased() == "activated" ? .green : .secondary)
+
+        // Last update (compact)
+        Text(lastUpdate, style: .relative)
+          .font(.system(size: 10))
+          .foregroundColor(.secondary)
+      }
+      #else
+      // Full layout for iOS/macOS
       // Session state
       Text(activationState)
         .font(.caption2)
@@ -124,9 +140,14 @@ public struct ConnectionStatusView: View {
       Text(lastUpdate, style: .relative)
         .font(.caption2)
         .foregroundColor(.secondary)
+      #endif
     }
     .padding(.horizontal, 12)
+    #if os(watchOS)
+    .padding(.vertical, 4)
+    #else
     .padding(.vertical, 8)
+    #endif
     .background(
       Rectangle()
         .fill(backgroundColor)
@@ -134,48 +155,41 @@ public struct ConnectionStatusView: View {
   }
 }
 
-#if DEBUG
-  // MARK: - Previews
+@available(iOS 17.0, watchOS 10.0, *)
+#Preview("Connection States") {
+  VStack(spacing: 0) {
+    // Reachable and activated
+    ConnectionStatusView(
+      isReachable: true,
+      activationState: "Activated",
+      lastUpdate: Date()
+    )
 
-  @available(iOS 14.8, watchOS 7.4, *)
-  struct ConnectionStatusView_Previews: PreviewProvider {
-    static var previews: some View {
-      VStack(spacing: 0) {
-        // Reachable and activated
-        ConnectionStatusView(
-          isReachable: true,
-          activationState: "Activated",
-          lastUpdate: Date()
-        )
+    Divider()
 
-        Divider()
+    // Not reachable but activated
+    ConnectionStatusView(
+      isReachable: false,
+      activationState: "Activated",
+      lastUpdate: Date().addingTimeInterval(-120)
+    )
 
-        // Not reachable but activated
-        ConnectionStatusView(
-          isReachable: false,
-          activationState: "Activated",
-          lastUpdate: Date().addingTimeInterval(-120)
-        )
+    Divider()
 
-        Divider()
+    // Not activated
+    ConnectionStatusView(
+      isReachable: false,
+      activationState: "Not Activated",
+      lastUpdate: Date().addingTimeInterval(-300)
+    )
 
-        // Not activated
-        ConnectionStatusView(
-          isReachable: false,
-          activationState: "Not Activated",
-          lastUpdate: Date().addingTimeInterval(-300)
-        )
+    Divider()
 
-        Divider()
-
-        // Inactive
-        ConnectionStatusView(
-          isReachable: false,
-          activationState: "Inactive",
-          lastUpdate: Date().addingTimeInterval(-60)
-        )
-      }
-      .previewLayout(.sizeThatFits)
-    }
+    // Inactive
+    ConnectionStatusView(
+      isReachable: false,
+      activationState: "Inactive",
+      lastUpdate: Date().addingTimeInterval(-60)
+    )
   }
-#endif
+}
