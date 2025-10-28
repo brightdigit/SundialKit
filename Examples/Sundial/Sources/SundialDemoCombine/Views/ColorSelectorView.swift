@@ -101,10 +101,12 @@ struct ColorSelectorView: View {
   struct ColorSelectorView_Previews: PreviewProvider {
     static var previews: some View {
       Group {
-        ColorSelectorView(
-          selectedColor: .constant(.blue),
-          onRandomize: {}
-        )
+        ScrollView{
+          ColorSelectorView(
+            selectedColor: .constant(.blue),
+            onRandomize: {}
+          )
+        }
         .previewDisplayName("Blue")
 
         ColorSelectorView(

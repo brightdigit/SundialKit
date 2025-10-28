@@ -89,16 +89,29 @@ public struct ColorPreview: View {
       // Metadata
       VStack(spacing: 2) {
         if let source = source {
+          #if os(watchOS)
+          Text(source)
+            .font(.system(size: 9))
+            .fontWeight(.black)
+            .foregroundColor(.primary)
+          #else
           Text(source)
             .font(.caption)
             .fontWeight(.medium)
             .foregroundColor(.primary)
+          #endif
         }
 
         if let timestamp = timestamp {
+        #if os(watchOS)
+          Text(timestamp, style: .relative)
+            
+            .font(.system(size: 10, weight: .semibold))
+          #else
           Text(timestamp, style: .time)
             .font(.caption2)
             .foregroundColor(.secondary)
+          #endif
         }
       }
     }

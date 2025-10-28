@@ -60,11 +60,13 @@ struct PayloadBuilderView: View {
   @available(iOS 16.0, watchOS 9.0, *)
   struct PayloadBuilderView_Previews: PreviewProvider {
     static var previews: some View {
-      PayloadBuilderView(
-        selectedColor: .constant(.blue),
-        complexityLevel: .constant(0.5),
-        onRandomize: {}
-      )
+      ScrollView{
+        PayloadBuilderView(
+          selectedColor: .constant(.blue),
+          complexityLevel: .constant(0.5),
+          onRandomize: {}
+        )
+      }
       .padding()
     }
   }

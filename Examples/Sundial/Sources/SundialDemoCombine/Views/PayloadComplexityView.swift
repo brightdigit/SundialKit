@@ -56,6 +56,20 @@ struct PayloadComplexityView: View {
 
   var body: some View {
     VStack(spacing: 8) {
+      #if os(watchOS)
+      HStack {
+        Text("Complexity")
+          .font(.subheadline)
+          .foregroundColor(.secondary)
+
+        Spacer()
+
+        Text(complexityLevel, format: .number.precision(.fractionLength(2)))
+          .font(.caption)
+          .fontWeight(.medium)
+          .foregroundColor(.blue)
+      }
+      #else
       HStack {
         Text("Payload Complexity")
           .font(.subheadline)
@@ -68,6 +82,7 @@ struct PayloadComplexityView: View {
           .fontWeight(.medium)
           .foregroundColor(.blue)
       }
+      #endif
 
       Slider(value: $complexityLevel, in: 0...1)
 
