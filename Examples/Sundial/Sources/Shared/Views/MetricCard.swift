@@ -82,16 +82,6 @@ public struct MetricCard: View {
     self.color = color
   }
 
-  private var backgroundColor: Color {
-    #if os(iOS)
-      Color(uiColor: .systemBackground)
-    #elseif os(macOS)
-      Color(nsColor: .windowBackgroundColor)
-    #else
-      Color.white
-    #endif
-  }
-
   public var body: some View {
     VStack(alignment: .leading, spacing: 8) {
       // Header with icon and title
@@ -123,7 +113,7 @@ public struct MetricCard: View {
     .padding()
     .background(
       RoundedRectangle(cornerRadius: 12)
-        .fill(backgroundColor)
+        .fill(Color.cardBackgroundColor)
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
     )
   }

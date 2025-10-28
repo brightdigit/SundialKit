@@ -45,40 +45,42 @@ import SwiftUI
 struct MessageLabView: View {
   @StateObject private var viewModel = MessageLabViewModel()
 
-  private var grayBackgroundColor: Color {
-    #if os(iOS) 
-      Color(uiColor: .systemGray6)
-    #elseif os(macOS)
-      Color(nsColor: .controlBackgroundColor)
-    #else
-      Color.gray.opacity(0.2)
-    #endif
-  }
-
   var body: some View {
     NavigationView {
       ScrollView {
-      
         LazyVStack(spacing: 24, pinnedViews: .sectionHeaders) {
           Section {
-            
+            // Section 1: Payload Builder
+            PayloadBuilderView(
+              selectedColor: $viewModel.selectedColor,
+              complexityLevel: $viewModel.complexityLevel,
+              onRandomize: viewModel.randomizeColor
+            )
 
-          // Section 1: Payload Builder
-          payloadBuilderSection
+            // Section 2: Transport Control
+            TransportControlView(
+              selectedTransportMethod: $viewModel.selectedTransportMethod,
+              effectiveTransportMethod: viewModel.effectiveTransportMethod,
+              automaticTransportMethod: viewModel.automaticTransportMethod,
+              isSending: viewModel.isSending,
+              isReachable: viewModel.isReachable,
+              onSend: viewModel.sendColor
+            )
 
-          // Section 2: Transport Control
-          transportControlSection
+            // Section 3: Results Display
+            ResultsView(
+              lastSentColor: viewModel.lastSentColor,
+              lastReceivedColor: viewModel.lastReceivedColor,
+              messagesSent: viewModel.messagesSent,
+              messagesReceived: viewModel.messagesReceived
+            )
 
-          // Section 3: Results Display
-          resultsSection
-
-          // Error display
-          if let error = viewModel.lastError {
-            errorSection(error)
-          }
-            
+            // Error display
+            if let error = viewModel.lastError {
+              ErrorSectionView(error: error)
+            }
           } header: {
-            self.connectionStatusFooter
+            connectionStatusFooter
           }
         }
         .padding()
@@ -87,268 +89,7 @@ struct MessageLabView: View {
     }
   }
 
-  // MARK: - Sections
-
-  private var payloadBuilderSection: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      Text("Payload Builder")
-        .font(.headline)
-
-      // Color picker
-      VStack(spacing: 12) {
-        HStack {
-          Text("Color")
-            .font(.subheadline)
-            .foregroundColor(.secondary)
-
-          Spacer()
-
-          Button(action: viewModel.randomizeColor) {
-            #if os(watchOS)
-            Image(systemName: "shuffle")
-            #else
-            Label("Random", systemImage: "shuffle")
-              .font(.caption)
-            #endif
-          }
-          .buttonStyle(.bordered)
-        }
-
-        #if os(watchOS)
-          // watchOS: Use color grid since ColorPicker is not available
-          colorGridPicker
-        #else
-          // iOS/macOS: Use standard ColorPicker
-          ColorPicker("Color", selection: $viewModel.selectedColor, supportsOpacity: true)
-            .labelsHidden()
-        #endif
-
-        ColorPreview(
-          color: viewModel.selectedColor,
-          size: 80
-        )
-      }
-      .padding()
-      .background(
-        RoundedRectangle(cornerRadius: 12)
-          .fill(grayBackgroundColor)
-      )
-
-      // Complexity slider
-      VStack(spacing: 8) {
-        HStack {
-          Text("Payload Complexity")
-            .font(.subheadline)
-            .foregroundColor(.secondary)
-
-          Spacer()
-
-          Text(complexityLabel)
-            .font(.caption)
-            .fontWeight(.medium)
-            .foregroundColor(.blue)
-        }
-
-        Slider(value: $viewModel.complexityLevel, in: 0...1)
-
-        HStack {
-          Text("Simple")
-            .font(.caption2)
-            .foregroundColor(.secondary)
-
-          Spacer()
-
-          Text("Complex")
-            .font(.caption2)
-            .foregroundColor(.secondary)
-        }
-      }
-      .padding()
-      .background(
-        RoundedRectangle(cornerRadius: 12)
-          .fill(grayBackgroundColor)
-      )
-    }
-  }
-
-  private var transportControlSection: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      Text("Transport Control")
-        .font(.headline)
-
-      // Transport method selector
-      VStack(spacing: 8) {
-        HStack {
-          Text("Transport Method")
-            .font(.subheadline)
-            .foregroundColor(.secondary)
-
-          Spacer()
-
-          if viewModel.selectedTransportMethod == nil {
-            Text("Auto")
-              .font(.caption)
-              .foregroundColor(.blue)
-          }
-        }
-
-        HStack(spacing: 8) {
-          TransportBadge(
-            method: .sendMessage,
-            isActive: viewModel.effectiveTransportMethod == .sendMessage
-          )
-          .onTapGesture {
-            viewModel.selectedTransportMethod =
-              viewModel.selectedTransportMethod == .sendMessage ? nil : .sendMessage
-          }
-
-          TransportBadge(
-            method: .sendMessageData,
-            isActive: viewModel.effectiveTransportMethod == .sendMessageData
-          )
-          .onTapGesture {
-            viewModel.selectedTransportMethod =
-              viewModel.selectedTransportMethod == .sendMessageData ? nil : .sendMessageData
-          }
-
-          TransportBadge(
-            method: .updateApplicationContext,
-            isActive: viewModel.effectiveTransportMethod == .updateApplicationContext
-          )
-          .onTapGesture {
-            viewModel.selectedTransportMethod =
-              viewModel.selectedTransportMethod == .updateApplicationContext
-              ? nil : .updateApplicationContext
-          }
-        }
-
-        if viewModel.selectedTransportMethod == nil {
-          Text("Automatic: \(viewModel.automaticTransportMethod.displayName)")
-            .font(.caption2)
-            .foregroundColor(.secondary)
-        }
-      }
-      .padding()
-      .background(
-        RoundedRectangle(cornerRadius: 12)
-          .fill(grayBackgroundColor)
-      )
-
-      // Send button
-      Button(action: { Task { await viewModel.sendColor() } }) {
-        HStack {
-          if viewModel.isSending {
-            ProgressView()
-              .progressViewStyle(.circular)
-          } else {
-            Image(systemName: "paperplane.fill")
-          }
-
-          Text(viewModel.isSending ? "Sending..." : "Send Message")
-            .fontWeight(.semibold)
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(viewModel.isReachable ? Color.blue : Color.orange)
-        .foregroundColor(.white)
-        .cornerRadius(12)
-      }
-      .disabled(viewModel.isSending)
-    }
-  }
-
-  private var resultsSection: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      Text("Results")
-        .font(.headline)
-
-      HStack(spacing: 16) {
-        // Sent
-        VStack(spacing: 12) {
-          Text("Sent")
-            .font(.caption)
-            .foregroundColor(.secondary)
-
-          if let sent = viewModel.lastSentColor {
-            ColorPreview(
-              color: sent.color,
-              timestamp: sent.timestamp,
-              source: "This Device"
-            )
-          } else {
-            ColorPreview(
-              color: .gray.opacity(0.3),
-              size: 60
-            )
-            .overlay(
-              Text("—")
-                .font(.title)
-                .foregroundColor(.secondary)
-            )
-          }
-
-          Text("\(viewModel.messagesSent)")
-            .font(.caption2)
-            .foregroundColor(.secondary)
-        }
-
-        Divider()
-
-        // Received
-        VStack(spacing: 12) {
-          Text("Received")
-            .font(.caption)
-            .foregroundColor(.secondary)
-
-          if let received = viewModel.lastReceivedColor {
-            ColorPreview(
-              color: received.color,
-              timestamp: received.timestamp,
-              source: "Counterpart"
-            )
-          } else {
-            ColorPreview(
-              color: .gray.opacity(0.3),
-              size: 60
-            )
-            .overlay(
-              Text("—")
-                .font(.title)
-                .foregroundColor(.secondary)
-            )
-          }
-
-          Text("\(viewModel.messagesReceived)")
-            .font(.caption2)
-            .foregroundColor(.secondary)
-        }
-      }
-      .frame(maxWidth: .infinity)
-      .padding()
-      .background(
-        RoundedRectangle(cornerRadius: 12)
-          .fill(grayBackgroundColor)
-      )
-    }
-  }
-
-  private func errorSection(_ error: String) -> some View {
-    HStack(spacing: 12) {
-      Image(systemName: "exclamationmark.triangle.fill")
-        .foregroundColor(.red)
-
-      Text(error)
-        .font(.caption)
-        .foregroundColor(.red)
-
-      Spacer()
-    }
-    .padding()
-    .background(
-      RoundedRectangle(cornerRadius: 12)
-        .fill(Color.red.opacity(0.1))
-    )
-  }
+  // MARK: - Connection Status
 
   private var connectionStatusFooter: some View {
     ConnectionStatusView(
@@ -356,49 +97,6 @@ struct MessageLabView: View {
       activationState: viewModel.activationState,
       lastUpdate: Date()
     )
-  }
-
-  // MARK: - Computed Properties
-
-  #if os(watchOS)
-    private var colorGridPicker: some View {
-      let colors: [Color] = [
-        .red, .orange, .yellow, .green, .blue, .purple,
-        .pink, .cyan, .mint, .indigo, .brown, .gray
-      ]
-
-      return LazyVGrid(columns: [GridItem(.adaptive(minimum: 40))], spacing: 8) {
-        ForEach(colors.indices, id: \.self) { index in
-          Circle()
-            .fill(colors[index])
-            .frame(width: 40, height: 40)
-            .overlay(
-              Circle()
-                .strokeBorder(Color.white, lineWidth: viewModel.selectedColor.isSimilar(to: colors[index]) ? 3 : 0)
-            )
-            .onTapGesture {
-              viewModel.selectedColor = colors[index]
-            }
-        }
-      }
-    }
-  #endif
-
-  private var complexityLabel: String {
-    if viewModel.complexityLevel < 0.5 {
-      return "ColorMessage (16 bytes)"
-    } else {
-      return "ComplexMessage (256+ bytes)"
-    }
-  }
-}
-
-// MARK: - Color Comparison Extension
-
-private extension Color {
-  func isSimilar(to other: Color) -> Bool {
-    // Simple comparison for predefined colors
-    self == other
   }
 }
 

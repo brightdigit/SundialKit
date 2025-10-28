@@ -61,10 +61,10 @@ final class MessageLabViewModel: ObservableObject {
   @Published var selectedTransportMethod: TransportMethod?
 
   /// Last color sent
-  @Published var lastSentColor: (color: Color, timestamp: Date)?
+  @Published var lastSentColor: ColorWithMetadata?
 
   /// Last color received
-  @Published var lastReceivedColor: (color: Color, timestamp: Date)?
+  @Published var lastReceivedColor: ColorWithMetadata?
 
   /// Whether a send operation is in progress
   @Published var isSending: Bool = false
@@ -159,7 +159,11 @@ final class MessageLabViewModel: ObservableObject {
       let result = try await connectivityObserver.send(message)
 
       // Update state
-      lastSentColor = (selectedColor, Date())
+      lastSentColor = ColorWithMetadata(
+        color: selectedColor,
+        timestamp: Date(),
+        source: "This Device"
+      )
       messagesSent += 1
 
       //print("Sent \(data.count) bytes via \(result.context)")

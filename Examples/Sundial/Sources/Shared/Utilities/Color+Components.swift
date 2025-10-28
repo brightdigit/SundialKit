@@ -10,6 +10,35 @@
   import SwiftUI
 
   public extension Color {
+    /// Standard gray background color used throughout the app
+    /// Uses platform-specific system colors for better integration
+    static var grayBackgroundColor: Color {
+      #if os(iOS)
+        Color(uiColor: .systemGray6)
+      #elseif os(macOS)
+        Color(nsColor: .controlBackgroundColor)
+      #else
+        Color(white: 0.15)  // Opaque dark charcoal gray for watchOS
+      #endif
+    }
+
+    /// Standard card/window background color (white/system background)
+    /// Uses platform-specific system colors for better integration
+    static var cardBackgroundColor: Color {
+      #if os(iOS)
+        Color(uiColor: .systemBackground)
+      #elseif os(macOS)
+        Color(nsColor: .windowBackgroundColor)
+      #else
+        Color.white
+      #endif
+    }
+
+    /// Semi-transparent gray background for subtle elements
+    static var subtleBackgroundColor: Color {
+      grayBackgroundColor.opacity(0.5)
+    }
+
     /// RGBA components of the color
     struct Components {
       public let red: Double

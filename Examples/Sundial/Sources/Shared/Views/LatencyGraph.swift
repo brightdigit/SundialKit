@@ -63,16 +63,6 @@ public struct LatencyGraph: View {
     self.height = height
   }
 
-  private var backgroundColor: Color {
-    #if os(iOS)
-      Color(uiColor: .systemBackground)
-    #elseif os(macOS)
-      Color(nsColor: .windowBackgroundColor)
-    #else
-      Color.white
-    #endif
-  }
-
   public var body: some View {
     VStack(alignment: .leading, spacing: 8) {
       if measurements.isEmpty {
