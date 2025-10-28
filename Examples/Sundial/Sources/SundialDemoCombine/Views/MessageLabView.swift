@@ -58,7 +58,11 @@ struct MessageLabView: View {
   var body: some View {
     NavigationView {
       ScrollView {
-        VStack(spacing: 24) {
+      
+        LazyVStack(spacing: 24, pinnedViews: .sectionHeaders) {
+          Section {
+            
+
           // Section 1: Payload Builder
           payloadBuilderSection
 
@@ -72,13 +76,14 @@ struct MessageLabView: View {
           if let error = viewModel.lastError {
             errorSection(error)
           }
+            
+          } header: {
+            self.connectionStatusFooter
+          }
         }
         .padding()
       }
       .navigationTitle("Transport Lab")
-      .safeAreaInset(edge: .bottom) {
-        connectionStatusFooter
-      }
     }
   }
 
@@ -92,15 +97,19 @@ struct MessageLabView: View {
       // Color picker
       VStack(spacing: 12) {
         HStack {
-          Text("Select Color")
+          Text("Color")
             .font(.subheadline)
             .foregroundColor(.secondary)
 
           Spacer()
 
           Button(action: viewModel.randomizeColor) {
+            #if os(watchOS)
+            Image(systemName: "shuffle")
+            #else
             Label("Random", systemImage: "shuffle")
               .font(.caption)
+            #endif
           }
           .buttonStyle(.bordered)
         }
