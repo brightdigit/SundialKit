@@ -132,7 +132,11 @@ final class MessageLabViewModel: ObservableObject {
       setupSubscriptions()
     }
   #else
-    init(connectivityObserver: ConnectivityObserver = .init()) {
+    init(
+      connectivityObserver: ConnectivityObserver = .init(
+        session: NeverConnectivitySession()
+      )
+    ) {
       self.connectivityObserver = connectivityObserver
 
       // Activate connectivity session (synchronous on @MainActor)

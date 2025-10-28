@@ -187,6 +187,10 @@
             print("Failed to decode binary message: \(error)")
           }
         }
+
+        // IMPORTANT: Must call reply handler to complete the send operation on sender's side
+        // Send empty Data as acknowledgment since we don't have a reply payload
+        replyHandler(Data())
       }
     }
   }
