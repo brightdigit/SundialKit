@@ -81,9 +81,13 @@ public enum BinaryMessageEncoder {
     }
 
     // Read footer length (last 4 bytes as little-endian UInt32)
+    // Copy to aligned buffer to avoid misaligned pointer access
     let lengthRange = (data.count - 4)..<data.count
-    let lengthData = data[lengthRange]
-    let length = lengthData.withUnsafeBytes { $0.load(as: UInt32.self).littleEndian }
+    var lengthBytes: UInt32 = 0
+    _ = withUnsafeMutableBytes(of: &lengthBytes) { buffer in
+      data.copyBytes(to: buffer, from: lengthRange)
+    }
+    let length = UInt32(littleEndian: lengthBytes)
 
     // Validate we have enough data for type key + length
     guard data.count >= Int(length) + 4 else {

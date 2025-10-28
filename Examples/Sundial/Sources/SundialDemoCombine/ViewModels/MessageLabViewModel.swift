@@ -109,35 +109,69 @@ final class MessageLabViewModel: ObservableObject {
 
   // MARK: - Initialization
 
-  init(connectivityObserver: ConnectivityObserver = .init()) {
-    self.connectivityObserver = connectivityObserver
+  #if os(iOS) || os(watchOS)
+    init(
+      connectivityObserver: ConnectivityObserver = .init(
+        messageDecoder: MessageDecoder(messagableTypes: [
+          Sundial_Demo_ColorMessage.self,
+          Sundial_Demo_ComplexMessage.self
+        ])
+      )
+    ) {
+      self.connectivityObserver = connectivityObserver
 
-    // Activate connectivity session
-    Task {
+      // Activate connectivity session (synchronous on @MainActor)
       do {
-        try await connectivityObserver.activate()
+        try connectivityObserver.activate()
+        print("✅ ConnectivityObserver activated successfully")
       } catch {
         lastError = "Failed to activate: \(error.localizedDescription)"
+        print("❌ ConnectivityObserver activation failed: \(error)")
       }
-    }
 
-    setupSubscriptions()
-  }
+      setupSubscriptions()
+    }
+  #else
+    init(connectivityObserver: ConnectivityObserver = .init()) {
+      self.connectivityObserver = connectivityObserver
+
+      // Activate connectivity session (synchronous on @MainActor)
+      do {
+        try connectivityObserver.activate()
+        print("✅ ConnectivityObserver activated successfully")
+      } catch {
+        lastError = "Failed to activate: \(error.localizedDescription)"
+        print("❌ ConnectivityObserver activation failed: \(error)")
+      }
+
+      setupSubscriptions()
+    }
+  #endif
 
   // MARK: - Setup
 
   private func setupSubscriptions() {
-    // Subscribe to received messages
-    connectivityObserver.messageReceived
-      .sink { [weak self] result in
-        self?.handleReceivedMessage(result)
+    // Subscribe to typed binary messages (decoded protobuf messages)
+    connectivityObserver.typedMessageReceived
+      .sink { [weak self] message in
+        print("📨 Received typed message: \(type(of: message))")
+        self?.handleReceivedTypedMessage(message)
       }
       .store(in: &cancellables)
 
     // Subscribe to reachability changes
     connectivityObserver.$isReachable
       .sink { [weak self] isReachable in
-        print("Reachability changed: \(isReachable)")
+        print("📡 Reachability changed: \(isReachable)")
+        print("📡 isPairedAppInstalled: \(self?.connectivityObserver.isPairedAppInstalled ?? false)")
+        print("📡 activationState: \(String(describing: self?.connectivityObserver.activationState))")
+      }
+      .store(in: &cancellables)
+
+    // Subscribe to activation state changes
+    connectivityObserver.$activationState
+      .sink { state in
+        print("🔄 Activation state changed: \(state)")
       }
       .store(in: &cancellables)
   }
@@ -146,17 +180,28 @@ final class MessageLabViewModel: ObservableObject {
 
   /// Send the currently selected color using effective transport method.
   func sendColor() async {
-    guard !isSending else { return }
+    guard !isSending else {
+      print("⚠️ Already sending, skipping")
+      return
+    }
 
+    print("📤 Starting send operation...")
     isSending = true
+    defer {
+      isSending = false
+      print("✅ Send operation complete, isSending reset to false")
+    }
+
     lastError = nil
 
     do {
+      print("🎨 Building message for color: \(selectedColor)")
       let message = try buildMessage()
-      
-      //let data = try message.encode()
+      print("📦 Message built successfully, type: \(type(of: message))")
 
+      print("🚀 Sending message...")
       let result = try await connectivityObserver.send(message)
+      print("✅ Message sent successfully via: \(result.context)")
 
       // Update state
       lastSentColor = ColorWithMetadata(
@@ -165,14 +210,12 @@ final class MessageLabViewModel: ObservableObject {
         source: "This Device"
       )
       messagesSent += 1
-
-      //print("Sent \(data.count) bytes via \(result.context)")
+      print("✅ UI state updated - messagesSent: \(messagesSent)")
     } catch {
       lastError = error.localizedDescription
-      print("Send error: \(error)")
+      print("❌ Send error: \(error)")
+      print("❌ Error description: \(error.localizedDescription)")
     }
-
-    isSending = false
   }
 
   /// Generate a random color.
@@ -265,15 +308,46 @@ final class MessageLabViewModel: ObservableObject {
     return message
   }
 
-  private func handleReceivedMessage(_ result: ConnectivityReceiveResult) {
-    do {
-      // The message is a ConnectivityMessage ([String: any Sendable])
-      // For binary messages, we need to extract the Data
-      // For now, skip message handling - will be implemented when proper binary transport is added
-      print("Received message with context: \(result.context)")
+  private func handleReceivedTypedMessage(_ message: any Messagable) {
+    print("Received typed message: \(type(of: message))")
+
+    // Extract color from the message based on its type
+    let colorComponents: (red: Double, green: Double, blue: Double, alpha: Double)?
+
+    if let colorMessage = message as? Sundial_Demo_ColorMessage {
+      colorComponents = (
+        red: Double(colorMessage.red),
+        green: Double(colorMessage.green),
+        blue: Double(colorMessage.blue),
+        alpha: Double(colorMessage.alpha)
+      )
+    } else if let complexMessage = message as? Sundial_Demo_ComplexMessage {
+      let color = complexMessage.color
+      colorComponents = (
+        red: Double(color.red),
+        green: Double(color.green),
+        blue: Double(color.blue),
+        alpha: Double(color.alpha)
+      )
+    } else {
+      print("Unknown message type: \(type(of: message))")
+      colorComponents = nil
+    }
+
+    // Update UI with received color
+    if let components = colorComponents {
+      lastReceivedColor = ColorWithMetadata(
+        color: Color(
+          red: components.red,
+          green: components.green,
+          blue: components.blue,
+          opacity: components.alpha
+        ),
+        timestamp: Date(),
+        source: "Counterpart Device"
+      )
       messagesReceived += 1
-    } catch {
-      print("Failed to handle message: \(error)")
+      print("Updated received color: \(components)")
     }
   }
 }
