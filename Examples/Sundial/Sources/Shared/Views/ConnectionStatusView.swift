@@ -95,7 +95,7 @@ public struct ConnectionStatusView: View {
     #elseif os(macOS)
       Color(nsColor: .controlBackgroundColor)
     #else
-      Color.gray.opacity(0.2)
+    Color(uiColor: UIColor.darkGray)
     #endif
   }
 
