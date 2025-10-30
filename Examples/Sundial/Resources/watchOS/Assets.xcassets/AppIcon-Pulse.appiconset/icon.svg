@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="pulseGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FF6B35;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F7931E;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+
+  <!-- Background gradient -->
+  <rect width="1024" height="1024" fill="url(#pulseGradient)" rx="200"/>
+
+  <!-- Concentric circles (pulse rings) -->
+  <circle cx="512" cy="512" r="250" fill="none" stroke="white" stroke-width="8" opacity="0.4"/>
+  <circle cx="512" cy="512" r="200" fill="none" stroke="white" stroke-width="8" opacity="0.4"/>
+  <circle cx="512" cy="512" r="150" fill="none" stroke="white" stroke-width="8" opacity="0.4"/>
+
+  <!-- Heartbeat waveform -->
+  <g stroke="white" stroke-width="20" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 300,512 L 380,512 L 420,420 L 460,600 L 500,420 L 540,512 L 724,512" opacity="0.9"/>
+  </g>
+
+  <!-- Central dot -->
+  <circle cx="512" cy="512" r="20" fill="white" opacity="0.8"/>
+</svg>
