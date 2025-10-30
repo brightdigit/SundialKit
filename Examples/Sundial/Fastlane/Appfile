@@ -1,0 +1,8 @@
+app_identifier("com.brightdigit.sundial.combine.ios") # The bundle identifier of your app
+apple_id("ci-appstore@brightdigit.com") # Your Apple Developer Portal username
+
+itc_team_id("2108001") # App Store Connect Team ID
+team_id("MLT7M394S7") # Developer Portal Team ID
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile

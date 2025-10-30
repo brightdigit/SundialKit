@@ -1,0 +1,174 @@
+name: Sundial Demo Apps
+on:
+  push:
+    branches-ignore:
+      - '*WIP'
+    paths:
+      - 'Examples/Sundial/**'
+      - '.github/workflows/sundial-demo.yml'
+  workflow_dispatch:
+    inputs:
+      deploy_testflight:
+        description: 'Deploy to TestFlight'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  DEMO_PATH: Examples/Sundial
+
+jobs:
+  # Build and test demo apps across Xcode versions
+  build-demo:
+    name: Build Sundial Demo
+    runs-on: ${{ matrix.runs-on }}
+    if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # iOS Builds - Latest Xcode
+          - type: ios
+            runs-on: macos-15
+            xcode: "/Applications/Xcode_16.1.app"
+            scheme: "SundialCombine"
+            deviceName: "iPhone 16 Pro"
+            osVersion: "18.1"
+
+          # iOS Stream variant
+          - type: ios
+            runs-on: macos-15
+            xcode: "/Applications/Xcode_16.1.app"
+            scheme: "SundialStream"
+            deviceName: "iPhone 16 Pro"
+            osVersion: "18.1"
+
+          # watchOS Builds
+          - type: watchos
+            runs-on: macos-15
+            xcode: "/Applications/Xcode_16.1.app"
+            scheme: "SundialCombine"
+            deviceName: "Apple Watch Series 10 (46mm)"
+            osVersion: "11.1"
+
+          - type: watchos
+            runs-on: macos-15
+            xcode: "/Applications/Xcode_16.1.app"
+            scheme: "SundialStream"
+            deviceName: "Apple Watch Series 10 (46mm)"
+            osVersion: "11.1"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s "${{ matrix.xcode }}"
+
+      - name: Generate Xcode Project
+        run: |
+          cd ${{ env.DEMO_PATH }}
+          xcodegen generate
+
+      - name: Build for ${{ matrix.type }}
+        run: |
+          cd ${{ env.DEMO_PATH }}
+          if [ "${{ matrix.type }}" = "ios" ]; then
+            xcodebuild -scheme "${{ matrix.scheme }}" \
+              -destination "platform=iOS Simulator,name=${{ matrix.deviceName }},OS=${{ matrix.osVersion }}" \
+              clean build
+          else
+            xcodebuild -scheme "${{ matrix.scheme }}" \
+              -destination "platform=watchOS Simulator,name=${{ matrix.deviceName }},OS=${{ matrix.osVersion }}" \
+              clean build
+          fi
+
+  # Lint demo app code
+  lint-demo:
+    name: Lint Sundial Demo
+    runs-on: ubuntu-latest
+    needs: [build-demo]
+    if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
+    env:
+      MINT_PATH: .mint/lib
+      MINT_LINK_PATH: .mint/bin
+      LINT_MODE: STRICT
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache mint
+        id: cache-mint
+        uses: actions/cache@v4
+        with:
+          path: |
+            .mint
+            Mint
+          key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
+          restore-keys: |
+            ${{ runner.os }}-mint-
+
+      - name: Install mint
+        if: steps.cache-mint.outputs.cache-hit == ''
+        run: |
+          git clone https://github.com/yonaskolb/Mint.git
+          cd Mint
+          swift run mint install yonaskolb/mint
+
+      - name: Lint Demo Apps
+        run: |
+          cd ${{ env.DEMO_PATH }}
+          if [ -f "../../Scripts/lint.sh" ]; then
+            ../../Scripts/lint.sh
+          else
+            echo "Lint script not found - skipping"
+          fi
+
+  # TestFlight deployment (manual trigger or on tags)
+  deploy-testflight:
+    name: Deploy to TestFlight
+    runs-on: macos-latest
+    needs: [build-demo, lint-demo]
+    if: |
+      (github.event_name == 'workflow_dispatch' &&
+       github.event.inputs.deploy_testflight == 'true') ||
+      startsWith(github.ref, 'refs/tags/demo-v')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3.0'
+          bundler-cache: true
+          working-directory: ${{ env.DEMO_PATH }}
+
+      - name: Select Xcode
+        run: sudo xcode-select -s "/Applications/Xcode_16.1.app"
+
+      - name: Generate Xcode Project
+        run: |
+          cd ${{ env.DEMO_PATH }}
+          xcodegen generate
+
+      - name: Deploy Pulse to TestFlight
+        run: |
+          cd ${{ env.DEMO_PATH }}
+          bundle exec fastlane beta_pulse
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_KEYCHAIN_PASSWORD: ${{ secrets.FASTLANE_KEYCHAIN_PASSWORD }}
+          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
+          DEVELOPMENT_TEAM: MLT7M394S7
+
+      - name: Deploy Flow to TestFlight
+        run: |
+          cd ${{ env.DEMO_PATH }}
+          bundle exec fastlane beta_flow
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_KEYCHAIN_PASSWORD: ${{ secrets.FASTLANE_KEYCHAIN_PASSWORD }}
+          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
+          DEVELOPMENT_TEAM: MLT7M394S7

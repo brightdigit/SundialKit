@@ -11,6 +11,8 @@ options:
 
 settings:
   base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
     SWIFT_VERSION: "6.1"
     ENABLE_USER_SCRIPT_SANDBOXING: NO
     DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM}
@@ -58,13 +60,17 @@ targets:
     settings:
       base:
         PRODUCT_NAME: SundialCombine
+        PRODUCT_DISPLAY_NAME: Pulse
         PRODUCT_BUNDLE_IDENTIFIER: com.brightdigit.sundial.combine.ios
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon-Pulse
         SWIFT_EMIT_LOC_STRINGS: YES
         ENABLE_EXPERIMENTAL_FEATURE: StrictConcurrency
         ENABLE_UPCOMING_FEATURE: ExistentialAny
         TARGETED_DEVICE_FAMILY: "1,2"
         SUPPORTS_MACCATALYST: NO
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "iPhone Distribution"
+        PROVISIONING_PROFILE_SPECIFIER: "match AppStore com.brightdigit.sundial.combine.ios"
 
   # MARK: - Combine watchOS App
 
@@ -92,13 +98,17 @@ targets:
     settings:
       base:
         PRODUCT_NAME: SundialCombine
+        PRODUCT_DISPLAY_NAME: Pulse
         PRODUCT_BUNDLE_IDENTIFIER: com.brightdigit.sundial.combine.ios.watchkitapp
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon-Pulse
         SWIFT_EMIT_LOC_STRINGS: YES
         ENABLE_EXPERIMENTAL_FEATURE: StrictConcurrency
         ENABLE_UPCOMING_FEATURE: ExistentialAny
         TARGETED_DEVICE_FAMILY: "4"
         SDKROOT: watchos
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "iPhone Distribution"
+        PROVISIONING_PROFILE_SPECIFIER: "match AppStore com.brightdigit.sundial.combine.ios.watchkitapp"
 
   # MARK: - Stream iOS App
 
@@ -137,13 +147,17 @@ targets:
     settings:
       base:
         PRODUCT_NAME: SundialStream
+        PRODUCT_DISPLAY_NAME: Flow
         PRODUCT_BUNDLE_IDENTIFIER: com.brightdigit.sundial.stream.ios
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon-Flow
         SWIFT_EMIT_LOC_STRINGS: YES
         ENABLE_EXPERIMENTAL_FEATURE: StrictConcurrency
         ENABLE_UPCOMING_FEATURE: ExistentialAny
         TARGETED_DEVICE_FAMILY: "1,2"
         SUPPORTS_MACCATALYST: NO
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "iPhone Distribution"
+        PROVISIONING_PROFILE_SPECIFIER: "match AppStore com.brightdigit.sundial.stream.ios"
 
   # MARK: - Stream watchOS App
 
@@ -171,13 +185,17 @@ targets:
     settings:
       base:
         PRODUCT_NAME: SundialStream
+        PRODUCT_DISPLAY_NAME: Flow
         PRODUCT_BUNDLE_IDENTIFIER: com.brightdigit.sundial.stream.ios.watchkitapp
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon-Flow
         SWIFT_EMIT_LOC_STRINGS: YES
         ENABLE_EXPERIMENTAL_FEATURE: StrictConcurrency
         ENABLE_UPCOMING_FEATURE: ExistentialAny
         TARGETED_DEVICE_FAMILY: "4"
         SDKROOT: watchos
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "iPhone Distribution"
+        PROVISIONING_PROFILE_SPECIFIER: "match AppStore com.brightdigit.sundial.stream.ios.watchkitapp"
 
 schemes:
   SundialCombine:
