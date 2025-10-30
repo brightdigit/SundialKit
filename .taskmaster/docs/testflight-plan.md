@@ -1,7 +1,7 @@
 # TestFlight Setup Plan for Pulse & Flow Demo Apps
 
 **Date**: 2025-10-29
-**Status**: Planning
+**Status**: In Progress
 **Target**: Internal TestFlight distribution only
 
 ## Overview
@@ -17,7 +17,31 @@ Both apps have iOS and watchOS companion targets.
 
 ---
 
+## Progress Status
+
+### ✅ Completed Phases
+- **Phase 1**: Display Names & Version Management - COMPLETE
+- **Phase 2**: Code Signing Configuration - COMPLETE
+- **Phase 3**: Fastlane Directory Structure - COMPLETE
+- **Phase 4**: Ruby Dependencies - COMPLETE
+- **Phase 8**: Makefile Integration - COMPLETE
+- **Phase 9**: Code Signing Setup (match certs created) - COMPLETE
+- **Phase 10**: App Store Connect Setup - COMPLETE
+- **Export Compliance**: Added to all 4 targets in project.yml - COMPLETE
+
+### 🚧 In Progress
+- **Phase 5**: Migrate from Mint to Mise
+
+### 📋 Remaining Phases
+- **Phase 6**: App Icons (optional)
+- **Phase 7**: GitHub Actions CI/CD
+- **Phase 11**: Documentation
+
+---
+
 ## Phase 1: Display Names & Version Management in project.yml
+
+**Status**: ✅ COMPLETE
 
 **File**: `Examples/Sundial/project.yml`
 
@@ -77,6 +101,8 @@ xcodegen generate
 
 ## Phase 2: Code Signing Configuration in project.yml
 
+**Status**: ✅ COMPLETE
+
 **File**: `Examples/Sundial/project.yml`
 
 Add signing settings to each target:
@@ -116,9 +142,24 @@ targets:
         PROVISIONING_PROFILE_SPECIFIER: "match AppStore com.brightdigit.sundial.stream.ios.watchkitapp"
 ```
 
+### Add Export Compliance
+
+Add to all 4 targets' Info.plist properties:
+
+```yaml
+info:
+  properties:
+    # ... existing properties
+    ITSAppUsesNonExemptEncryption: false
+```
+
+This eliminates the need for manual compliance selection during TestFlight upload.
+
 ---
 
 ## Phase 3: Fastlane Directory Structure
+
+**Status**: ✅ COMPLETE
 
 **Directory**: `Examples/Sundial/Fastlane/`
 
@@ -248,6 +289,8 @@ app_identifier([
 
 ## Phase 4: Ruby Dependencies
 
+**Status**: ✅ COMPLETE
+
 **File**: `Examples/Sundial/Gemfile`
 
 ```ruby
@@ -267,7 +310,199 @@ This creates `Gemfile.lock` - commit both files to repository.
 
 ---
 
-## Phase 5: App Icons
+## Phase 5: Migrate from Mint to Mise
+
+**Status**: 🚧 IN PROGRESS
+
+Migrate Swift development tools from Mint to Mise for improved developer experience and consistency across the project.
+
+### Why Mise?
+
+- **Unified tool management**: Manages Ruby, Node, and Swift tools in one place
+- **Faster installation**: Better caching and parallel downloads
+- **Cross-platform**: Works on macOS, Linux, and in CI/CD
+- **Version management**: Explicit version tracking in `.mise.toml`
+- **Already in use**: Project already has `.mise.toml` for Ruby version management
+
+### Update .mise.toml
+
+**File**: `.mise.toml` (root)
+
+Add Swift development tools to the existing file:
+
+```toml
+[tools]
+# Core tools managed by mise
+ruby = "3.3.0"
+
+# Swift development tools (migrated from Mint)
+[tools.cargo-binstall]
+"swift-format" = { version = "602.0.0", source = "swiftlang/swift-format" }
+"swiftlint" = { version = "0.61.0", source = "realm/SwiftLint" }
+"periphery" = { version = "3.2.0", source = "peripheryapp/periphery" }
+```
+
+**Alternative**: Use mise exec with system Swift tools if cargo-binstall is not preferred.
+
+### Update Scripts/lint.sh
+
+**File**: `Scripts/lint.sh`
+
+Replace Mint references with Mise:
+
+```bash
+#!/bin/bash
+
+# Remove Mint-specific variables
+# OLD: DEFAULT_MINT_PATH, MINT_CMD, MINT_ARGS, MINT_RUN
+# NEW: Use mise exec
+
+# Detect if mise is available
+if command -v mise &> /dev/null; then
+    TOOL_CMD="mise exec --"
+else
+    echo "Error: mise is not installed"
+    echo "Install mise: https://mise.jdx.dev/getting-started.html"
+    exit 1
+fi
+
+# Bootstrap tools (mise will install based on .mise.toml)
+run_command mise install
+
+# Format code (non-CI only)
+if [ -z "$CI" ]; then
+    run_command $TOOL_CMD swift-format format $SWIFTFORMAT_OPTIONS --recursive --parallel --in-place Sources Tests
+    run_command $TOOL_CMD swiftlint --fix
+fi
+
+# Lint code
+if [ -z "$FORMAT_ONLY" ]; then
+    run_command $TOOL_CMD swift-format lint $SWIFTFORMAT_OPTIONS --recursive --parallel Sources Tests
+    run_command $TOOL_CMD swiftlint lint $SWIFTLINT_OPTIONS
+    run_command swift build --build-tests
+fi
+
+# Run periphery (non-CI only)
+if [ -z "$CI" ]; then
+    run_command $TOOL_CMD periphery scan $PERIPHERY_OPTIONS --disable-update-check
+fi
+```
+
+### Update GitHub Actions Workflows
+
+**Files**: `.github/workflows/*.yml`
+
+Replace Mint caching and installation with Mise:
+
+**Before** (Mint):
+```yaml
+- name: Cache mint
+  uses: actions/cache@v4
+  with:
+    path: |
+      .mint
+      Mint
+    key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
+
+- name: Install mint
+  if: steps.cache-mint.outputs.cache-hit == ''
+  run: |
+    git clone https://github.com/yonaskolb/Mint.git
+    cd Mint
+    swift run mint install yonaskolb/mint
+```
+
+**After** (Mise):
+```yaml
+- name: Install mise
+  uses: jdx/mise-action@v2
+  with:
+    version: 2024.11.0
+    install: true
+    cache: true
+
+- name: Verify mise tools
+  run: mise list
+```
+
+### Update Makefile
+
+**File**: `Makefile` (if it references mint)
+
+Replace any `mint run` commands with `mise exec --`:
+
+**Before**:
+```makefile
+lint:
+    mint run swiftlint
+```
+
+**After**:
+```makefile
+lint:
+    mise exec -- swiftlint
+```
+
+### Update Documentation
+
+**Files**: `CLAUDE.md`, `README.md`, `CONTRIBUTING.md`
+
+- Remove references to Mint installation and usage
+- Add mise installation instructions
+- Update development tool setup section
+
+**Example** (CLAUDE.md):
+```markdown
+## Development Tools
+
+SundialKit uses [mise](https://mise.jdx.dev/) to manage development tools:
+- **swift-format** (swiftlang/swift-format@602.0.0) - Official Apple Swift formatter
+- **SwiftLint** (realm/SwiftLint@0.61.0) - Swift style and conventions linter
+- **Periphery** (peripheryapp/periphery@3.2.0) - Unused code detection
+
+### Install mise (macOS)
+```bash
+curl https://mise.run | sh
+# or
+brew install mise
+```
+
+### Install Development Tools
+```bash
+mise install  # Installs tools from .mise.toml
+```
+
+### Run Linting
+```bash
+./Scripts/lint.sh              # Normal mode
+LINT_MODE=STRICT ./Scripts/lint.sh  # Strict mode (CI)
+```
+```
+
+### Remove Mintfile
+
+**Action**: Delete `Mintfile` after migration is complete and verified.
+
+```bash
+git rm Mintfile
+```
+
+### Migration Checklist
+
+- [ ] Update `.mise.toml` with Swift tools
+- [ ] Update `Scripts/lint.sh` to use mise
+- [ ] Update all GitHub Actions workflows
+- [ ] Update `Makefile` (if applicable)
+- [ ] Update `CLAUDE.md` documentation
+- [ ] Update `README.md` (if it mentions Mint)
+- [ ] Test locally: `mise install && ./Scripts/lint.sh`
+- [ ] Test in CI: Push to a test branch and verify workflow
+- [ ] Remove `Mintfile`
+- [ ] Remove `.mint/` from repository (if committed)
+
+---
+
+## Phase 6: App Icons
 
 Create distinct app icons for each variant to easily differentiate on device.
 
@@ -309,7 +544,9 @@ targets:
 
 ---
 
-## Phase 6: GitHub Actions CI/CD Workflow
+## Phase 7: GitHub Actions CI/CD Workflow
+
+**Status**: 📋 PENDING
 
 **File**: `.github/workflows/sundial-demo.yml`
 
@@ -517,7 +754,9 @@ Add these secrets to repository settings:
 
 ---
 
-## Phase 7: Makefile Integration
+## Phase 8: Makefile Integration
+
+**Status**: ✅ COMPLETE
 
 **File**: `Makefile` (root) or create `Examples/Sundial/Makefile`
 
@@ -557,7 +796,9 @@ demo-beta-all: demo-install-certs
 
 ---
 
-## Phase 8: Code Signing Setup
+## Phase 9: Code Signing Setup
+
+**Status**: ✅ COMPLETE
 
 ### Initial Certificate Sync
 
@@ -586,7 +827,9 @@ export DEVELOPMENT_TEAM="MLT7M394S7"
 
 ---
 
-## Phase 9: App Store Connect Setup
+## Phase 10: App Store Connect Setup
+
+**Status**: ✅ COMPLETE
 
 ### Create App Records
 
@@ -629,7 +872,9 @@ Since this is internal TestFlight only:
 
 ---
 
-## Phase 10: Documentation
+## Phase 11: Documentation
+
+**Status**: 📋 PENDING
 
 ### Create DEPLOYMENT.md
 
@@ -806,25 +1051,28 @@ See [Examples/Sundial/DEPLOYMENT.md](Examples/Sundial/DEPLOYMENT.md) for deploym
 
 ## Summary
 
-### What Gets Created
+### ✅ Completed
 
-- ✅ Version management in `project.yml`
-- ✅ Display names: "Pulse" and "Flow"
-- ✅ Fastlane configuration (Fastfile, Appfile, Matchfile)
-- ✅ Ruby Gemfile with fastlane dependency
-- ✅ Code signing with match and AppCerts repo
-- ✅ GitHub Actions workflow (build + lint + deploy)
-- ✅ Makefile targets for convenience
-- ✅ Comprehensive deployment documentation
-- ✅ Two App Store Connect records
-- ✅ TestFlight internal testing groups
+- Version management in `project.yml`
+- Display names: "Pulse" and "Flow"
+- Export compliance configuration
+- Fastlane configuration (Fastfile, Appfile, Matchfile)
+- Ruby Gemfile with fastlane dependency
+- Code signing with match and AppCerts repo
+- Makefile targets for convenience
+- Two App Store Connect records created
+- TestFlight internal testing groups configured
 
-### What Needs Manual Work
+### 🚧 In Progress
 
-- 🎨 Design distinct app icons for Pulse and Flow
-- 🔑 Set up GitHub Secrets for CI/CD
-- 🍎 Create App Store Connect app records
-- 📝 Create lint script for demo apps (or adapt existing)
+- **Phase 5**: Migrating from Mint to Mise for development tools
+
+### 📋 Remaining Work
+
+- **Phase 6**: Design distinct app icons for Pulse and Flow (optional)
+- **Phase 7**: Create GitHub Actions workflow (build + lint + deploy)
+  - Set up GitHub Secrets for CI/CD
+- **Phase 11**: Create comprehensive deployment documentation
 
 ### Deployment Workflow
 
@@ -865,8 +1113,13 @@ make demo-beta-all      # Deploy both
 
 ## Next Steps
 
-1. Review and approve this plan
-2. Execute Phase 1: Update project.yml
-3. Execute remaining phases in order
-4. Test locally before setting up CI/CD
-5. Document any deviations or issues discovered during implementation
+1. ✅ ~~Review and approve this plan~~ - COMPLETE
+2. ✅ ~~Execute Phase 1-4: Project configuration, Fastlane, Ruby~~ - COMPLETE
+3. ✅ ~~Execute Phase 8-10: Makefile, Code Signing, App Store Connect~~ - COMPLETE
+4. 🚧 **Execute Phase 5**: Complete Mint to Mise migration - IN PROGRESS
+5. Execute Phase 6: Design and add app icons (optional)
+6. Execute Phase 7: Set up GitHub Actions CI/CD workflow
+7. Execute Phase 11: Create deployment documentation
+8. Test full deployment workflow locally
+9. Test CI/CD pipeline with a test branch
+10. Deploy first TestFlight build
