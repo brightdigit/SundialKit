@@ -1,0 +1,6 @@
+# Fastlane
+Fastlane/README.md
+Fastlane/report.xml
+Fastlane/test_output/
+Fastlane/.env*
+!Fastlane/.env.sample
