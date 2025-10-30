@@ -1,0 +1,11 @@
+git_url("git@github.com:brightdigit/AppCerts.git")
+storage_mode("git")
+type("appstore")
+username("ci-appstore@brightdigit.com")
+platform("ios")
+app_identifier([
+  "com.brightdigit.sundial.combine.ios",
+  "com.brightdigit.sundial.combine.ios.watchkitapp",
+  "com.brightdigit.sundial.stream.ios",
+  "com.brightdigit.sundial.stream.ios.watchkitapp"
+])
