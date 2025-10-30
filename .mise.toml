@@ -1,0 +1,3 @@
+[tools]
+# Core tools managed by mise
+ruby = "3.3.0"
