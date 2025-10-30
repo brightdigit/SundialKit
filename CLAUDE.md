@@ -42,15 +42,22 @@ swift test --enable-code-coverage
 swift test --filter <TestName>
 ```
 
-### Formatting & Linting (Mint)
-SundialKit uses [Mint](https://github.com/yonaskolb/Mint) to manage development tools:
-- **swift-format** (swiftlang/swift-format@601.0.0) - Official Apple Swift formatter
-- **SwiftLint** (realm/SwiftLint@0.59.1) - Swift style and conventions linter
+### Formatting & Linting (Mise)
+SundialKit uses [mise](https://mise.jdx.dev/) to manage development tools:
+- **swift-format** (swiftlang/swift-format@602.0.0) - Official Apple Swift formatter
+- **SwiftLint** (realm/SwiftLint@0.61.0) - Swift style and conventions linter
 - **Periphery** (peripheryapp/periphery@3.2.0) - Unused code detection
 
-#### Install Mint (macOS)
+#### Install mise (macOS)
 ```bash
-brew install mint
+curl https://mise.run | sh
+# or
+brew install mise
+```
+
+#### Install Development Tools
+```bash
+mise install  # Installs tools from .mise.toml
 ```
 
 #### Run linting script
@@ -189,7 +196,7 @@ SundialKit v2.0.0 uses a layered architecture separating protocols, wrappers, an
 ## Development Notes
 
 ### Development Tools
-Development tools (formatter, linter, unused code detector) are managed via Mint and defined in `Mintfile`. The `Scripts/lint.sh` script orchestrates formatting, linting, and code quality checks. Use `make lint` for local development.
+Development tools (formatter, linter, unused code detector) are managed via mise and defined in `.mise.toml`. The `Scripts/lint.sh` script orchestrates formatting, linting, and code quality checks. Use `make lint` for local development.
 
 ### Important Type Aliases
 - `ConnectivityMessage` = `[String: any Sendable]` (Sendable-safe WatchConnectivity dictionary)

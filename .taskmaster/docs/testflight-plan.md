@@ -24,13 +24,14 @@ Both apps have iOS and watchOS companion targets.
 - **Phase 2**: Code Signing Configuration - COMPLETE
 - **Phase 3**: Fastlane Directory Structure - COMPLETE
 - **Phase 4**: Ruby Dependencies - COMPLETE
+- **Phase 5**: Migrate from Mint to Mise - COMPLETE
 - **Phase 8**: Makefile Integration - COMPLETE
 - **Phase 9**: Code Signing Setup (match certs created) - COMPLETE
 - **Phase 10**: App Store Connect Setup - COMPLETE
 - **Export Compliance**: Added to all 4 targets in project.yml - COMPLETE
 
 ### 🚧 In Progress
-- **Phase 5**: Migrate from Mint to Mise
+- None
 
 ### 📋 Remaining Phases
 - **Phase 6**: App Icons (optional)

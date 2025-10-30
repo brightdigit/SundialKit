@@ -89,29 +89,19 @@ jobs:
     needs: [build-demo]
     if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
     env:
-      MINT_PATH: .mint/lib
-      MINT_LINK_PATH: .mint/bin
       LINT_MODE: STRICT
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache mint
-        id: cache-mint
-        uses: actions/cache@v4
+      - name: Install mise
+        uses: jdx/mise-action@v2
         with:
-          path: |
-            .mint
-            Mint
-          key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
-          restore-keys: |
-            ${{ runner.os }}-mint-
+          version: 2024.11.0
+          install: true
+          cache: true
 
-      - name: Install mint
-        if: steps.cache-mint.outputs.cache-hit == ''
-        run: |
-          git clone https://github.com/yonaskolb/Mint.git
-          cd Mint
-          swift run mint install yonaskolb/mint
+      - name: Verify mise tools
+        run: mise list
 
       - name: Lint Demo Apps
         run: |
