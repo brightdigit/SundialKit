@@ -22,9 +22,9 @@ env:
   DEMO_PATH: Examples/Sundial
 
 jobs:
-  # Build and test demo apps across platforms and schemes
+  # Build and test Swift Package across platforms
   build-demo:
-    name: Build Sundial Demo
+    name: Build Sundial Demo Package
     runs-on: ${{ matrix.runs-on }}
     if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
     strategy:
@@ -35,7 +35,6 @@ jobs:
           - type: ios
             runs-on: macos-26
             xcode: "/Applications/Xcode_26.0.app"
-            scheme: "SundialCombine"
             deviceName: "iPhone 17 Pro"
             osVersion: "26.0.1"
             download-platform: true
@@ -43,23 +42,6 @@ jobs:
           - type: ios
             runs-on: macos-26
             xcode: "/Applications/Xcode_26.1.app"
-            scheme: "SundialCombine"
-            deviceName: "iPhone 17 Pro"
-            osVersion: "26.1"
-            download-platform: true
-
-          - type: ios
-            runs-on: macos-26
-            xcode: "/Applications/Xcode_26.0.app"
-            scheme: "SundialStream"
-            deviceName: "iPhone 17 Pro"
-            osVersion: "26.0.1"
-            download-platform: true
-
-          - type: ios
-            runs-on: macos-26
-            xcode: "/Applications/Xcode_26.1.app"
-            scheme: "SundialStream"
             deviceName: "iPhone 17 Pro"
             osVersion: "26.1"
             download-platform: true
@@ -68,7 +50,6 @@ jobs:
           - type: watchos
             runs-on: macos-26
             xcode: "/Applications/Xcode_26.0.app"
-            scheme: "SundialCombine"
             deviceName: "Apple Watch Ultra 3 (49mm)"
             osVersion: "26.0"
             download-platform: true
@@ -76,23 +57,6 @@ jobs:
           - type: watchos
             runs-on: macos-26
             xcode: "/Applications/Xcode_26.1.app"
-            scheme: "SundialCombine"
-            deviceName: "Apple Watch Ultra 3 (49mm)"
-            osVersion: "26.0"
-            download-platform: true
-
-          - type: watchos
-            runs-on: macos-26
-            xcode: "/Applications/Xcode_26.0.app"
-            scheme: "SundialStream"
-            deviceName: "Apple Watch Ultra 3 (49mm)"
-            osVersion: "26.0"
-            download-platform: true
-
-          - type: watchos
-            runs-on: macos-26
-            xcode: "/Applications/Xcode_26.1.app"
-            scheme: "SundialStream"
             deviceName: "Apple Watch Ultra 3 (49mm)"
             osVersion: "26.0"
             download-platform: true
@@ -103,7 +67,7 @@ jobs:
       - name: Build and Test
         uses: brightdigit/swift-build@v1.4.0
         with:
-          scheme: ${{ matrix.scheme }}-Package
+          scheme: Sundial
           type: ${{ matrix.type }}
           xcode: ${{ matrix.xcode }}
           deviceName: ${{ matrix.deviceName }}
