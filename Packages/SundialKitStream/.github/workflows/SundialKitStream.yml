@@ -156,6 +156,8 @@ jobs:
         uses: jdx/mise-action@v2
         with:
           version: latest
+          install: true
+          cache: true
       - name: Lint
         run: |
           set -e
