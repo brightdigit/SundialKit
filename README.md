@@ -590,6 +590,22 @@ class WatchConnectivityObject : ObservableObject {
 }
 ```
 
+# Demo Applications
+
+SundialKit includes two demo applications showcasing different concurrency approaches:
+
+- **Pulse** (`Examples/Sundial/Apps/SundialCombine`) - Combine-based reactive demo with @MainActor observers
+- **Flow** (`Examples/Sundial/Apps/SundialStream`) - AsyncStream/actor-based demo with modern Swift concurrency
+
+Both apps demonstrate:
+- Network connectivity monitoring
+- WatchConnectivity communication between iPhone and Apple Watch
+- Real-world usage patterns for SundialKit
+
+Both apps are available for internal testing via TestFlight.
+
+See [Examples/Sundial/DEPLOYMENT.md](Examples/Sundial/DEPLOYMENT.md) for deployment and development instructions.
+
 # Development
 
 SundialKit uses a Make-based workflow for building, testing, and linting the project.
