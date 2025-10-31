@@ -144,6 +144,24 @@ If certificates are out of sync:
 bundle exec fastlane match appstore --readonly --force
 ```
 
+### SSH Authentication Issues (CI/CD)
+
+If GitHub Actions fails with certificate repository access errors:
+
+1. Verify the `APPCERTS_DEPLOY_KEY` organizational secret is configured
+2. Ensure the corresponding public key is added as a deploy key to the AppCerts repository
+3. Check that the deploy key has read access enabled
+4. Verify the workflow includes the `webfactory/ssh-agent` step before fastlane commands
+
+To regenerate the deploy key:
+```bash
+# Generate new SSH key pair (no passphrase)
+ssh-keygen -t ed25519 -C "brightdigit-github-actions" -f appcerts_deploy_key -N ""
+
+# Add public key (appcerts_deploy_key.pub) as deploy key to AppCerts repo
+# Add private key (appcerts_deploy_key) as APPCERTS_DEPLOY_KEY organizational secret
+```
+
 ### Build Failures
 
 Ensure Xcode project is up to date:
@@ -174,13 +192,22 @@ brew install xcodegen
 
 ## Required GitHub Secrets
 
-For CI/CD deployment, configure these secrets in repository settings:
+For CI/CD deployment, configure these secrets:
+
+### Organization-Level Secrets
+These are configured at the BrightDigit organization level and shared across repositories:
+
+- `APPCERTS_DEPLOY_KEY` - SSH private key for accessing the AppCerts repository (deploy key with read-only access)
+
+### Repository-Level Secrets
+These are configured in the SundialKit repository settings:
 
 - `MATCH_PASSWORD` - Password to decrypt match certificates
-- `FASTLANE_KEYCHAIN_PASSWORD` - CI keychain password
 - `APP_STORE_CONNECT_API_KEY_KEY_ID` - App Store Connect API key ID
 - `APP_STORE_CONNECT_API_KEY_ISSUER_ID` - API issuer ID
 - `APP_STORE_CONNECT_API_KEY_KEY` - API key content (base64 encoded)
+
+Note: `FASTLANE_KEYCHAIN_PASSWORD` is automatically generated per-run and doesn't need to be configured.
 
 ## Resources
 
