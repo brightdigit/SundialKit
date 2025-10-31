@@ -47,8 +47,36 @@ platform :ios do
     )
   end
 
-  # Private helper lane
-  private_lane :build_and_upload do |options|
+  desc "Build and archive (no upload) - Pulse"
+  lane :build_only_pulse do
+    build_only(
+      scheme: "SundialCombine",
+      bundle_ids: {
+        "com.brightdigit.sundial.combine.ios" => "match AppStore com.brightdigit.sundial.combine.ios",
+        "com.brightdigit.sundial.combine.ios.watchkitapp" => "match AppStore com.brightdigit.sundial.combine.ios.watchkitapp"
+      }
+    )
+  end
+
+  desc "Build and archive (no upload) - Flow"
+  lane :build_only_flow do
+    build_only(
+      scheme: "SundialStream",
+      bundle_ids: {
+        "com.brightdigit.sundial.stream.ios" => "match AppStore com.brightdigit.sundial.stream.ios",
+        "com.brightdigit.sundial.stream.ios.watchkitapp" => "match AppStore com.brightdigit.sundial.stream.ios.watchkitapp"
+      }
+    )
+  end
+
+  desc "Build and archive both apps (no upload)"
+  lane :build_only_all do
+    build_only_pulse
+    build_only_flow
+  end
+
+  # Private helper lane - build and archive only (no upload)
+  private_lane :build_only do |options|
     # Generate Xcode project first
     sh("cd .. && xcodegen generate")
 
@@ -75,6 +103,15 @@ platform :ios do
         provisioningProfiles: options[:bundle_ids]
       }
     )
+
+    # Return api_key for potential upload
+    api_key
+  end
+
+  # Private helper lane - build and upload
+  private_lane :build_and_upload do |options|
+    # Build and get API key
+    api_key = build_only(options)
 
     # Upload to TestFlight
     upload_to_testflight(

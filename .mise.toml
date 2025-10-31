@@ -8,6 +8,9 @@ ruby = "3.3.0"
 swiftlint = "0.61.0"
 "spm:peripheryapp/periphery" = "3.2.0"
 
+# Xcode project generation
+xcodegen = "2.43.0"
+
 [tasks]
 swift-format = "swift-format"
 swiftlint = "swiftlint"
