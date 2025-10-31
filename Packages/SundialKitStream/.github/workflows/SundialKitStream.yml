@@ -155,7 +155,7 @@ jobs:
       - name: Install mise
         uses: jdx/mise-action@v2
         with:
-          version: latest
+          version: 2024.11.0
           install: true
           cache: true
       - name: Lint
