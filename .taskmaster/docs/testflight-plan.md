@@ -25,6 +25,8 @@ Both apps have iOS and watchOS companion targets.
 - **Phase 3**: Fastlane Directory Structure - COMPLETE
 - **Phase 4**: Ruby Dependencies - COMPLETE
 - **Phase 5**: Migrate from Mint to Mise - COMPLETE
+- **Phase 6**: App Icons - COMPLETE
+- **Phase 7**: GitHub Actions CI/CD - COMPLETE
 - **Phase 8**: Makefile Integration - COMPLETE
 - **Phase 9**: Code Signing Setup (match certs created) - COMPLETE
 - **Phase 10**: App Store Connect Setup - COMPLETE
@@ -34,8 +36,6 @@ Both apps have iOS and watchOS companion targets.
 - None
 
 ### 📋 Remaining Phases
-- **Phase 6**: App Icons (optional)
-- **Phase 7**: GitHub Actions CI/CD
 - **Phase 11**: Documentation
 
 ---
@@ -313,7 +313,7 @@ This creates `Gemfile.lock` - commit both files to repository.
 
 ## Phase 5: Migrate from Mint to Mise
 
-**Status**: 🚧 IN PROGRESS
+**Status**: ✅ COMPLETE
 
 Migrate Swift development tools from Mint to Mise for improved developer experience and consistency across the project.
 
@@ -505,6 +505,8 @@ git rm Mintfile
 
 ## Phase 6: App Icons
 
+**Status**: ✅ COMPLETE
+
 Create distinct app icons for each variant to easily differentiate on device.
 
 ### Design Themes
@@ -547,7 +549,7 @@ targets:
 
 ## Phase 7: GitHub Actions CI/CD Workflow
 
-**Status**: 📋 PENDING
+**Status**: ✅ COMPLETE
 
 **File**: `.github/workflows/sundial-demo.yml`
 
@@ -1063,16 +1065,19 @@ See [Examples/Sundial/DEPLOYMENT.md](Examples/Sundial/DEPLOYMENT.md) for deploym
 - Makefile targets for convenience
 - Two App Store Connect records created
 - TestFlight internal testing groups configured
+- Mint to Mise migration complete
+- Distinct app icons for Pulse and Flow (Icon Composer format)
+- GitHub Actions CI/CD workflow (build + lint + archive + deploy)
+  - Archive job tests code signing on every push
+  - Deploy job requires manual trigger
+  - Random keychain passwords (no secret needed)
 
 ### 🚧 In Progress
 
-- **Phase 5**: Migrating from Mint to Mise for development tools
+- None
 
 ### 📋 Remaining Work
 
-- **Phase 6**: Design distinct app icons for Pulse and Flow (optional)
-- **Phase 7**: Create GitHub Actions workflow (build + lint + deploy)
-  - Set up GitHub Secrets for CI/CD
 - **Phase 11**: Create comprehensive deployment documentation
 
 ### Deployment Workflow
@@ -1117,10 +1122,11 @@ make demo-beta-all      # Deploy both
 1. ✅ ~~Review and approve this plan~~ - COMPLETE
 2. ✅ ~~Execute Phase 1-4: Project configuration, Fastlane, Ruby~~ - COMPLETE
 3. ✅ ~~Execute Phase 8-10: Makefile, Code Signing, App Store Connect~~ - COMPLETE
-4. 🚧 **Execute Phase 5**: Complete Mint to Mise migration - IN PROGRESS
-5. Execute Phase 6: Design and add app icons (optional)
-6. Execute Phase 7: Set up GitHub Actions CI/CD workflow
-7. Execute Phase 11: Create deployment documentation
-8. Test full deployment workflow locally
-9. Test CI/CD pipeline with a test branch
-10. Deploy first TestFlight build
+4. ✅ ~~Execute Phase 5: Complete Mint to Mise migration~~ - COMPLETE
+5. ✅ ~~Execute Phase 6: Design and add app icons~~ - COMPLETE
+6. ✅ ~~Execute Phase 7: Set up GitHub Actions CI/CD workflow~~ - COMPLETE
+7. **Execute Phase 11**: Create deployment documentation (NEXT)
+8. Test CI/CD archive job (push to branch, verify code signing works)
+9. Test full deployment workflow locally
+10. Test manual TestFlight deployment via GitHub Actions
+11. Deploy first TestFlight build

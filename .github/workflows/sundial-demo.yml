@@ -13,6 +13,10 @@ on:
         required: false
         type: boolean
         default: false
+  # Uncomment to enable automatic TestFlight deployment on version tags
+  # push:
+  #   tags:
+  #     - 'demo-v*'
 
 env:
   DEMO_PATH: Examples/Sundial
@@ -112,15 +116,61 @@ jobs:
             echo "Lint script not found - skipping"
           fi
 
-  # TestFlight deployment (manual trigger or on tags)
+  # Test code signing and archiving (no upload)
+  archive-demo:
+    name: Test Archive & Code Signing
+    runs-on: macos-latest
+    needs: [build-demo]
+    if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3.0'
+          bundler-cache: true
+          working-directory: ${{ env.DEMO_PATH }}
+
+      - name: Select Xcode
+        run: sudo xcode-select -s "/Applications/Xcode_16.1.app"
+
+      - name: Generate keychain password
+        id: keychain
+        run: echo "password=$(openssl rand -base64 32)" >> $GITHUB_OUTPUT
+
+      - name: Archive Pulse (test code signing)
+        run: |
+          cd ${{ env.DEMO_PATH }}
+          bundle exec fastlane build_only_pulse
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_KEYCHAIN_PASSWORD: ${{ steps.keychain.outputs.password }}
+          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
+          DEVELOPMENT_TEAM: MLT7M394S7
+
+      - name: Archive Flow (test code signing)
+        run: |
+          cd ${{ env.DEMO_PATH }}
+          bundle exec fastlane build_only_flow
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_KEYCHAIN_PASSWORD: ${{ steps.keychain.outputs.password }}
+          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
+          DEVELOPMENT_TEAM: MLT7M394S7
+
+  # TestFlight deployment (manual trigger only)
   deploy-testflight:
     name: Deploy to TestFlight
     runs-on: macos-latest
-    needs: [build-demo, lint-demo]
+    needs: [build-demo, lint-demo, archive-demo]
     if: |
-      (github.event_name == 'workflow_dispatch' &&
-       github.event.inputs.deploy_testflight == 'true') ||
-      startsWith(github.ref, 'refs/tags/demo-v')
+      github.event_name == 'workflow_dispatch' &&
+      github.event.inputs.deploy_testflight == 'true'
     steps:
       - uses: actions/checkout@v4
 
@@ -139,13 +189,17 @@ jobs:
           cd ${{ env.DEMO_PATH }}
           xcodegen generate
 
+      - name: Generate keychain password
+        id: keychain
+        run: echo "password=$(openssl rand -base64 32)" >> $GITHUB_OUTPUT
+
       - name: Deploy Pulse to TestFlight
         run: |
           cd ${{ env.DEMO_PATH }}
           bundle exec fastlane beta_pulse
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          FASTLANE_KEYCHAIN_PASSWORD: ${{ secrets.FASTLANE_KEYCHAIN_PASSWORD }}
+          FASTLANE_KEYCHAIN_PASSWORD: ${{ steps.keychain.outputs.password }}
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
@@ -157,7 +211,7 @@ jobs:
           bundle exec fastlane beta_flow
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          FASTLANE_KEYCHAIN_PASSWORD: ${{ secrets.FASTLANE_KEYCHAIN_PASSWORD }}
+          FASTLANE_KEYCHAIN_PASSWORD: ${{ steps.keychain.outputs.password }}
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
