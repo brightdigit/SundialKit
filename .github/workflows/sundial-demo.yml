@@ -136,6 +136,12 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.APPCERTS_DEPLOY_KEY }}
 
+      - name: Add GitHub to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          cp .github/known_hosts ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
       - name: Generate keychain password
         id: keychain
         run: echo "password=$(openssl rand -base64 32)" >> $GITHUB_OUTPUT
@@ -184,6 +190,12 @@ jobs:
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.APPCERTS_DEPLOY_KEY }}
+
+      - name: Add GitHub to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          cp .github/known_hosts ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
 
       - name: Generate keychain password
         id: keychain
