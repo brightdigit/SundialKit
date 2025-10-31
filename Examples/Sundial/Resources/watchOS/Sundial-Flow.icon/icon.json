@@ -1,0 +1,172 @@
+{
+  "fill" : {
+    "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+  },
+  "groups" : [
+    {
+      "blend-mode-specializations" : [
+        {
+          "value" : "normal"
+        },
+        {
+          "appearance" : "dark",
+          "value" : "darken"
+        },
+        {
+          "appearance" : "tinted",
+          "value" : "soft-light"
+        }
+      ],
+      "blur-material" : 0.5,
+      "layers" : [
+        {
+          "blend-mode" : "normal",
+          "fill" : {
+            "linear-gradient" : [
+              "display-p3:0.73529,0.87788,1.00000,1.00000",
+              "srgb:0.00000,0.47843,1.00000,1.00000"
+            ]
+          },
+          "image-name" : "flow 2.svg",
+          "name" : "flow 2",
+          "position" : {
+            "scale" : 0.8,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "opacity-specializations" : [
+        {
+          "appearance" : "light",
+          "value" : 0.7
+        },
+        {
+          "appearance" : "dark",
+          "value" : 0.85
+        }
+      ],
+      "position" : {
+        "scale" : 1.76,
+        "translation-in-points" : [
+          0,
+          0
+        ]
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 1
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "blend-mode" : "normal",
+      "blur-material" : null,
+      "layers" : [
+        {
+          "image-name" : "dial-2.svg",
+          "name" : "dial-2",
+          "position" : {
+            "scale" : 2,
+            "translation-in-points" : [
+              15,
+              -21
+            ]
+          }
+        },
+        {
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "dial.svg",
+          "name" : "dial",
+          "position" : {
+            "scale" : 2,
+            "translation-in-points" : [
+              14,
+              29
+            ]
+          }
+        }
+      ],
+      "lighting" : "individual",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 1
+      },
+      "specular" : false,
+      "translucency" : {
+        "enabled" : false,
+        "value" : 0.5
+      }
+    },
+    {
+      "blend-mode" : "plus-lighter",
+      "blur-material" : 0.15,
+      "hidden" : true,
+      "layers" : [
+        {
+          "hidden-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : true
+            }
+          ],
+          "image-name" : "white-circle.svg",
+          "name" : "white-circle",
+          "position" : {
+            "scale" : 2.25,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "opacity" : 0.5,
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.9
+      }
+    },
+    {
+      "layers" : [
+        {
+          "glass" : false,
+          "image-name" : "rainbow_circle.svg",
+          "name" : "rainbow_circle",
+          "position" : {
+            "scale" : 5,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

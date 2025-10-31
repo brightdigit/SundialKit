@@ -63,7 +63,7 @@ targets:
         PRODUCT_NAME: SundialCombine
         PRODUCT_DISPLAY_NAME: Pulse
         PRODUCT_BUNDLE_IDENTIFIER: com.brightdigit.sundial.combine.ios
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon-Pulse
+        ASSETCATALOG_COMPILER_APPICON_NAME: Sundial-Pulse
         SWIFT_EMIT_LOC_STRINGS: YES
         ENABLE_EXPERIMENTAL_FEATURE: StrictConcurrency
         ENABLE_UPCOMING_FEATURE: ExistentialAny
@@ -102,7 +102,7 @@ targets:
         PRODUCT_NAME: SundialCombine
         PRODUCT_DISPLAY_NAME: Pulse
         PRODUCT_BUNDLE_IDENTIFIER: com.brightdigit.sundial.combine.ios.watchkitapp
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon-Pulse
+        ASSETCATALOG_COMPILER_APPICON_NAME: Sundial-Pulse
         SWIFT_EMIT_LOC_STRINGS: YES
         ENABLE_EXPERIMENTAL_FEATURE: StrictConcurrency
         ENABLE_UPCOMING_FEATURE: ExistentialAny
@@ -152,7 +152,7 @@ targets:
         PRODUCT_NAME: SundialStream
         PRODUCT_DISPLAY_NAME: Flow
         PRODUCT_BUNDLE_IDENTIFIER: com.brightdigit.sundial.stream.ios
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon-Flow
+        ASSETCATALOG_COMPILER_APPICON_NAME: Sundial-Flow
         SWIFT_EMIT_LOC_STRINGS: YES
         ENABLE_EXPERIMENTAL_FEATURE: StrictConcurrency
         ENABLE_UPCOMING_FEATURE: ExistentialAny
@@ -191,7 +191,7 @@ targets:
         PRODUCT_NAME: SundialStream
         PRODUCT_DISPLAY_NAME: Flow
         PRODUCT_BUNDLE_IDENTIFIER: com.brightdigit.sundial.stream.ios.watchkitapp
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon-Flow
+        ASSETCATALOG_COMPILER_APPICON_NAME: Sundial-Flow
         SWIFT_EMIT_LOC_STRINGS: YES
         ENABLE_EXPERIMENTAL_FEATURE: StrictConcurrency
         ENABLE_UPCOMING_FEATURE: ExistentialAny

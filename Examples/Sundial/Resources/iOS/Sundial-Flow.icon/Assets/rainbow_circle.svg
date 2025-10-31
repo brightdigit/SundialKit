@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .slice {
+        stroke-width: 0;
+      }
+    </style>
+  </defs>
+  
+  <!-- Center point: (200, 200), Radius: 150 -->
+  
+  <!-- Slice 1: Red (0° hue) -->
+  <path d="M 200 200 L 350 200 A 150 150 0 0 1 306.066 306.066 Z" 
+        fill="#FF0000" class="slice"/>
+  
+  <!-- Slice 2: Orange (45° hue) -->
+  <path d="M 200 200 L 306.066 306.066 A 150 150 0 0 1 200 350 Z" 
+        fill="#FF8000" class="slice"/>
+  
+  <!-- Slice 3: Yellow (90° hue) -->
+  <path d="M 200 200 L 200 350 A 150 150 0 0 1 93.934 306.066 Z" 
+        fill="#FFFF00" class="slice"/>
+  
+  <!-- Slice 4: Chartreuse (135° hue) -->
+  <path d="M 200 200 L 93.934 306.066 A 150 150 0 0 1 50 200 Z" 
+        fill="#80FF00" class="slice"/>
+  
+  <!-- Slice 5: Cyan (180° hue) -->
+  <path d="M 200 200 L 50 200 A 150 150 0 0 1 93.934 93.934 Z" 
+        fill="#00FFFF" class="slice"/>
+  
+  <!-- Slice 6: Azure (225° hue) -->
+  <path d="M 200 200 L 93.934 93.934 A 150 150 0 0 1 200 50 Z" 
+        fill="#0080FF" class="slice"/>
+  
+  <!-- Slice 7: Violet (270° hue) -->
+  <path d="M 200 200 L 200 50 A 150 150 0 0 1 306.066 93.934 Z" 
+        fill="#8000FF" class="slice"/>
+  
+  <!-- Slice 8: Rose (315° hue) -->
+  <path d="M 200 200 L 306.066 93.934 A 150 150 0 0 1 350 200 Z" 
+        fill="#FF0080" class="slice"/>
+
+</svg>

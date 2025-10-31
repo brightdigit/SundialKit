@@ -1,0 +1,127 @@
+{
+  "fill" : {
+    "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+  },
+  "groups" : [
+    {
+      "blend-mode" : "normal",
+      "blur-material" : null,
+      "layers" : [
+        {
+          "image-name" : "dial-2.svg",
+          "name" : "dial-2",
+          "position" : {
+            "scale" : 2,
+            "translation-in-points" : [
+              15,
+              -21
+            ]
+          }
+        }
+      ],
+      "lighting" : "individual",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 1
+      },
+      "specular" : false,
+      "translucency" : {
+        "enabled" : false,
+        "value" : 0.5
+      }
+    },
+    {
+      "blur-material" : null,
+      "hidden" : false,
+      "layers" : [
+        {
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "dial.svg",
+          "name" : "dial",
+          "position" : {
+            "scale" : 2,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "lighting" : "combined",
+      "position" : {
+        "scale" : 1,
+        "translation-in-points" : [
+          13,
+          21
+        ]
+      },
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 1
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : false,
+        "value" : 0.5
+      }
+    },
+    {
+      "blend-mode" : "plus-lighter",
+      "blur-material" : 0.15,
+      "hidden" : false,
+      "layers" : [
+        {
+          "image-name" : "white-circle.svg",
+          "name" : "white-circle",
+          "position" : {
+            "scale" : 2.25,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "opacity" : 0.5,
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.9
+      }
+    },
+    {
+      "layers" : [
+        {
+          "glass" : false,
+          "image-name" : "rainbow_circle.svg",
+          "name" : "rainbow_circle",
+          "position" : {
+            "scale" : 5,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}
