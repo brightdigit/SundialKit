@@ -67,7 +67,7 @@ jobs:
       - name: Build and Test
         uses: brightdigit/swift-build@v1.4.0
         with:
-          scheme: Sundial
+          scheme: Sundial-Package
           type: ${{ matrix.type }}
           xcode: ${{ matrix.xcode }}
           deviceName: ${{ matrix.deviceName }}
