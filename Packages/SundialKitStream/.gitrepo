@@ -6,7 +6,7 @@
 [subrepo]
 	remote = git@github.com:brightdigit/SundialKitStream.git
 	branch = demo-app-mise-migration
-	commit = cda05eb9100899281a02a94470a1628478d28067
-	parent = 9001d376cb2583257199ecd083ecab13f27f15ca
+	commit = 225096b1ec61a2a6ff31230d3110d3982254f140
+	parent = 89db8590987ebd0bd17aed67d45b7bc13853d39e
 	method = merge
 	cmdver = 0.4.9
