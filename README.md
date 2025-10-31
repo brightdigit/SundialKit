@@ -607,14 +607,21 @@ make help           # Show all available commands
 
 ## Development Tools
 
-The project uses [Mint](https://github.com/yonaskolb/Mint) to manage development tools:
+The project uses [mise](https://mise.jdx.dev/) to manage development tools:
 - **swift-format** - Official Apple Swift formatter
 - **SwiftLint** - Swift style and conventions linter
 - **Periphery** - Unused code detection
 
-Install Mint on macOS:
+Install mise on macOS:
 ```bash
-brew install mint
+curl https://mise.run | sh
+# or
+brew install mise
+```
+
+Install development tools:
+```bash
+mise install  # Installs tools from .mise.toml
 ```
 
 Run linting manually:

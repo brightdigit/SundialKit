@@ -27,24 +27,14 @@ else
 	PACKAGE_DIR="${SRCROOT}"
 fi
 
-# Detect OS and set paths accordingly
-if [ "$(uname)" = "Darwin" ]; then
-	DEFAULT_MINT_PATH="/opt/homebrew/bin/mint"
-elif [ "$(uname)" = "Linux" ] && [ -n "$GITHUB_ACTIONS" ]; then
-	DEFAULT_MINT_PATH="$GITHUB_WORKSPACE/Mint/.mint/bin/mint"
-elif [ "$(uname)" = "Linux" ]; then
-	DEFAULT_MINT_PATH="/usr/local/bin/mint"
+# Detect if mise is available
+if command -v mise &> /dev/null; then
+    TOOL_CMD="mise exec --"
 else
-	echo "Unsupported operating system"
-	exit 1
+    echo "Error: mise is not installed"
+    echo "Install mise: https://mise.jdx.dev/getting-started.html"
+    exit 1
 fi
-
-# Use environment MINT_CMD if set, otherwise use default path
-MINT_CMD=${MINT_CMD:-$DEFAULT_MINT_PATH}
-
-export MINT_PATH="$PACKAGE_DIR/.mint"
-MINT_ARGS="-n -m $PACKAGE_DIR/Mintfile --silent"
-MINT_RUN="$MINT_CMD run $MINT_ARGS"
 
 if [ "$LINT_MODE" = "NONE" ]; then
 	exit
@@ -57,16 +47,18 @@ else
 fi
 
 pushd $PACKAGE_DIR
-run_command $MINT_CMD bootstrap -m Mintfile
+
+# Bootstrap tools (mise will install based on .mise.toml)
+run_command mise install
 
 if [ -z "$CI" ]; then
-	run_command $MINT_RUN swift-format format $SWIFTFORMAT_OPTIONS  --recursive --parallel --in-place Sources Tests
-	run_command $MINT_RUN swiftlint --fix
+	run_command $TOOL_CMD swift-format format $SWIFTFORMAT_OPTIONS  --recursive --parallel --in-place Sources Tests
+	run_command $TOOL_CMD swiftlint --fix
 fi
 
 if [ -z "$FORMAT_ONLY" ]; then
-	run_command $MINT_RUN swift-format lint --configuration .swift-format --recursive --parallel $SWIFTFORMAT_OPTIONS Sources Tests
-	run_command $MINT_RUN swiftlint lint $SWIFTLINT_OPTIONS
+	run_command $TOOL_CMD swift-format lint --configuration .swift-format --recursive --parallel $SWIFTFORMAT_OPTIONS Sources Tests
+	run_command $TOOL_CMD swiftlint lint $SWIFTLINT_OPTIONS
 	# Check for compilation errors
 	run_command swift build --build-tests
 fi
@@ -74,7 +66,7 @@ fi
 $PACKAGE_DIR/Scripts/header.sh -d  $PACKAGE_DIR/Sources -c "Leo Dion" -o "BrightDigit" -p "SundialKit"
 
 if [ -z "$CI" ]; then
-	run_command $MINT_RUN periphery scan $PERIPHERY_OPTIONS --disable-update-check
+	run_command $TOOL_CMD periphery scan $PERIPHERY_OPTIONS --disable-update-check
 fi
 
 popd
