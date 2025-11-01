@@ -5,7 +5,7 @@
 set -euo pipefail
 
 REMOTE_URL="https://github.com/brightdigit/SundialKit.git"
-REMOTE_BRANCH="branch: \"31-connectivitymanager\""
+REMOTE_BRANCH="branch: \"48-demo-application-part-1-mise\""
 LOCAL_PATH="../../"
 
 PACKAGE_FILE="Package.swift"

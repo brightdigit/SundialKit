@@ -590,6 +590,22 @@ class WatchConnectivityObject : ObservableObject {
 }
 ```
 
+# Demo Applications
+
+SundialKit includes two demo applications showcasing different concurrency approaches:
+
+- **Pulse** (`Examples/Sundial/Apps/SundialCombine`) - Combine-based reactive demo with @MainActor observers
+- **Flow** (`Examples/Sundial/Apps/SundialStream`) - AsyncStream/actor-based demo with modern Swift concurrency
+
+Both apps demonstrate:
+- Network connectivity monitoring
+- WatchConnectivity communication between iPhone and Apple Watch
+- Real-world usage patterns for SundialKit
+
+Both apps are available for internal testing via TestFlight.
+
+See [Examples/Sundial/DEPLOYMENT.md](Examples/Sundial/DEPLOYMENT.md) for deployment and development instructions.
+
 # Development
 
 SundialKit uses a Make-based workflow for building, testing, and linting the project.
@@ -607,14 +623,21 @@ make help           # Show all available commands
 
 ## Development Tools
 
-The project uses [Mint](https://github.com/yonaskolb/Mint) to manage development tools:
+The project uses [mise](https://mise.jdx.dev/) to manage development tools:
 - **swift-format** - Official Apple Swift formatter
 - **SwiftLint** - Swift style and conventions linter
 - **Periphery** - Unused code detection
 
-Install Mint on macOS:
+Install mise on macOS:
 ```bash
-brew install mint
+curl https://mise.run | sh
+# or
+brew install mise
+```
+
+Install development tools:
+```bash
+mise install  # Installs tools from .mise.toml
 ```
 
 Run linting manually:

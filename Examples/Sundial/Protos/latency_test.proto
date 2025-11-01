@@ -1,0 +1,71 @@
+// latency_test.proto
+// Messages for latency measurement and performance testing
+
+syntax = "proto3";
+
+package sundial.demo;
+
+// Request message for latency ping/pong testing
+message LatencyTestRequest {
+  // Timestamp when request was sent (milliseconds since epoch)
+  int64 send_timestamp_ms = 1;
+
+  // Sequence number for matching requests/replies
+  int64 sequence_number = 2;
+
+  // Variable-size payload for testing different message sizes
+  bytes payload = 3;
+
+  // Size category for classification
+  enum PayloadSize {
+    SMALL = 0;   // < 100 bytes
+    MEDIUM = 1;  // 100-1000 bytes
+    LARGE = 2;   // > 1000 bytes
+  }
+  PayloadSize payload_size = 4;
+}
+
+// Reply message with timing information
+message LatencyTestReply {
+  // When the request was received
+  int64 receive_timestamp_ms = 1;
+
+  // When the reply was sent
+  int64 reply_timestamp_ms = 2;
+
+  // Sequence number matching the request
+  int64 sequence_number = 3;
+
+  // Processing time on receiver (microseconds)
+  int64 processing_time_us = 4;
+
+  // Echo back the original payload
+  bytes payload = 5;
+}
+
+// Aggregated latency statistics
+message LatencyStats {
+  // Average round-trip time (milliseconds)
+  double average_rtt_ms = 1;
+
+  // Minimum RTT
+  double min_rtt_ms = 2;
+
+  // Maximum RTT
+  double max_rtt_ms = 3;
+
+  // Standard deviation
+  double std_dev_ms = 4;
+
+  // Number of successful messages
+  int32 success_count = 5;
+
+  // Number of failed messages
+  int32 failure_count = 6;
+
+  // Success rate (0.0 to 1.0)
+  double success_rate = 7;
+
+  // Test duration (milliseconds)
+  int64 duration_ms = 8;
+}

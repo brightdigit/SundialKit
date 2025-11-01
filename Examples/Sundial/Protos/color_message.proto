@@ -1,0 +1,22 @@
+// color_message.proto
+// Simple color message for basic testing
+
+syntax = "proto3";
+
+package sundial.demo;
+
+// Simple color message with timestamp
+// Compact binary representation for efficient transmission
+message ColorMessage {
+  // RGBA color components (0.0 to 1.0)
+  float red = 1;
+  float green = 2;
+  float blue = 3;
+  float alpha = 4;
+
+  // Timestamp when color was created (milliseconds since epoch)
+  int64 timestamp_ms = 5;
+
+  // Optional source identifier (e.g., "iPhone", "Watch")
+  string source = 6;
+}

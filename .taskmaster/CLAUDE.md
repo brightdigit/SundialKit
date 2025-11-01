@@ -908,3 +908,4 @@ These commands make AI calls and may take up to a minute:
 ---
 
 _This guide ensures Claude Code has immediate access to Task Master's essential functionality for agentic development workflows._
+- Use xcodebuild and either iphone or watchos for the platform when building Sundial Demo

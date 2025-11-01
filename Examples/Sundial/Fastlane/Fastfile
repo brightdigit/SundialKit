@@ -1,0 +1,157 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Build and upload Pulse to TestFlight"
+  lane :beta_pulse do
+    build_and_upload(
+      scheme: "SundialCombine",
+      bundle_ids: {
+        "com.brightdigit.sundial.combine.ios" => "match AppStore com.brightdigit.sundial.combine.ios",
+        "com.brightdigit.sundial.combine.ios.watchkitapp" => "match AppStore com.brightdigit.sundial.combine.ios.watchkitapp"
+      }
+    )
+  end
+
+  desc "Build and upload Flow to TestFlight"
+  lane :beta_flow do
+    build_and_upload(
+      scheme: "SundialStream",
+      bundle_ids: {
+        "com.brightdigit.sundial.stream.ios" => "match AppStore com.brightdigit.sundial.stream.ios",
+        "com.brightdigit.sundial.stream.ios.watchkitapp" => "match AppStore com.brightdigit.sundial.stream.ios.watchkitapp"
+      }
+    )
+  end
+
+  desc "Build and upload both apps to TestFlight"
+  lane :beta_all do
+    beta_pulse
+    beta_flow
+  end
+
+  desc "Sync certificates (readonly for CI)"
+  lane :sync_certs do
+    match(
+      type: "appstore",
+      readonly: true,
+      keychain_password: ENV['FASTLANE_KEYCHAIN_PASSWORD']
+    )
+  end
+
+  desc "Update App Store certificates (local only)"
+  lane :update_appstore_certs do
+    match(
+      type: "appstore",
+      readonly: false,
+      force_for_new_devices: true
+    )
+  end
+
+  desc "Build and archive (no upload) - Pulse"
+  lane :build_only_pulse do
+    build_only(
+      scheme: "SundialCombine",
+      bundle_ids: {
+        "com.brightdigit.sundial.combine.ios" => "match AppStore com.brightdigit.sundial.combine.ios",
+        "com.brightdigit.sundial.combine.ios.watchkitapp" => "match AppStore com.brightdigit.sundial.combine.ios.watchkitapp"
+      }
+    )
+  end
+
+  desc "Build and archive (no upload) - Flow"
+  lane :build_only_flow do
+    build_only(
+      scheme: "SundialStream",
+      bundle_ids: {
+        "com.brightdigit.sundial.stream.ios" => "match AppStore com.brightdigit.sundial.stream.ios",
+        "com.brightdigit.sundial.stream.ios.watchkitapp" => "match AppStore com.brightdigit.sundial.stream.ios.watchkitapp"
+      }
+    )
+  end
+
+  desc "Build and archive both apps (no upload)"
+  lane :build_only_all do
+    build_only_pulse
+    build_only_flow
+  end
+
+  # Private helper lane - build and archive only (no upload)
+  private_lane :build_only do |options|
+    # Generate Xcode project first
+    sh("cd .. && xcodegen generate")
+
+    # App Store Connect API authentication
+    api_key = app_store_connect_api_key(
+      key_id: ENV['APP_STORE_CONNECT_API_KEY_KEY_ID'],
+      issuer_id: ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'],
+      key_content: ENV['APP_STORE_CONNECT_API_KEY_KEY']
+    )
+
+    # Create and configure keychain for CI only
+    # Local development uses the default keychain
+    if is_ci
+      keychain_name = "fastlane_tmp_keychain"
+      keychain_password = ENV['FASTLANE_KEYCHAIN_PASSWORD']
+
+      create_keychain(
+        name: keychain_name,
+        password: keychain_password,
+        default_keychain: true,
+        unlock: true,
+        timeout: 3600,
+        lock_when_sleeps: false
+      )
+
+      # Fetch certificates (readonly for CI)
+      match(
+        type: "appstore",
+        readonly: true,
+        keychain_name: keychain_name,
+        keychain_password: keychain_password
+      )
+    else
+      # Local development - use default keychain
+      match(
+        type: "appstore",
+        readonly: false
+      )
+    end
+
+    # Build app (CI uses custom keychain)
+    build_options = {
+      scheme: options[:scheme],
+      destination: "generic/platform=iOS",
+      skip_package_pkg: true,
+      export_options: {
+        provisioningProfiles: options[:bundle_ids]
+      }
+    }
+
+    # On CI, specify custom keychain
+    if is_ci
+      build_options[:xcargs] = "OTHER_CODE_SIGN_FLAGS='--keychain fastlane_tmp_keychain'"
+    end
+
+    build_app(build_options)
+
+    # Clean up temporary keychain on CI
+    if is_ci
+      delete_keychain(name: "fastlane_tmp_keychain")
+    end
+
+    # Return api_key for potential upload
+    api_key
+  end
+
+  # Private helper lane - build and upload
+  private_lane :build_and_upload do |options|
+    # Build and get API key
+    api_key = build_only(options)
+
+    # Upload to TestFlight
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: true
+    )
+  end
+end
