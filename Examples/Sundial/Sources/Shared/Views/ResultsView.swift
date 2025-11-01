@@ -32,13 +32,25 @@ import SwiftUI
 
 /// Results section displaying sent and received colors with metadata
 @available(iOS 16.0, watchOS 9.0, *)
-struct ResultsView: View {
-  let lastSentColor: ColorWithMetadata?
-  let lastReceivedColor: ColorWithMetadata?
-  let messagesSent: Int
-  let messagesReceived: Int
+public struct ResultsView: View {
+  public let lastSentColor: ColorWithMetadata?
+  public let lastReceivedColor: ColorWithMetadata?
+  public let messagesSent: Int
+  public let messagesReceived: Int
 
-  var body: some View {
+  public init(
+    lastSentColor: ColorWithMetadata?,
+    lastReceivedColor: ColorWithMetadata?,
+    messagesSent: Int,
+    messagesReceived: Int
+  ) {
+    self.lastSentColor = lastSentColor
+    self.lastReceivedColor = lastReceivedColor
+    self.messagesSent = messagesSent
+    self.messagesReceived = messagesReceived
+  }
+
+  public var body: some View {
     VStack(alignment: .leading, spacing: 16) {
       Text("Results")
         .font(.headline)

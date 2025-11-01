@@ -1,8 +1,8 @@
 //
-//  PayloadBuilderView.swift
+//  StreamDiagnosticsView.swift
 //  Sundial
 //
-//  Created on 10/28/25.
+//  Created on 11/1/25.
 //  Copyright (c) 2025 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
@@ -27,47 +27,32 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import SundialDemoShared
 import SwiftUI
 
-/// Payload Builder section for selecting colors and complexity levels
-@available(iOS 16.0, watchOS 9.0, *)
-struct PayloadBuilderView: View {
-  @Binding var selectedColor: Color
-  @Binding var complexityLevel: Double
-  let onRandomize: () -> Void
-
+/// Tab 4: Diagnostics (Stream variant)
+@available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
+struct StreamDiagnosticsView: View {
   var body: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      Text("Payload Builder")
-        .font(.headline)
+    NavigationView {
+      VStack {
+        Image(systemName: "wrench.and.screwdriver")
+          .font(.largeTitle)
+          .foregroundColor(.green)
 
-      ColorSelectorView(
-        selectedColor: $selectedColor,
-        onRandomize: onRandomize
-      )
+        Text("Diagnostics")
+          .font(.title2)
+          .fontWeight(.semibold)
 
-      PayloadComplexityView(
-        complexityLevel: $complexityLevel
-      )
+        Text("Coming soon - Stream variant")
+          .font(.caption)
+          .foregroundColor(.secondary)
+      }
+      .navigationTitle("Diagnostics")
     }
   }
 }
 
-#if DEBUG
-  // MARK: - Previews
-
-  @available(iOS 16.0, watchOS 9.0, *)
-  struct PayloadBuilderView_Previews: PreviewProvider {
-    static var previews: some View {
-      ScrollView{
-        PayloadBuilderView(
-          selectedColor: .constant(.blue),
-          complexityLevel: .constant(0.5),
-          onRandomize: {}
-        )
-      }
-      .padding()
-    }
-  }
-#endif
+@available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
+#Preview {
+  StreamDiagnosticsView()
+}
