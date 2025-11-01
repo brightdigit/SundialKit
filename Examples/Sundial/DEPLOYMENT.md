@@ -59,7 +59,7 @@ bundle exec fastlane match appstore --readonly
 3. Set environment variables:
 ```bash
 export MATCH_PASSWORD="ask-team-for-password"
-export DEVELOPMENT_TEAM="MLT7M394S7"
+export DEVELOPMENT_TEAM="ask-team-for-team-id"
 ```
 
 ### Deploy to TestFlight
@@ -130,7 +130,7 @@ git push origin demo-v1.0.0
 
 ### Team Information
 
-- **Developer Team**: MLT7M394S7
+- **Developer Team**: Configured via `DEVELOPMENT_TEAM` environment variable (ask team for value)
 - **App Store Connect Team**: 2108001
 - **Apple ID**: leogdion@brightdigit.com
 - **Certificate Repo**: git@github.com:brightdigit/AppCerts.git
@@ -202,6 +202,7 @@ These are configured at the BrightDigit organization level and shared across rep
 ### Repository-Level Secrets
 These are configured in the SundialKit repository settings:
 
+- `DEVELOPMENT_TEAM` - Apple Developer Team ID (10-character alphanumeric identifier)
 - `MATCH_PASSWORD` - Password to decrypt match certificates
 - `APP_STORE_CONNECT_API_KEY_KEY_ID` - App Store Connect API key ID
 - `APP_STORE_CONNECT_API_KEY_ISSUER_ID` - API issuer ID

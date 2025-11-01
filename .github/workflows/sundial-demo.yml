@@ -156,7 +156,7 @@ jobs:
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
-          DEVELOPMENT_TEAM: MLT7M394S7
+          DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
 
   # TestFlight deployment (manual trigger only)
   deploy-testflight:
@@ -211,7 +211,7 @@ jobs:
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
-          DEVELOPMENT_TEAM: MLT7M394S7
+          DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
 
       - name: Deploy Flow to TestFlight
         run: |
@@ -223,4 +223,4 @@ jobs:
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
-          DEVELOPMENT_TEAM: MLT7M394S7
+          DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
