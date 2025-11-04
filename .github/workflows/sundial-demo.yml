@@ -158,23 +158,42 @@ jobs:
           APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
           DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
 
-  # TestFlight deployment (manual trigger only)
+      - name: Upload Pulse IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulse-ipa
+          path: ${{ env.DEMO_PATH }}/SundialCombine.ipa
+          retention-days: 1
+
+      - name: Upload Flow IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: flow-ipa
+          path: ${{ env.DEMO_PATH }}/SundialStream.ipa
+          retention-days: 1
+
+  # Automatic TestFlight deployment on v2.0.0 or main branch
   deploy-testflight:
     name: Deploy to TestFlight
     runs-on: macos-26
-    needs: [build-demo, lint-demo, archive-demo]
+    needs: [archive-demo]
     if: |
-      github.event_name == 'workflow_dispatch' &&
-      github.event.inputs.deploy_testflight == 'true'
+      (github.ref == 'refs/heads/v2.0.0' || github.ref == 'refs/heads/main') &&
+      !contains(github.event.head_commit.message, '[skip ci]')
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install mise
-        uses: jdx/mise-action@v2
+      - name: Download Pulse IPA
+        uses: actions/download-artifact@v4
         with:
-          version: 2024.11.0
-          install: true
-          cache: true
+          name: pulse-ipa
+          path: ${{ env.DEMO_PATH }}
+
+      - name: Download Flow IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: flow-ipa
+          path: ${{ env.DEMO_PATH }}
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
@@ -183,44 +202,36 @@ jobs:
           bundler-cache: true
           working-directory: ${{ env.DEMO_PATH }}
 
-      - name: Select Xcode
-        run: sudo xcode-select -s "/Applications/Xcode_26.0.app"
-
-      - name: Setup SSH for AppCerts repository
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.APPCERTS_DEPLOY_KEY }}
-
-      - name: Add GitHub to known_hosts
-        run: |
-          mkdir -p ~/.ssh
-          cp .github/known_hosts ~/.ssh/known_hosts
-          chmod 644 ~/.ssh/known_hosts
-
-      - name: Generate keychain password
-        id: keychain
-        run: echo "password=$(openssl rand -base64 32)" >> $GITHUB_OUTPUT
-
-      - name: Deploy Pulse to TestFlight
+      - name: Upload IPAs to TestFlight
         run: |
           cd ${{ env.DEMO_PATH }}
-          bundle exec fastlane beta_pulse
+          bundle exec fastlane upload_only pulse_ipa:SundialCombine.ipa flow_ipa:SundialStream.ipa
         env:
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          FASTLANE_KEYCHAIN_PASSWORD: ${{ steps.keychain.outputs.password }}
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
-          DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
 
-      - name: Deploy Flow to TestFlight
+      - name: Increment build number and commit
+        if: success()
         run: |
           cd ${{ env.DEMO_PATH }}
-          bundle exec fastlane beta_flow
-        env:
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          FASTLANE_KEYCHAIN_PASSWORD: ${{ steps.keychain.outputs.password }}
-          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
-          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
-          APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
-          DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
+
+          # Read current build number
+          CURRENT_BUILD=$(grep "CURRENT_PROJECT_VERSION:" project.yml | sed 's/.*CURRENT_PROJECT_VERSION: "\(.*\)"/\1/')
+          echo "Current build number: $CURRENT_BUILD"
+
+          # Increment build number
+          NEW_BUILD=$((CURRENT_BUILD + 1))
+          echo "New build number: $NEW_BUILD"
+
+          # Update project.yml
+          sed -i '' "s/CURRENT_PROJECT_VERSION: \"$CURRENT_BUILD\"/CURRENT_PROJECT_VERSION: \"$NEW_BUILD\"/" project.yml
+
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Commit and push with [skip ci]
+          git add project.yml
+          git commit -m "chore: bump build number to $NEW_BUILD [skip ci]"
+          git push
