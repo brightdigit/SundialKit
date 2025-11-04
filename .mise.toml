@@ -1,0 +1,20 @@
+[tools]
+# Core tools managed by mise
+ruby = "3.3.0"
+
+# Swift development tools (migrated from Mint)
+# Using Swift Package Manager plugins
+"spm:swiftlang/swift-format" = "602.0.0"
+swiftlint = "0.61.0"
+"spm:peripheryapp/periphery" = "3.2.0"
+
+# Xcode project generation
+xcodegen = "2.43.0"
+
+[tasks]
+swift-format = "swift-format"
+swiftlint = "swiftlint"
+periphery = "periphery"
+
+[settings]
+experimental = true

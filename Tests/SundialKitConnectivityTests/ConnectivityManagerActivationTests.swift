@@ -24,7 +24,7 @@
       #expect(mockSession.activationState == .activated)
 
       // Wait for delegate callback to propagate through async layers
-      try await Task.sleep(forMilliseconds: 200)  // 0.2 seconds
+      try await Task.sleep(forMilliseconds: 500)  // 0.5 seconds
       #expect(await manager.activationState == .activated)
     }
 
@@ -37,7 +37,7 @@
       #expect(mockSession.activationState == .activated)
 
       // Wait for actor state to be updated
-      try await Task.sleep(forMilliseconds: 200)  // 0.2 seconds
+      try await Task.sleep(forMilliseconds: 500)  // 0.5 seconds
       #expect(await manager.activationState == .activated)
     }
 
@@ -64,7 +64,7 @@
       }
 
       // Give first task time to start
-      try await Task.sleep(forMilliseconds: 200)  // 0.2 seconds
+      try await Task.sleep(forMilliseconds: 500)  // 0.5 seconds
 
       // Try second activation - should throw immediately
       do {

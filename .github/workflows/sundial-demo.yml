@@ -1,0 +1,237 @@
+name: Sundial Demo Apps
+on:
+  push:
+    branches-ignore:
+      - '*WIP'
+    paths:
+      - 'Examples/Sundial/**'
+      - '.github/workflows/sundial-demo.yml'
+  workflow_dispatch:
+    inputs:
+      deploy_testflight:
+        description: 'Deploy to TestFlight'
+        required: false
+        type: boolean
+        default: false
+  # Uncomment to enable automatic TestFlight deployment on version tags
+  # push:
+  #   tags:
+  #     - 'demo-v*'
+
+env:
+  DEMO_PATH: Examples/Sundial
+
+jobs:
+  # Build and test Swift Package across platforms
+  build-demo:
+    name: Build Sundial Demo Package
+    runs-on: ${{ matrix.runs-on }}
+    if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # iOS Builds - Xcode 26.x on macOS-26
+          - type: ios
+            runs-on: macos-26
+            xcode: "/Applications/Xcode_26.0.app"
+            deviceName: "iPhone 17 Pro"
+            osVersion: "26.0.1"
+            download-platform: true
+
+          - type: ios
+            runs-on: macos-26
+            xcode: "/Applications/Xcode_26.1.app"
+            deviceName: "iPhone 17 Pro"
+            osVersion: "26.1"
+            download-platform: true
+
+          # watchOS Builds - Xcode 26.x on macOS-26
+          - type: watchos
+            runs-on: macos-26
+            xcode: "/Applications/Xcode_26.0.app"
+            deviceName: "Apple Watch Ultra 3 (49mm)"
+            osVersion: "26.0"
+            download-platform: true
+
+          - type: watchos
+            runs-on: macos-26
+            xcode: "/Applications/Xcode_26.1.app"
+            deviceName: "Apple Watch Ultra 3 (49mm)"
+            osVersion: "26.0"
+            download-platform: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and Test
+        uses: brightdigit/swift-build@v1.4.0
+        with:
+          scheme: Sundial-Package
+          type: ${{ matrix.type }}
+          xcode: ${{ matrix.xcode }}
+          deviceName: ${{ matrix.deviceName }}
+          osVersion: ${{ matrix.osVersion }}
+          download-platform: ${{ matrix.download-platform }}
+          working-directory: ${{ env.DEMO_PATH }}
+
+  # Lint demo app code
+  lint-demo:
+    name: Lint Sundial Demo
+    runs-on: ubuntu-latest
+    needs: [build-demo]
+    if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
+    env:
+      LINT_MODE: STRICT
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install mise
+        uses: jdx/mise-action@v2
+        with:
+          version: 2024.11.0
+          install: true
+          cache: true
+
+      - name: Verify mise tools
+        run: mise list
+
+      - name: Lint Demo Apps
+        run: |
+          cd ${{ env.DEMO_PATH }}
+          if [ -f "../../Scripts/lint.sh" ]; then
+            ../../Scripts/lint.sh
+          else
+            echo "Lint script not found - skipping"
+          fi
+
+  # Test code signing and archiving (no upload)
+  archive-demo:
+    name: Test Archive & Code Signing
+    runs-on: macos-26
+    needs: [build-demo]
+    if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install mise
+        uses: jdx/mise-action@v2
+        with:
+          version: 2024.11.0
+          install: true
+          cache: true
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3.0'
+          bundler-cache: true
+          working-directory: ${{ env.DEMO_PATH }}
+
+      - name: Select Xcode
+        run: sudo xcode-select -s "/Applications/Xcode_26.0.app"
+
+      - name: Setup SSH for AppCerts repository
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.APPCERTS_DEPLOY_KEY }}
+
+      - name: Add GitHub to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          cp .github/known_hosts ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Generate keychain password
+        id: keychain
+        run: echo "password=$(openssl rand -base64 32)" >> $GITHUB_OUTPUT
+
+      - name: Archive both apps (test code signing)
+        run: |
+          cd ${{ env.DEMO_PATH }}
+          bundle exec fastlane build_only_all
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_KEYCHAIN_PASSWORD: ${{ steps.keychain.outputs.password }}
+          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
+          DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
+
+      - name: Upload Pulse IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulse-ipa
+          path: ${{ env.DEMO_PATH }}/SundialCombine.ipa
+          retention-days: 1
+
+      - name: Upload Flow IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: flow-ipa
+          path: ${{ env.DEMO_PATH }}/SundialStream.ipa
+          retention-days: 1
+
+  # Automatic TestFlight deployment on v2.0.0 or main branch
+  deploy-testflight:
+    name: Deploy to TestFlight
+    runs-on: macos-26
+    needs: [archive-demo]
+    if: |
+      (github.ref == 'refs/heads/v2.0.0' || github.ref == 'refs/heads/main') &&
+      !contains(github.event.head_commit.message, '[skip ci]')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Pulse IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: pulse-ipa
+          path: ${{ env.DEMO_PATH }}
+
+      - name: Download Flow IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: flow-ipa
+          path: ${{ env.DEMO_PATH }}
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3.0'
+          bundler-cache: true
+          working-directory: ${{ env.DEMO_PATH }}
+
+      - name: Upload IPAs to TestFlight
+        run: |
+          cd ${{ env.DEMO_PATH }}
+          bundle exec fastlane upload_only pulse_ipa:SundialCombine.ipa flow_ipa:SundialStream.ipa
+        env:
+          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
+
+      - name: Increment build number and commit
+        if: success()
+        run: |
+          cd ${{ env.DEMO_PATH }}
+
+          # Read current build number
+          CURRENT_BUILD=$(grep "CURRENT_PROJECT_VERSION:" project.yml | sed 's/.*CURRENT_PROJECT_VERSION: "\(.*\)"/\1/')
+          echo "Current build number: $CURRENT_BUILD"
+
+          # Increment build number
+          NEW_BUILD=$((CURRENT_BUILD + 1))
+          echo "New build number: $NEW_BUILD"
+
+          # Update project.yml
+          sed -i '' "s/CURRENT_PROJECT_VERSION: \"$CURRENT_BUILD\"/CURRENT_PROJECT_VERSION: \"$NEW_BUILD\"/" project.yml
+
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Commit and push with [skip ci]
+          git add project.yml
+          git commit -m "chore: bump build number to $NEW_BUILD [skip ci]"
+          git push

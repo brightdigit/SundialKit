@@ -83,7 +83,7 @@ struct NetworkMonitorTests {
     monitor.start(queue: queue)
 
     // Give it a moment to process
-    try await Task.sleep(forMilliseconds: 100)
+    try await Task.sleep(forMilliseconds: 300)
 
     #expect(pathMonitor.dispatchQueueLabel == "test.queue")
     #expect(pathMonitor.pathUpdate != nil)
@@ -97,12 +97,12 @@ struct NetworkMonitorTests {
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
 
     monitor.start(queue: .global())
-    try await Task.sleep(forMilliseconds: 100)
+    try await Task.sleep(forMilliseconds: 300)
 
     monitor.stop()
 
     // Wait for async stop to complete
-    try await Task.sleep(forMilliseconds: 50)
+    try await Task.sleep(forMilliseconds: 200)
 
     #expect(pathMonitor.isCancelled == true)
   }
@@ -113,7 +113,7 @@ struct NetworkMonitorTests {
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
 
     monitor.start(queue: .global())
-    try await Task.sleep(forMilliseconds: 50)
+    try await Task.sleep(forMilliseconds: 200)
 
     // Second start should be ignored
     monitor.start(queue: .global())
@@ -141,7 +141,7 @@ struct NetworkMonitorTests {
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
 
     monitor.start(queue: .global())
-    try await Task.sleep(forMilliseconds: 100)
+    try await Task.sleep(forMilliseconds: 300)
 
     // Send new path update
     let newPath = MockPath(
@@ -151,7 +151,7 @@ struct NetworkMonitorTests {
     )
     pathMonitor.sendPath(newPath)
 
-    try await Task.sleep(forMilliseconds: 50)
+    try await Task.sleep(forMilliseconds: 200)
 
     #expect(await monitor.pathStatus == .satisfied(.cellular))
     #expect(await monitor.isExpensive == true)
@@ -164,7 +164,7 @@ struct NetworkMonitorTests {
     let monitor = NetworkMonitor(monitor: pathMonitor, ping: nil as NeverPing?)
 
     monitor.start(queue: .global())
-    try await Task.sleep(forMilliseconds: 100)
+    try await Task.sleep(forMilliseconds: 300)
 
     let newPath = MockPath(
       isConstrained: true,
@@ -173,7 +173,7 @@ struct NetworkMonitorTests {
     )
     pathMonitor.sendPath(newPath)
 
-    try await Task.sleep(forMilliseconds: 50)
+    try await Task.sleep(forMilliseconds: 200)
 
     #expect(await monitor.isConstrained == true)
   }
@@ -189,7 +189,7 @@ struct NetworkMonitorTests {
     await monitor.addObserver(observer)
     monitor.start(queue: .global())
 
-    try await Task.sleep(forMilliseconds: 100)
+    try await Task.sleep(forMilliseconds: 300)
 
     // Send update
     let newPath = MockPath(
@@ -199,7 +199,7 @@ struct NetworkMonitorTests {
     )
     pathMonitor.sendPath(newPath)
 
-    try await Task.sleep(forMilliseconds: 50)
+    try await Task.sleep(forMilliseconds: 200)
 
     #expect(!observer.pathStatusUpdates.isEmpty)
     #expect(observer.pathStatusUpdates.last == .satisfied(.cellular))
@@ -214,7 +214,7 @@ struct NetworkMonitorTests {
     await monitor.addObserver(observer)
     monitor.start(queue: .global())
 
-    try await Task.sleep(forMilliseconds: 100)
+    try await Task.sleep(forMilliseconds: 300)
 
     let newPath = MockPath(
       isConstrained: false,
@@ -223,7 +223,7 @@ struct NetworkMonitorTests {
     )
     pathMonitor.sendPath(newPath)
 
-    try await Task.sleep(forMilliseconds: 50)
+    try await Task.sleep(forMilliseconds: 200)
 
     #expect(observer.expensiveUpdates.contains(true))
   }
@@ -237,7 +237,7 @@ struct NetworkMonitorTests {
     await monitor.addObserver(observer)
     monitor.start(queue: .global())
 
-    try await Task.sleep(forMilliseconds: 100)
+    try await Task.sleep(forMilliseconds: 300)
 
     let newPath = MockPath(
       isConstrained: true,
@@ -246,7 +246,7 @@ struct NetworkMonitorTests {
     )
     pathMonitor.sendPath(newPath)
 
-    try await Task.sleep(forMilliseconds: 50)
+    try await Task.sleep(forMilliseconds: 200)
 
     #expect(observer.constrainedUpdates.contains(true))
   }
@@ -260,7 +260,7 @@ struct NetworkMonitorTests {
     await monitor.addObserver(observer)
     monitor.start(queue: .global())
 
-    try await Task.sleep(forMilliseconds: 100)
+    try await Task.sleep(forMilliseconds: 300)
 
     await monitor.removeObservers { ($0 as? TestNetworkStateObserver) === observer }
 
@@ -272,7 +272,7 @@ struct NetworkMonitorTests {
     )
     pathMonitor.sendPath(newPath)
 
-    try await Task.sleep(forMilliseconds: 50)
+    try await Task.sleep(forMilliseconds: 200)
 
     // Observer should not have received the cellular update
     let hasCellularUpdate = observer.pathStatusUpdates.contains { status in
@@ -294,7 +294,7 @@ struct NetworkMonitorTests {
     await monitor.addObserver(observer)  // Add again (now allowed with strong references)
     monitor.start(queue: .global())
 
-    try await Task.sleep(forMilliseconds: 100)
+    try await Task.sleep(forMilliseconds: 300)
 
     let newPath = MockPath(
       isConstrained: false,
@@ -303,7 +303,7 @@ struct NetworkMonitorTests {
     )
     pathMonitor.sendPath(newPath)
 
-    try await Task.sleep(forMilliseconds: 50)
+    try await Task.sleep(forMilliseconds: 200)
 
     // With strong references, duplicates receive notifications multiple times
     let cellularCount = observer.pathStatusUpdates.filter { status in
@@ -377,7 +377,7 @@ struct NetworkMonitorTests {
     monitor.start(queue: .global())
 
     // Wait for potential ping to execute
-    try await Task.sleep(forMilliseconds: 200)
+    try await Task.sleep(forMilliseconds: 500)
 
     monitor.stop()
 

@@ -121,6 +121,7 @@
     ) {
       let handler = unsafeBitCast(replyHandler, to: (@Sendable (Data) -> Void).self)
       delegate?.session(self, didReceiveMessageData: messageData, replyHandler: handler)
+      replyHandler(Data())
     }
   }
 

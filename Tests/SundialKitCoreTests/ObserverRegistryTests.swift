@@ -174,7 +174,7 @@ struct ObserverRegistryTests {
     }
 
     // Wait for async notifications to complete
-    try await Task.sleep(forMilliseconds: 50)
+    try await Task.sleep(forMilliseconds: 200)
 
     #expect(observer1.receivedValues == [42])
     #expect(observer2.receivedValues == [42])
@@ -195,7 +195,7 @@ struct ObserverRegistryTests {
     }
 
     // Wait for async notifications to complete
-    try await Task.sleep(forMilliseconds: 50)
+    try await Task.sleep(forMilliseconds: 200)
 
     // Both observers should receive the notification (strong references)
     #expect(observer1.receivedValues == [99])

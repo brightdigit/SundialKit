@@ -1,88 +1,258 @@
 name: Sundial
+
 options:
-  bundleIdPrefix: com.brightdigit
+  bundleIdPrefix: com.brightdigit.sundial
   deploymentTarget:
-    watchOS: 7.4
-    iOS: 14.8
+    iOS: "16.0"
+    watchOS: "9.0"
+  developmentLanguage: en
+  xcodeVersion: "16.0"
+  createIntermediateGroups: true
+  fileTypes:
+    "icon":
+      file: true
+
 settings:
-  MARKETING_VERSION: "1.0.0"
-  CURRENT_PROJECT_VERSION: "1"
-  SDKROOT: iphoneos
-  DEAD_CODE_STRIPPING: false
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "6.1"
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+    DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM}
+
+# Reference the local Swift Package
 packages:
-  SundialKit:
-    path: ./Packages/SundialKit
-targets:  
   Sundial:
+    path: .
+
+targets:
+  # MARK: - Combine iOS App
+
+  SundialCombine-iOS:
     type: application
     platform: iOS
-    dependencies:
-      - target: "Sundial.watchkitapp"
-      - package: SundialKit
+    deploymentTarget:
+      iOS: "16.0"
     sources:
-      - path: "PLists/iOS/Application"
-        group: "Support/iOS"
-      - path: "Assets/Catalogs/Application"
-        group: "Assets"
-      - "Sources"
+      - path: Apps/SundialCombine
+      - path: Resources/iOS/Sundial-Pulse.icon
+        buildPhase: resources
+      - path: Resources/iOS/Assets.xcassets
+        buildPhase: resources
+      - path: Resources/iOS/Info.plist
+        buildPhase: none
+    dependencies:
+      - package: Sundial
+        product: SundialDemoCombine
+      - target: SundialCombine-watchOS
+        embed: true
     info:
-      path: PLists/iOS/Application/Info.plist
+      path: Resources/iOS/Info.plist
       properties:
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: true
+        LSRequiresIPhoneOS: true
+        UIApplicationSupportsIndirectInputEvents: true
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
         ITSAppUsesNonExemptEncryption: false
-        CFBundleShortVersionString: $(MARKETING_VERSION)
-        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
-        CFBundleDisplayName: Sundial
-        UILaunchStoryboardName: Launch Screen
     settings:
       base:
-        PRODUCT_NAME: Sundial
-  Sundial.watchkitapp:
-    type: application.watchapp2
+        PRODUCT_NAME: SundialCombine
+        PRODUCT_DISPLAY_NAME: Pulse
+        PRODUCT_BUNDLE_IDENTIFIER: com.brightdigit.sundial.combine.ios
+        ASSETCATALOG_COMPILER_APPICON_NAME: Sundial-Pulse
+        SWIFT_EMIT_LOC_STRINGS: YES
+        ENABLE_EXPERIMENTAL_FEATURE: StrictConcurrency
+        ENABLE_UPCOMING_FEATURE: ExistentialAny
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SUPPORTS_MACCATALYST: NO
+      configs:
+        Debug:
+          CODE_SIGN_STYLE: Automatic
+          CODE_SIGN_IDENTITY: "Apple Development"
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "iPhone Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "match AppStore com.brightdigit.sundial.combine.ios"
+
+  # MARK: - Combine watchOS App
+
+  SundialCombine-watchOS:
+    type: application
     platform: watchOS
-    scheme: {}
-    dependencies:
-      - target: "Sundial.watchkitapp.watchkitextension"
+    deploymentTarget:
+      watchOS: "9.0"
     sources:
-      - path: "PLists/watchOS/Application"
-        group: "Support/watchOS"
-      - path: "Assets/Catalogs/Application"
-        group: "Assets"
+      - path: Apps/SundialCombine
+      - path: Resources/watchOS/Sundial-Pulse.icon
+        buildPhase: resources
+      - path: Resources/watchOS/Assets.xcassets
+        buildPhase: resources
+      - path: Resources/watchOS/Info-Combine.plist
+        buildPhase: none
+    dependencies:
+      - package: Sundial
+        product: SundialDemoCombine
     info:
-      path: PLists/watchOS/Application/Info.plist
+      path: Resources/watchOS/Info-Combine.plist
       properties:
-        WKWatchKitApp: true
-        CFBundleShortVersionString: $(MARKETING_VERSION)
-        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
-        CFBundleDisplayName: Sundial
-        WKCompanionAppBundleIdentifier: com.brightdigit.Sundial
+        WKApplication: true
+        WKCompanionAppBundleIdentifier: com.brightdigit.sundial.combine.ios
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+        ITSAppUsesNonExemptEncryption: false
     settings:
       base:
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        PRODUCT_NAME: Sundial
-        PRODUCT_MODULE_NAME: Sundial_watchkitapp_watchkitextension
-        IBSC_MODULE: Sundial_watchkitapp_watchkitextension
-  Sundial.watchkitapp.watchkitextension:
-    type: watchkit2-extension
+        PRODUCT_NAME: SundialCombine
+        PRODUCT_DISPLAY_NAME: Pulse
+        PRODUCT_BUNDLE_IDENTIFIER: com.brightdigit.sundial.combine.ios.watchkitapp
+        ASSETCATALOG_COMPILER_APPICON_NAME: Sundial-Pulse
+        SWIFT_EMIT_LOC_STRINGS: YES
+        ENABLE_EXPERIMENTAL_FEATURE: StrictConcurrency
+        ENABLE_UPCOMING_FEATURE: ExistentialAny
+        TARGETED_DEVICE_FAMILY: "4"
+        SDKROOT: watchos
+      configs:
+        Debug:
+          CODE_SIGN_STYLE: Automatic
+          CODE_SIGN_IDENTITY: "Apple Development"
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "iPhone Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "match AppStore com.brightdigit.sundial.combine.ios.watchkitapp"
+
+  # MARK: - Stream iOS App
+
+  SundialStream-iOS:
+    type: application
+    platform: iOS
+    deploymentTarget:
+      iOS: "17.0"
+    sources:
+      - path: Apps/SundialStream
+      - path: Resources/iOS/Sundial-Flow.icon
+        buildPhase: resources
+      - path: Resources/iOS/Assets.xcassets
+        buildPhase: resources
+      - path: Resources/iOS/Info.plist
+        buildPhase: none
+    dependencies:
+      - package: Sundial
+        product: SundialDemoStream
+      - target: SundialStream-watchOS
+        embed: true
+    info:
+      path: Resources/iOS/Info.plist
+      properties:
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: true
+        LSRequiresIPhoneOS: true
+        UIApplicationSupportsIndirectInputEvents: true
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_NAME: SundialStream
+        PRODUCT_DISPLAY_NAME: Flow
+        PRODUCT_BUNDLE_IDENTIFIER: com.brightdigit.sundial.stream.ios
+        ASSETCATALOG_COMPILER_APPICON_NAME: Sundial-Flow
+        SWIFT_EMIT_LOC_STRINGS: YES
+        ENABLE_EXPERIMENTAL_FEATURE: StrictConcurrency
+        ENABLE_UPCOMING_FEATURE: ExistentialAny
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SUPPORTS_MACCATALYST: NO
+      configs:
+        Debug:
+          CODE_SIGN_STYLE: Automatic
+          CODE_SIGN_IDENTITY: "Apple Development"
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "iPhone Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "match AppStore com.brightdigit.sundial.stream.ios"
+
+  # MARK: - Stream watchOS App
+
+  SundialStream-watchOS:
+    type: application
     platform: watchOS
-    dependencies:
-      - package: SundialKit
+    deploymentTarget:
+      watchOS: "10.0"
     sources:
-      - path: "PLists/watchOS/Extension"
-        group: "Support/watchOS"      
-      - path: "Assets/Catalogs/Extension"
-        group: "Assets"
-      - "Sources"
+      - path: Apps/SundialStream
+      - path: Resources/watchOS/Sundial-Flow.icon
+        buildPhase: resources
+      - path: Resources/watchOS/Assets.xcassets
+        buildPhase: resources
+      - path: Resources/watchOS/Info-Stream.plist
+        buildPhase: none
+    dependencies:
+      - package: Sundial
+        product: SundialDemoStream
     info:
-      path: PLists/watchOS/Extension/Info.plist
+      path: Resources/watchOS/Info-Stream.plist
       properties:
-        WKRunsIndependentlyOfCompanionApp: true
-        CFBundleShortVersionString: $(MARKETING_VERSION)
-        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
-        CFBundleDisplayName: Sundial
-        NSExtension:
-          NSExtensionAttributes:
-            WKAppBundleIdentifier: com.brightdigit.Sundial.watchkitapp
-          NSExtensionPointIdentifier: com.apple.watchkit
+        WKApplication: true
+        WKCompanionAppBundleIdentifier: com.brightdigit.sundial.stream.ios
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+        ITSAppUsesNonExemptEncryption: false
     settings:
       base:
-        PRODUCT_NAME: Sundial
+        PRODUCT_NAME: SundialStream
+        PRODUCT_DISPLAY_NAME: Flow
+        PRODUCT_BUNDLE_IDENTIFIER: com.brightdigit.sundial.stream.ios.watchkitapp
+        ASSETCATALOG_COMPILER_APPICON_NAME: Sundial-Flow
+        SWIFT_EMIT_LOC_STRINGS: YES
+        ENABLE_EXPERIMENTAL_FEATURE: StrictConcurrency
+        ENABLE_UPCOMING_FEATURE: ExistentialAny
+        TARGETED_DEVICE_FAMILY: "4"
+        SDKROOT: watchos
+      configs:
+        Debug:
+          CODE_SIGN_STYLE: Automatic
+          CODE_SIGN_IDENTITY: "Apple Development"
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "iPhone Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "match AppStore com.brightdigit.sundial.stream.ios.watchkitapp"
+
+schemes:
+  SundialCombine:
+    build:
+      targets:
+        SundialCombine-iOS: all
+        SundialCombine-watchOS: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+
+  SundialStream:
+    build:
+      targets:
+        SundialStream-iOS: all
+        SundialStream-watchOS: all
+    run:
+      config: Debug
+    archive:
+      config: Release

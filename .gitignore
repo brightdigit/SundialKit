@@ -192,3 +192,4 @@ dev-debug.log
 .taskmaster/tasks/task_*.txt
 
 .mcp.json
+build
