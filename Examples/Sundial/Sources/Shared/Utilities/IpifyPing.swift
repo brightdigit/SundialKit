@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SundialKitCore
 import SundialKitNetwork
 
 /// A NetworkPing implementation that verifies connectivity by fetching the public IP address from ipify.org.
