@@ -27,7 +27,6 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import SundialDemoShared
 import SwiftUI
 
 /// Results section displaying sent and received colors with metadata

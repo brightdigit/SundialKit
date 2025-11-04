@@ -27,7 +27,6 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import SundialDemoShared
 import SwiftUI
 
 /// Complexity slider for selecting message payload size.

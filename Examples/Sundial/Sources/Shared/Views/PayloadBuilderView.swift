@@ -27,7 +27,6 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import SundialDemoShared
 import SwiftUI
 
 /// Payload Builder section for selecting colors and complexity levels

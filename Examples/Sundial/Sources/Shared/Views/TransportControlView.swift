@@ -27,7 +27,6 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import SundialDemoShared
 import SwiftUI
 
 /// Transport Control section for selecting transport methods and sending messages

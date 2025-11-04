@@ -56,6 +56,7 @@ let package = Package(
       dependencies: [
         .product(name: "SwiftProtobuf", package: "swift-protobuf"),
         .product(name: "SundialKitCore", package: "SundialKit"),
+        .product(name: "SundialKitNetwork", package: "SundialKit"),
         .product(name: "SundialKitConnectivity", package: "SundialKit")
       ],
       path: "Sources/Shared",
