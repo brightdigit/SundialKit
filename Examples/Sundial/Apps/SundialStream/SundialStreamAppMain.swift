@@ -13,20 +13,17 @@ import SwiftUI
 
 /// Entry point for SundialStream iOS and watchOS apps.
 ///
-/// This thin wrapper will instantiate the Stream variant app from the SundialDemoStream library
-/// once Phase 4 implementation is complete.
-///
-/// **TODO**: Update to use actual Stream app implementation when available.
-@available(iOS 16.0, watchOS 9.0, *)
+/// Demonstrates modern Swift concurrency patterns with SundialKitStream:
+/// - Actor-based ConnectivityObserver
+/// - AsyncStream for reactive state
+/// - @Observable instead of Combine
+/// - Swift 6.1 strict concurrency compliant
+@available(iOS 17.0, watchOS 10.0, *)
 @main
 struct SundialStreamAppMain: App {
   var body: some Scene {
     WindowGroup {
-      Text("SundialStream")
-        .font(.title)
-      Text("Coming in Phase 4")
-        .font(.caption)
-        .foregroundColor(.secondary)
+      StreamTabView()
     }
   }
 }

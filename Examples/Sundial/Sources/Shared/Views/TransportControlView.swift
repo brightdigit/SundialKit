@@ -32,15 +32,31 @@ import SwiftUI
 
 /// Transport Control section for selecting transport methods and sending messages
 @available(iOS 16.0, watchOS 9.0, *)
-struct TransportControlView: View {
-  @Binding var selectedTransportMethod: TransportMethod?
-  let effectiveTransportMethod: TransportMethod
-  let automaticTransportMethod: TransportMethod
-  let isSending: Bool
-  let isReachable: Bool
-  let onSend: () async -> Void
+public struct TransportControlView: View {
+  @Binding public var selectedTransportMethod: TransportMethod?
+  public let effectiveTransportMethod: TransportMethod
+  public let automaticTransportMethod: TransportMethod
+  public let isSending: Bool
+  public let isReachable: Bool
+  public let onSend: () async -> Void
 
-  var body: some View {
+  public init(
+    selectedTransportMethod: Binding<TransportMethod?>,
+    effectiveTransportMethod: TransportMethod,
+    automaticTransportMethod: TransportMethod,
+    isSending: Bool,
+    isReachable: Bool,
+    onSend: @escaping () async -> Void
+  ) {
+    self._selectedTransportMethod = selectedTransportMethod
+    self.effectiveTransportMethod = effectiveTransportMethod
+    self.automaticTransportMethod = automaticTransportMethod
+    self.isSending = isSending
+    self.isReachable = isReachable
+    self.onSend = onSend
+  }
+
+  public var body: some View {
     VStack(alignment: .leading, spacing: 16) {
       Text("Transport Control")
         .font(.headline)

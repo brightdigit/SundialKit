@@ -1,5 +1,5 @@
 //
-//  ErrorSectionView.swift
+//  PayloadBuilderView.swift
 //  Sundial
 //
 //  Created on 10/28/25.
@@ -27,29 +27,40 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import SundialDemoShared
 import SwiftUI
 
-/// Error display section for showing error messages
+/// Payload Builder section for selecting colors and complexity levels
 @available(iOS 16.0, watchOS 9.0, *)
-struct ErrorSectionView: View {
-  let error: String
+public struct PayloadBuilderView: View {
+  @Binding public var selectedColor: Color
+  @Binding public var complexityLevel: Double
+  public let onRandomize: () -> Void
 
-  var body: some View {
-    HStack(spacing: 12) {
-      Image(systemName: "exclamationmark.triangle.fill")
-        .foregroundColor(.red)
+  public init(
+    selectedColor: Binding<Color>,
+    complexityLevel: Binding<Double>,
+    onRandomize: @escaping () -> Void
+  ) {
+    self._selectedColor = selectedColor
+    self._complexityLevel = complexityLevel
+    self.onRandomize = onRandomize
+  }
 
-      Text(error)
-        .font(.caption)
-        .foregroundColor(.red)
+  public var body: some View {
+    VStack(alignment: .leading, spacing: 16) {
+      Text("Payload Builder")
+        .font(.headline)
 
-      Spacer()
+      ColorSelectorView(
+        selectedColor: $selectedColor,
+        onRandomize: onRandomize
+      )
+
+      PayloadComplexityView(
+        complexityLevel: $complexityLevel
+      )
     }
-    .padding()
-    .background(
-      RoundedRectangle(cornerRadius: 12)
-        .fill(Color.red.opacity(0.1))
-    )
   }
 }
 
@@ -57,10 +68,16 @@ struct ErrorSectionView: View {
   // MARK: - Previews
 
   @available(iOS 16.0, watchOS 9.0, *)
-  struct ErrorSectionView_Previews: PreviewProvider {
+  struct PayloadBuilderView_Previews: PreviewProvider {
     static var previews: some View {
-      ErrorSectionView(error: "Failed to send message: Connection timeout")
-        .padding()
+      ScrollView{
+        PayloadBuilderView(
+          selectedColor: .constant(.blue),
+          complexityLevel: .constant(0.5),
+          onRandomize: {}
+        )
+      }
+      .padding()
     }
   }
 #endif

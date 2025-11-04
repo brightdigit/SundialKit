@@ -1,8 +1,8 @@
 //
-//  ColorWithMetadata.swift
+//  StreamProtocolComparisonView.swift
 //  Sundial
 //
-//  Created on 10/28/25.
+//  Created on 11/1/25.
 //  Copyright (c) 2025 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
@@ -29,29 +29,30 @@
 
 import SwiftUI
 
-/// Represents a color with associated metadata (timestamp and source).
-///
-/// Used to track sent and received colors in the Message Lab,
-/// providing context about when and where the color originated.
-public struct ColorWithMetadata: Equatable {
-  /// The color value
-  public let color: Color
+/// Tab 3: Protocol Comparison (Stream variant)
+@available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
+struct StreamProtocolComparisonView: View {
+  var body: some View {
+    NavigationView {
+      VStack {
+        Image(systemName: "chart.bar")
+          .font(.largeTitle)
+          .foregroundColor(.purple)
 
-  /// When the color was sent or received
-  public let timestamp: Date
+        Text("Protocol Comparison")
+          .font(.title2)
+          .fontWeight(.semibold)
 
-  /// Optional source identifier (e.g., "This Device", "Counterpart")
-  public let source: String?
-
-  /// Creates a new color with metadata.
-  ///
-  /// - Parameters:
-  ///   - color: The color value
-  ///   - timestamp: When the color was sent/received
-  ///   - source: Optional source identifier
-  public init(color: Color, timestamp: Date, source: String? = nil) {
-    self.color = color
-    self.timestamp = timestamp
-    self.source = source
+        Text("Coming soon - Stream variant")
+          .font(.caption)
+          .foregroundColor(.secondary)
+      }
+      .navigationTitle("Protocol")
+    }
   }
+}
+
+@available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
+#Preview {
+  StreamProtocolComparisonView()
 }

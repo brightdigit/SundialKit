@@ -8,6 +8,9 @@ options:
   developmentLanguage: en
   xcodeVersion: "16.0"
   createIntermediateGroups: true
+  fileTypes:
+    "icon":
+      file: true
 
 settings:
   base:
@@ -32,9 +35,12 @@ targets:
       iOS: "16.0"
     sources:
       - path: Apps/SundialCombine
-      - path: Resources/iOS
-        type: folder
+      - path: Resources/iOS/Sundial-Pulse.icon
         buildPhase: resources
+      - path: Resources/iOS/Assets.xcassets
+        buildPhase: resources
+      - path: Resources/iOS/Info.plist
+        buildPhase: none
     dependencies:
       - package: Sundial
         product: SundialDemoCombine
@@ -69,9 +75,14 @@ targets:
         ENABLE_UPCOMING_FEATURE: ExistentialAny
         TARGETED_DEVICE_FAMILY: "1,2"
         SUPPORTS_MACCATALYST: NO
-        CODE_SIGN_STYLE: Manual
-        CODE_SIGN_IDENTITY: "iPhone Distribution"
-        PROVISIONING_PROFILE_SPECIFIER: "match AppStore com.brightdigit.sundial.combine.ios"
+      configs:
+        Debug:
+          CODE_SIGN_STYLE: Automatic
+          CODE_SIGN_IDENTITY: "Apple Development"
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "iPhone Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "match AppStore com.brightdigit.sundial.combine.ios"
 
   # MARK: - Combine watchOS App
 
@@ -82,9 +93,12 @@ targets:
       watchOS: "9.0"
     sources:
       - path: Apps/SundialCombine
-      - path: Resources/watchOS
-        type: folder
+      - path: Resources/watchOS/Sundial-Pulse.icon
         buildPhase: resources
+      - path: Resources/watchOS/Assets.xcassets
+        buildPhase: resources
+      - path: Resources/watchOS/Info-Combine.plist
+        buildPhase: none
     dependencies:
       - package: Sundial
         product: SundialDemoCombine
@@ -108,9 +122,14 @@ targets:
         ENABLE_UPCOMING_FEATURE: ExistentialAny
         TARGETED_DEVICE_FAMILY: "4"
         SDKROOT: watchos
-        CODE_SIGN_STYLE: Manual
-        CODE_SIGN_IDENTITY: "iPhone Distribution"
-        PROVISIONING_PROFILE_SPECIFIER: "match AppStore com.brightdigit.sundial.combine.ios.watchkitapp"
+      configs:
+        Debug:
+          CODE_SIGN_STYLE: Automatic
+          CODE_SIGN_IDENTITY: "Apple Development"
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "iPhone Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "match AppStore com.brightdigit.sundial.combine.ios.watchkitapp"
 
   # MARK: - Stream iOS App
 
@@ -118,12 +137,15 @@ targets:
     type: application
     platform: iOS
     deploymentTarget:
-      iOS: "16.0"
+      iOS: "17.0"
     sources:
       - path: Apps/SundialStream
-      - path: Resources/iOS
-        type: folder
+      - path: Resources/iOS/Sundial-Flow.icon
         buildPhase: resources
+      - path: Resources/iOS/Assets.xcassets
+        buildPhase: resources
+      - path: Resources/iOS/Info.plist
+        buildPhase: none
     dependencies:
       - package: Sundial
         product: SundialDemoStream
@@ -158,9 +180,14 @@ targets:
         ENABLE_UPCOMING_FEATURE: ExistentialAny
         TARGETED_DEVICE_FAMILY: "1,2"
         SUPPORTS_MACCATALYST: NO
-        CODE_SIGN_STYLE: Manual
-        CODE_SIGN_IDENTITY: "iPhone Distribution"
-        PROVISIONING_PROFILE_SPECIFIER: "match AppStore com.brightdigit.sundial.stream.ios"
+      configs:
+        Debug:
+          CODE_SIGN_STYLE: Automatic
+          CODE_SIGN_IDENTITY: "Apple Development"
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "iPhone Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "match AppStore com.brightdigit.sundial.stream.ios"
 
   # MARK: - Stream watchOS App
 
@@ -168,12 +195,15 @@ targets:
     type: application
     platform: watchOS
     deploymentTarget:
-      watchOS: "9.0"
+      watchOS: "10.0"
     sources:
       - path: Apps/SundialStream
-      - path: Resources/watchOS
-        type: folder
+      - path: Resources/watchOS/Sundial-Flow.icon
         buildPhase: resources
+      - path: Resources/watchOS/Assets.xcassets
+        buildPhase: resources
+      - path: Resources/watchOS/Info-Stream.plist
+        buildPhase: none
     dependencies:
       - package: Sundial
         product: SundialDemoStream
@@ -197,9 +227,14 @@ targets:
         ENABLE_UPCOMING_FEATURE: ExistentialAny
         TARGETED_DEVICE_FAMILY: "4"
         SDKROOT: watchos
-        CODE_SIGN_STYLE: Manual
-        CODE_SIGN_IDENTITY: "iPhone Distribution"
-        PROVISIONING_PROFILE_SPECIFIER: "match AppStore com.brightdigit.sundial.stream.ios.watchkitapp"
+      configs:
+        Debug:
+          CODE_SIGN_STYLE: Automatic
+          CODE_SIGN_IDENTITY: "Apple Development"
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "iPhone Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "match AppStore com.brightdigit.sundial.stream.ios.watchkitapp"
 
 schemes:
   SundialCombine:
