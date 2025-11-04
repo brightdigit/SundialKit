@@ -8,6 +8,9 @@ options:
   developmentLanguage: en
   xcodeVersion: "16.0"
   createIntermediateGroups: true
+  fileTypes:
+    "icon":
+      file: true
 
 settings:
   base:
@@ -32,9 +35,12 @@ targets:
       iOS: "16.0"
     sources:
       - path: Apps/SundialCombine
-      - path: Resources/iOS
-        type: folder
+      - path: Resources/iOS/Sundial-Pulse.icon
         buildPhase: resources
+      - path: Resources/iOS/Assets.xcassets
+        buildPhase: resources
+      - path: Resources/iOS/Info.plist
+        buildPhase: none
     dependencies:
       - package: Sundial
         product: SundialDemoCombine
@@ -87,9 +93,12 @@ targets:
       watchOS: "9.0"
     sources:
       - path: Apps/SundialCombine
-      - path: Resources/watchOS
-        type: folder
+      - path: Resources/watchOS/Sundial-Pulse.icon
         buildPhase: resources
+      - path: Resources/watchOS/Assets.xcassets
+        buildPhase: resources
+      - path: Resources/watchOS/Info-Combine.plist
+        buildPhase: none
     dependencies:
       - package: Sundial
         product: SundialDemoCombine
@@ -131,9 +140,12 @@ targets:
       iOS: "17.0"
     sources:
       - path: Apps/SundialStream
-      - path: Resources/iOS
-        type: folder
+      - path: Resources/iOS/Sundial-Flow.icon
         buildPhase: resources
+      - path: Resources/iOS/Assets.xcassets
+        buildPhase: resources
+      - path: Resources/iOS/Info.plist
+        buildPhase: none
     dependencies:
       - package: Sundial
         product: SundialDemoStream
@@ -186,9 +198,12 @@ targets:
       watchOS: "10.0"
     sources:
       - path: Apps/SundialStream
-      - path: Resources/watchOS
-        type: folder
+      - path: Resources/watchOS/Sundial-Flow.icon
         buildPhase: resources
+      - path: Resources/watchOS/Assets.xcassets
+        buildPhase: resources
+      - path: Resources/watchOS/Info-Stream.plist
+        buildPhase: none
     dependencies:
       - package: Sundial
         product: SundialDemoStream
