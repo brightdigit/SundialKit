@@ -54,7 +54,7 @@ import SwiftUI
 ///    - Session activation state
 ///    - Message transmission log
 ///    - Error reporting
-@available(iOS 16.0, watchOS 9.0, *)
+@available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
 public struct SundialTabView: View {
   public init() {}
 

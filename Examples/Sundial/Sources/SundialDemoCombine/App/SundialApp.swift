@@ -41,7 +41,7 @@ import SwiftUI
 /// - Compatible with SundialKit v1.0.0 patterns
 ///
 /// Compare with SundialDemoStream for modern async/await implementation.
-@available(iOS 16.0, watchOS 9.0, *)
+@available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
 public struct SundialApp: App {
   public init() {}
 

@@ -27,32 +27,177 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import SundialDemoShared
 import SwiftUI
 
-/// Tab 2: Latency Dashboard
-@available(iOS 16.0, watchOS 9.0, *)
+/// Tab 2: Latency Dashboard (Combine variant)
+/// Measures round-trip time (RTT) and displays latency metrics.
+@available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
 struct LatencyDashboardView: View {
+  @State private var viewModel = CombineLatencyDashboardViewModel()
+
   var body: some View {
     NavigationView {
-      VStack {
-        Image(systemName: "clock")
-          .font(.largeTitle)
-          .foregroundColor(.orange)
+      ScrollView {
+        VStack(spacing: 24) {
+          controlSection
 
-        Text("Latency Dashboard")
-          .font(.title2)
-          .fontWeight(.semibold)
-
-        Text("Coming soon")
-          .font(.caption)
-          .foregroundColor(.secondary)
+          if !viewModel.measurements.isEmpty {
+            metricsSection
+            breakdownSection
+            graphSection
+          } else {
+            emptyState
+          }
+        }
+        .padding()
       }
       .navigationTitle("Latency")
     }
   }
+
+  // MARK: - View Components
+
+  private var controlSection: some View {
+    VStack(spacing: 16) {
+      Picker("Payload Size", selection: $viewModel.currentPayloadSize) {
+        Text("Small (64B)").tag(Sundial_Demo_LatencyTestRequest.PayloadSize.small)
+        Text("Medium (512B)").tag(Sundial_Demo_LatencyTestRequest.PayloadSize.medium)
+        Text("Large (4KB)").tag(Sundial_Demo_LatencyTestRequest.PayloadSize.large)
+      }
+      .pickerStyle(.segmented)
+
+      Button(action: {
+        if viewModel.isRunning {
+          viewModel.stopLatencyTest()
+        } else {
+          viewModel.startLatencyTest()
+        }
+      }) {
+        Label(
+          viewModel.isRunning ? "Stop Test" : "Start Test",
+          systemImage: viewModel.isRunning ? "stop.fill" : "play.fill"
+        )
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(viewModel.isRunning ? Color.red : Color.orange)
+        .foregroundColor(.white)
+        .cornerRadius(12)
+      }
+    }
+  }
+
+  private var metricsSection: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      Text("Live Metrics")
+        .font(.headline)
+
+      LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+        MetricCard(
+          title: "Average RTT",
+          value: formatTime(viewModel.averageRTT),
+          subtitle: "ms",
+          icon: "clock",
+          color: .orange
+        )
+
+        MetricCard(
+          title: "Min RTT",
+          value: formatTime(viewModel.minRTT),
+          subtitle: "ms",
+          icon: "arrow.down",
+          color: .green
+        )
+
+        MetricCard(
+          title: "Max RTT",
+          value: formatTime(viewModel.maxRTT),
+          subtitle: "ms",
+          icon: "arrow.up",
+          color: .red
+        )
+
+        MetricCard(
+          title: "Std Deviation",
+          value: formatTime(viewModel.standardDeviation),
+          subtitle: "ms",
+          icon: "chart.bar",
+          color: .purple
+        )
+      }
+    }
+  }
+
+  private var breakdownSection: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      Text("Time Breakdown")
+        .font(.headline)
+
+      LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+        MetricCard(
+          title: "Encode",
+          value: formatTime(viewModel.averageEncodeTime),
+          subtitle: "ms",
+          icon: "arrow.up.doc",
+          color: .blue
+        )
+
+        MetricCard(
+          title: "Network",
+          value: formatTime(viewModel.averageNetworkTime),
+          subtitle: "ms",
+          icon: "network",
+          color: .orange
+        )
+
+        MetricCard(
+          title: "Decode",
+          value: formatTime(viewModel.averageDecodeTime),
+          subtitle: "ms",
+          icon: "arrow.down.doc",
+          color: .green
+        )
+      }
+    }
+  }
+
+  private var graphSection: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      Text("Latency Graph")
+        .font(.headline)
+
+      LatencyGraph(measurements: viewModel.measurements)
+        .frame(height: 200)
+    }
+  }
+
+  private var emptyState: some View {
+    VStack(spacing: 16) {
+      Image(systemName: "chart.line.uptrend.xyaxis")
+        .font(.system(size: 60))
+        .foregroundColor(.orange)
+
+      Text("Latency Dashboard")
+        .font(.title2)
+        .fontWeight(.semibold)
+
+      Text("Start a test to measure round-trip time")
+        .font(.subheadline)
+        .foregroundColor(.secondary)
+        .multilineTextAlignment(.center)
+    }
+    .padding(.vertical, 40)
+  }
+
+  // MARK: - Helpers
+
+  private func formatTime(_ time: TimeInterval?) -> String {
+    guard let time = time else { return "-" }
+    return String(format: "%.1f", time * 1000)  // Convert to ms
+  }
 }
 
-@available(iOS 17.0, watchOS 10.0, *)
+@available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
 #Preview {
   LatencyDashboardView()
 }
