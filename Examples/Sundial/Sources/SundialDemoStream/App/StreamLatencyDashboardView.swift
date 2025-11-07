@@ -89,6 +89,25 @@ struct StreamLatencyDashboardView: View {
 
   private func controlSection(viewModel: StreamLatencyDashboardViewModel) -> some View {
     VStack(spacing: 16) {
+      // Reachability status banner
+      if !viewModel.isReachable {
+        HStack {
+          Image(systemName: "exclamationmark.triangle.fill")
+            .foregroundColor(.orange)
+          VStack(alignment: .leading, spacing: 4) {
+            Text("Devices Not Reachable")
+              .font(.subheadline)
+              .fontWeight(.semibold)
+            Text("Ensure both apps are in foreground and Bluetooth is connected")
+              .font(.caption)
+              .foregroundColor(.secondary)
+          }
+        }
+        .padding()
+        .background(Color.orange.opacity(0.1))
+        .cornerRadius(8)
+      }
+
       Picker("Payload Size", selection: Binding(
         get: { viewModel.currentPayloadSize },
         set: { viewModel.currentPayloadSize = $0 }
@@ -112,10 +131,11 @@ struct StreamLatencyDashboardView: View {
         )
         .frame(maxWidth: .infinity)
         .padding()
-        .background(viewModel.isRunning ? Color.red : Color.orange)
+        .background(viewModel.isRunning ? Color.red : (viewModel.isReachable ? Color.orange : Color.gray))
         .foregroundColor(.white)
         .cornerRadius(12)
       }
+      .disabled(!viewModel.isReachable && !viewModel.isRunning)
     }
   }
 

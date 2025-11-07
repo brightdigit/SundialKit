@@ -54,8 +54,14 @@ struct SundialStreamApp: App {
       messageDecoder: MessageDecoder(messagableTypes: [
         Sundial_Demo_ColorMessage.self,
         Sundial_Demo_ComplexMessage.self,
+        Sundial_Demo_LatencyTestRequest.self,
+        Sundial_Demo_LatencyTestReply.self,
       ])
     )
+
+    /// App-level latency responder service.
+    /// Automatically replies to latency test requests from the paired device.
+    @State private var latencyResponder: LatencyResponderService?
   #endif
 
   var body: some Scene {
@@ -63,6 +69,12 @@ struct SundialStreamApp: App {
       #if os(iOS) || os(watchOS)
         StreamTabView()
           .environment(\.connectivityObserver, sharedConnectivityObserver)
+          .task {
+            // Initialize latency responder service on app startup
+            if latencyResponder == nil {
+              latencyResponder = LatencyResponderService(connectivityObserver: sharedConnectivityObserver)
+            }
+          }
       #else
         StreamTabView()
       #endif

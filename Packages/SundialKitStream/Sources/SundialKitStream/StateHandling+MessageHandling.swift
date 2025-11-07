@@ -36,21 +36,21 @@ extension StateHandling where Self: MessageHandling & Sendable {
 
   /// Handles session activation completion.
   nonisolated public func session(
-    _: any ConnectivitySession,
+    _ session: any ConnectivitySession,
     activationDidCompleteWith state: ActivationState,
     error: Error?
   ) {
-    Task { await handleActivation(state, error: error) }
+    Task { await handleActivation(state, error: error, session: session) }
   }
 
   /// Handles session becoming inactive.
   nonisolated public func sessionDidBecomeInactive(_ session: any ConnectivitySession) {
-    Task { await handleActivation(session.activationState, error: nil) }
+    Task { await handleActivation(session.activationState, error: nil, session: session) }
   }
 
   /// Handles session deactivation.
   nonisolated public func sessionDidDeactivate(_ session: any ConnectivitySession) {
-    Task { await handleActivation(session.activationState, error: nil) }
+    Task { await handleActivation(session.activationState, error: nil, session: session) }
   }
 
   /// Handles reachability changes.

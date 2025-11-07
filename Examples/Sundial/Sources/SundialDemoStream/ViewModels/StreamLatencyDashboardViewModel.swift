@@ -14,6 +14,7 @@ final class StreamLatencyDashboardViewModel {
   // MARK: - Published State
 
   var isRunning: Bool = false
+  var isReachable: Bool = false
   var currentPayloadSize: Sundial_Demo_LatencyTestRequest.PayloadSize = .small
   var latencyTracker = LatencyTracker()
 
@@ -67,31 +68,10 @@ final class StreamLatencyDashboardViewModel {
 
   // MARK: - Initialization
 
-  init(connectivityObserver: ConnectivityObserver? = nil) {
-    #if os(iOS) || os(watchOS)
-      self.connectivityObserver =
-        connectivityObserver
-        ?? ConnectivityObserver(
-          messageDecoder: MessageDecoder(messagableTypes: [
-            Sundial_Demo_ColorMessage.self,
-            Sundial_Demo_ComplexMessage.self,
-            Sundial_Demo_LatencyTestRequest.self,
-            Sundial_Demo_LatencyTestReply.self,
-          ])
-        )
-    #else
-      self.connectivityObserver = connectivityObserver ?? Self.createMacOSObserver()
-    #endif
+  init(connectivityObserver: ConnectivityObserver) {
+    self.connectivityObserver = connectivityObserver
     setupStreams()
   }
-
-  #if !os(iOS) && !os(watchOS)
-    private static func createMacOSObserver() -> ConnectivityObserver {
-      fatalError(
-        "ConnectivityObserver must be explicitly provided on macOS. Create it with: ConnectivityObserver(session: NeverConnectivitySession(), messageDecoder: ...)"
-      )
-    }
-  #endif
 
   deinit {
     streamTask?.cancel()
@@ -106,8 +86,17 @@ final class StreamLatencyDashboardViewModel {
       do {
         try await connectivityObserver.activate()
         print("✅ Latency Dashboard: ConnectivityObserver activated")
+
+        // Get initial reachability status
+        isReachable = await connectivityObserver.isReachable()
+        print("📡 Latency Dashboard: Initial reachability: \(isReachable)")
       } catch {
         print("❌ Latency Dashboard: Activation failed: \(error)")
+      }
+
+      // Listen for reachability changes
+      Task { @MainActor in
+        await consumeReachabilityChanges()
       }
 
       // Listen for latency replies
@@ -115,10 +104,22 @@ final class StreamLatencyDashboardViewModel {
     }
   }
 
+  private func consumeReachabilityChanges() async {
+    for await reachable in await connectivityObserver.reachabilityUpdates() {
+      self.isReachable = reachable
+      print("📡 Latency Dashboard: Reachability changed to: \(reachable)")
+    }
+  }
+
   private func consumeLatencyReplies() async {
+    print("👂 Latency: Started listening for typed messages")
     for await message in await connectivityObserver.typedMessageStream() {
+      print("📨 Latency: Received typed message: \(type(of: message))")
       if let reply = message as? Sundial_Demo_LatencyTestReply {
+        print("✅ Latency: Message is LatencyTestReply #\(reply.sequenceNumber)")
         handleLatencyReply(reply)
+      } else {
+        print("ℹ️ Latency: Message is not LatencyTestReply, ignoring")
       }
     }
   }
@@ -152,8 +153,19 @@ final class StreamLatencyDashboardViewModel {
 
   /// Send a single latency ping.
   func sendLatencyPing() async throws {
+    // Check reachability first
+    let reachable = await connectivityObserver.isReachable()
+    print("🔵 Latency: Current reachability status: \(reachable)")
+
+    guard reachable else {
+      print("❌ Latency: Cannot send ping - devices not reachable!")
+      print("💡 Latency: Make sure both apps are in the foreground and Bluetooth is connected")
+      throw ConnectivityError.notReachable
+    }
+
     sequenceNumber += 1
     let sendTime = Date()
+    print("🔵 Latency: Preparing to send ping #\(sequenceNumber)")
 
     let payloadSize: Int
     let payload: Data
@@ -184,12 +196,12 @@ final class StreamLatencyDashboardViewModel {
     let encodeTime = CFAbsoluteTimeGetCurrent() - encodeStart
 
     // Send the request
-    _ = try await connectivityObserver.send(request)
+    let sendResult = try await connectivityObserver.send(request)
+    print("📤 Sent latency ping #\(sequenceNumber) via \(sendResult.context)")
 
     // Store pending request info
     pendingRequests[sequenceNumber] = (sendTime: sendTime, encodeTime: encodeTime, payloadSize: payloadSize)
-
-    print("📤 Sent latency ping #\(sequenceNumber)")
+    print("💾 Stored pending request #\(sequenceNumber), total pending: \(pendingRequests.count)")
   }
 
   private func handleLatencyReply(_ reply: Sundial_Demo_LatencyTestReply) {

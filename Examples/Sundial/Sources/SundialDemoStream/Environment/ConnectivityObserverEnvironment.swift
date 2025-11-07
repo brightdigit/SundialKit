@@ -28,6 +28,9 @@
 //
 
 #if canImport(SundialKitStream)
+  import SundialDemoShared
+  import SundialKitConnectivity
+  import SundialKitCore
   import SundialKitStream
   import SwiftUI
 
@@ -36,13 +39,27 @@
   /// This ensures only one WatchConnectivitySession is created, preventing conflicts
   /// with WCSession.default's single delegate requirement.
   @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
-  struct ConnectivityObserverKey: EnvironmentKey {
-    static let defaultValue: ConnectivityObserver? = nil
+  public struct ConnectivityObserverKey: EnvironmentKey {
+    public static let defaultValue: ConnectivityObserver = {
+      #if os(iOS) || os(watchOS)
+        return ConnectivityObserver(
+          messageDecoder: MessageDecoder(messagableTypes: [
+            Sundial_Demo_ColorMessage.self,
+            Sundial_Demo_ComplexMessage.self,
+            Sundial_Demo_LatencyTestRequest.self,
+            Sundial_Demo_LatencyTestReply.self,
+          ])
+        )
+      #else
+        // Fallback for unsupported platforms (shouldn't happen in practice)
+        fatalError("ConnectivityObserver requires iOS or watchOS")
+      #endif
+    }()
   }
 
   @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
   extension EnvironmentValues {
-    var connectivityObserver: ConnectivityObserver? {
+    public var connectivityObserver: ConnectivityObserver {
       get { self[ConnectivityObserverKey.self] }
       set { self[ConnectivityObserverKey.self] = newValue }
     }

@@ -75,8 +75,9 @@ extension StateHandling {
   /// - Parameters:
   ///   - activationState: The new activation state
   ///   - error: Optional error that occurred during activation
-  internal func handleActivation(_ activationState: ActivationState, error: Error?) async {
-    await stateManager.handleActivation(activationState, error: error)
+  ///   - session: The connectivity session to read initial state from
+  internal func handleActivation(_ activationState: ActivationState, error: Error?, session: any ConnectivitySession) async {
+    await stateManager.handleActivation(activationState, error: error, session: session)
   }
 
   /// Handles reachability status changes

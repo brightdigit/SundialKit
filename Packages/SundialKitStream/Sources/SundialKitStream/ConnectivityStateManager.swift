@@ -78,22 +78,33 @@ public actor ConnectivityStateManager {
 
   // MARK: - State Updates
 
-  internal func handleActivation(_ activationState: ActivationState, error: (any Error)?) async {
+  internal func handleActivation(_ activationState: ActivationState, error: (any Error)?, session: any ConnectivitySession) async {
+    // Read the current state from the session since sessionReachabilityDidChange
+    // is only called when reachability CHANGES, not on initial activation
+    let currentReachability = session.isReachable
+    let currentIsPairedAppInstalled = session.isPairedAppInstalled
+    let currentIsPaired = session.isPaired
+
+    print("📡 StateManager: Activation complete - reading initial state from session")
+    print("   - isReachable: \(currentReachability)")
+    print("   - isPairedAppInstalled: \(currentIsPairedAppInstalled)")
+    print("   - isPaired: \(currentIsPaired)")
+
     #if os(iOS)
       state = ConnectivityState(
         activationState: activationState,
         activationError: error,
-        isReachable: state.isReachable,
-        isPairedAppInstalled: state.isPairedAppInstalled,
-        isPaired: state.isPaired
+        isReachable: currentReachability,
+        isPairedAppInstalled: currentIsPairedAppInstalled,
+        isPaired: currentIsPaired
       )
     #else
       state = ConnectivityState(
         activationState: activationState,
         activationError: error,
-        isReachable: state.isReachable,
-        isPairedAppInstalled: state.isPairedAppInstalled,
-        isPaired: false
+        isReachable: currentReachability,
+        isPairedAppInstalled: currentIsPairedAppInstalled,
+        isPaired: true
       )
     #endif
 
@@ -116,6 +127,8 @@ public actor ConnectivityStateManager {
   }
 
   internal func updateReachability(_ isReachable: Bool) async {
+    print("📡 StateManager: Reachability changed: \(state.isReachable) → \(isReachable)")
+
     #if os(iOS)
       state = ConnectivityState(
         activationState: state.activationState,
