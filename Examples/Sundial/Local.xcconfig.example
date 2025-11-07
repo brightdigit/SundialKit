@@ -1,0 +1,12 @@
+// Local development configuration template
+// Copy this file to Local.xcconfig and set your Apple Developer Team ID
+//
+// To find your Team ID:
+//   1. Run: security find-identity -v -p codesigning
+//   2. Or check: Xcode → Settings → Accounts → Team ID
+//
+// Usage:
+//   cp Local.xcconfig.example Local.xcconfig
+//   # Edit Local.xcconfig with your team ID
+
+DEVELOPMENT_TEAM = YOUR_TEAM_ID_HERE
