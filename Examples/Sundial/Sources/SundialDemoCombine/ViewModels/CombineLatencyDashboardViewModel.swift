@@ -9,14 +9,13 @@ import SundialKitCore
 /// ViewModel for the Latency Dashboard tab in SundialDemoCombine.
 /// Measures round-trip time (RTT) by sending ping messages and tracking replies.
 @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
-@Observable
 @MainActor
-final class CombineLatencyDashboardViewModel {
+final class CombineLatencyDashboardViewModel: ObservableObject {
   // MARK: - Published State
 
-  var isRunning: Bool = false
-  var currentPayloadSize: Sundial_Demo_LatencyTestRequest.PayloadSize = .small
-  var latencyTracker = LatencyTracker()
+  @Published var isRunning: Bool = false
+  @Published var currentPayloadSize: Sundial_Demo_LatencyTestRequest.PayloadSize = .small
+  @Published var latencyTracker = LatencyTracker()
 
   // MARK: - Computed Properties
 

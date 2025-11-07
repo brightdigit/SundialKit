@@ -28,13 +28,27 @@
 //
 
 import SundialDemoShared
+import SundialKitCombine
 import SwiftUI
 
 /// Tab 4: Diagnostics (Combine variant)
 /// Monitors connection health, message history, and error logs.
 @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
 struct DiagnosticsView: View {
-  @State private var viewModel = CombineDiagnosticsViewModel()
+  @EnvironmentObject private var sharedConnectivityObserver: ConnectivityObserver
+
+  var body: some View {
+    DiagnosticsContentView(connectivityObserver: sharedConnectivityObserver)
+  }
+}
+
+@available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
+private struct DiagnosticsContentView: View {
+  @StateObject private var viewModel: CombineDiagnosticsViewModel
+
+  init(connectivityObserver: ConnectivityObserver) {
+    _viewModel = StateObject(wrappedValue: CombineDiagnosticsViewModel(connectivityObserver: connectivityObserver))
+  }
 
   var body: some View {
     NavigationView {

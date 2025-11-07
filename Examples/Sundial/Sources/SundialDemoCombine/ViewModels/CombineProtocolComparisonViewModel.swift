@@ -8,19 +8,18 @@ import SwiftProtobuf
 /// ViewModel for the Protocol Comparison tab in SundialDemoCombine.
 /// Compares binary protobuf encoding vs dictionary encoding for message efficiency.
 @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
-@Observable
 @MainActor
-final class CombineProtocolComparisonViewModel {
+final class CombineProtocolComparisonViewModel: ObservableObject {
   // MARK: - Published State
 
-  var selectedMessageType: MessageType = .simple
-  var protobufSize: Int = 0
-  var dictionarySize: Int = 0
-  var protobufEncodeTime: TimeInterval = 0
-  var dictionaryEncodeTime: TimeInterval = 0
-  var protobufDecodeTime: TimeInterval = 0
-  var dictionaryDecodeTime: TimeInterval = 0
-  var hasRunComparison: Bool = false
+  @Published var selectedMessageType: MessageType = .simple
+  @Published var protobufSize: Int = 0
+  @Published var dictionarySize: Int = 0
+  @Published var protobufEncodeTime: TimeInterval = 0
+  @Published var dictionaryEncodeTime: TimeInterval = 0
+  @Published var protobufDecodeTime: TimeInterval = 0
+  @Published var dictionaryDecodeTime: TimeInterval = 0
+  @Published var hasRunComparison: Bool = false
 
   // MARK: - Computed Properties
 

@@ -15,7 +15,7 @@ import SwiftUI
 ///
 /// This thin wrapper instantiates the `SundialApp` from the SundialDemoCombine library,
 /// allowing the same library code to be used by both the iOS and watchOS app targets.
-@available(iOS 16.0, watchOS 9.0, *)
+@available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
 @main
 struct SundialCombineAppMain: App {
   var body: some Scene {

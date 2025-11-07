@@ -28,6 +28,7 @@
 //
 
 import SundialDemoShared
+import SundialKitCombine
 import SwiftUI
 
 /// Message Transport Lab - Tab 1
@@ -43,7 +44,21 @@ import SwiftUI
 /// 4. Connection Status - Footer with reachability and session state
 @available(iOS 16.0, watchOS 9.0, *)
 struct MessageLabView: View {
-  @StateObject private var viewModel = MessageLabViewModel()
+  @EnvironmentObject private var sharedConnectivityObserver: ConnectivityObserver
+
+  var body: some View {
+    // Pass the shared observer to the actual content view
+    MessageLabContentView(connectivityObserver: sharedConnectivityObserver)
+  }
+}
+
+@available(iOS 16.0, watchOS 9.0, *)
+private struct MessageLabContentView: View {
+  @StateObject private var viewModel: MessageLabViewModel
+
+  init(connectivityObserver: ConnectivityObserver) {
+    _viewModel = StateObject(wrappedValue: MessageLabViewModel(connectivityObserver: connectivityObserver))
+  }
 
   var body: some View {
     NavigationView {

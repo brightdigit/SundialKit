@@ -86,7 +86,7 @@
   ///
   @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
   @MainActor
-  public final class ConnectivityObserver: ConnectivitySessionDelegate {
+  public final class ConnectivityObserver: ObservableObject, ConnectivitySessionDelegate {
     // MARK: - Published Properties
 
     /// Current activation state

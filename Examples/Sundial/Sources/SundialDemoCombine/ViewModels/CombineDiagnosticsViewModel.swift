@@ -9,19 +9,18 @@ import SundialKitCore
 /// ViewModel for the Diagnostics tab in SundialDemoCombine.
 /// Monitors connection health, message history, and error logs.
 @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
-@Observable
 @MainActor
-final class CombineDiagnosticsViewModel {
+final class CombineDiagnosticsViewModel: ObservableObject {
   // MARK: - Published State
 
-  var messageHistory: [MessageHistoryEntry] = []
-  var errorLog: [ErrorEntry] = []
-  var activationState: ActivationState = .notActivated
-  var isReachable: Bool = false
-  var isPairedAppInstalled: Bool = false
-  var messagesSent: Int = 0
-  var messagesReceived: Int = 0
-  var lastUpdate: Date = Date()
+  @Published var messageHistory: [MessageHistoryEntry] = []
+  @Published var errorLog: [ErrorEntry] = []
+  @Published var activationState: ActivationState = .notActivated
+  @Published var isReachable: Bool = false
+  @Published var isPairedAppInstalled: Bool = false
+  @Published var messagesSent: Int = 0
+  @Published var messagesReceived: Int = 0
+  @Published var lastUpdate: Date = Date()
 
   // MARK: - Computed Properties
 

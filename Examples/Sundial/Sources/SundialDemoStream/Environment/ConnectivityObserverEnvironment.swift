@@ -1,8 +1,8 @@
 //
-//  SundialStreamApp.swift
+//  ConnectivityObserverEnvironment.swift
 //  Sundial
 //
-//  Created on 11/1/25.
+//  Created on 11/7/25.
 //  Copyright (c) 2025 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
@@ -27,45 +27,24 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import SwiftUI
 #if canImport(SundialKitStream)
-  import SundialKitConnectivity
-  import SundialKitCore
   import SundialKitStream
-  import SundialDemoShared
-#endif
+  import SwiftUI
 
-/// Sundial Demo App using SundialKitStream.
-///
-/// Demonstrates modern Swift concurrency patterns:
-/// - Actor-based ConnectivityObserver
-/// - AsyncStream for reactive state
-/// - @Observable instead of Combine
-/// - Swift 6.1 strict concurrency compliant
-@available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
-struct SundialStreamApp: App {
-  // MARK: - Shared Dependencies
+  /// Environment key for sharing a single ConnectivityObserver instance across all views.
+  ///
+  /// This ensures only one WatchConnectivitySession is created, preventing conflicts
+  /// with WCSession.default's single delegate requirement.
+  @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
+  struct ConnectivityObserverKey: EnvironmentKey {
+    static let defaultValue: ConnectivityObserver? = nil
+  }
 
-  /// Shared ConnectivityObserver instance used by all view models.
-  /// This ensures only ONE WatchConnectivitySession is created,
-  /// preventing conflicts with WCSession.default's single delegate.
-  #if os(iOS) || os(watchOS)
-    @State private var sharedConnectivityObserver = ConnectivityObserver(
-      messageDecoder: MessageDecoder(messagableTypes: [
-        Sundial_Demo_ColorMessage.self,
-        Sundial_Demo_ComplexMessage.self,
-      ])
-    )
-  #endif
-
-  var body: some Scene {
-    WindowGroup {
-      #if os(iOS) || os(watchOS)
-        StreamTabView()
-          .environment(\.connectivityObserver, sharedConnectivityObserver)
-      #else
-        StreamTabView()
-      #endif
+  @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
+  extension EnvironmentValues {
+    var connectivityObserver: ConnectivityObserver? {
+      get { self[ConnectivityObserverKey.self] }
+      set { self[ConnectivityObserverKey.self] = newValue }
     }
   }
-}
+#endif

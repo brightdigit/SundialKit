@@ -30,6 +30,16 @@
 import SundialDemoShared
 import SwiftUI
 
+extension View {
+  fileprivate static var segmentedIfAvailable: some PickerStyle {
+    #if !os(watchOS)
+      return .segmented
+    #else
+      return .automatic
+    #endif
+  }
+}
+
 /// Tab 3: Protocol Comparison (Combine variant)
 /// Compares binary protobuf encoding vs dictionary encoding.
 @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
@@ -64,7 +74,7 @@ struct ProtocolComparisonView: View {
           Text(type.rawValue).tag(type)
         }
       }
-      .pickerStyle(.segmented)
+      .pickerStyle(Self.segmentedIfAvailable)
 
       Button(action: {
         isRunning = true

@@ -28,13 +28,37 @@
 //
 
 import SundialDemoShared
+import SundialKitCombine
 import SwiftUI
+
+extension View {
+  fileprivate static var segmentedIfAvailable: some PickerStyle {
+    #if !os(watchOS)
+      return .segmented
+    #else
+      return .automatic
+    #endif
+  }
+}
 
 /// Tab 2: Latency Dashboard (Combine variant)
 /// Measures round-trip time (RTT) and displays latency metrics.
 @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
 struct LatencyDashboardView: View {
-  @State private var viewModel = CombineLatencyDashboardViewModel()
+  @EnvironmentObject private var sharedConnectivityObserver: ConnectivityObserver
+
+  var body: some View {
+    LatencyDashboardContentView(connectivityObserver: sharedConnectivityObserver)
+  }
+}
+
+@available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
+private struct LatencyDashboardContentView: View {
+  @StateObject private var viewModel: CombineLatencyDashboardViewModel
+
+  init(connectivityObserver: ConnectivityObserver) {
+    _viewModel = StateObject(wrappedValue: CombineLatencyDashboardViewModel(connectivityObserver: connectivityObserver))
+  }
 
   var body: some View {
     NavigationView {
@@ -65,7 +89,7 @@ struct LatencyDashboardView: View {
         Text("Medium (512B)").tag(Sundial_Demo_LatencyTestRequest.PayloadSize.medium)
         Text("Large (4KB)").tag(Sundial_Demo_LatencyTestRequest.PayloadSize.large)
       }
-      .pickerStyle(.segmented)
+      .pickerStyle(Self.segmentedIfAvailable)
 
       Button(action: {
         if viewModel.isRunning {

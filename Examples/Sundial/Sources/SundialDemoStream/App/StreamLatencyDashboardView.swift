@@ -45,18 +45,34 @@ extension View {
 /// Measures round-trip time (RTT) and displays latency metrics.
 @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
 struct StreamLatencyDashboardView: View {
-  @State private var viewModel = StreamLatencyDashboardViewModel()
+  @Environment(\.connectivityObserver) private var sharedObserver
+  @State private var viewModel: StreamLatencyDashboardViewModel?
 
   var body: some View {
+    Group {
+      if let viewModel {
+        contentView(viewModel: viewModel)
+      } else {
+        ProgressView("Initializing...")
+      }
+    }
+    .task {
+      if viewModel == nil {
+        viewModel = StreamLatencyDashboardViewModel(connectivityObserver: sharedObserver)
+      }
+    }
+  }
+
+  private func contentView(viewModel: StreamLatencyDashboardViewModel) -> some View {
     NavigationView {
       ScrollView {
         VStack(spacing: 24) {
-          controlSection
+          controlSection(viewModel: viewModel)
 
           if !viewModel.measurements.isEmpty {
-            metricsSection
-            breakdownSection
-            graphSection
+            metricsSection(viewModel: viewModel)
+            breakdownSection(viewModel: viewModel)
+            graphSection(viewModel: viewModel)
           } else {
             emptyState
           }
@@ -71,9 +87,12 @@ struct StreamLatencyDashboardView: View {
 
   
 
-  private var controlSection: some View {
+  private func controlSection(viewModel: StreamLatencyDashboardViewModel) -> some View {
     VStack(spacing: 16) {
-      Picker("Payload Size", selection: $viewModel.currentPayloadSize) {
+      Picker("Payload Size", selection: Binding(
+        get: { viewModel.currentPayloadSize },
+        set: { viewModel.currentPayloadSize = $0 }
+      )) {
         Text("Small (64B)").tag(Sundial_Demo_LatencyTestRequest.PayloadSize.small)
         Text("Medium (512B)").tag(Sundial_Demo_LatencyTestRequest.PayloadSize.medium)
         Text("Large (4KB)").tag(Sundial_Demo_LatencyTestRequest.PayloadSize.large)
@@ -100,7 +119,7 @@ struct StreamLatencyDashboardView: View {
     }
   }
 
-  private var metricsSection: some View {
+  private func metricsSection(viewModel: StreamLatencyDashboardViewModel) -> some View {
     VStack(alignment: .leading, spacing: 12) {
       Text("Live Metrics")
         .font(.headline)
@@ -141,7 +160,7 @@ struct StreamLatencyDashboardView: View {
     }
   }
 
-  private var breakdownSection: some View {
+  private func breakdownSection(viewModel: StreamLatencyDashboardViewModel) -> some View {
     VStack(alignment: .leading, spacing: 12) {
       Text("Time Breakdown")
         .font(.headline)
@@ -174,7 +193,7 @@ struct StreamLatencyDashboardView: View {
     }
   }
 
-  private var graphSection: some View {
+  private func graphSection(viewModel: StreamLatencyDashboardViewModel) -> some View {
     VStack(alignment: .leading, spacing: 12) {
       Text("Latency Graph")
         .font(.headline)

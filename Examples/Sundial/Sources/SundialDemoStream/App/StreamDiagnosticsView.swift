@@ -34,16 +34,32 @@ import SwiftUI
 /// Monitors connection health, message history, and error logs.
 @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
 struct StreamDiagnosticsView: View {
-  @State private var viewModel = StreamDiagnosticsViewModel()
+  @Environment(\.connectivityObserver) private var sharedObserver
+  @State private var viewModel: StreamDiagnosticsViewModel?
 
   var body: some View {
+    Group {
+      if let viewModel {
+        contentView(viewModel: viewModel)
+      } else {
+        ProgressView("Initializing...")
+      }
+    }
+    .task {
+      if viewModel == nil {
+        viewModel = StreamDiagnosticsViewModel(connectivityObserver: sharedObserver)
+      }
+    }
+  }
+
+  private func contentView(viewModel: StreamDiagnosticsViewModel) -> some View {
     NavigationView {
       ScrollView {
         VStack(spacing: 24) {
-          connectionStatusSection
-          statisticsSection
-          messageHistorySection
-          errorLogSection
+          connectionStatusSection(viewModel: viewModel)
+          statisticsSection(viewModel: viewModel)
+          messageHistorySection(viewModel: viewModel)
+          errorLogSection(viewModel: viewModel)
         }
         .padding()
       }
@@ -58,7 +74,7 @@ struct StreamDiagnosticsView: View {
 
   // MARK: - View Components
 
-  private var connectionStatusSection: some View {
+  private func connectionStatusSection(viewModel: StreamDiagnosticsViewModel) -> some View {
     VStack(alignment: .leading, spacing: 12) {
       Text("Connection Status")
         .font(.headline)
@@ -71,7 +87,7 @@ struct StreamDiagnosticsView: View {
     }
   }
 
-  private var statisticsSection: some View {
+  private func statisticsSection(viewModel: StreamDiagnosticsViewModel) -> some View {
     VStack(alignment: .leading, spacing: 12) {
       Text("Statistics")
         .font(.headline)
@@ -112,7 +128,7 @@ struct StreamDiagnosticsView: View {
     }
   }
 
-  private var messageHistorySection: some View {
+  private func messageHistorySection(viewModel: StreamDiagnosticsViewModel) -> some View {
     VStack(alignment: .leading, spacing: 12) {
       HStack {
         Text("Message History")
@@ -143,7 +159,7 @@ struct StreamDiagnosticsView: View {
     }
   }
 
-  private var errorLogSection: some View {
+  private func errorLogSection(viewModel: StreamDiagnosticsViewModel) -> some View {
     VStack(alignment: .leading, spacing: 12) {
       HStack {
         Text("Error Log")

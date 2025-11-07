@@ -43,23 +43,49 @@ import SwiftUI
 /// 4. Connection Status - Footer with reachability and session state
 @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
 struct StreamMessageLabView: View {
-  @State private var viewModel = StreamMessageLabViewModel()
+  @Environment(\.connectivityObserver) private var sharedObserver
+  @State private var viewModel: StreamMessageLabViewModel?
 
   var body: some View {
+    Group {
+      if let viewModel {
+        contentView(viewModel: viewModel)
+      } else {
+        ProgressView("Initializing...")
+      }
+    }
+    .task {
+      // Initialize view model with shared observer on first appearance
+      if viewModel == nil {
+        viewModel = StreamMessageLabViewModel(connectivityObserver: sharedObserver)
+      }
+    }
+  }
+
+  private func contentView(viewModel: StreamMessageLabViewModel) -> some View {
     NavigationView {
       ScrollView {
         LazyVStack(spacing: 24, pinnedViews: .sectionHeaders) {
           Section {
             // Section 1: Payload Builder
             PayloadBuilderView(
-              selectedColor: $viewModel.selectedColor,
-              complexityLevel: $viewModel.complexityLevel,
+              selectedColor: Binding(
+                get: { viewModel.selectedColor },
+                set: { viewModel.selectedColor = $0 }
+              ),
+              complexityLevel: Binding(
+                get: { viewModel.complexityLevel },
+                set: { viewModel.complexityLevel = $0 }
+              ),
               onRandomize: viewModel.randomizeColor
             )
 
             // Section 2: Transport Control
             TransportControlView(
-              selectedTransportMethod: $viewModel.selectedTransportMethod,
+              selectedTransportMethod: Binding(
+                get: { viewModel.selectedTransportMethod },
+                set: { viewModel.selectedTransportMethod = $0 }
+              ),
               effectiveTransportMethod: viewModel.effectiveTransportMethod,
               automaticTransportMethod: viewModel.automaticTransportMethod,
               isSending: viewModel.isSending,
@@ -80,7 +106,7 @@ struct StreamMessageLabView: View {
               ErrorSectionView(error: error)
             }
           } header: {
-            connectionStatusFooter
+            connectionStatusFooter(viewModel: viewModel)
           }
         }
         .padding()
@@ -91,7 +117,7 @@ struct StreamMessageLabView: View {
 
   // MARK: - Connection Status
 
-  private var connectionStatusFooter: some View {
+  private func connectionStatusFooter(viewModel: StreamMessageLabViewModel) -> some View {
     ConnectionStatusView(
       isReachable: viewModel.isReachable,
       activationState: String(describing: viewModel.activationState),
