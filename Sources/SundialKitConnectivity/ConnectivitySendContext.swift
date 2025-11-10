@@ -55,4 +55,15 @@ extension ConnectivitySendContext {
       self = .failure(error)
     }
   }
+
+  /// The transport mechanism used for this send operation, if applicable.
+  /// Returns `nil` for failure cases.
+  public var transport: MessageTransport? {
+    switch self {
+    case .applicationContext(let transport), .reply(_, let transport):
+      return transport
+    case .failure:
+      return nil
+    }
+  }
 }

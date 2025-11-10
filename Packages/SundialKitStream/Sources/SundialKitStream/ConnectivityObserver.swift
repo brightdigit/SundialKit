@@ -150,4 +150,24 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
       await stateManager.isPaired
     }
   #endif
+
+  /// Updates the application context with new data.
+  ///
+  /// Application context is for background delivery of state updates.
+  /// The system will deliver this data to the counterpart device when it's convenient.
+  ///
+  /// - Parameter context: The context dictionary to send
+  /// - Throws: Error if the context cannot be updated
+  ///
+  /// ## Example
+  /// ```swift
+  /// let context: [String: any Sendable] = [
+  ///   "appVersion": "1.0",
+  ///   "lastSync": Date().timeIntervalSince1970
+  /// ]
+  /// try await observer.updateApplicationContext(context)
+  /// ```
+  public func updateApplicationContext(_ context: ConnectivityMessage) throws {
+    try session.updateApplicationContext(context)
+  }
 }

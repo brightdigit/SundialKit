@@ -71,7 +71,20 @@ public protocol StateHandling {
 
 @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
 extension StateHandling {
-  /// Handles activation state changes and errors
+  /// Handles activation with full session state snapshot
+  /// - Parameters:
+  ///   - session: The connectivity session with current state
+  ///   - activationState: The new activation state
+  ///   - error: Optional error that occurred during activation
+  internal func handleActivation(
+    from session: any ConnectivitySession,
+    activationState: ActivationState,
+    error: Error?
+  ) async {
+    await stateManager.handleActivation(from: session, activationState: activationState, error: error)
+  }
+
+  /// Handles activation state changes and errors (legacy)
   /// - Parameters:
   ///   - activationState: The new activation state
   ///   - error: Optional error that occurred during activation

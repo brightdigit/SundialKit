@@ -34,7 +34,7 @@
 
   extension WatchConnectivitySession {
     internal func session(
-      _: WCSession,
+      _ wcSession: WCSession,
       activationDidCompleteWith activationState: WCSessionActivationState,
       error: Error?
     ) {
@@ -44,6 +44,11 @@
       else {
         preconditionFailure()
       }
+      #if DEBUG
+        print(
+          "🔔 WCSession activation complete - state: \(activationState), isReachable: \(wcSession.isReachable), isPairedAppInstalled: \(wcSession.isPairedAppInstalled)"
+        )
+      #endif
       delegate?.session(
         self,
         activationDidCompleteWith: activationState,
@@ -72,7 +77,11 @@
       }
     #endif
 
-    internal func sessionReachabilityDidChange(_: WCSession) {
+    internal func sessionReachabilityDidChange(_ session: WCSession) {
+      #if DEBUG
+        print(
+          "🔔 WCSession.sessionReachabilityDidChange fired - isReachable: \(session.isReachable)")
+      #endif
       delegate?.sessionReachabilityDidChange(self)
     }
 

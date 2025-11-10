@@ -78,6 +78,50 @@ public actor ConnectivityStateManager {
 
   // MARK: - State Updates
 
+  /// Handles activation with full session state snapshot
+  internal func handleActivation(
+    from session: any ConnectivitySession,
+    activationState: ActivationState,
+    error: (any Error)?
+  ) async {
+    // Capture all session properties at activation time for consistent snapshot
+    #if os(iOS)
+      state = ConnectivityState(
+        activationState: activationState,
+        activationError: error,
+        isReachable: session.isReachable,
+        isPairedAppInstalled: session.isPairedAppInstalled,
+        isPaired: session.isPaired
+      )
+    #else
+      state = ConnectivityState(
+        activationState: activationState,
+        activationError: error,
+        isReachable: session.isReachable,
+        isPairedAppInstalled: session.isPairedAppInstalled,
+        isPaired: false  // Always true on watchOS (implicit pairing)
+      )
+    #endif
+
+    // Notify subscribers
+    await continuationManager.yieldActivationState(activationState)
+
+    let result: Result<ActivationState, Error> =
+      if let error = error {
+        .failure(error)
+      } else {
+        .success(activationState)
+      }
+    await continuationManager.yieldActivationCompletion(result)
+    await continuationManager.yieldReachability(state.isReachable)
+    await continuationManager.yieldPairedAppInstalled(state.isPairedAppInstalled)
+
+    #if os(iOS)
+      await continuationManager.yieldPaired(state.isPaired)
+    #endif
+  }
+
+  /// Legacy method - preserved for backward compatibility
   internal func handleActivation(_ activationState: ActivationState, error: (any Error)?) async {
     #if os(iOS)
       state = ConnectivityState(

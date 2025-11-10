@@ -82,6 +82,18 @@ final class StreamMessageLabViewModel {
   /// Current activation state
   var activationState: ActivationState = .notActivated
 
+  /// Whether devices are paired (iOS only, always true on watchOS)
+  var isPaired: Bool = {
+    #if os(watchOS)
+      return true
+    #else
+      return false
+    #endif
+  }()
+
+  /// Whether companion app is installed
+  var isPairedAppInstalled: Bool = false
+
   // MARK: - Dependencies
 
   /// Actor-based connectivity observer
@@ -143,6 +155,37 @@ final class StreamMessageLabViewModel {
       do {
         try await connectivityObserver.activate()
         print("✅ ConnectivityObserver activated successfully")
+
+        // Check initial state immediately after activation
+        Task { @MainActor in
+          try? await Task.sleep(for: .milliseconds(500))
+          let reachable = await connectivityObserver.isReachable()
+          let activationState = await connectivityObserver.getCurrentActivationState()
+          let pairedAppInstalled = await connectivityObserver.isPairedAppInstalled()
+          #if os(iOS)
+            let paired = await connectivityObserver.isPaired()
+          #else
+            let paired = true
+          #endif
+
+          print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+          print("📊 INITIAL STATE (500ms after activation)")
+          print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+          if let activationState {
+            print("🔄 Activation State: \(activationState)")
+          } else {
+            print("🔄 Activation State: nil")
+          }
+          print("🔗 isPaired: \(paired)")
+          print("📱 isPairedAppInstalled: \(pairedAppInstalled)")
+          print("📡 isReachable: \(reachable)")
+          #if os(watchOS)
+            print("⌚ Watch app perspective")
+          #elseif os(iOS)
+            print("📱 iPhone app perspective")
+          #endif
+          print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        }
       } catch {
         lastError = "Failed to activate: \(error.localizedDescription)"
         print("❌ ConnectivityObserver activation failed: \(error)")
@@ -161,8 +204,20 @@ final class StreamMessageLabViewModel {
         }
 
         // Stream 3: Activation state
-        group.addTask { 
+        group.addTask {
           await self.consumeActivationState()
+        }
+
+        // Stream 4: Paired status (iOS only)
+        #if os(iOS)
+          group.addTask {
+            await self.consumePairedStatus()
+          }
+        #endif
+
+        // Stream 5: Paired app installed status
+        group.addTask {
+          await self.consumePairedAppInstalledStatus()
         }
       }
     }
@@ -189,6 +244,22 @@ final class StreamMessageLabViewModel {
     }
   }
 
+  #if os(iOS)
+    private func consumePairedStatus() async {
+      for await paired in await connectivityObserver.pairedUpdates() {
+        print("🔗 Paired status changed: \(paired)")
+        isPaired = paired
+      }
+    }
+  #endif
+
+  private func consumePairedAppInstalledStatus() async {
+    for await installed in await connectivityObserver.pairedAppInstalledUpdates() {
+      print("📱 Paired app installed status changed: \(installed)")
+      isPairedAppInstalled = installed
+    }
+  }
+
   // MARK: - Actions
 
   /// Send the currently selected color using effective transport method.
@@ -212,9 +283,36 @@ final class StreamMessageLabViewModel {
       let message = try buildMessage()
       print("📦 Message built successfully, type: \(type(of: message))")
 
+      // Capture live state immediately before send
+      let liveReachable = await connectivityObserver.isReachable()
+      let liveActivation = await connectivityObserver.getCurrentActivationState()
+      let livePairedAppInstalled = await connectivityObserver.isPairedAppInstalled()
+      #if os(iOS)
+        let livePaired = await connectivityObserver.isPaired()
+      #else
+        let livePaired = true
+      #endif
+
+      // Print diagnostic information immediately before send
+      print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+      print("📊 CONNECTIVITY STATE (LIVE)")
+      print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+      if let liveActivation {
+        print("🔄 Activation State: \(liveActivation)")
+      } else {
+        print("🔄 Activation State: not yet activated")
+      }
+      print("🔗 isPaired: \(livePaired)")
+      print("📱 isPairedAppInstalled: \(livePairedAppInstalled)")
+      print("📡 isReachable: \(liveReachable)")
+      print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
       print("🚀 Sending message...")
       let result = try await connectivityObserver.send(message)
       print("✅ Message sent successfully via: \(result.context)")
+      if let transport = result.context.transport {
+        print("📊 Actual transport used: \(transport)")
+      }
 
       // Update state
       lastSentColor = ColorWithMetadata(
