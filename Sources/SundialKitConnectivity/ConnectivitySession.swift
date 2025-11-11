@@ -43,6 +43,13 @@ public protocol ConnectivitySession: AnyObject, Sendable {
   var isPairedAppInstalled: Bool { get }
   var activationState: ActivationState { get }
 
+  /// The most recent application context received from the counterpart device.
+  ///
+  /// This property contains the latest context dictionary sent via `updateApplicationContext(_:)`,
+  /// even if it arrived while the app was inactive. Returns `nil` if no context has been received
+  /// or if the context dictionary is empty.
+  var receivedApplicationContext: ConnectivityMessage? { get }
+
   func activate() throws
   func updateApplicationContext(_ context: ConnectivityMessage) throws
   func sendMessage(

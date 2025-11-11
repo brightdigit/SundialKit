@@ -307,21 +307,43 @@ final class StreamMessageLabViewModel {
       print("📡 isReachable: \(liveReachable)")
       print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 
-      print("🚀 Sending message...")
-      let result = try await connectivityObserver.send(message)
-      print("✅ Message sent successfully via: \(result.context)")
-      if let transport = result.context.transport {
-        print("📊 Actual transport used: \(transport)")
-      }
+      print("🚀 Sending message via \(effectiveTransportMethod)...")
 
-      // Update state
-      lastSentColor = ColorWithMetadata(
-        color: selectedColor,
-        timestamp: Date(),
-        source: "This Device"
-      )
-      messagesSent += 1
-      print("✅ UI state updated - messagesSent: \(messagesSent)")
+      // Route to appropriate transport method
+      switch effectiveTransportMethod {
+      case .updateApplicationContext:
+        // Convert message to context and send via updateApplicationContext
+        print("📦 Converting message to application context...")
+        let context = message.message()
+        try await connectivityObserver.updateApplicationContext(context)
+        print("✅ Message sent successfully via updateApplicationContext")
+
+        // Update state
+        lastSentColor = ColorWithMetadata(
+          color: selectedColor,
+          timestamp: Date(),
+          source: "This Device"
+        )
+        messagesSent += 1
+        print("✅ UI state updated - messagesSent: \(messagesSent)")
+
+      case .sendMessage, .sendMessageData:
+        // Send via interactive message (requires reachability)
+        let result = try await connectivityObserver.send(message)
+        print("✅ Message sent successfully via: \(result.context)")
+        if let transport = result.context.transport {
+          print("📊 Actual transport used: \(transport)")
+        }
+
+        // Update state
+        lastSentColor = ColorWithMetadata(
+          color: selectedColor,
+          timestamp: Date(),
+          source: "This Device"
+        )
+        messagesSent += 1
+        print("✅ UI state updated - messagesSent: \(messagesSent)")
+      }
     } catch {
       lastError = error.localizedDescription
       print("❌ Send error: \(error)")

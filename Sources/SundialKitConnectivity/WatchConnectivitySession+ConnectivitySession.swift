@@ -61,6 +61,17 @@
       return state
     }
 
+    /// The most recent application context received from the counterpart device.
+    ///
+    /// This property contains the latest context dictionary sent via `updateApplicationContext(_:)`,
+    /// even if it arrived while the app was inactive. Returns `nil` if no context has been received
+    /// or if the context dictionary is empty.
+    public var receivedApplicationContext: ConnectivityMessage? {
+      let context = session.receivedApplicationContext
+      guard !context.isEmpty else { return nil }
+      return ConnectivityMessage(forceCasting: context)
+    }
+
     /// Updates the application context to be sent to the counterpart device.
     ///
     /// The context is delivered opportunistically when the counterpart wakes up.

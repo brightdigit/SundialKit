@@ -43,6 +43,12 @@ extension StateHandling where Self: MessageHandling & Sendable {
     // Capture full session state snapshot at activation
     Task {
       await handleActivation(from: session, activationState: state, error: error)
+
+      // Check for pending application context that arrived while inactive
+      // This handles the case where updateApplicationContext was sent while the watch was unreachable
+      if error == nil, state == .activated, let pendingContext = session.receivedApplicationContext {
+        await handleApplicationContext(pendingContext, error: nil)
+      }
     }
   }
 
@@ -62,7 +68,15 @@ extension StateHandling where Self: MessageHandling & Sendable {
 
   /// Handles reachability changes.
   nonisolated public func sessionReachabilityDidChange(_ session: any ConnectivitySession) {
-    Task { await handleReachabilityChange(session.isReachable) }
+    Task {
+      await handleReachabilityChange(session.isReachable)
+
+      // Check for pending application context when becoming reachable
+      // This handles the case where updateApplicationContext was sent while unreachable
+      if session.isReachable, let pendingContext = session.receivedApplicationContext {
+        await handleApplicationContext(pendingContext, error: nil)
+      }
+    }
   }
 
   /// Handles companion device state changes.
