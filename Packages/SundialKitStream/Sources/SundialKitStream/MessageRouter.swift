@@ -82,8 +82,16 @@ internal struct MessageRouter {
         throw error
       }
     } else {
-      // No way to deliver the message
-      throw SundialError.missingCompanion
+      // No way to deliver the message - determine specific reason
+      // Check if devices are paired at all
+      if !session.isPaired {
+        print("❌ MessageRouter: Cannot send - devices not paired (isPaired=\(session.isPaired))")
+        throw ConnectivityError.deviceNotPaired
+      } else {
+        // Devices are paired but app not installed
+        print("❌ MessageRouter: Cannot send - companion app not installed (isPaired=\(session.isPaired), isPairedAppInstalled=\(session.isPairedAppInstalled))")
+        throw ConnectivityError.companionAppNotInstalled
+      }
     }
   }
 
@@ -104,7 +112,8 @@ internal struct MessageRouter {
   ) async throws -> ConnectivitySendResult {
     guard session.isReachable else {
       // Binary messages require reachability - can't use application context
-      throw SundialError.missingCompanion
+      print("❌ MessageRouter: Cannot send binary - not reachable (isReachable=\(session.isReachable), isPaired=\(session.isPaired), isPairedAppInstalled=\(session.isPairedAppInstalled))")
+      throw ConnectivityError.notReachable
     }
 
     return try await withCheckedThrowingContinuation { continuation in

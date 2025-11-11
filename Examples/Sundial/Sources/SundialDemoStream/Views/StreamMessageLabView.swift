@@ -121,7 +121,9 @@ struct StreamMessageLabView: View {
     ConnectionStatusView(
       isReachable: viewModel.isReachable,
       activationState: String(describing: viewModel.activationState),
-      lastUpdate: Date()
+      lastUpdate: Date(),
+      isPaired: viewModel.isPaired,
+      isPairedAppInstalled: viewModel.isPairedAppInstalled
     )
   }
 }

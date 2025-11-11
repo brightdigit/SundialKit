@@ -66,6 +66,11 @@ public final class NeverConnectivitySession: NSObject, ConnectivitySession, Send
     .notActivated
   }
 
+  /// The most recent application context (always nil).
+  public var receivedApplicationContext: ConnectivityMessage? {
+    nil
+  }
+
   /// Attempts to activate the session (always throws).
   ///
   /// - Throws: `SundialError.sessionNotSupported`

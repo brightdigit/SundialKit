@@ -30,6 +30,12 @@
 public import Foundation
 public import SundialKitConnectivity
 public import SundialKitCore
+#if canImport(UIKit)
+  import UIKit
+#endif
+#if canImport(AppKit)
+  import AppKit
+#endif
 
 /// Actor-based WatchConnectivity observer providing AsyncStream APIs
 ///
@@ -77,6 +83,7 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
   internal let continuationManager: StreamContinuationManager
   public let stateManager: ConnectivityStateManager
   public let messageDistributor: MessageDistributor
+  private nonisolated(unsafe) var appLifecycleTask: Task<Void, Never>?
 
   // MARK: - Initialization
 
@@ -90,6 +97,13 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
       messageDecoder: messageDecoder
     )
     session.delegate = self
+
+    // Set up automatic checking for pending application context when app becomes active
+    self.setupAppLifecycleObserver()
+  }
+
+  deinit {
+    appLifecycleTask?.cancel()
   }
 
   #if canImport(WatchConnectivity)
@@ -116,6 +130,21 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
   /// - Throws: `ConnectivityError.sessionNotSupported` if not supported
   public func activate() throws {
     try session.activate()
+  }
+
+  /// Checks for pending application context that may have arrived while the app was inactive.
+  ///
+  /// This method is provided for manual checking, but is **automatically called** in the
+  /// following scenarios:
+  /// - After successful session activation
+  /// - When the session becomes reachable
+  /// - When the app returns to the foreground (via app lifecycle notifications)
+  ///
+  /// Most apps will not need to call this method directly.
+  public func checkPendingApplicationContext() async {
+    if let pendingContext = session.receivedApplicationContext {
+      await handleApplicationContext(pendingContext, error: nil)
+    }
   }
 
   /// Gets the current activation state snapshot
@@ -150,4 +179,57 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
       await stateManager.isPaired
     }
   #endif
+
+  /// Updates the application context with new data.
+  ///
+  /// Application context is for background delivery of state updates.
+  /// The system will deliver this data to the counterpart device when it's convenient.
+  ///
+  /// - Parameter context: The context dictionary to send
+  /// - Throws: Error if the context cannot be updated
+  ///
+  /// ## Example
+  /// ```swift
+  /// let context: [String: any Sendable] = [
+  ///   "appVersion": "1.0",
+  ///   "lastSync": Date().timeIntervalSince1970
+  /// ]
+  /// try await observer.updateApplicationContext(context)
+  /// ```
+  public func updateApplicationContext(_ context: ConnectivityMessage) throws {
+    try session.updateApplicationContext(context)
+  }
+
+  // MARK: - Private Helpers
+
+  /// Sets up automatic observation of app lifecycle to check for pending application context.
+  ///
+  /// When the app becomes active, this automatically checks if there's a pending
+  /// application context that arrived while the app was backgrounded.
+  private nonisolated func setupAppLifecycleObserver() {
+    appLifecycleTask = Task { [weak session] in
+      #if canImport(UIKit) && !os(watchOS)
+        // iOS/tvOS
+        let notificationName = UIApplication.didBecomeActiveNotification
+      #elseif os(watchOS)
+        // watchOS - use extension-specific notification
+        let notificationName = Notification.Name("NSExtensionHostDidBecomeActiveNotification")
+      #elseif canImport(AppKit)
+        // macOS
+        let notificationName = NSApplication.didBecomeActiveNotification
+      #else
+        // Unsupported platform - return early
+        return
+      #endif
+
+      let notifications = NotificationCenter.default.notifications(named: notificationName)
+
+      for await _ in notifications {
+        // Check for pending application context when app becomes active
+        if let session = session, let pendingContext = session.receivedApplicationContext {
+          await self.handleApplicationContext(pendingContext, error: nil)
+        }
+      }
+    }
+  }
 }

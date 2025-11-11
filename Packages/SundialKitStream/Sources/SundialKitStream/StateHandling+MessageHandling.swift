@@ -55,7 +55,15 @@ extension StateHandling where Self: MessageHandling & Sendable {
 
   /// Handles reachability changes.
   nonisolated public func sessionReachabilityDidChange(_ session: any ConnectivitySession) {
-    Task { await handleReachabilityChange(session.isReachable) }
+    Task {
+      await handleReachabilityChange(session.isReachable)
+
+      // Check for pending application context when becoming reachable
+      // This handles the case where updateApplicationContext was sent while unreachable
+      if session.isReachable, let pendingContext = session.receivedApplicationContext {
+        await handleApplicationContext(pendingContext, error: nil)
+      }
+    }
   }
 
   /// Handles companion device state changes.
