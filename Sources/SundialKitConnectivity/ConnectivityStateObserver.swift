@@ -37,7 +37,8 @@
   /// WatchConnectivity session state, reachability, and companion status.
   ///
   /// Observers must be Sendable (actors, @MainActor classes, or value types).
-  /// All delegate methods are nonisolated and called on the main queue.
+  /// All delegate methods are nonisolated. Observers are responsible for thread
+  /// management - use @MainActor on your observer class/actor for UI-related work.
   @available(macOS, unavailable)
   @available(tvOS, unavailable)
   public protocol ConnectivityStateObserver: Sendable {

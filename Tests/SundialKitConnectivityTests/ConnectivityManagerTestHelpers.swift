@@ -31,6 +31,8 @@
 
     while Date() < deadline {
       attempts += 1
+      // Yield to allow pending tasks to execute before checking condition
+      await Task.yield()
       if await condition() {
         let elapsed = Date().timeIntervalSince(startTime)
         if elapsed > 1.0 {
