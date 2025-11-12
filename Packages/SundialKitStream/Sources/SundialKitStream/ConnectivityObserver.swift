@@ -83,7 +83,7 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
   internal let continuationManager: StreamContinuationManager
   public let stateManager: ConnectivityStateManager
   public let messageDistributor: MessageDistributor
-  private nonisolated(unsafe) var appLifecycleTask: Task<Void, Never>?
+  private var appLifecycleTask: Task<Void, Never>?
 
   // MARK: - Initialization
 
@@ -97,9 +97,6 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
       messageDecoder: messageDecoder
     )
     session.delegate = self
-
-    // Set up automatic checking for pending application context when app becomes active
-    self.setupAppLifecycleObserver()
   }
 
   deinit {
@@ -130,6 +127,7 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
   /// - Throws: `ConnectivityError.sessionNotSupported` if not supported
   public func activate() throws {
     try session.activate()
+    setupAppLifecycleObserver()
   }
 
   /// Checks for pending application context that may have arrived while the app was inactive.
@@ -206,8 +204,20 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
   ///
   /// When the app becomes active, this automatically checks if there's a pending
   /// application context that arrived while the app was backgrounded.
-  private nonisolated func setupAppLifecycleObserver() {
-    appLifecycleTask = Task { [weak session] in
+  ///
+  /// This handles the edge case where:
+  /// 1. Session is already activated and reachable
+  /// 2. updateApplicationContext arrives while app is backgrounded
+  /// 3. App returns to foreground
+  /// In this scenario, no activation or reachability events fire, so this is the only
+  /// mechanism that will detect and process the pending context.
+  private func setupAppLifecycleObserver() {
+    // Guard against multiple calls
+    guard appLifecycleTask == nil else { return }
+
+    appLifecycleTask = Task { [weak self] in
+      guard let self else { return }
+
       #if canImport(UIKit) && !os(watchOS)
         // iOS/tvOS
         let notificationName = UIApplication.didBecomeActiveNotification
@@ -226,7 +236,7 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
 
       for await _ in notifications {
         // Check for pending application context when app becomes active
-        if let session = session, let pendingContext = session.receivedApplicationContext {
+        if let pendingContext = self.session.receivedApplicationContext {
           await self.handleApplicationContext(pendingContext, error: nil)
         }
       }
