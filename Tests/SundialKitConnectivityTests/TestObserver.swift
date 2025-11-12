@@ -30,7 +30,7 @@
       didChangeActivationState activationState: ActivationState
     ) {
       Task {
-        await setLastActivationState(activationState)
+        await self.setLastActivationState(activationState)
       }
     }
 
@@ -39,7 +39,7 @@
       didChangeReachability isReachable: Bool
     ) {
       Task {
-        await setLastReachability(isReachable)
+        await self.setLastReachability(isReachable)
       }
     }
 
@@ -48,7 +48,7 @@
       didChangeCompanionAppInstalled isInstalled: Bool
     ) {
       Task {
-        await setLastCompanionAppInstalled(isInstalled)
+        await self.setLastCompanionAppInstalled(isInstalled)
       }
     }
 
@@ -58,7 +58,7 @@
         didChangePairedStatus isPaired: Bool
       ) {
         Task {
-          await setLastPairedStatus(isPaired)
+          await self.setLastPairedStatus(isPaired)
         }
       }
     #endif
@@ -68,7 +68,7 @@
       didReceiveMessage message: ConnectivityMessage
     ) {
       Task {
-        await setLastMessage(message)
+        await self.setLastMessage(message)
       }
     }
 
@@ -77,7 +77,7 @@
       didReceiveApplicationContext context: ConnectivityMessage
     ) {
       Task {
-        await setLastContext(context)
+        await self.setLastContext(context)
       }
     }
 
