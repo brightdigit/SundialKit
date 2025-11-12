@@ -84,6 +84,12 @@ public actor ConnectivityStateManager {
     activationState: ActivationState,
     error: (any Error)?
   ) async {
+    // Validate state consistency: activated state should not have an error
+    assert(
+      !(error != nil && activationState == .activated),
+      "Invalid state: activation cannot be .activated with an error present"
+    )
+
     // Capture all session properties at activation time for consistent snapshot
     #if os(iOS)
       state = ConnectivityState(
@@ -123,6 +129,12 @@ public actor ConnectivityStateManager {
 
   /// Legacy method - preserved for backward compatibility
   internal func handleActivation(_ activationState: ActivationState, error: (any Error)?) async {
+    // Validate state consistency: activated state should not have an error
+    assert(
+      !(error != nil && activationState == .activated),
+      "Invalid state: activation cannot be .activated with an error present"
+    )
+
     #if os(iOS)
       state = ConnectivityState(
         activationState: activationState,
@@ -160,6 +172,12 @@ public actor ConnectivityStateManager {
   }
 
   internal func updateReachability(_ isReachable: Bool) async {
+    // Verify session has been activated before updating reachability
+    assert(
+      state.activationState != nil,
+      "Cannot update reachability before session activation"
+    )
+
     #if os(iOS)
       state = ConnectivityState(
         activationState: state.activationState,

@@ -28,6 +28,7 @@
 //
 
 public import Foundation
+import os
 public import SundialKitConnectivity
 public import SundialKitCore
 
@@ -68,9 +69,10 @@ public actor MessageDistributor {
         let decoded = try decoder.decode(message)
         await continuationManager.yieldTypedMessage(decoded)
       } catch {
-        // Decoding failed - log but don't crash (raw stream still gets the message)
+        // Decoding failed - crash in debug, log in production
+        assertionFailure("Failed to decode message: \(error)")
         #warning("Error silently swallowed - replace print() with proper logging (OSLog/Logger)")
-        print("Failed to decode message: \(error)")
+        os_log(.error, "Failed to decode message: %{public}@", String(describing: error))
       }
     }
   }
@@ -92,9 +94,10 @@ public actor MessageDistributor {
         let decoded = try decoder.decode(applicationContext)
         await continuationManager.yieldTypedMessage(decoded)
       } catch {
-        // Decoding failed - log but don't crash (raw stream still gets the message)
+        // Decoding failed - crash in debug, log in production
+        assertionFailure("Failed to decode application context: \(error)")
         #warning("Error silently swallowed - replace print() with proper logging (OSLog/Logger)")
-        print("Failed to decode application context: \(error)")
+        os_log(.error, "Failed to decode application context: %{public}@", String(describing: error))
       }
     }
   }
@@ -109,9 +112,10 @@ public actor MessageDistributor {
         let decoded = try decoder.decodeBinary(data)
         await continuationManager.yieldTypedMessage(decoded)
       } catch {
-        // Decoding failed - log the error
+        // Decoding failed - crash in debug, log in production
+        assertionFailure("Failed to decode binary message: \(error)")
         #warning("Error silently swallowed - replace print() with proper logging (OSLog/Logger)")
-        print("Failed to decode binary message: \(error)")
+        os_log(.error, "Failed to decode binary message: %{public}@", String(describing: error))
       }
     }
   }

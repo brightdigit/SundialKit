@@ -96,6 +96,12 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
       continuationManager: continuationManager,
       messageDecoder: messageDecoder
     )
+
+    // Ensure session doesn't already have a delegate
+    assert(
+      session.delegate == nil,
+      "Session already has a delegate - multiple delegates will cause undefined behavior"
+    )
     session.delegate = self
   }
 
