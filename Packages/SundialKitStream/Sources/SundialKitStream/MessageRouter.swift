@@ -89,7 +89,9 @@ internal struct MessageRouter {
         throw ConnectivityError.deviceNotPaired
       } else {
         // Devices are paired but app not installed
-        print("❌ MessageRouter: Cannot send - companion app not installed (isPaired=\(session.isPaired), isPairedAppInstalled=\(session.isPairedAppInstalled))")
+        print(
+          "❌ MessageRouter: Cannot send - companion app not installed (isPaired=\(session.isPaired), isPairedAppInstalled=\(session.isPairedAppInstalled))"
+        )
         throw ConnectivityError.companionAppNotInstalled
       }
     }
@@ -112,7 +114,9 @@ internal struct MessageRouter {
   ) async throws -> ConnectivitySendResult {
     guard session.isReachable else {
       // Binary messages require reachability - can't use application context
-      print("❌ MessageRouter: Cannot send binary - not reachable (isReachable=\(session.isReachable), isPaired=\(session.isPaired), isPairedAppInstalled=\(session.isPairedAppInstalled))")
+      print(
+        "❌ MessageRouter: Cannot send binary - not reachable (isReachable=\(session.isReachable), isPaired=\(session.isPaired), isPairedAppInstalled=\(session.isPairedAppInstalled))"
+      )
       throw ConnectivityError.notReachable
     }
 

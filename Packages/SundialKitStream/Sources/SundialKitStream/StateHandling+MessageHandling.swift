@@ -46,7 +46,8 @@ extension StateHandling where Self: MessageHandling & Sendable {
 
       // Check for pending application context that arrived while inactive
       // This handles the case where updateApplicationContext was sent while the watch was unreachable
-      if error == nil, state == .activated, let pendingContext = session.receivedApplicationContext {
+      if error == nil, state == .activated, let pendingContext = session.receivedApplicationContext
+      {
         await handleApplicationContext(pendingContext, error: nil)
       }
     }

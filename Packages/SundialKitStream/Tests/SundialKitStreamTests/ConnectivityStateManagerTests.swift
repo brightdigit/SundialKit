@@ -421,7 +421,8 @@ internal struct ConnectivityStateManagerTests {
 
     let reachabilityStream = AsyncStream<Bool> { continuation in
       Task {
-        await continuationManager.registerReachability(id: reachabilityId, continuation: continuation)
+        await continuationManager.registerReachability(
+          id: reachabilityId, continuation: continuation)
       }
     }
 
@@ -484,7 +485,8 @@ internal struct ConnectivityStateManagerTests {
 
     let reachabilityStream = AsyncStream<Bool> { continuation in
       Task {
-        await continuationManager.registerReachability(id: reachabilityId, continuation: continuation)
+        await continuationManager.registerReachability(
+          id: reachabilityId, continuation: continuation)
       }
     }
 

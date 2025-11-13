@@ -97,7 +97,8 @@ public actor MessageDistributor {
         // Decoding failed - crash in debug, log in production
         assertionFailure("Failed to decode application context: \(error)")
         #warning("Error silently swallowed - replace print() with proper logging (OSLog/Logger)")
-        os_log(.error, "Failed to decode application context: %{public}@", String(describing: error))
+        os_log(
+          .error, "Failed to decode application context: %{public}@", String(describing: error))
       }
     }
   }

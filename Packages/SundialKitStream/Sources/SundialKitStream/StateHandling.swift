@@ -81,7 +81,8 @@ extension StateHandling {
     activationState: ActivationState,
     error: Error?
   ) async {
-    await stateManager.handleActivation(from: session, activationState: activationState, error: error)
+    await stateManager.handleActivation(
+      from: session, activationState: activationState, error: error)
   }
 
   /// Handles activation state changes and errors (legacy)

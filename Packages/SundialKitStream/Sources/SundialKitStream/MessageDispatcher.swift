@@ -75,7 +75,7 @@ internal struct MessageDispatcher {
   ) {
     // Verify decoder exists if typed subscribers are registered
     assert(
-      messageDecoder != nil || typedRegistry.count == 0,
+      messageDecoder != nil || typedRegistry.isEmpty,
       "Typed message subscribers exist but no decoder is configured"
     )
 
@@ -123,7 +123,8 @@ internal struct MessageDispatcher {
         // Decoding failed - crash in debug, log in production
         assertionFailure("Failed to decode application context: \(error)")
         #warning("Error silently swallowed - replace print() with proper logging (OSLog/Logger)")
-        os_log(.error, "Failed to decode application context: %{public}@", String(describing: error))
+        os_log(
+          .error, "Failed to decode application context: %{public}@", String(describing: error))
       }
     }
   }
