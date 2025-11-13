@@ -146,6 +146,13 @@ jobs:
         id: keychain
         run: echo "password=$(openssl rand -base64 32)" >> $GITHUB_OUTPUT
 
+      - name: Generate Local.xcconfig for CI
+        run: |
+          cd ${{ env.DEMO_PATH }}
+          ./Scripts/generate-local-xcconfig.sh
+        env:
+          DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
+
       - name: Archive both apps (test code signing)
         run: |
           cd ${{ env.DEMO_PATH }}
