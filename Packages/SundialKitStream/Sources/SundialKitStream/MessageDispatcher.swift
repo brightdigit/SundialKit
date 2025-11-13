@@ -28,7 +28,7 @@
 //
 
 import Foundation
-import os
+import os.log
 import SundialKitConnectivity
 import SundialKitCore
 
@@ -91,8 +91,9 @@ internal struct MessageDispatcher {
       } catch {
         // Decoding failed - crash in debug, log in production
         assertionFailure("Failed to decode message: \(error)")
-        #warning("Error silently swallowed - replace print() with proper logging (OSLog/Logger)")
-        os_log(.error, "Failed to decode message: %{public}@", String(describing: error))
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          SundialLogger.stream.error("Failed to decode message: \(String(describing: error))")
+        }
       }
     }
   }
@@ -122,9 +123,11 @@ internal struct MessageDispatcher {
       } catch {
         // Decoding failed - crash in debug, log in production
         assertionFailure("Failed to decode application context: \(error)")
-        #warning("Error silently swallowed - replace print() with proper logging (OSLog/Logger)")
-        os_log(
-          .error, "Failed to decode application context: %{public}@", String(describing: error))
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          SundialLogger.stream.error(
+            "Failed to decode application context: \(String(describing: error))"
+          )
+        }
       }
     }
   }
@@ -151,8 +154,11 @@ internal struct MessageDispatcher {
       } catch {
         // Decoding failed - crash in debug, log in production
         assertionFailure("Failed to decode binary message: \(error)")
-        #warning("Error silently swallowed - replace print() with proper logging (OSLog/Logger)")
-        os_log(.error, "Failed to decode binary message: %{public}@", String(describing: error))
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          SundialLogger.stream.error(
+            "Failed to decode binary message: \(String(describing: error))"
+          )
+        }
       }
     }
   }

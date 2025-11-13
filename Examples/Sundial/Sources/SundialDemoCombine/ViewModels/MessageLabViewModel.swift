@@ -29,6 +29,7 @@
 
 import Combine
 import Foundation
+import os.log
 import SundialDemoShared
 import SundialKitCombine
 import SundialKitConnectivity
@@ -123,10 +124,14 @@ final class MessageLabViewModel: ObservableObject {
       // Activate connectivity session (synchronous on @MainActor)
       do {
         try connectivityObserver.activate()
-        print("✅ ConnectivityObserver activated successfully")
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          DemoLogger.shared.info("ConnectivityObserver activated successfully")
+        }
       } catch {
         lastError = "Failed to activate: \(error.localizedDescription)"
-        print("❌ ConnectivityObserver activation failed: \(error)")
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          DemoLogger.shared.error("ConnectivityObserver activation failed: \(error)")
+        }
       }
 
       setupSubscriptions()
@@ -142,10 +147,14 @@ final class MessageLabViewModel: ObservableObject {
       // Activate connectivity session (synchronous on @MainActor)
       do {
         try connectivityObserver.activate()
-        print("✅ ConnectivityObserver activated successfully")
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          DemoLogger.shared.info("ConnectivityObserver activated successfully")
+        }
       } catch {
         lastError = "Failed to activate: \(error.localizedDescription)"
-        print("❌ ConnectivityObserver activation failed: \(error)")
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          DemoLogger.shared.error("ConnectivityObserver activation failed: \(error)")
+        }
       }
 
       setupSubscriptions()
@@ -158,7 +167,9 @@ final class MessageLabViewModel: ObservableObject {
     // Subscribe to typed binary messages (decoded protobuf messages)
     connectivityObserver.typedMessageReceived
       .sink { [weak self] message in
-        print("📨 Received typed message: \(type(of: message))")
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          DemoLogger.shared.debug("Received typed message: \(type(of: message))")
+        }
         self?.handleReceivedTypedMessage(message)
       }
       .store(in: &cancellables)
@@ -166,16 +177,20 @@ final class MessageLabViewModel: ObservableObject {
     // Subscribe to reachability changes
     connectivityObserver.$isReachable
       .sink { [weak self] isReachable in
-        print("📡 Reachability changed: \(isReachable)")
-        print("📡 isPairedAppInstalled: \(self?.connectivityObserver.isPairedAppInstalled ?? false)")
-        print("📡 activationState: \(String(describing: self?.connectivityObserver.activationState))")
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          DemoLogger.shared.info("Reachability changed: \(isReachable)")
+          DemoLogger.shared.debug("isPairedAppInstalled: \(self?.connectivityObserver.isPairedAppInstalled ?? false)")
+          DemoLogger.shared.debug("activationState: \(String(describing: self?.connectivityObserver.activationState))")
+        }
       }
       .store(in: &cancellables)
 
     // Subscribe to activation state changes
     connectivityObserver.$activationState
       .sink { state in
-        print("🔄 Activation state changed: \(state)")
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          DemoLogger.shared.info("Activation state changed: \(state)")
+        }
       }
       .store(in: &cancellables)
   }
@@ -185,27 +200,41 @@ final class MessageLabViewModel: ObservableObject {
   /// Send the currently selected color using effective transport method.
   func sendColor() async {
     guard !isSending else {
-      print("⚠️ Already sending, skipping")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.debug("Already sending, skipping")
+      }
       return
     }
 
-    print("📤 Starting send operation...")
+    if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+      DemoLogger.shared.debug("Starting send operation...")
+    }
     isSending = true
     defer {
       isSending = false
-      print("✅ Send operation complete, isSending reset to false")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.debug("Send operation complete, isSending reset to false")
+      }
     }
 
     lastError = nil
 
     do {
-      print("🎨 Building message for color: \(selectedColor)")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.debug("Building message for color: \(selectedColor)")
+      }
       let message = try buildMessage()
-      print("📦 Message built successfully, type: \(type(of: message))")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.debug("Message built successfully, type: \(type(of: message))")
+      }
 
-      print("🚀 Sending message...")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.debug("Sending message...")
+      }
       let result = try await connectivityObserver.send(message)
-      print("✅ Message sent successfully via: \(result.context)")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.info("Message sent successfully via: \(result.context)")
+      }
 
       // Update state
       lastSentColor = ColorWithMetadata(
@@ -214,11 +243,15 @@ final class MessageLabViewModel: ObservableObject {
         source: "This Device"
       )
       messagesSent += 1
-      print("✅ UI state updated - messagesSent: \(messagesSent)")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.debug("UI state updated - messagesSent: \(messagesSent)")
+      }
     } catch {
       lastError = error.localizedDescription
-      print("❌ Send error: \(error)")
-      print("❌ Error description: \(error.localizedDescription)")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.error("Send error: \(error)")
+        DemoLogger.shared.error("Error description: \(error.localizedDescription)")
+      }
     }
   }
 
@@ -313,7 +346,9 @@ final class MessageLabViewModel: ObservableObject {
   }
 
   private func handleReceivedTypedMessage(_ message: any Messagable) {
-    print("Received typed message: \(type(of: message))")
+    if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+      DemoLogger.shared.debug("Received typed message: \(type(of: message))")
+    }
 
     // Extract color from the message based on its type
     let colorComponents: (red: Double, green: Double, blue: Double, alpha: Double)?
@@ -334,7 +369,9 @@ final class MessageLabViewModel: ObservableObject {
         alpha: Double(color.alpha)
       )
     } else {
-      print("Unknown message type: \(type(of: message))")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.debug("Unknown message type: \(type(of: message))")
+      }
       colorComponents = nil
     }
 
@@ -351,7 +388,9 @@ final class MessageLabViewModel: ObservableObject {
         source: "Counterpart Device"
       )
       messagesReceived += 1
-      print("Updated received color: \(components)")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.debug("Updated received color: \(components)")
+      }
     }
   }
 }

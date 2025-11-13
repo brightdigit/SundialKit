@@ -28,6 +28,7 @@
 //
 
 import Foundation
+import os.log
 import SundialKitConnectivity
 import SundialKitCore
 
@@ -85,13 +86,19 @@ internal struct MessageRouter {
       // No way to deliver the message - determine specific reason
       // Check if devices are paired at all
       if !session.isPaired {
-        print("❌ MessageRouter: Cannot send - devices not paired (isPaired=\(session.isPaired))")
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          SundialLogger.stream.error(
+            "MessageRouter: Cannot send - devices not paired (isPaired=\(session.isPaired))"
+          )
+        }
         throw ConnectivityError.deviceNotPaired
       } else {
         // Devices are paired but app not installed
-        print(
-          "❌ MessageRouter: Cannot send - companion app not installed (isPaired=\(session.isPaired), isPairedAppInstalled=\(session.isPairedAppInstalled))"
-        )
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          SundialLogger.stream.error(
+            "MessageRouter: Cannot send - companion app not installed (isPaired=\(session.isPaired), isPairedAppInstalled=\(session.isPairedAppInstalled))"
+          )
+        }
         throw ConnectivityError.companionAppNotInstalled
       }
     }
@@ -114,9 +121,11 @@ internal struct MessageRouter {
   ) async throws -> ConnectivitySendResult {
     guard session.isReachable else {
       // Binary messages require reachability - can't use application context
-      print(
-        "❌ MessageRouter: Cannot send binary - not reachable (isReachable=\(session.isReachable), isPaired=\(session.isPaired), isPairedAppInstalled=\(session.isPairedAppInstalled))"
-      )
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        SundialLogger.stream.error(
+          "MessageRouter: Cannot send binary - not reachable (isReachable=\(session.isReachable), isPaired=\(session.isPaired), isPairedAppInstalled=\(session.isPairedAppInstalled))"
+        )
+      }
       throw ConnectivityError.notReachable
     }
 
