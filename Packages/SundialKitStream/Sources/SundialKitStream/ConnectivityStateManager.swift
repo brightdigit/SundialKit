@@ -112,7 +112,7 @@ public actor ConnectivityStateManager {
     // Notify subscribers
     await continuationManager.yieldActivationState(activationState)
 
-    let result: Result<ActivationState, Error> =
+    let result: Result<ActivationState, any Error> =
       if let error = error {
         .failure(error)
       } else {
@@ -156,7 +156,7 @@ public actor ConnectivityStateManager {
     // Notify subscribers
     await continuationManager.yieldActivationState(activationState)
 
-    let result: Result<ActivationState, Error> =
+    let result: Result<ActivationState, any Error> =
       if let error = error {
         .failure(error)
       } else {

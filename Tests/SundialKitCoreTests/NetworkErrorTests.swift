@@ -258,13 +258,13 @@ struct NetworkErrorTests {
       #expect(error.recoverySuggestion != nil, "Missing recoverySuggestion for \(error)")
 
       #expect(
-        error.errorDescription != nil && !error.errorDescription!.isEmpty,
+        error.errorDescription?.isEmpty == false,
         "Empty errorDescription for \(error)")
       #expect(
-        error.failureReason != nil && !error.failureReason!.isEmpty,
+        error.failureReason?.isEmpty == false,
         "Empty failureReason for \(error)")
       #expect(
-        error.recoverySuggestion != nil && !error.recoverySuggestion!.isEmpty,
+        error.recoverySuggestion?.isEmpty == false,
         "Empty recoverySuggestion for \(error)")
     }
   }

@@ -38,7 +38,7 @@ extension StateHandling where Self: MessageHandling & Sendable {
   nonisolated public func session(
     _ session: any ConnectivitySession,
     activationDidCompleteWith state: ActivationState,
-    error: Error?
+    error: (any Error)?
   ) {
     // Capture full session state snapshot at activation
     Task {
@@ -100,7 +100,7 @@ extension StateHandling where Self: MessageHandling & Sendable {
   nonisolated public func session(
     _: any ConnectivitySession,
     didReceiveApplicationContext applicationContext: ConnectivityMessage,
-    error: Error?
+    error: (any Error)?
   ) {
     Task {
       await handleApplicationContext(applicationContext, error: error)

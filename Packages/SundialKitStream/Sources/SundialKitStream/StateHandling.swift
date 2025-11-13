@@ -79,7 +79,7 @@ extension StateHandling {
   internal func handleActivation(
     from session: any ConnectivitySession,
     activationState: ActivationState,
-    error: Error?
+    error: (any Error)?
   ) async {
     await stateManager.handleActivation(
       from: session, activationState: activationState, error: error)
@@ -89,7 +89,7 @@ extension StateHandling {
   /// - Parameters:
   ///   - activationState: The new activation state
   ///   - error: Optional error that occurred during activation
-  internal func handleActivation(_ activationState: ActivationState, error: Error?) async {
+  internal func handleActivation(_ activationState: ActivationState, error: (any Error)?) async {
     await stateManager.handleActivation(activationState, error: error)
   }
 

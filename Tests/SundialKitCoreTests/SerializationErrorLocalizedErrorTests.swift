@@ -34,6 +34,26 @@ import Testing
 
 @Suite("SerializationError LocalizedError Tests")
 struct SerializationErrorLocalizedErrorTests {
+  // Create one error for each ErrorKind
+  static let errors: [SerializationError] = [
+    .encodingFailed("test"),
+    .unsupportedType("test"),
+    .invalidMessageFormat,
+    .decodingFailed("test"),
+    .missingRequiredKey("test"),
+    .typeMismatch(key: "key", expected: "exp", actual: "act"),
+    .invalidData,
+    .corruptedData,
+    .missingTypeKey,
+    .missingBinaryData,
+    .unknownMessageType("test"),
+    .missingField("test"),
+    .invalidDataSize,
+    .invalidFormat,
+    .invalidTypeKey,
+    .notBinaryMessagable("test"),
+  ]
+
   @Test("Encoding failed has proper localization")
   func encodingFailedLocalization() {
     let reason = "Object too large"
@@ -57,11 +77,12 @@ struct SerializationErrorLocalizedErrorTests {
     #expect(error.errorDescription == "Unsupported type '\(typeName)' in message data.")
     #expect(
       error.failureReason
-        == "The message contains types that are not supported by the serialization format."
+        == "The message contains types that are not supported" + " by the serialization format."
     )
     #expect(
       error.recoverySuggestion
-        == "Convert custom types to property list types (String, Number, Date, Data, Array, Dictionary) before encoding."
+        == "Convert custom types to property list types (String, Number,"
+        + " Date, Data, Array, Dictionary) before encoding."
     )
   }
 
@@ -256,45 +277,26 @@ struct SerializationErrorLocalizedErrorTests {
     )
     #expect(
       error.recoverySuggestion
+        // swiftlint:disable:next line_length
         == "Ensure the message type conforms to BinaryMessagable protocol, or use dictionary transport instead of binary."
     )
   }
 
   @Test("All ErrorKind cases have complete localization")
   func allErrorKindsHaveLocalization() {
-    // Create one error for each ErrorKind
-    let errors: [SerializationError] = [
-      .encodingFailed("test"),
-      .unsupportedType("test"),
-      .invalidMessageFormat,
-      .decodingFailed("test"),
-      .missingRequiredKey("test"),
-      .typeMismatch(key: "key", expected: "exp", actual: "act"),
-      .invalidData,
-      .corruptedData,
-      .missingTypeKey,
-      .missingBinaryData,
-      .unknownMessageType("test"),
-      .missingField("test"),
-      .invalidDataSize,
-      .invalidFormat,
-      .invalidTypeKey,
-      .notBinaryMessagable("test"),
-    ]
-
-    for error in errors {
+    for error in Self.errors {
       #expect(error.errorDescription != nil, "Missing errorDescription for \(error.kind)")
       #expect(error.failureReason != nil, "Missing failureReason for \(error.kind)")
       #expect(error.recoverySuggestion != nil, "Missing recoverySuggestion for \(error.kind)")
 
       #expect(
-        error.errorDescription != nil && !error.errorDescription!.isEmpty,
+        error.errorDescription?.isEmpty == false,
         "Empty errorDescription for \(error.kind)")
       #expect(
-        error.failureReason != nil && !error.failureReason!.isEmpty,
+        error.failureReason?.isEmpty == false,
         "Empty failureReason for \(error.kind)")
       #expect(
-        error.recoverySuggestion != nil && !error.recoverySuggestion!.isEmpty,
+        error.recoverySuggestion?.isEmpty == false,
         "Empty recoverySuggestion for \(error.kind)")
     }
   }

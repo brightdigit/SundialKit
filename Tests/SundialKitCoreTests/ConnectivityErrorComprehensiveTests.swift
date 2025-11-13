@@ -51,31 +51,31 @@ import Testing
 struct ConnectivityErrorComprehensiveTests {
   // MARK: - All Errors Have Complete Localization
 
+  static let allErrors: [ConnectivityError] = [
+    .sessionNotSupported,
+    .sessionNotActivated,
+    .sessionInactive,
+    .deviceNotPaired,
+    .companionAppNotInstalled,
+    .notReachable,
+    .messageReplyFailed,
+    .messageReplyTimedOut,
+    .invalidParameter,
+    .payloadTooLarge,
+    .payloadUnsupportedTypes,
+    .transferTimedOut,
+    .insufficientSpace,
+    .fileNotAccessible,
+    .sessionMissingDelegate,
+    .fileAccessDenied,
+    .deliveryFailed,
+    .watchOnlyApp,
+  ]
   @Test("All non-generic errors have non-nil localization")
   func allErrorsHaveLocalization() {
     #if canImport(WatchConnectivity)
-      let allErrors: [ConnectivityError] = [
-        .sessionNotSupported,
-        .sessionNotActivated,
-        .sessionInactive,
-        .deviceNotPaired,
-        .companionAppNotInstalled,
-        .notReachable,
-        .messageReplyFailed,
-        .messageReplyTimedOut,
-        .invalidParameter,
-        .payloadTooLarge,
-        .payloadUnsupportedTypes,
-        .transferTimedOut,
-        .insufficientSpace,
-        .fileNotAccessible,
-        .sessionMissingDelegate,
-        .fileAccessDenied,
-        .deliveryFailed,
-        .watchOnlyApp,
-      ]
 
-      for error in allErrors {
+      for error in Self.allErrors {
         #expect(error.errorDescription != nil, "Missing errorDescription for \(error)")
         #expect(error.failureReason != nil, "Missing failureReason for \(error)")
         #expect(error.recoverySuggestion != nil, "Missing recoverySuggestion for \(error)")
@@ -85,15 +85,20 @@ struct ConnectivityErrorComprehensiveTests {
         let failureExists = error.failureReason != nil
         let suggestionExists = error.recoverySuggestion != nil
 
-        if descriptionExists {
-          #expect(!error.errorDescription!.isEmpty, "Empty errorDescription for \(error)")
-        }
-        if failureExists {
-          #expect(!error.failureReason!.isEmpty, "Empty failureReason for \(error)")
-        }
-        if suggestionExists {
-          #expect(!error.recoverySuggestion!.isEmpty, "Empty recoverySuggestion for \(error)")
-        }
+        #expect(
+          error.errorDescription?.isEmpty == false,
+          "Empty errorDescription for \(error)"
+        )
+
+        #expect(
+          error.failureReason?.isEmpty == false,
+          "Empty failureReason for \(error)"
+        )
+
+        #expect(
+          error.recoverySuggestion?.isEmpty == false,
+          "Empty recoverySuggestion for \(error)"
+        )
       }
     #else
       Issue.record("WatchConnectivity not available on this platform")

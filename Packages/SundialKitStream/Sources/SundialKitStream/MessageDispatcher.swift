@@ -71,11 +71,11 @@ internal struct MessageDispatcher {
     _ message: ConnectivityMessage,
     replyHandler: @escaping @Sendable ([String: any Sendable]) -> Void,
     to messageRegistry: StreamContinuationRegistry<ConnectivityReceiveResult>,
-    and typedRegistry: StreamContinuationRegistry<Messagable>
+    and typedRegistry: StreamContinuationRegistry<any Messagable>
   ) {
     // Verify decoder exists if typed subscribers are registered
     assert(
-      messageDecoder != nil || typedRegistry.isEmpty,
+      messageDecoder != nil || typedRegistry.count == 0,
       "Typed message subscribers exist but no decoder is configured"
     )
 
@@ -106,9 +106,9 @@ internal struct MessageDispatcher {
   ///   - typedRegistry: Registry of typed message stream continuations
   internal func dispatchApplicationContext(
     _ context: ConnectivityMessage,
-    error: Error?,
+    error: (any Error)?,
     to messageRegistry: StreamContinuationRegistry<ConnectivityReceiveResult>,
-    and typedRegistry: StreamContinuationRegistry<Messagable>
+    and typedRegistry: StreamContinuationRegistry<any Messagable>
   ) {
     // Send to raw stream subscribers
     let result = ConnectivityReceiveResult(message: context, context: .applicationContext)

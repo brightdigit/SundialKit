@@ -28,11 +28,32 @@ else
 fi
 
 # Detect if mise is available
-if command -v mise &> /dev/null; then
-    TOOL_CMD="mise exec --"
+# Check common installation paths for mise
+MISE_PATHS=(
+    "/opt/homebrew/bin/mise"
+    "/usr/local/bin/mise"
+    "$HOME/.local/bin/mise"
+)
+
+MISE_BIN=""
+for mise_path in "${MISE_PATHS[@]}"; do
+    if [ -x "$mise_path" ]; then
+        MISE_BIN="$mise_path"
+        break
+    fi
+done
+
+# Fallback to PATH lookup
+if [ -z "$MISE_BIN" ] && command -v mise &> /dev/null; then
+    MISE_BIN="mise"
+fi
+
+if [ -n "$MISE_BIN" ]; then
+    TOOL_CMD="$MISE_BIN exec --"
 else
     echo "Error: mise is not installed"
     echo "Install mise: https://mise.jdx.dev/getting-started.html"
+    echo "Checked paths: ${MISE_PATHS[*]}"
     exit 1
 fi
 
@@ -49,7 +70,7 @@ fi
 pushd $PACKAGE_DIR
 
 # Bootstrap tools (mise will install based on .mise.toml)
-run_command mise install
+run_command "$MISE_BIN" install
 
 if [ -z "$CI" ]; then
 	run_command $TOOL_CMD swift-format format $SWIFTFORMAT_OPTIONS  --recursive --parallel --in-place Sources Tests

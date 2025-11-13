@@ -29,10 +29,17 @@
 
 #if canImport(WatchConnectivity)
   public import Foundation
+  import os
   public import SundialKitCore
   import WatchConnectivity
 
   extension WatchConnectivitySession {
+    @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
+    private static let logger = Logger(
+      subsystem: "com.brightdigit.SundialKit",
+      category: "connectivity"
+    )
+
     internal func session(
       _ wcSession: WCSession,
       activationDidCompleteWith activationState: WCSessionActivationState,
@@ -44,15 +51,15 @@
       else {
         preconditionFailure()
       }
-      #if DEBUG
-        print(
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        Self.logger.debug(
           """
-          🔔 WCSession activation complete - state: \(activationState), \
+          WCSession activation complete - state: \(activationState.rawValue), \
           isReachable: \(wcSession.isReachable), \
           isPairedAppInstalled: \(wcSession.isPairedAppInstalled)
           """
         )
-      #endif
+      }
       delegate?.session(
         self,
         activationDidCompleteWith: activationState,
@@ -82,11 +89,11 @@
     #endif
 
     internal func sessionReachabilityDidChange(_ session: WCSession) {
-      #if DEBUG
-        print(
-          "🔔 WCSession.sessionReachabilityDidChange fired - isReachable: \(session.isReachable)"
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        Self.logger.debug(
+          "WCSession.sessionReachabilityDidChange fired - isReachable: \(session.isReachable)"
         )
-      #endif
+      }
       delegate?.sessionReachabilityDidChange(self)
     }
 

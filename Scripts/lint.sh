@@ -70,7 +70,7 @@ fi
 pushd $PACKAGE_DIR
 
 # Bootstrap tools (mise will install based on .mise.toml)
-run_command mise install
+run_command "$MISE_BIN" install
 
 if [ -z "$CI" ]; then
 	run_command $TOOL_CMD swift-format format $SWIFTFORMAT_OPTIONS  --recursive --parallel --in-place Sources Tests

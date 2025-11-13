@@ -49,7 +49,7 @@ extension ConnectivityObserver {
 
   /// AsyncStream of activation completion events (with success state or error)
   /// - Returns: Stream that yields Result containing activation state or error
-  public func activationCompletionStream() -> AsyncStream<Result<ActivationState, Error>> {
+  public func activationCompletionStream() -> AsyncStream<Result<ActivationState, any Error>> {
     AsyncStream(
       register: { id, cont in
         await self.continuationManager.registerActivationCompletion(id: id, continuation: cont)
@@ -115,7 +115,7 @@ extension ConnectivityObserver {
   /// their typed `Messagable` forms.
   ///
   /// - Returns: Stream that yields decoded messages as they are received
-  public func typedMessageStream() -> AsyncStream<Messagable> {
+  public func typedMessageStream() -> AsyncStream<any Messagable> {
     AsyncStream(
       register: { id, cont in
         await self.continuationManager.registerTypedMessage(id: id, continuation: cont)

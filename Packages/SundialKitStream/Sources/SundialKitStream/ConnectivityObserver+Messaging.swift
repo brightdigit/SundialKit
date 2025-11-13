@@ -87,7 +87,7 @@ extension ConnectivityObserver {
     -> ConnectivitySendResult
   {
     // Determine transport based on type and options
-    if let binaryMessage = message as? BinaryMessagable,
+    if let binaryMessage = message as? any BinaryMessagable,
       !options.contains(.forceDictionary)
     {
       // Binary transport

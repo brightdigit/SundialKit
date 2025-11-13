@@ -115,14 +115,14 @@
     public let sendResult = PassthroughSubject<ConnectivitySendResult, Never>()
 
     /// Publisher for activation completion events (with success state or error)
-    public let activationCompleted = PassthroughSubject<Result<ActivationState, Error>, Never>()
+    public let activationCompleted = PassthroughSubject<Result<ActivationState, any Error>, Never>()
 
     /// Publisher for typed decoded messages
     ///
     /// Requires a `MessageDecoder` to be configured during initialization.
     /// Both dictionary and binary messages are automatically decoded into
     /// their typed `Messagable` forms.
-    public let typedMessageReceived = PassthroughSubject<Messagable, Never>()
+    public let typedMessageReceived = PassthroughSubject<any Messagable, Never>()
 
     // MARK: - Private Properties
 
@@ -131,6 +131,11 @@
 
     // MARK: - Initialization
 
+    /// Creates a new connectivity observer with the specified session and message decoder.
+    ///
+    /// - Parameters:
+    ///   - session: The connectivity session to observe
+    ///   - messageDecoder: Optional message decoder for typed message handling
     public init(session: any ConnectivitySession, messageDecoder: MessageDecoder? = nil) {
       self.session = session
       self.messageDecoder = messageDecoder
