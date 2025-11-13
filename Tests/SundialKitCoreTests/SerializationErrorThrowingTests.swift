@@ -1,5 +1,5 @@
 //
-//  ConnectivitySendContext.swift
+//  SerializationErrorThrowingTests.swift
 //  SundialKit
 //
 //  Created by Leo Dion.
@@ -27,43 +27,38 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-public import SundialKitCore
+import Foundation
+import Testing
 
-/// Result from sending a message
-public enum ConnectivitySendContext: Sendable {
-  /// Sent via application context
-  case applicationContext(transport: MessageTransport)
-  /// Sent via message with reply received
-  case reply(ConnectivityMessage, transport: MessageTransport)
-  /// Failure
-  case failure(any Error)
-}
+@testable import SundialKitCore
 
-extension ConnectivitySendContext {
-  /// The transport mechanism used for this send operation, if applicable.
-  /// Returns `nil` for failure cases.
-  public var transport: MessageTransport? {
-    switch self {
-    case .applicationContext(let transport), .reply(_, let transport):
-      return transport
-    case .failure:
-      return nil
+@Suite("SerializationError Throwing Tests")
+struct SerializationErrorThrowingTests {
+  @Test("SerializationError can be thrown and caught")
+  func errorThrowing() throws {
+    func throwError() throws {
+      throw SerializationError.invalidData
+    }
+
+    #expect(throws: SerializationError.self) {
+      try throwError()
     }
   }
 
-  /// Creates a send context from a result.
-  /// - Parameters:
-  ///   - result: The result of sending a message
-  ///   - transport: The transport mechanism used (defaults to `.dictionary`)
-  public init(
-    _ result: Result<ConnectivityMessage, any Error>, transport: MessageTransport = .dictionary
-  ) {
-    switch result {
-    case .success(let message):
-      self = .reply(message, transport: transport)
+  @Test("Specific error kind can be checked when caught")
+  func errorKindChecking() {
+    func throwDecodingError() throws {
+      throw SerializationError.decodingFailed("Parse error")
+    }
 
-    case .failure(let error):
-      self = .failure(error)
+    do {
+      try throwDecodingError()
+      Issue.record("Expected error to be thrown")
+    } catch let error as SerializationError {
+      #expect(error.kind == .decodingFailed)
+      #expect(error.context.reason == "Parse error")
+    } catch {
+      Issue.record("Caught unexpected error: \(error)")
     }
   }
 }

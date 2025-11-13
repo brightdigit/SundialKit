@@ -68,7 +68,9 @@
     /// or if the context dictionary is empty.
     public var receivedApplicationContext: ConnectivityMessage? {
       let context = session.receivedApplicationContext
-      guard !context.isEmpty else { return nil }
+      guard !context.isEmpty else {
+        return nil
+      }
       return ConnectivityMessage(forceCasting: context)
     }
 

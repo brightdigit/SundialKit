@@ -46,7 +46,11 @@
       }
       #if DEBUG
         print(
-          "🔔 WCSession activation complete - state: \(activationState), isReachable: \(wcSession.isReachable), isPairedAppInstalled: \(wcSession.isPairedAppInstalled)"
+          """
+          🔔 WCSession activation complete - state: \(activationState), \
+          isReachable: \(wcSession.isReachable), \
+          isPairedAppInstalled: \(wcSession.isPairedAppInstalled)
+          """
         )
       #endif
       delegate?.session(
@@ -80,7 +84,8 @@
     internal func sessionReachabilityDidChange(_ session: WCSession) {
       #if DEBUG
         print(
-          "🔔 WCSession.sessionReachabilityDidChange fired - isReachable: \(session.isReachable)")
+          "🔔 WCSession.sessionReachabilityDidChange fired - isReachable: \(session.isReachable)"
+        )
       #endif
       delegate?.sessionReachabilityDidChange(self)
     }

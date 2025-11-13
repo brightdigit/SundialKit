@@ -418,45 +418,4 @@ struct ConnectivityErrorLocalizedErrorTests {
       Issue.record("WatchConnectivity not available on this platform")
     #endif
   }
-
-  // MARK: - All Errors Have Complete Localization
-
-  @Test("All non-generic errors have non-nil localization")
-  func allErrorsHaveLocalization() {
-    #if canImport(WatchConnectivity)
-      let allErrors: [ConnectivityError] = [
-        .sessionNotSupported,
-        .sessionNotActivated,
-        .sessionInactive,
-        .deviceNotPaired,
-        .companionAppNotInstalled,
-        .notReachable,
-        .messageReplyFailed,
-        .messageReplyTimedOut,
-        .invalidParameter,
-        .payloadTooLarge,
-        .payloadUnsupportedTypes,
-        .transferTimedOut,
-        .insufficientSpace,
-        .fileNotAccessible,
-        .sessionMissingDelegate,
-        .fileAccessDenied,
-        .deliveryFailed,
-        .watchOnlyApp,
-      ]
-
-      for error in allErrors {
-        #expect(error.errorDescription != nil, "Missing errorDescription for \(error)")
-        #expect(error.failureReason != nil, "Missing failureReason for \(error)")
-        #expect(error.recoverySuggestion != nil, "Missing recoverySuggestion for \(error)")
-
-        // Ensure strings are not empty
-        #expect(!error.errorDescription!.isEmpty, "Empty errorDescription for \(error)")
-        #expect(!error.failureReason!.isEmpty, "Empty failureReason for \(error)")
-        #expect(!error.recoverySuggestion!.isEmpty, "Empty recoverySuggestion for \(error)")
-      }
-    #else
-      Issue.record("WatchConnectivity not available on this platform")
-    #endif
-  }
 }

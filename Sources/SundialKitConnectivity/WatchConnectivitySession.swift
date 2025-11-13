@@ -50,6 +50,8 @@
     internal let session: WCSession
     #warning("replace with a property wrapper or internal actor")
     private let delegateLock = NSLock()
+    // swiftformat:disable:next noLeadingUnderscores
+    // Backing storage for thread-safe delegate property with NSLock synchronization
     private var _delegate: ConnectivitySessionDelegate?
 
     /// The delegate to receive session lifecycle and message events.
