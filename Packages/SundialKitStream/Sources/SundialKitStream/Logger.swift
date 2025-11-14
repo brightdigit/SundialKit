@@ -28,11 +28,11 @@
 //
 
 import Foundation
-#if canImport(os)
+#if canImport(os.log)
   import os.log
 #endif
 
-#if canImport(os)
+#if canImport(os.log)
   /// Unified logging infrastructure for SundialKit
   ///
   /// Provides subsystem-based structured logging using OSLog/Logger framework.

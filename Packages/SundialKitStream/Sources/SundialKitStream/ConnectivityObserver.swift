@@ -244,14 +244,17 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
         return
       #endif
 
-      let notifications = NotificationCenter.default.notifications(named: notificationName)
 
-      for await _ in notifications {
-        // Check for pending application context when app becomes active
-        if let pendingContext = self.session.receivedApplicationContext {
-          await self.handleApplicationContext(pendingContext, error: nil)
+      #if canImport(Darwin)
+        let notifications = NotificationCenter.default.notifications(named: notificationName)
+
+        for await _ in notifications {
+          // Check for pending application context when app becomes active
+          if let pendingContext = self.session.receivedApplicationContext {
+            await self.handleApplicationContext(pendingContext, error: nil)
+          }
         }
-      }
+      #endif
     }
   }
 }
