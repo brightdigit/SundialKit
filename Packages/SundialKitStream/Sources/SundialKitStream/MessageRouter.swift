@@ -31,6 +31,10 @@ import Foundation
 import SundialKitConnectivity
 import SundialKitCore
 
+#if canImport(os.log)
+  import os.log
+#endif
+
 /// Internal helper for routing messages through appropriate transports.
 ///
 /// `MessageRouter` encapsulates the logic for selecting the best transport

@@ -213,7 +213,8 @@ internal struct StreamContinuationManagerMessagingTests {
     let task = Task { @Sendable in
       for await result in stream {
         // Store the result using message field
-        await capture.set(message: ConnectivityReceiveResult(message: result.message, context: .applicationContext))
+        await capture.set(
+          message: ConnectivityReceiveResult(message: result.message, context: .applicationContext))
         break
       }
     }

@@ -31,6 +31,10 @@ import Foundation
 import SundialKitConnectivity
 import SundialKitCore
 
+#if canImport(os.log)
+  import os.log
+#endif
+
 /// Internal helper for dispatching received messages to stream subscribers.
 ///
 /// `MessageDispatcher` handles the distribution of incoming messages to various
@@ -74,7 +78,7 @@ internal struct MessageDispatcher {
   ) {
     // Verify decoder exists if typed subscribers are registered
     assert(
-      messageDecoder != nil || typedRegistry.count == 0,
+      messageDecoder != nil || typedRegistry.isEmpty,
       "Typed message subscribers exist but no decoder is configured"
     )
 

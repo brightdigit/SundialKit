@@ -244,7 +244,6 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
         return
       #endif
 
-
       #if canImport(Darwin)
         let notifications = NotificationCenter.default.notifications(named: notificationName)
 

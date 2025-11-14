@@ -1,6 +1,6 @@
 //
-//  Logger.swift
-//  SundialKit
+//  SundialLogger.swift
+//  SundialKitStream
 //
 //  Created by Leo Dion.
 //  Copyright © 2025 BrightDigit.
@@ -28,58 +28,62 @@
 //
 
 import Foundation
-#if canImport(os)
-  @_exported import os.log
+
+#if canImport(os.log)
+  import os.log
 #endif
 
-#if canImport(os)
+#if canImport(os.log)
   /// Unified logging infrastructure for SundialKit
   ///
   /// Provides subsystem-based structured logging using OSLog/Logger framework.
   /// Each SundialKit module has its own subsystem for organized log filtering.
   @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
-  package enum SundialLogger {
+  internal enum SundialLogger {
     /// Core protocols and types
-    package static let core = Logger(subsystem: "com.brightdigit.SundialKit.Core", category: "core")
+    internal static let core = Logger(
+      subsystem: "com.brightdigit.SundialKit.Core",
+      category: "core"
+    )
 
     /// Network monitoring (PathMonitor, NetworkPing)
-    package static let network = Logger(
+    internal static let network = Logger(
       subsystem: "com.brightdigit.SundialKit.Network",
       category: "network"
     )
 
     /// WatchConnectivity abstractions
-    package static let connectivity = Logger(
+    internal static let connectivity = Logger(
       subsystem: "com.brightdigit.SundialKit.Connectivity",
       category: "connectivity"
     )
 
     /// Stream-based observers (actor-based AsyncStream APIs)
-    package static let stream = Logger(
+    internal static let stream = Logger(
       subsystem: "com.brightdigit.SundialKit.Stream",
       category: "stream"
     )
 
     /// Combine-based observers (@MainActor with publishers)
-    package static let combine = Logger(
+    internal static let combine = Logger(
       subsystem: "com.brightdigit.SundialKit.Combine",
       category: "combine"
     )
 
     /// Binary message encoding/decoding
-    package static let binary = Logger(
+    internal static let binary = Logger(
       subsystem: "com.brightdigit.SundialKit.Binary",
       category: "binary"
     )
 
     /// Messagable protocol and message decoding
-    package static let messagable = Logger(
+    internal static let messagable = Logger(
       subsystem: "com.brightdigit.SundialKit.Messagable",
       category: "messagable"
     )
 
     /// Test infrastructure
-    package static let test = Logger(
+    internal static let test = Logger(
       subsystem: "com.brightdigit.SundialKit.Tests",
       category: "tests"
     )
@@ -89,7 +93,7 @@ import Foundation
     ///   - subsystem: Reverse DNS notation subsystem identifier
     ///   - category: Category within the subsystem
     /// - Returns: Configured Logger instance
-    package static func custom(subsystem: String, category: String) -> Logger {
+    internal static func custom(subsystem: String, category: String) -> Logger {
       Logger(subsystem: subsystem, category: category)
     }
   }
@@ -99,7 +103,7 @@ import Foundation
   /// Legacy logging support for pre-macOS 11.0 / pre-iOS 14.0
   ///
   /// Uses os_log directly when Logger is unavailable
-  package enum SundialLoggerLegacy {
+  internal enum SundialLoggerLegacy {
     private static let coreLog = OSLog(
       subsystem: "com.brightdigit.SundialKit.Core",
       category: "core"
@@ -134,51 +138,55 @@ import Foundation
     )
 
     /// Log a message to the core subsystem
-    package static func core(_ type: OSLogType, _ message: StaticString, _ args: any CVarArg...) {
+    internal static func core(_ type: OSLogType, _ message: StaticString, _ args: any CVarArg...) {
       os_log(message, log: coreLog, type: type, args)
     }
 
     /// Log a message to the network subsystem
-    package static func network(_ type: OSLogType, _ message: StaticString, _ args: any CVarArg...) {
+    internal static func network(_ type: OSLogType, _ message: StaticString, _ args: any CVarArg...)
+    {
       os_log(message, log: networkLog, type: type, args)
     }
 
     /// Log a message to the connectivity subsystem
-    package static func connectivity(
+    internal static func connectivity(
       _ type: OSLogType, _ message: StaticString, _ args: any CVarArg...
     ) {
       os_log(message, log: connectivityLog, type: type, args)
     }
 
     /// Log a message to the stream subsystem
-    package static func stream(_ type: OSLogType, _ message: StaticString, _ args: any CVarArg...) {
+    internal static func stream(_ type: OSLogType, _ message: StaticString, _ args: any CVarArg...)
+    {
       os_log(message, log: streamLog, type: type, args)
     }
 
     /// Log a message to the combine subsystem
-    package static func combine(_ type: OSLogType, _ message: StaticString, _ args: any CVarArg...) {
+    internal static func combine(_ type: OSLogType, _ message: StaticString, _ args: any CVarArg...)
+    {
       os_log(message, log: combineLog, type: type, args)
     }
 
     /// Log a message to the binary subsystem
-    package static func binary(_ type: OSLogType, _ message: StaticString, _ args: any CVarArg...) {
+    internal static func binary(_ type: OSLogType, _ message: StaticString, _ args: any CVarArg...)
+    {
       os_log(message, log: binaryLog, type: type, args)
     }
 
     /// Log a message to the messagable subsystem
-    package static func messagable(
+    internal static func messagable(
       _ type: OSLogType, _ message: StaticString, _ args: any CVarArg...
     ) {
       os_log(message, log: messagableLog, type: type, args)
     }
 
     /// Log a message to the test subsystem
-    package static func test(_ type: OSLogType, _ message: StaticString, _ args: any CVarArg...) {
+    internal static func test(_ type: OSLogType, _ message: StaticString, _ args: any CVarArg...) {
       os_log(message, log: testLog, type: type, args)
     }
 
     /// Create a custom OSLog instance
-    package static func custom(subsystem: String, category: String) -> OSLog {
+    internal static func custom(subsystem: String, category: String) -> OSLog {
       OSLog(subsystem: subsystem, category: category)
     }
   }
@@ -188,9 +196,9 @@ import Foundation
   /// Print-based logging fallback for platforms without OSLog
   ///
   /// Provides the same API as SundialLogger but uses print() for output
-  package enum SundialLogger {
+  internal enum SundialLogger {
     /// Fallback logger that prints to stdout
-    package struct FallbackLogger {
+    internal struct FallbackLogger {
       let subsystem: String
       let category: String
 
@@ -208,49 +216,49 @@ import Foundation
     }
 
     /// Core protocols and types
-    package static let core = FallbackLogger(
+    internal static let core = FallbackLogger(
       subsystem: "com.brightdigit.SundialKit.Core",
       category: "core"
     )
 
     /// Network monitoring (PathMonitor, NetworkPing)
-    package static let network = FallbackLogger(
+    internal static let network = FallbackLogger(
       subsystem: "com.brightdigit.SundialKit.Network",
       category: "network"
     )
 
     /// WatchConnectivity abstractions
-    package static let connectivity = FallbackLogger(
+    internal static let connectivity = FallbackLogger(
       subsystem: "com.brightdigit.SundialKit.Connectivity",
       category: "connectivity"
     )
 
     /// Stream-based observers (actor-based AsyncStream APIs)
-    package static let stream = FallbackLogger(
+    internal static let stream = FallbackLogger(
       subsystem: "com.brightdigit.SundialKit.Stream",
       category: "stream"
     )
 
     /// Combine-based observers (@MainActor with publishers)
-    package static let combine = FallbackLogger(
+    internal static let combine = FallbackLogger(
       subsystem: "com.brightdigit.SundialKit.Combine",
       category: "combine"
     )
 
     /// Binary message encoding/decoding
-    package static let binary = FallbackLogger(
+    internal static let binary = FallbackLogger(
       subsystem: "com.brightdigit.SundialKit.Binary",
       category: "binary"
     )
 
     /// Messagable protocol and message decoding
-    package static let messagable = FallbackLogger(
+    internal static let messagable = FallbackLogger(
       subsystem: "com.brightdigit.SundialKit.Messagable",
       category: "messagable"
     )
 
     /// Test infrastructure
-    package static let test = FallbackLogger(
+    internal static let test = FallbackLogger(
       subsystem: "com.brightdigit.SundialKit.Tests",
       category: "tests"
     )
@@ -260,7 +268,7 @@ import Foundation
     ///   - subsystem: Reverse DNS notation subsystem identifier
     ///   - category: Category within the subsystem
     /// - Returns: Configured FallbackLogger instance
-    package static func custom(subsystem: String, category: String) -> FallbackLogger {
+    internal static func custom(subsystem: String, category: String) -> FallbackLogger {
       FallbackLogger(subsystem: subsystem, category: category)
     }
   }

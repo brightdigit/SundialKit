@@ -61,6 +61,10 @@ internal struct StreamContinuationRegistry<Element> where Element: Sendable {
   internal var count: Int {
     continuations.count
   }
+
+  internal var isEmpty: Bool {
+    continuations.isEmpty
+  }
   // MARK: - Initialization
 
   /// Creates a new stream continuation registry.

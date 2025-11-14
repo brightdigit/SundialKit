@@ -31,6 +31,10 @@ public import Foundation
 public import SundialKitConnectivity
 public import SundialKitCore
 
+#if canImport(os.log)
+  import os.log
+#endif
+
 /// Distributes incoming messages to appropriate stream subscribers
 ///
 /// This type handles message decoding and distribution to both
