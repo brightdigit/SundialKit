@@ -108,22 +108,34 @@ internal struct NetworkObserverEdgeCasesTests {
 
     await observer.start(queue: .global())
 
-    let stream = await observer.pathStatusStream
-    var iterator = stream.makeAsyncIterator()
+    let capture = TestValueCapture()
 
-    // Get initial value
-    _ = await iterator.next()
+    try await confirmation("Received initial status", expectedCount: 1) { confirm in
+      Task { @Sendable in
+        let stream = await observer.pathStatusStream
+        var count = 0
+        for await _ in stream {
+          count += 1
+          if count == 1 {
+            confirm()
+          } else {
+            // Should not receive values after cancel
+            await capture.set(boolValue: true)
+          }
+        }
+      }
 
-    // Cancel
-    await observer.cancel()
+      // Wait for initial value confirmation
+      try await Task.sleep(for: .milliseconds(50))
 
-    // Iteration should complete
-    var completedNaturally = false
-    for await _ in stream {
-      // Should not get here after cancel
+      // Cancel observer
+      await observer.cancel()
+
+      // Give time to verify no additional values are received
+      try await Task.sleep(for: .milliseconds(100))
     }
-    completedNaturally = true
 
-    #expect(completedNaturally == true)
+    let receivedAfterCancel = await capture.boolValue
+    #expect(receivedAfterCancel != true)
   }
 }

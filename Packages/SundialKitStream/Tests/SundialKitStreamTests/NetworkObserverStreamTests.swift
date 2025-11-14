@@ -76,21 +76,34 @@ internal struct NetworkObserverStreamTests {
 
     await observer.start(queue: .global())
 
-    let stream = await observer.pathStatusStream
-    var iterator = stream.makeAsyncIterator()
+    try await confirmation("Received path status", expectedCount: 2) { receivedStatus in
+      let capture = TestValueCapture()
 
-    // Should receive initial status
-    let firstStatus = await iterator.next()
-    #expect(firstStatus == .satisfied(.wiredEthernet))
+      Task { @Sendable in
+        let stream = await observer.pathStatusStream
+        for await status in stream {
+          await capture.append(pathStatus: status)
+          receivedStatus()
+          let count = await capture.pathStatuses.count
+          if count >= 2 { break }
+        }
+      }
 
-    // Send new path update
-    let newPath = MockPath(pathStatus: .unsatisfied(.localNetworkDenied))
-    monitor.sendPath(newPath)
+      // Wait briefly for initial status
+      try await Task.sleep(for: .milliseconds(10))
 
-    try await Task.sleep(for: .milliseconds(10))
+      // Send new path update
+      let newPath = MockPath(pathStatus: .unsatisfied(.localNetworkDenied))
+      monitor.sendPath(newPath)
 
-    let secondStatus = await iterator.next()
-    #expect(secondStatus == .unsatisfied(.localNetworkDenied))
+      // Give time for async delivery
+      try await Task.sleep(for: .milliseconds(50))
+
+      let statuses = await capture.pathStatuses
+      #expect(statuses.count == 2)
+      #expect(statuses[0] == .satisfied(.wiredEthernet))
+      #expect(statuses[1] == .unsatisfied(.localNetworkDenied))
+    }
   }
 
   @Test("isExpensiveStream tracks expensive status")
@@ -100,21 +113,34 @@ internal struct NetworkObserverStreamTests {
 
     await observer.start(queue: .global())
 
-    let stream = await observer.isExpensiveStream
-    var iterator = stream.makeAsyncIterator()
+    try await confirmation("Received expensive status", expectedCount: 2) { receivedValue in
+      let capture = TestValueCapture()
 
-    // Initial path is not expensive
-    let firstValue = await iterator.next()
-    #expect(firstValue == false)
+      Task { @Sendable in
+        let stream = await observer.isExpensiveStream
+        for await value in stream {
+          await capture.append(boolValue: value)
+          receivedValue()
+          let count = await capture.boolValues.count
+          if count >= 2 { break }
+        }
+      }
 
-    // Send expensive path
-    let expensivePath = MockPath(isExpensive: true, pathStatus: .satisfied(.cellular))
-    monitor.sendPath(expensivePath)
+      // Wait briefly for initial value
+      try await Task.sleep(for: .milliseconds(10))
 
-    try await Task.sleep(for: .milliseconds(10))
+      // Send expensive path
+      let expensivePath = MockPath(isExpensive: true, pathStatus: .satisfied(.cellular))
+      monitor.sendPath(expensivePath)
 
-    let secondValue = await iterator.next()
-    #expect(secondValue == true)
+      // Give time for async delivery
+      try await Task.sleep(for: .milliseconds(50))
+
+      let values = await capture.boolValues
+      #expect(values.count == 2)
+      #expect(values[0] == false)
+      #expect(values[1] == true)
+    }
   }
 
   @Test("isConstrainedStream tracks constrained status")
@@ -124,21 +150,34 @@ internal struct NetworkObserverStreamTests {
 
     await observer.start(queue: .global())
 
-    let stream = await observer.isConstrainedStream
-    var iterator = stream.makeAsyncIterator()
+    try await confirmation("Received constrained status", expectedCount: 2) { receivedValue in
+      let capture = TestValueCapture()
 
-    // Initial path is not constrained
-    let firstValue = await iterator.next()
-    #expect(firstValue == false)
+      Task { @Sendable in
+        let stream = await observer.isConstrainedStream
+        for await value in stream {
+          await capture.append(boolValue: value)
+          receivedValue()
+          let count = await capture.boolValues.count
+          if count >= 2 { break }
+        }
+      }
 
-    // Send constrained path
-    let constrainedPath = MockPath(isConstrained: true, pathStatus: .satisfied(.wifi))
-    monitor.sendPath(constrainedPath)
+      // Wait briefly for initial value
+      try await Task.sleep(for: .milliseconds(10))
 
-    try await Task.sleep(for: .milliseconds(10))
+      // Send constrained path
+      let constrainedPath = MockPath(isConstrained: true, pathStatus: .satisfied(.wifi))
+      monitor.sendPath(constrainedPath)
 
-    let secondValue = await iterator.next()
-    #expect(secondValue == true)
+      // Give time for async delivery
+      try await Task.sleep(for: .milliseconds(50))
+
+      let values = await capture.boolValues
+      #expect(values.count == 2)
+      #expect(values[0] == false)
+      #expect(values[1] == true)
+    }
   }
 
   // MARK: - Multiple Subscribers Tests

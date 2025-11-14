@@ -39,13 +39,13 @@ internal struct StreamContinuationManagerActivationTests {
   // MARK: - Activation Tests
 
   @Test("Register activation continuation succeeds")
-  internal func registerActivation() async {
+  internal func registerActivation() async throws {
     let manager = StreamContinuationManager()
     let id = UUID()
     let capture = TestValueCapture()
 
     let stream = AsyncStream<ActivationState> { continuation in
-      Task.detached {
+      Task {
         await manager.registerActivation(id: id, continuation: continuation)
       }
     }
@@ -57,6 +57,9 @@ internal struct StreamContinuationManagerActivationTests {
       }
     }
 
+    // Give subscriber time to set up
+    try await Task.sleep(for: .milliseconds(50))
+
     await manager.yieldActivationState(.activated)
     await task.value
 
@@ -65,34 +68,41 @@ internal struct StreamContinuationManagerActivationTests {
   }
 
   @Test("Yield activation state to multiple subscribers")
-  internal func yieldActivationStateMultipleSubscribers() async {
+  internal func yieldActivationStateMultipleSubscribers() async throws {
     let manager = StreamContinuationManager()
     let capture = TestValueCapture()
 
-    await confirmation("All subscribers receive value", expectedCount: 3) { confirm in
+    try await confirmation("All subscribers receive value", expectedCount: 3) { confirm in
       // Create 3 subscribers
+      var consumerTasks: [Task<Void, Never>] = []
       for _ in 0..<3 {
         let id = UUID()
         let stream = AsyncStream<ActivationState> { continuation in
-          Task.detached {
+          Task {
             await manager.registerActivation(id: id, continuation: continuation)
           }
         }
 
-        Task { @Sendable in
+        let task = Task { @Sendable in
           for await value in stream {
             await capture.set(activationState: value)
             confirm()
             break
           }
         }
+        consumerTasks.append(task)
       }
 
       // Give subscribers time to set up
-      try? await Task.sleep(for: .milliseconds(100))
+      try await Task.sleep(for: .milliseconds(100))
 
       // Yield to all subscribers
       await manager.yieldActivationState(.activated)
+
+      // Wait for all consumers to process the value
+      for task in consumerTasks {
+        await task.value
+      }
     }
 
     let receivedValue = await capture.activationState
@@ -108,12 +118,12 @@ internal struct StreamContinuationManagerActivationTests {
   }
 
   @Test("Remove activation continuation succeeds")
-  internal func removeActivation() async {
+  internal func removeActivation() async throws {
     let manager = StreamContinuationManager()
     let id = UUID()
 
     let stream = AsyncStream<ActivationState> { continuation in
-      Task.detached {
+      Task {
         await manager.registerActivation(id: id, continuation: continuation)
       }
 
@@ -130,6 +140,9 @@ internal struct StreamContinuationManagerActivationTests {
       }
     }
 
+    // Give subscriber time to set up
+    try await Task.sleep(for: .milliseconds(50))
+
     await manager.yieldActivationState(.activated)
     task.cancel()
     await task.value
@@ -138,13 +151,13 @@ internal struct StreamContinuationManagerActivationTests {
   // MARK: - Activation Completion Tests
 
   @Test("Yield activation completion with success")
-  internal func yieldActivationCompletionSuccess() async {
+  internal func yieldActivationCompletionSuccess() async throws {
     let manager = StreamContinuationManager()
     let id = UUID()
     let capture = TestValueCapture()
 
     let stream = AsyncStream<Result<ActivationState, any Error>> { continuation in
-      Task.detached {
+      Task {
         await manager.registerActivationCompletion(id: id, continuation: continuation)
       }
     }
@@ -155,6 +168,9 @@ internal struct StreamContinuationManagerActivationTests {
         break
       }
     }
+
+    // Give subscriber time to set up
+    try await Task.sleep(for: .milliseconds(50))
 
     await manager.yieldActivationCompletion(.success(.activated))
     await task.value
@@ -169,14 +185,14 @@ internal struct StreamContinuationManagerActivationTests {
   }
 
   @Test("Yield activation completion with failure")
-  internal func yieldActivationCompletionFailure() async {
+  internal func yieldActivationCompletionFailure() async throws {
     struct TestError: Error {}
     let manager = StreamContinuationManager()
     let id = UUID()
     let capture = TestValueCapture()
 
     let stream = AsyncStream<Result<ActivationState, any Error>> { continuation in
-      Task.detached {
+      Task {
         await manager.registerActivationCompletion(id: id, continuation: continuation)
       }
     }
@@ -187,6 +203,9 @@ internal struct StreamContinuationManagerActivationTests {
         break
       }
     }
+
+    // Give subscriber time to set up
+    try await Task.sleep(for: .milliseconds(50))
 
     await manager.yieldActivationCompletion(.failure(TestError()))
     await task.value
@@ -201,12 +220,12 @@ internal struct StreamContinuationManagerActivationTests {
   }
 
   @Test("Remove activation completion continuation succeeds")
-  internal func removeActivationCompletion() async {
+  internal func removeActivationCompletion() async throws {
     let manager = StreamContinuationManager()
     let id = UUID()
 
     let stream = AsyncStream<Result<ActivationState, any Error>> { continuation in
-      Task.detached {
+      Task {
         await manager.registerActivationCompletion(id: id, continuation: continuation)
       }
 
@@ -222,6 +241,9 @@ internal struct StreamContinuationManagerActivationTests {
         break
       }
     }
+
+    // Give subscriber time to set up
+    try await Task.sleep(for: .milliseconds(50))
 
     await manager.yieldActivationCompletion(.success(.activated))
     task.cancel()

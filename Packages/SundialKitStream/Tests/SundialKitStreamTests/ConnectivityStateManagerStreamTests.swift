@@ -45,79 +45,84 @@ internal struct ConnectivityStateManagerStreamTests {
     let stateManager = ConnectivityStateManager(continuationManager: continuationManager)
     let session = MockConnectivitySession()
 
-    // Set up actor-isolated state capture
-    let capture = TestValueCapture()
+    await confirmation("All notifications received", expectedCount: 3) { confirm in
+      // Set up actor-isolated state capture
+      let capture = TestValueCapture()
 
-    // Create streams with proper Task wrapping
-    let activationId = UUID()
-    let reachabilityId = UUID()
-    let pairedAppInstalledId = UUID()
+      // Create streams with proper Task wrapping
+      let activationId = UUID()
+      let reachabilityId = UUID()
+      let pairedAppInstalledId = UUID()
 
-    let activationStream = AsyncStream<ActivationState> { continuation in
-      Task.detached {
-        await continuationManager.registerActivation(id: activationId, continuation: continuation)
+      let activationStream = AsyncStream<ActivationState> { continuation in
+        Task {
+          await continuationManager.registerActivation(id: activationId, continuation: continuation)
+        }
       }
-    }
 
-    let reachabilityStream = AsyncStream<Bool> { continuation in
-      Task.detached {
-        await continuationManager.registerReachability(
-          id: reachabilityId,
-          continuation: continuation
-        )
+      let reachabilityStream = AsyncStream<Bool> { continuation in
+        Task {
+          await continuationManager.registerReachability(
+            id: reachabilityId,
+            continuation: continuation
+          )
+        }
       }
-    }
 
-    let pairedAppInstalledStream = AsyncStream<Bool> { continuation in
-      Task.detached {
-        await continuationManager.registerPairedAppInstalled(
-          id: pairedAppInstalledId,
-          continuation: continuation
-        )
+      let pairedAppInstalledStream = AsyncStream<Bool> { continuation in
+        Task {
+          await continuationManager.registerPairedAppInstalled(
+            id: pairedAppInstalledId,
+            continuation: continuation
+          )
+        }
       }
-    }
 
-    // Consume streams with @Sendable closures
-    Task { @Sendable in
-      for await state in activationStream {
-        await capture.set(activationState: state)
-        break
+      // Consume streams with @Sendable closures
+      Task { @Sendable in
+        for await state in activationStream {
+          await capture.set(activationState: state)
+          confirm()
+          break
+        }
       }
-    }
 
-    Task { @Sendable in
-      for await isReachable in reachabilityStream {
-        await capture.set(reachability: isReachable)
-        break
+      Task { @Sendable in
+        for await isReachable in reachabilityStream {
+          await capture.set(reachability: isReachable)
+          confirm()
+          break
+        }
       }
-    }
 
-    Task { @Sendable in
-      for await isPairedAppInstalled in pairedAppInstalledStream {
-        await capture.set(pairedAppInstalled: isPairedAppInstalled)
-        break
+      Task { @Sendable in
+        for await isPairedAppInstalled in pairedAppInstalledStream {
+          await capture.set(pairedAppInstalled: isPairedAppInstalled)
+          confirm()
+          break
+        }
       }
+
+      // Give streams time to register
+      try? await Task.sleep(for: .milliseconds(50))
+
+      // Trigger activation
+      session.isReachable = true
+      session.isPairedAppInstalled = true
+      await stateManager.handleActivation(from: session, activationState: .activated, error: nil)
+
+      // Wait for all streams to receive values
+      try? await Task.sleep(for: .milliseconds(100))
+
+      // Verify all notifications were triggered
+      let activationState = await capture.activationState
+      let reachability = await capture.reachability
+      let pairedAppInstalled = await capture.pairedAppInstalled
+
+      #expect(activationState == .activated)
+      #expect(reachability == true)
+      #expect(pairedAppInstalled == true)
     }
-
-    // Give streams time to register
-    try? await Task.sleep(for: .milliseconds(100))
-
-    // Trigger activation
-    session.isReachable = true
-    session.isPairedAppInstalled = true
-    await stateManager.handleActivation(from: session, activationState: .activated, error: nil)
-
-    // Give time for notifications to propagate
-    try? await Task.sleep(for: .milliseconds(100))
-
-    // Verify all notifications were triggered
-    let activationState = await capture.activationState
-    let reachability = await capture.reachability
-    let pairedAppInstalled = await capture.pairedAppInstalled
-
-    #expect(activationState == .activated)
-    #expect(reachability == true)
-    #expect(pairedAppInstalled == true)
   }
 
   @Test("Update reachability triggers reachability stream")
@@ -126,47 +131,50 @@ internal struct ConnectivityStateManagerStreamTests {
     let stateManager = ConnectivityStateManager(continuationManager: continuationManager)
     let session = MockConnectivitySession()
 
-    let capture = TestValueCapture()
-    let reachabilityId = UUID()
+    await confirmation("Reachability values received", expectedCount: 2) { confirm in
+      let capture = TestValueCapture()
+      let reachabilityId = UUID()
 
-    let reachabilityStream = AsyncStream<Bool> { continuation in
-      Task.detached {
-        await continuationManager.registerReachability(
-          id: reachabilityId,
-          continuation: continuation
-        )
-      }
-    }
-
-    Task { @Sendable in
-      for await isReachable in reachabilityStream {
-        await capture.append(boolValue: isReachable)
-        let count = await capture.boolValues.count
-        if count >= 2 {
-          break
+      let reachabilityStream = AsyncStream<Bool> { continuation in
+        Task {
+          await continuationManager.registerReachability(
+            id: reachabilityId,
+            continuation: continuation
+          )
         }
       }
+
+      Task { @Sendable in
+        for await isReachable in reachabilityStream {
+          await capture.append(boolValue: isReachable)
+          confirm()
+          let count = await capture.boolValues.count
+          if count >= 2 {
+            break
+          }
+        }
+      }
+
+      // Give stream time to register
+      try? await Task.sleep(for: .milliseconds(50))
+
+      // Trigger initial activation (should emit false)
+      await stateManager.handleActivation(from: session, activationState: .activated, error: nil)
+
+      // Give time for first notification
+      try? await Task.sleep(for: .milliseconds(10))
+
+      // Update reachability (should emit true)
+      await stateManager.updateReachability(true)
+
+      // Wait for both values to be received
+      try? await Task.sleep(for: .milliseconds(100))
+
+      let capturedValues = await capture.boolValues
+      #expect(capturedValues.count == 2)
+      #expect(capturedValues[0] == false)
+      #expect(capturedValues[1] == true)
     }
-
-    // Give stream time to register
-    try? await Task.sleep(for: .milliseconds(100))
-
-    // Trigger initial activation (should emit false)
-    await stateManager.handleActivation(from: session, activationState: .activated, error: nil)
-
-    // Give time for first notification
-    try? await Task.sleep(for: .milliseconds(50))
-
-    // Update reachability (should emit true)
-    await stateManager.updateReachability(true)
-
-    // Give time for second notification
-    try? await Task.sleep(for: .milliseconds(50))
-
-    let capturedValues = await capture.boolValues
-    #expect(capturedValues.count == 2)
-    #expect(capturedValues[0] == false)
-    #expect(capturedValues[1] == true)
   }
 
   @Test("Update companion state triggers paired app installed stream")
@@ -174,35 +182,38 @@ internal struct ConnectivityStateManagerStreamTests {
     let continuationManager = StreamContinuationManager()
     let stateManager = ConnectivityStateManager(continuationManager: continuationManager)
 
-    let capture = TestValueCapture()
-    let pairedAppInstalledId = UUID()
+    await confirmation("Paired app installed received", expectedCount: 1) { confirm in
+      let capture = TestValueCapture()
+      let pairedAppInstalledId = UUID()
 
-    let pairedAppInstalledStream = AsyncStream<Bool> { continuation in
-      Task.detached {
-        await continuationManager.registerPairedAppInstalled(
-          id: pairedAppInstalledId,
-          continuation: continuation
-        )
+      let pairedAppInstalledStream = AsyncStream<Bool> { continuation in
+        Task {
+          await continuationManager.registerPairedAppInstalled(
+            id: pairedAppInstalledId,
+            continuation: continuation
+          )
+        }
       }
-    }
 
-    Task { @Sendable in
-      for await isPairedAppInstalled in pairedAppInstalledStream {
-        await capture.set(pairedAppInstalled: isPairedAppInstalled)
-        break
+      Task { @Sendable in
+        for await isPairedAppInstalled in pairedAppInstalledStream {
+          await capture.set(pairedAppInstalled: isPairedAppInstalled)
+          confirm()
+          break
+        }
       }
+
+      // Give stream time to register
+      try? await Task.sleep(for: .milliseconds(50))
+
+      // Update companion state
+      await stateManager.updateCompanionState(isPairedAppInstalled: true, isPaired: false)
+
+      // Wait for stream to receive value
+      try? await Task.sleep(for: .milliseconds(100))
+
+      let capturedValue = await capture.pairedAppInstalled
+      #expect(capturedValue == true)
     }
-
-    // Give stream time to register
-    try? await Task.sleep(for: .milliseconds(100))
-
-    // Update companion state
-    await stateManager.updateCompanionState(isPairedAppInstalled: true, isPaired: false)
-
-    // Give time for notification
-    try? await Task.sleep(for: .milliseconds(50))
-
-    let capturedValue = await capture.pairedAppInstalled
-    #expect(capturedValue == true)
   }
 }

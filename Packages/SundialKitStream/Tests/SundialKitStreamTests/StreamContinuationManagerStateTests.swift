@@ -39,13 +39,13 @@ internal struct StreamContinuationManagerStateTests {
   // MARK: - Reachability Tests
 
   @Test("Yield reachability to subscribers")
-  internal func yieldReachability() async {
+  internal func yieldReachability() async throws {
     let manager = StreamContinuationManager()
     let id = UUID()
     let capture = TestValueCapture()
 
     let stream = AsyncStream<Bool> { continuation in
-      Task.detached {
+      Task {
         await manager.registerReachability(id: id, continuation: continuation)
       }
     }
@@ -57,6 +57,9 @@ internal struct StreamContinuationManagerStateTests {
       }
     }
 
+    // Give subscriber time to set up
+    try await Task.sleep(for: .milliseconds(50))
+
     await manager.yieldReachability(true)
     await task.value
 
@@ -65,13 +68,13 @@ internal struct StreamContinuationManagerStateTests {
   }
 
   @Test("Yield reachability transitions")
-  internal func yieldReachabilityTransitions() async {
+  internal func yieldReachabilityTransitions() async throws {
     let manager = StreamContinuationManager()
     let id = UUID()
     let capture = TestValueCapture()
 
     let stream = AsyncStream<Bool> { continuation in
-      Task.detached {
+      Task {
         await manager.registerReachability(id: id, continuation: continuation)
       }
     }
@@ -86,6 +89,9 @@ internal struct StreamContinuationManagerStateTests {
       }
     }
 
+    // Give subscriber time to set up
+    try await Task.sleep(for: .milliseconds(50))
+
     await manager.yieldReachability(true)
     await manager.yieldReachability(false)
     await manager.yieldReachability(true)
@@ -97,12 +103,12 @@ internal struct StreamContinuationManagerStateTests {
   }
 
   @Test("Remove reachability continuation succeeds")
-  internal func removeReachability() async {
+  internal func removeReachability() async throws {
     let manager = StreamContinuationManager()
     let id = UUID()
 
     let stream = AsyncStream<Bool> { continuation in
-      Task.detached {
+      Task {
         await manager.registerReachability(id: id, continuation: continuation)
       }
 
@@ -119,6 +125,9 @@ internal struct StreamContinuationManagerStateTests {
       }
     }
 
+    // Give subscriber time to set up
+    try await Task.sleep(for: .milliseconds(50))
+
     await manager.yieldReachability(true)
     task.cancel()
     await task.value
@@ -127,13 +136,13 @@ internal struct StreamContinuationManagerStateTests {
   // MARK: - Paired App Installed Tests
 
   @Test("Yield paired app installed status")
-  internal func yieldPairedAppInstalled() async {
+  internal func yieldPairedAppInstalled() async throws {
     let manager = StreamContinuationManager()
     let id = UUID()
     let capture = TestValueCapture()
 
     let stream = AsyncStream<Bool> { continuation in
-      Task.detached {
+      Task {
         await manager.registerPairedAppInstalled(id: id, continuation: continuation)
       }
     }
@@ -145,6 +154,9 @@ internal struct StreamContinuationManagerStateTests {
       }
     }
 
+    // Give subscriber time to set up
+    try await Task.sleep(for: .milliseconds(50))
+
     await manager.yieldPairedAppInstalled(true)
     await task.value
 
@@ -153,12 +165,12 @@ internal struct StreamContinuationManagerStateTests {
   }
 
   @Test("Remove paired app installed continuation succeeds")
-  internal func removePairedAppInstalled() async {
+  internal func removePairedAppInstalled() async throws {
     let manager = StreamContinuationManager()
     let id = UUID()
 
     let stream = AsyncStream<Bool> { continuation in
-      Task.detached {
+      Task {
         await manager.registerPairedAppInstalled(id: id, continuation: continuation)
       }
 
@@ -175,6 +187,9 @@ internal struct StreamContinuationManagerStateTests {
       }
     }
 
+    // Give subscriber time to set up
+    try await Task.sleep(for: .milliseconds(50))
+
     await manager.yieldPairedAppInstalled(true)
     task.cancel()
     await task.value
@@ -183,13 +198,13 @@ internal struct StreamContinuationManagerStateTests {
   // MARK: - Paired Tests (iOS-specific)
 
   @Test("Yield paired status")
-  internal func yieldPaired() async {
+  internal func yieldPaired() async throws {
     let manager = StreamContinuationManager()
     let id = UUID()
     let capture = TestValueCapture()
 
     let stream = AsyncStream<Bool> { continuation in
-      Task.detached {
+      Task {
         await manager.registerPaired(id: id, continuation: continuation)
       }
     }
@@ -201,6 +216,9 @@ internal struct StreamContinuationManagerStateTests {
       }
     }
 
+    // Give subscriber time to set up
+    try await Task.sleep(for: .milliseconds(50))
+
     await manager.yieldPaired(true)
     await task.value
 
@@ -209,12 +227,12 @@ internal struct StreamContinuationManagerStateTests {
   }
 
   @Test("Remove paired continuation succeeds")
-  internal func removePaired() async {
+  internal func removePaired() async throws {
     let manager = StreamContinuationManager()
     let id = UUID()
 
     let stream = AsyncStream<Bool> { continuation in
-      Task.detached {
+      Task {
         await manager.registerPaired(id: id, continuation: continuation)
       }
 
@@ -230,6 +248,9 @@ internal struct StreamContinuationManagerStateTests {
         break
       }
     }
+
+    // Give subscriber time to set up
+    try await Task.sleep(for: .milliseconds(50))
 
     await manager.yieldPaired(true)
     task.cancel()

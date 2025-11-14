@@ -39,13 +39,13 @@ internal struct StreamContinuationManagerMessagingTests {
   // MARK: - Message Received Tests
 
   @Test("Yield message received")
-  internal func yieldMessageReceived() async {
+  internal func yieldMessageReceived() async throws {
     let manager = StreamContinuationManager()
     let id = UUID()
     let capture = TestValueCapture()
 
     let stream = AsyncStream<ConnectivityReceiveResult> { continuation in
-      Task.detached {
+      Task {
         await manager.registerMessageReceived(id: id, continuation: continuation)
       }
     }
@@ -63,6 +63,9 @@ internal struct StreamContinuationManagerMessagingTests {
       context: .applicationContext
     )
 
+    // Give subscriber time to set up
+    try await Task.sleep(for: .milliseconds(50))
+
     await manager.yieldMessageReceived(result)
     await task.value
 
@@ -72,12 +75,12 @@ internal struct StreamContinuationManagerMessagingTests {
   }
 
   @Test("Remove message received continuation succeeds")
-  internal func removeMessageReceived() async {
+  internal func removeMessageReceived() async throws {
     let manager = StreamContinuationManager()
     let id = UUID()
 
     let stream = AsyncStream<ConnectivityReceiveResult> { continuation in
-      Task.detached {
+      Task {
         await manager.registerMessageReceived(id: id, continuation: continuation)
       }
 
@@ -100,6 +103,9 @@ internal struct StreamContinuationManagerMessagingTests {
       context: .applicationContext
     )
 
+    // Give subscriber time to set up
+    try await Task.sleep(for: .milliseconds(50))
+
     await manager.yieldMessageReceived(result)
     task.cancel()
     await task.value
@@ -108,7 +114,7 @@ internal struct StreamContinuationManagerMessagingTests {
   // MARK: - Typed Message Tests
 
   @Test("Yield typed message")
-  internal func yieldTypedMessage() async {
+  internal func yieldTypedMessage() async throws {
     struct TestMessage: Messagable {
       static let key: String = "test"
       let value: String
@@ -127,7 +133,7 @@ internal struct StreamContinuationManagerMessagingTests {
     let capture = TestValueCapture()
 
     let stream = AsyncStream<any Messagable> { continuation in
-      Task.detached {
+      Task {
         await manager.registerTypedMessage(id: id, continuation: continuation)
       }
     }
@@ -139,6 +145,9 @@ internal struct StreamContinuationManagerMessagingTests {
       }
     }
 
+    // Give subscriber time to set up
+    try await Task.sleep(for: .milliseconds(50))
+
     let testMessage = TestMessage(from: ["value": "test"])
     await manager.yieldTypedMessage(testMessage)
     _ = await task.value
@@ -149,7 +158,7 @@ internal struct StreamContinuationManagerMessagingTests {
   }
 
   @Test("Remove typed message continuation succeeds")
-  internal func removeTypedMessage() async {
+  internal func removeTypedMessage() async throws {
     struct TestMessage: Messagable {
       static let key: String = "test"
 
@@ -161,7 +170,7 @@ internal struct StreamContinuationManagerMessagingTests {
     let id = UUID()
 
     let stream = AsyncStream<any Messagable> { continuation in
-      Task.detached {
+      Task {
         await manager.registerTypedMessage(id: id, continuation: continuation)
       }
 
@@ -178,6 +187,9 @@ internal struct StreamContinuationManagerMessagingTests {
       }
     }
 
+    // Give subscriber time to set up
+    try await Task.sleep(for: .milliseconds(50))
+
     let testMessage = TestMessage(from: [:])
     await manager.yieldTypedMessage(testMessage)
     task.cancel()
@@ -187,13 +199,13 @@ internal struct StreamContinuationManagerMessagingTests {
   // MARK: - Send Result Tests
 
   @Test("Yield send result")
-  internal func yieldSendResult() async {
+  internal func yieldSendResult() async throws {
     let manager = StreamContinuationManager()
     let id = UUID()
     let capture = TestValueCapture()
 
     let stream = AsyncStream<ConnectivitySendResult> { continuation in
-      Task.detached {
+      Task {
         await manager.registerSendResult(id: id, continuation: continuation)
       }
     }
@@ -212,6 +224,9 @@ internal struct StreamContinuationManagerMessagingTests {
       context: .applicationContext(transport: .dictionary)
     )
 
+    // Give subscriber time to set up
+    try await Task.sleep(for: .milliseconds(50))
+
     await manager.yieldSendResult(sendResult)
     _ = await task.value
 
@@ -221,12 +236,12 @@ internal struct StreamContinuationManagerMessagingTests {
   }
 
   @Test("Remove send result continuation succeeds")
-  internal func removeSendResult() async {
+  internal func removeSendResult() async throws {
     let manager = StreamContinuationManager()
     let id = UUID()
 
     let stream = AsyncStream<ConnectivitySendResult> { continuation in
-      Task.detached {
+      Task {
         await manager.registerSendResult(id: id, continuation: continuation)
       }
 
@@ -248,6 +263,9 @@ internal struct StreamContinuationManagerMessagingTests {
       message: testMessage,
       context: .applicationContext(transport: .dictionary)
     )
+
+    // Give subscriber time to set up
+    try await Task.sleep(for: .milliseconds(50))
 
     await manager.yieldSendResult(sendResult)
     task.cancel()

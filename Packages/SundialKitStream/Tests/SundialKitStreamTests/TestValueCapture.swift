@@ -53,6 +53,11 @@ internal actor TestValueCapture {
   internal var messages: [ConnectivityReceiveResult] = []
   internal var typedMessage: (any Messagable)?
 
+  // MARK: - Network Values
+
+  internal var pathStatus: PathStatus?
+  internal var pathStatuses: [PathStatus] = []
+
   // MARK: - Generic Values
 
   internal var boolValue: Bool?
@@ -95,6 +100,14 @@ internal actor TestValueCapture {
 
   internal func set(typedMessage: any Messagable) {
     self.typedMessage = typedMessage
+  }
+
+  internal func set(pathStatus: PathStatus) {
+    self.pathStatus = pathStatus
+  }
+
+  internal func append(pathStatus: PathStatus) {
+    self.pathStatuses.append(pathStatus)
   }
 
   internal func set(boolValue: Bool) {
@@ -143,6 +156,14 @@ internal actor TestValueCapture {
     typedMessage
   }
 
+  internal func getPathStatus() -> PathStatus? {
+    pathStatus
+  }
+
+  internal func getPathStatuses() -> [PathStatus] {
+    pathStatuses
+  }
+
   internal func getBoolValue() -> Bool? {
     boolValue
   }
@@ -166,6 +187,8 @@ internal actor TestValueCapture {
     message = nil
     messages = []
     typedMessage = nil
+    pathStatus = nil
+    pathStatuses = []
     boolValue = nil
     boolValues = []
     stringValue = nil

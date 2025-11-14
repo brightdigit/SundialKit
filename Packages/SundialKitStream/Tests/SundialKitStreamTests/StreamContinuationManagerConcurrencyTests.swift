@@ -39,19 +39,18 @@ internal struct StreamContinuationManagerConcurrencyTests {
   // MARK: - Concurrent Operations Tests
 
   @Test("Concurrent yielding to same stream type")
-  internal func concurrentYielding() async {
+  internal func concurrentYielding() async throws {
     let manager = StreamContinuationManager()
-    let capture = TestValueCapture()
+    let id = UUID()
 
-    await confirmation("All values received", expectedCount: 10) { confirm in
-      let id = UUID()
-      let stream = AsyncStream<ActivationState> { continuation in
-        Task.detached {
-          await manager.registerActivation(id: id, continuation: continuation)
-        }
+    let stream = AsyncStream<ActivationState> { continuation in
+      Task {
+        await manager.registerActivation(id: id, continuation: continuation)
       }
+    }
 
-      Task { @Sendable in
+    try await confirmation("All values received", expectedCount: 10) { confirm in
+      let consumerTask = Task { @Sendable in
         var count = 0
         for await _ in stream {
           confirm()
@@ -63,7 +62,7 @@ internal struct StreamContinuationManagerConcurrencyTests {
       }
 
       // Give subscriber time to set up
-      try? await Task.sleep(for: .milliseconds(50))
+      try await Task.sleep(for: .milliseconds(50))
 
       // Yield multiple values concurrently
       await withTaskGroup(of: Void.self) { group in
@@ -73,79 +72,87 @@ internal struct StreamContinuationManagerConcurrencyTests {
           }
         }
       }
-    }
 
-    // Note: Test verifies concurrent yields are handled correctly via confirmation callback
+      // Wait for consumer to process all values
+      await consumerTask.value
+    }
   }
 
   @Test("Multiple stream types active simultaneously")
   internal func multipleStreamTypes() async {
     let manager = StreamContinuationManager()
-    let activationCapture = TestValueCapture()
-    let reachabilityCapture = TestValueCapture()
-    let pairedAppInstalledCapture = TestValueCapture()
 
-    await withTaskGroup(of: Void.self) { group in
+    await confirmation("All stream types received", expectedCount: 3) { confirm in
+      let activationCapture = TestValueCapture()
+      let reachabilityCapture = TestValueCapture()
+      let pairedAppInstalledCapture = TestValueCapture()
+
       // Activation stream
-      group.addTask {
+      Task {
         let id = UUID()
         let stream = AsyncStream<ActivationState> { continuation in
-          Task.detached {
+          Task {
             await manager.registerActivation(id: id, continuation: continuation)
           }
         }
 
         for await _ in stream {
           await activationCapture.set(boolValue: true)
+          confirm()
           break
         }
       }
 
       // Reachability stream
-      group.addTask {
+      Task {
         let id = UUID()
         let stream = AsyncStream<Bool> { continuation in
-          Task.detached {
+          Task {
             await manager.registerReachability(id: id, continuation: continuation)
           }
         }
 
         for await _ in stream {
           await reachabilityCapture.set(boolValue: true)
+          confirm()
           break
         }
       }
 
       // Paired app installed stream
-      group.addTask {
+      Task {
         let id = UUID()
         let stream = AsyncStream<Bool> { continuation in
-          Task.detached {
+          Task {
             await manager.registerPairedAppInstalled(id: id, continuation: continuation)
           }
         }
 
         for await _ in stream {
           await pairedAppInstalledCapture.set(boolValue: true)
+          confirm()
           break
         }
       }
 
       // Give subscribers time to set up
-      try? await Task.sleep(for: .milliseconds(100))
+      try? await Task.sleep(for: .milliseconds(50))
 
       // Yield to all streams
       await manager.yieldActivationState(.activated)
       await manager.yieldReachability(true)
       await manager.yieldPairedAppInstalled(true)
+
+      // Wait for all streams to receive values
+      try? await Task.sleep(for: .milliseconds(100))
+
+      let activationValue = await activationCapture.boolValue
+      let reachabilityValue = await reachabilityCapture.boolValue
+      let pairedAppInstalledValue = await pairedAppInstalledCapture.boolValue
+
+      #expect(activationValue == true)
+      #expect(reachabilityValue == true)
+      #expect(pairedAppInstalledValue == true)
     }
-
-    let activationReceived = await activationCapture.boolValue
-    let reachabilityReceived = await reachabilityCapture.boolValue
-    let pairedAppInstalledReceived = await pairedAppInstalledCapture.boolValue
-
-    #expect(activationReceived == true)
-    #expect(reachabilityReceived == true)
-    #expect(pairedAppInstalledReceived == true)
   }
 }
