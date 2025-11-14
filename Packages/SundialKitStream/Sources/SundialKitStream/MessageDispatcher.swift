@@ -28,7 +28,6 @@
 //
 
 import Foundation
-import os.log
 import SundialKitConnectivity
 import SundialKitCore
 

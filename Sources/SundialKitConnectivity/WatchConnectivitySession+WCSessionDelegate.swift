@@ -29,7 +29,9 @@
 
 #if canImport(WatchConnectivity)
   public import Foundation
-  import os.log
+  #if canImport(os)
+    import os.log
+  #endif
   public import SundialKitCore
   import WatchConnectivity
 

@@ -8,7 +8,9 @@
 
 #if canImport(WatchConnectivity)
   import Foundation
-  import os.log
+  #if canImport(os)
+    import os.log
+  #endif
   import SundialKitCore
   import Testing
 
