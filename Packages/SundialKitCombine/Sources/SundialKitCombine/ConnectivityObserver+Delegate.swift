@@ -132,9 +132,9 @@
             self.typedMessageReceived.send(decoded)
           } catch {
             // Decoding failed - log but don't crash (raw publisher still gets the message)
-            #warning(
-              "Error silently swallowed - replace print() with proper logging (OSLog/Logger)")
-            print("Failed to decode message: \(error)")
+            if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+              SundialLogger.combine.error("Failed to decode message: \(String(describing: error))")
+            }
           }
         }
       }
@@ -160,9 +160,11 @@
             self.typedMessageReceived.send(decoded)
           } catch {
             // Decoding failed - log but don't crash (raw publisher still gets the message)
-            #warning(
-              "Error silently swallowed - replace print() with proper logging (OSLog/Logger)")
-            print("Failed to decode application context: \(error)")
+            if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+              SundialLogger.combine.error(
+                "Failed to decode application context: \(String(describing: error))"
+              )
+            }
           }
         }
       }
@@ -182,9 +184,11 @@
             self.typedMessageReceived.send(decoded)
           } catch {
             // Decoding failed - log the error
-            #warning(
-              "Error silently swallowed - replace print() with proper logging (OSLog/Logger)")
-            print("Failed to decode binary message: \(error)")
+            if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+              SundialLogger.combine.error(
+                "Failed to decode binary message: \(String(describing: error))"
+              )
+            }
           }
         }
 

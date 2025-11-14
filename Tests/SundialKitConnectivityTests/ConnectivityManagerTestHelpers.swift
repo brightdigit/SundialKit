@@ -8,6 +8,9 @@
 
 #if canImport(WatchConnectivity)
   import Foundation
+  #if canImport(os)
+    import os.log
+  #endif
   import SundialKitCore
   import Testing
 
@@ -37,7 +40,11 @@
         let elapsed = Date().timeIntervalSince(startTime)
         if elapsed > 1.0 {
           // Log if it took more than 1 second
-          print("waitUntil: condition met after \(elapsed)s (\(attempts) attempts)")
+          if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+            SundialLogger.test.debug(
+              "waitUntil: condition met after \(elapsed)s (\(attempts) attempts)"
+            )
+          }
         }
         return
       }
@@ -45,7 +52,9 @@
     }
 
     let elapsed = Date().timeIntervalSince(startTime)
-    print("waitUntil: timeout after \(elapsed)s (\(attempts) attempts)")
+    if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+      SundialLogger.test.debug("waitUntil: timeout after \(elapsed)s (\(attempts) attempts)")
+    }
     Issue.record("Timeout waiting for condition after \(elapsed)s (\(attempts) attempts)")
   }
 #endif

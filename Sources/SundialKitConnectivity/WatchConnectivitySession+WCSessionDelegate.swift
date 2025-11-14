@@ -29,17 +29,13 @@
 
 #if canImport(WatchConnectivity)
   public import Foundation
-  import os
+  #if canImport(os)
+    import os.log
+  #endif
   public import SundialKitCore
   import WatchConnectivity
 
   extension WatchConnectivitySession {
-    @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
-    private static let logger = Logger(
-      subsystem: "com.brightdigit.SundialKit",
-      category: "connectivity"
-    )
-
     internal func session(
       _ wcSession: WCSession,
       activationDidCompleteWith activationState: WCSessionActivationState,
@@ -52,7 +48,7 @@
         preconditionFailure()
       }
       if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
-        Self.logger.debug(
+        SundialLogger.connectivity.debug(
           """
           WCSession activation complete - state: \(activationState.rawValue), \
           isReachable: \(wcSession.isReachable), \
@@ -90,7 +86,7 @@
 
     internal func sessionReachabilityDidChange(_ session: WCSession) {
       if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
-        Self.logger.debug(
+        SundialLogger.connectivity.debug(
           "WCSession.sessionReachabilityDidChange fired - isReachable: \(session.isReachable)"
         )
       }
