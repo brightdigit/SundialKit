@@ -189,7 +189,7 @@ final class MessageLabViewModel: ObservableObject {
     connectivityObserver.$activationState
       .sink { state in
         if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
-          DemoLogger.shared.info("Activation state changed: \(state)")
+          DemoLogger.shared.info("Activation state changed: \(String(describing: state))")
         }
       }
       .store(in: &cancellables)
@@ -221,7 +221,7 @@ final class MessageLabViewModel: ObservableObject {
 
     do {
       if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
-        DemoLogger.shared.debug("Building message for color: \(selectedColor)")
+        DemoLogger.shared.debug("Building message for color: \(self.selectedColor)")
       }
       let message = try buildMessage()
       if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
@@ -233,7 +233,7 @@ final class MessageLabViewModel: ObservableObject {
       }
       let result = try await connectivityObserver.send(message)
       if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
-        DemoLogger.shared.info("Message sent successfully via: \(result.context)")
+        DemoLogger.shared.info("Message sent successfully via: \(String(describing: result.context))")
       }
 
       // Update state
@@ -244,7 +244,7 @@ final class MessageLabViewModel: ObservableObject {
       )
       messagesSent += 1
       if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
-        DemoLogger.shared.debug("UI state updated - messagesSent: \(messagesSent)")
+        DemoLogger.shared.debug("UI state updated - messagesSent: \(self.messagesSent)")
       }
     } catch {
       lastError = error.localizedDescription
@@ -389,7 +389,7 @@ final class MessageLabViewModel: ObservableObject {
       )
       messagesReceived += 1
       if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
-        DemoLogger.shared.debug("Updated received color: \(components)")
+        DemoLogger.shared.debug("Updated received color: \(String(describing: components))")
       }
     }
   }
