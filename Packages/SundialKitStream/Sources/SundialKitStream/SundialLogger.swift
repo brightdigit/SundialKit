@@ -33,6 +33,8 @@ import Foundation
   import os.log
 #endif
 
+// swiftlint:disable file_types_order
+
 #if canImport(os.log)
   /// Unified logging infrastructure for SundialKit
   ///
@@ -97,99 +99,6 @@ import Foundation
       Logger(subsystem: subsystem, category: category)
     }
   }
-
-  // MARK: - Fallback for older OS versions
-
-  /// Legacy logging support for pre-macOS 11.0 / pre-iOS 14.0
-  ///
-  /// Uses os_log directly when Logger is unavailable
-  internal enum SundialLoggerLegacy {
-    private static let coreLog = OSLog(
-      subsystem: "com.brightdigit.SundialKit.Core",
-      category: "core"
-    )
-    private static let networkLog = OSLog(
-      subsystem: "com.brightdigit.SundialKit.Network",
-      category: "network"
-    )
-    private static let connectivityLog = OSLog(
-      subsystem: "com.brightdigit.SundialKit.Connectivity",
-      category: "connectivity"
-    )
-    private static let streamLog = OSLog(
-      subsystem: "com.brightdigit.SundialKit.Stream",
-      category: "stream"
-    )
-    private static let combineLog = OSLog(
-      subsystem: "com.brightdigit.SundialKit.Combine",
-      category: "combine"
-    )
-    private static let binaryLog = OSLog(
-      subsystem: "com.brightdigit.SundialKit.Binary",
-      category: "binary"
-    )
-    private static let messagableLog = OSLog(
-      subsystem: "com.brightdigit.SundialKit.Messagable",
-      category: "messagable"
-    )
-    private static let testLog = OSLog(
-      subsystem: "com.brightdigit.SundialKit.Tests",
-      category: "tests"
-    )
-
-    /// Log a message to the core subsystem
-    internal static func core(_ type: OSLogType, _ message: StaticString, _ args: any CVarArg...) {
-      os_log(message, log: coreLog, type: type, args)
-    }
-
-    /// Log a message to the network subsystem
-    internal static func network(_ type: OSLogType, _ message: StaticString, _ args: any CVarArg...)
-    {
-      os_log(message, log: networkLog, type: type, args)
-    }
-
-    /// Log a message to the connectivity subsystem
-    internal static func connectivity(
-      _ type: OSLogType, _ message: StaticString, _ args: any CVarArg...
-    ) {
-      os_log(message, log: connectivityLog, type: type, args)
-    }
-
-    /// Log a message to the stream subsystem
-    internal static func stream(_ type: OSLogType, _ message: StaticString, _ args: any CVarArg...)
-    {
-      os_log(message, log: streamLog, type: type, args)
-    }
-
-    /// Log a message to the combine subsystem
-    internal static func combine(_ type: OSLogType, _ message: StaticString, _ args: any CVarArg...)
-    {
-      os_log(message, log: combineLog, type: type, args)
-    }
-
-    /// Log a message to the binary subsystem
-    internal static func binary(_ type: OSLogType, _ message: StaticString, _ args: any CVarArg...)
-    {
-      os_log(message, log: binaryLog, type: type, args)
-    }
-
-    /// Log a message to the messagable subsystem
-    internal static func messagable(
-      _ type: OSLogType, _ message: StaticString, _ args: any CVarArg...
-    ) {
-      os_log(message, log: messagableLog, type: type, args)
-    }
-
-    /// Log a message to the test subsystem
-    internal static func test(_ type: OSLogType, _ message: StaticString, _ args: any CVarArg...) {
-      os_log(message, log: testLog, type: type, args)
-    }
-
-    /// Create a custom OSLog instance
-    internal static func custom(subsystem: String, category: String) -> OSLog {
-      OSLog(subsystem: subsystem, category: category)
-    }
-  }
 #else
   // MARK: - Fallback for non-Apple platforms (Linux, Windows)
 
@@ -199,18 +108,18 @@ import Foundation
   internal enum SundialLogger {
     /// Fallback logger that prints to stdout
     internal struct FallbackLogger {
-      let subsystem: String
-      let category: String
+      internal let subsystem: String
+      internal let category: String
 
-      func error(_ message: String) {
+      internal func error(_ message: String) {
         print("[\(subsystem):\(category)] ERROR: \(message)")
       }
 
-      func info(_ message: String) {
+      internal func info(_ message: String) {
         print("[\(subsystem):\(category)] INFO: \(message)")
       }
 
-      func debug(_ message: String) {
+      internal func debug(_ message: String) {
         print("[\(subsystem):\(category)] DEBUG: \(message)")
       }
     }
@@ -273,3 +182,4 @@ import Foundation
     }
   }
 #endif
+// swiftlint:enable file_types_order

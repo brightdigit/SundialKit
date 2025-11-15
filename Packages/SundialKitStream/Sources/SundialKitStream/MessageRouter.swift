@@ -99,6 +99,7 @@ internal struct MessageRouter {
         // Devices are paired but app not installed
         if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
           SundialLogger.stream.error(
+            // swiftlint:disable:next line_length
             "MessageRouter: Cannot send - companion app not installed (isPaired=\(session.isPaired), isPairedAppInstalled=\(session.isPairedAppInstalled))"
           )
         }
@@ -126,6 +127,7 @@ internal struct MessageRouter {
       // Binary messages require reachability - can't use application context
       if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
         SundialLogger.stream.error(
+          // swiftlint:disable:next line_length
           "MessageRouter: Cannot send binary - not reachable (isReachable=\(session.isReachable), isPaired=\(session.isPaired), isPairedAppInstalled=\(session.isPairedAppInstalled))"
         )
       }

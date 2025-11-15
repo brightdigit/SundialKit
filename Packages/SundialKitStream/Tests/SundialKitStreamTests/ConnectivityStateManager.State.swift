@@ -1,5 +1,5 @@
 //
-//  ConnectivityStateManager.swift
+//  ConnectivityStateManager.State.swift
 //  SundialKitStream
 //
 //  Created by Leo Dion.
@@ -27,52 +27,16 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-public import Foundation
-public import SundialKitConnectivity
-public import SundialKitCore
+import Foundation
+import Testing
 
-/// Manages ConnectivityState and notifies stream subscribers of changes
-///
-/// This type coordinates state updates with the StreamContinuationManager,
-/// ensuring all subscribers receive state change notifications.
-@available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-public actor ConnectivityStateManager {
-  // MARK: - Properties
+@testable import SundialKitConnectivity
+@testable import SundialKitCore
+@testable import SundialKitStream
 
-  internal var state: ConnectivityState = .initial
-  internal let continuationManager: StreamContinuationManager
-
-  // MARK: - State Access
-
-  internal var currentState: ConnectivityState {
-    state
-  }
-
-  internal var activationState: ActivationState? {
-    state.activationState
-  }
-
-  internal var activationError: (any Error)? {
-    state.activationError
-  }
-
-  internal var isReachable: Bool {
-    state.isReachable
-  }
-
-  internal var isPairedAppInstalled: Bool {
-    state.isPairedAppInstalled
-  }
-
-  #if os(iOS)
-    internal var isPaired: Bool {
-      state.isPaired
-    }
-  #endif
-
-  // MARK: - Initialization
-
-  internal init(continuationManager: StreamContinuationManager) {
-    self.continuationManager = continuationManager
+extension ConnectivityStateManager {
+  @Suite("State Tests")
+  internal enum State {
+    // Empty container - all tests in nested suites
   }
 }

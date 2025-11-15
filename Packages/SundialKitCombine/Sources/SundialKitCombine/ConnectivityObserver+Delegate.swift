@@ -33,6 +33,9 @@
   public import SundialKitConnectivity
   public import SundialKitCore
 
+  #if canImport(os.log)
+    import os.log
+  #endif
   // MARK: - ConnectivitySessionDelegate
 
   @MainActor

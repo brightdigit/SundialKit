@@ -1,5 +1,5 @@
 //
-//  MockPathMonitor.swift
+//  ConnectivityStateManager.State.ConsistencyTests.swift
 //  SundialKitStream
 //
 //  Created by Leo Dion.
@@ -28,46 +28,43 @@
 //
 
 import Foundation
+import Testing
 
+@testable import SundialKitConnectivity
 @testable import SundialKitCore
-@testable import SundialKitNetwork
 @testable import SundialKitStream
 
-// MARK: - Mock Implementations
-
-internal final class MockPathMonitor: PathMonitor, @unchecked Sendable {
-  internal typealias PathType = MockPath
-
-  internal let id: UUID
-  internal private(set) var pathUpdate: ((MockPath) -> Void)?
-  internal private(set) var dispatchQueueLabel: String?
-  internal private(set) var isCancelled = false
-
-  internal init(id: UUID = UUID()) {
-    self.id = id
-  }
-
-  internal func onPathUpdate(_ handler: @escaping (MockPath) -> Void) {
-    pathUpdate = handler
-  }
-
-  internal func start(queue: DispatchQueue) {
-    dispatchQueueLabel = queue.label
-    // Immediately send an initial path
-    pathUpdate?(
-      .init(
-        isConstrained: false,
-        isExpensive: false,
-        pathStatus: .satisfied(.wiredEthernet)
+extension ConnectivityStateManager.State {
+  @Suite("Consistency Tests")
+  internal struct ConsistencyTests {
+    @Test("State snapshot is consistent across all properties")
+    internal func stateSnapshotConsistency() async {
+      let continuationManager = SundialKitStream.StreamContinuationManager()
+      let stateManager = SundialKitStream.ConnectivityStateManager(
+        continuationManager: continuationManager
       )
-    )
-  }
+      let session = MockConnectivitySession()
 
-  internal func cancel() {
-    isCancelled = true
-  }
+      // Set up complete session state
+      session.activationState = .activated
+      session.isReachable = true
+      session.isPairedAppInstalled = true
+      session.isPaired = true
 
-  internal func sendPath(_ path: MockPath) {
-    pathUpdate?(path)
+      await stateManager.handleActivation(from: session, activationState: .activated, error: nil)
+
+      let state = await stateManager.currentState
+
+      // All properties should match session state
+      #expect(state.activationState == .activated)
+      #expect(state.activationError == nil)
+      #expect(state.isReachable == true)
+      #expect(state.isPairedAppInstalled == true)
+      #if os(iOS)
+        #expect(state.isPaired == true)
+      #else
+        #expect(state.isPaired == false)
+      #endif
+    }
   }
 }

@@ -1,5 +1,5 @@
 //
-//  MockPathMonitor.swift
+//  StreamContinuationManagerTests+Messaging.swift
 //  SundialKitStream
 //
 //  Created by Leo Dion.
@@ -27,47 +27,10 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import Foundation
+import Testing
 
-@testable import SundialKitCore
-@testable import SundialKitNetwork
-@testable import SundialKitStream
-
-// MARK: - Mock Implementations
-
-internal final class MockPathMonitor: PathMonitor, @unchecked Sendable {
-  internal typealias PathType = MockPath
-
-  internal let id: UUID
-  internal private(set) var pathUpdate: ((MockPath) -> Void)?
-  internal private(set) var dispatchQueueLabel: String?
-  internal private(set) var isCancelled = false
-
-  internal init(id: UUID = UUID()) {
-    self.id = id
-  }
-
-  internal func onPathUpdate(_ handler: @escaping (MockPath) -> Void) {
-    pathUpdate = handler
-  }
-
-  internal func start(queue: DispatchQueue) {
-    dispatchQueueLabel = queue.label
-    // Immediately send an initial path
-    pathUpdate?(
-      .init(
-        isConstrained: false,
-        isExpensive: false,
-        pathStatus: .satisfied(.wiredEthernet)
-      )
-    )
-  }
-
-  internal func cancel() {
-    isCancelled = true
-  }
-
-  internal func sendPath(_ path: MockPath) {
-    pathUpdate?(path)
-  }
+extension StreamContinuationManager {
+  /// Messaging-related test suites
+  @Suite("Messaging Tests")
+  internal enum Messaging {}
 }
