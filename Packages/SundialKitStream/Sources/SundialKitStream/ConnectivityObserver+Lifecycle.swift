@@ -29,7 +29,7 @@
 
 import Foundation
 import SundialKitConnectivity
-import SundialKitCore
+public import SundialKitCore
 
 #if canImport(UIKit)
   import UIKit
@@ -56,7 +56,7 @@ extension ConnectivityObserver {
   /// ]
   /// try await observer.updateApplicationContext(context)
   /// ```
-  internal func updateApplicationContext(_ context: ConnectivityMessage) throws {
+  public func updateApplicationContext(_ context: ConnectivityMessage) throws {
     try session.updateApplicationContext(context)
   }
 
