@@ -29,6 +29,7 @@
 
 import Foundation
 import Observation
+import os.log
 import SundialDemoShared
 import SundialKitConnectivity
 import SundialKitCore
@@ -81,6 +82,18 @@ final class StreamMessageLabViewModel {
 
   /// Current activation state
   var activationState: ActivationState = .notActivated
+
+  /// Whether devices are paired (iOS only, always true on watchOS)
+  var isPaired: Bool = {
+    #if os(watchOS)
+      return true
+    #else
+      return false
+    #endif
+  }()
+
+  /// Whether companion app is installed
+  var isPairedAppInstalled: Bool = false
 
   // MARK: - Dependencies
 
@@ -142,10 +155,47 @@ final class StreamMessageLabViewModel {
       // Activate connectivity session
       do {
         try await connectivityObserver.activate()
-        print("✅ ConnectivityObserver activated successfully")
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          DemoLogger.shared.info("ConnectivityObserver activated successfully")
+        }
+
+        // Check initial state immediately after activation
+        Task { @MainActor in
+          try? await Task.sleep(for: .milliseconds(500))
+          let reachable = await connectivityObserver.isReachable()
+          let activationState = await connectivityObserver.getCurrentActivationState()
+          let pairedAppInstalled = await connectivityObserver.isPairedAppInstalled()
+          #if os(iOS)
+            let paired = await connectivityObserver.isPaired()
+          #else
+            let paired = true
+          #endif
+
+          if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+            DemoLogger.shared.debug("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+            DemoLogger.shared.debug("INITIAL STATE (500ms after activation)")
+            DemoLogger.shared.debug("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+            if let activationState {
+              DemoLogger.shared.debug("Activation State: \(String(describing: activationState))")
+            } else {
+              DemoLogger.shared.debug("Activation State: nil")
+            }
+            DemoLogger.shared.debug("isPaired: \(paired)")
+            DemoLogger.shared.debug("isPairedAppInstalled: \(pairedAppInstalled)")
+            DemoLogger.shared.debug("isReachable: \(reachable)")
+            #if os(watchOS)
+              DemoLogger.shared.debug("Watch app perspective")
+            #elseif os(iOS)
+              DemoLogger.shared.debug("iPhone app perspective")
+            #endif
+            DemoLogger.shared.debug("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+          }
+        }
       } catch {
         lastError = "Failed to activate: \(error.localizedDescription)"
-        print("❌ ConnectivityObserver activation failed: \(error)")
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          DemoLogger.shared.error("ConnectivityObserver activation failed: \(error)")
+        }
       }
 
       // Start consuming all streams concurrently
@@ -161,8 +211,20 @@ final class StreamMessageLabViewModel {
         }
 
         // Stream 3: Activation state
-        group.addTask { 
+        group.addTask {
           await self.consumeActivationState()
+        }
+
+        // Stream 4: Paired status (iOS only)
+        #if os(iOS)
+          group.addTask {
+            await self.consumePairedStatus()
+          }
+        #endif
+
+        // Stream 5: Paired app installed status
+        group.addTask {
+          await self.consumePairedAppInstalledStatus()
         }
       }
     }
@@ -170,22 +232,48 @@ final class StreamMessageLabViewModel {
 
   private func consumeTypedMessages() async {
     for await message in await connectivityObserver.typedMessageStream() {
-      print("📨 Received typed message: \(type(of: message))")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.debug("Received typed message: \(String(describing: type(of: message)))")
+      }
       handleReceivedTypedMessage(message)
     }
   }
 
   private func consumeReachability() async {
     for await reachable in await connectivityObserver.reachabilityUpdates() {
-      print("📡 Reachability changed: \(reachable)")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.info("Reachability changed: \(reachable)")
+      }
       isReachable = reachable
     }
   }
 
   private func consumeActivationState() async {
     for await state in await connectivityObserver.activationStates() {
-      print("🔄 Activation state changed: \(state)")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.info("Activation state changed: \(String(describing: state))")
+      }
       activationState = state
+    }
+  }
+
+  #if os(iOS)
+    private func consumePairedStatus() async {
+      for await paired in await connectivityObserver.pairedUpdates() {
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          DemoLogger.shared.info("Paired status changed: \(paired)")
+        }
+        isPaired = paired
+      }
+    }
+  #endif
+
+  private func consumePairedAppInstalledStatus() async {
+    for await installed in await connectivityObserver.pairedAppInstalledUpdates() {
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.info("Paired app installed status changed: \(installed)")
+      }
+      isPairedAppInstalled = installed
     }
   }
 
@@ -194,40 +282,115 @@ final class StreamMessageLabViewModel {
   /// Send the currently selected color using effective transport method.
   func sendColor() async {
     guard !isSending else {
-      print("⚠️ Already sending, skipping")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.debug("Already sending, skipping")
+      }
       return
     }
 
-    print("📤 Starting send operation...")
+    if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+      DemoLogger.shared.debug("Starting send operation...")
+    }
     isSending = true
     defer {
       isSending = false
-      print("✅ Send operation complete, isSending reset to false")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.debug("Send operation complete, isSending reset to false")
+      }
     }
 
     lastError = nil
 
     do {
-      print("🎨 Building message for color: \(selectedColor)")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.debug("Building message for color: \(String(describing: self.selectedColor))")
+      }
       let message = try buildMessage()
-      print("📦 Message built successfully, type: \(type(of: message))")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.debug("Message built successfully, type: \(String(describing: type(of: message)))")
+      }
 
-      print("🚀 Sending message...")
-      let result = try await connectivityObserver.send(message)
-      print("✅ Message sent successfully via: \(result.context)")
+      // Capture live state immediately before send
+      let liveReachable = await connectivityObserver.isReachable()
+      let liveActivation = await connectivityObserver.getCurrentActivationState()
+      let livePairedAppInstalled = await connectivityObserver.isPairedAppInstalled()
+      #if os(iOS)
+        let livePaired = await connectivityObserver.isPaired()
+      #else
+        let livePaired = true
+      #endif
 
-      // Update state
-      lastSentColor = ColorWithMetadata(
-        color: selectedColor,
-        timestamp: Date(),
-        source: "This Device"
-      )
-      messagesSent += 1
-      print("✅ UI state updated - messagesSent: \(messagesSent)")
+      // Print diagnostic information immediately before send
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.debug("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        DemoLogger.shared.debug("CONNECTIVITY STATE (LIVE)")
+        DemoLogger.shared.debug("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        if let liveActivation {
+          DemoLogger.shared.debug("Activation State: \(String(describing: liveActivation))")
+        } else {
+          DemoLogger.shared.debug("Activation State: not yet activated")
+        }
+        DemoLogger.shared.debug("isPaired: \(livePaired)")
+        DemoLogger.shared.debug("isPairedAppInstalled: \(livePairedAppInstalled)")
+        DemoLogger.shared.debug("isReachable: \(liveReachable)")
+        DemoLogger.shared.debug("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+      }
+
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.debug("Sending message via \(String(describing: self.effectiveTransportMethod))...")
+      }
+
+      // Route to appropriate transport method
+      switch effectiveTransportMethod {
+      case .updateApplicationContext:
+        // Convert message to context and send via updateApplicationContext
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          DemoLogger.shared.debug("Converting message to application context...")
+        }
+        let context = message.message()
+        try await connectivityObserver.updateApplicationContext(context)
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          DemoLogger.shared.info("Message sent successfully via updateApplicationContext")
+        }
+
+        // Update state
+        lastSentColor = ColorWithMetadata(
+          color: selectedColor,
+          timestamp: Date(),
+          source: "This Device"
+        )
+        messagesSent += 1
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          DemoLogger.shared.debug("UI state updated - messagesSent: \(self.messagesSent)")
+        }
+
+      case .sendMessage, .sendMessageData:
+        // Send via interactive message (requires reachability)
+        let result = try await connectivityObserver.send(message)
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          DemoLogger.shared.info("Message sent successfully via: \(String(describing: result.context))")
+          if let transport = result.context.transport {
+            DemoLogger.shared.debug("Actual transport used: \(String(describing: transport))")
+          }
+        }
+
+        // Update state
+        lastSentColor = ColorWithMetadata(
+          color: selectedColor,
+          timestamp: Date(),
+          source: "This Device"
+        )
+        messagesSent += 1
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          DemoLogger.shared.debug("UI state updated - messagesSent: \(self.messagesSent)")
+        }
+      }
     } catch {
       lastError = error.localizedDescription
-      print("❌ Send error: \(error)")
-      print("❌ Error description: \(error.localizedDescription)")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.error("Send error: \(error)")
+        DemoLogger.shared.error("Error description: \(error.localizedDescription)")
+      }
     }
   }
 
@@ -322,7 +485,9 @@ final class StreamMessageLabViewModel {
   }
 
   private func handleReceivedTypedMessage(_ message: any Messagable) {
-    print("Received typed message: \(type(of: message))")
+    if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+      DemoLogger.shared.debug("Received typed message: \(String(describing: type(of: message)))")
+    }
 
     // Extract color from the message based on its type
     let colorComponents: (red: Double, green: Double, blue: Double, alpha: Double)?
@@ -343,7 +508,9 @@ final class StreamMessageLabViewModel {
         alpha: Double(color.alpha)
       )
     } else {
-      print("Unknown message type: \(type(of: message))")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.debug("Unknown message type: \(String(describing: type(of: message)))")
+      }
       colorComponents = nil
     }
 
@@ -360,7 +527,9 @@ final class StreamMessageLabViewModel {
         source: "Counterpart Device"
       )
       messagesReceived += 1
-      print("Updated received color: \(components)")
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        DemoLogger.shared.debug("Updated received color: \(String(describing: components))")
+      }
     }
   }
 }

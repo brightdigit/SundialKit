@@ -39,8 +39,8 @@ public import SundialKitCore
 public actor ConnectivityStateManager {
   // MARK: - Properties
 
-  private var state: ConnectivityState = .initial
-  private let continuationManager: StreamContinuationManager
+  internal var state: ConnectivityState = .initial
+  internal let continuationManager: StreamContinuationManager
 
   // MARK: - State Access
 
@@ -74,92 +74,5 @@ public actor ConnectivityStateManager {
 
   internal init(continuationManager: StreamContinuationManager) {
     self.continuationManager = continuationManager
-  }
-
-  // MARK: - State Updates
-
-  internal func handleActivation(_ activationState: ActivationState, error: (any Error)?) async {
-    #if os(iOS)
-      state = ConnectivityState(
-        activationState: activationState,
-        activationError: error,
-        isReachable: state.isReachable,
-        isPairedAppInstalled: state.isPairedAppInstalled,
-        isPaired: state.isPaired
-      )
-    #else
-      state = ConnectivityState(
-        activationState: activationState,
-        activationError: error,
-        isReachable: state.isReachable,
-        isPairedAppInstalled: state.isPairedAppInstalled,
-        isPaired: false
-      )
-    #endif
-
-    // Notify subscribers
-    await continuationManager.yieldActivationState(activationState)
-
-    let result: Result<ActivationState, Error> =
-      if let error = error {
-        .failure(error)
-      } else {
-        .success(activationState)
-      }
-    await continuationManager.yieldActivationCompletion(result)
-    await continuationManager.yieldReachability(state.isReachable)
-    await continuationManager.yieldPairedAppInstalled(state.isPairedAppInstalled)
-
-    #if os(iOS)
-      await continuationManager.yieldPaired(state.isPaired)
-    #endif
-  }
-
-  internal func updateReachability(_ isReachable: Bool) async {
-    #if os(iOS)
-      state = ConnectivityState(
-        activationState: state.activationState,
-        activationError: state.activationError,
-        isReachable: isReachable,
-        isPairedAppInstalled: state.isPairedAppInstalled,
-        isPaired: state.isPaired
-      )
-    #else
-      state = ConnectivityState(
-        activationState: state.activationState,
-        activationError: state.activationError,
-        isReachable: isReachable,
-        isPairedAppInstalled: state.isPairedAppInstalled,
-        isPaired: false
-      )
-    #endif
-
-    await continuationManager.yieldReachability(isReachable)
-  }
-
-  internal func updateCompanionState(isPairedAppInstalled: Bool, isPaired: Bool) async {
-    #if os(iOS)
-      state = ConnectivityState(
-        activationState: state.activationState,
-        activationError: state.activationError,
-        isReachable: state.isReachable,
-        isPairedAppInstalled: isPairedAppInstalled,
-        isPaired: isPaired
-      )
-    #else
-      state = ConnectivityState(
-        activationState: state.activationState,
-        activationError: state.activationError,
-        isReachable: state.isReachable,
-        isPairedAppInstalled: isPairedAppInstalled,
-        isPaired: true
-      )
-    #endif
-
-    await continuationManager.yieldPairedAppInstalled(state.isPairedAppInstalled)
-
-    #if os(iOS)
-      await continuationManager.yieldPaired(state.isPaired)
-    #endif
   }
 }

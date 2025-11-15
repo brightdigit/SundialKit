@@ -140,7 +140,7 @@
     public func send(_ message: some Messagable, options: SendOptions = []) async throws
       -> ConnectivitySendResult
     {
-      if let binaryMessage = message as? BinaryMessagable, !options.contains(.forceDictionary) {
+      if let binaryMessage = message as? any BinaryMessagable, !options.contains(.forceDictionary) {
         // Binary transport
 
         let data = try BinaryMessageEncoder.encode(binaryMessage)

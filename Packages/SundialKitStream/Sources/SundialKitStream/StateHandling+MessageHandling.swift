@@ -36,26 +36,48 @@ extension StateHandling where Self: MessageHandling & Sendable {
 
   /// Handles session activation completion.
   nonisolated public func session(
-    _: any ConnectivitySession,
+    _ session: any ConnectivitySession,
     activationDidCompleteWith state: ActivationState,
-    error: Error?
+    error: (any Error)?
   ) {
-    Task { await handleActivation(state, error: error) }
+    // Capture full session state snapshot at activation
+    Task {
+      await handleActivation(from: session, activationState: state, error: error)
+
+      // Check for pending application context that arrived while inactive
+      // This handles the case where updateApplicationContext was sent while the watch was unreachable
+      if error == nil, state == .activated, let pendingContext = session.receivedApplicationContext
+      {
+        await handleApplicationContext(pendingContext, error: nil)
+      }
+    }
   }
 
   /// Handles session becoming inactive.
   nonisolated public func sessionDidBecomeInactive(_ session: any ConnectivitySession) {
-    Task { await handleActivation(session.activationState, error: nil) }
+    Task {
+      await handleActivation(from: session, activationState: session.activationState, error: nil)
+    }
   }
 
   /// Handles session deactivation.
   nonisolated public func sessionDidDeactivate(_ session: any ConnectivitySession) {
-    Task { await handleActivation(session.activationState, error: nil) }
+    Task {
+      await handleActivation(from: session, activationState: session.activationState, error: nil)
+    }
   }
 
   /// Handles reachability changes.
   nonisolated public func sessionReachabilityDidChange(_ session: any ConnectivitySession) {
-    Task { await handleReachabilityChange(session.isReachable) }
+    Task {
+      await handleReachabilityChange(session.isReachable)
+
+      // Check for pending application context when becoming reachable
+      // This handles the case where updateApplicationContext was sent while unreachable
+      if session.isReachable, let pendingContext = session.receivedApplicationContext {
+        await handleApplicationContext(pendingContext, error: nil)
+      }
+    }
   }
 
   /// Handles companion device state changes.
@@ -78,7 +100,7 @@ extension StateHandling where Self: MessageHandling & Sendable {
   nonisolated public func session(
     _: any ConnectivitySession,
     didReceiveApplicationContext applicationContext: ConnectivityMessage,
-    error: Error?
+    error: (any Error)?
   ) {
     Task {
       await handleApplicationContext(applicationContext, error: error)

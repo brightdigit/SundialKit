@@ -39,16 +39,16 @@ public import SundialKitCore
 internal actor StreamContinuationManager {
   // MARK: - Continuation Storage
 
-  private var activationContinuations: [UUID: AsyncStream<ActivationState>.Continuation] = [:]
-  private var activationCompletionContinuations:
+  internal var activationContinuations: [UUID: AsyncStream<ActivationState>.Continuation] = [:]
+  internal var activationCompletionContinuations:
     [UUID: AsyncStream<Result<ActivationState, any Error>>.Continuation] = [:]
-  private var reachabilityContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
-  private var pairedAppInstalledContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
-  private var pairedContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
-  private var messageReceivedContinuations:
+  internal var reachabilityContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
+  internal var pairedAppInstalledContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
+  internal var pairedContinuations: [UUID: AsyncStream<Bool>.Continuation] = [:]
+  internal var messageReceivedContinuations:
     [UUID: AsyncStream<ConnectivityReceiveResult>.Continuation] = [:]
-  private var typedMessageContinuations: [UUID: AsyncStream<any Messagable>.Continuation] = [:]
-  private var sendResultContinuations: [UUID: AsyncStream<ConnectivitySendResult>.Continuation] =
+  internal var typedMessageContinuations: [UUID: AsyncStream<any Messagable>.Continuation] = [:]
+  internal var sendResultContinuations: [UUID: AsyncStream<ConnectivitySendResult>.Continuation] =
     [:]
 
   // MARK: - Registration
@@ -57,6 +57,10 @@ internal actor StreamContinuationManager {
     id: UUID,
     continuation: AsyncStream<ActivationState>.Continuation
   ) {
+    assert(
+      activationContinuations[id] == nil,
+      "Duplicate continuation registration for activation stream with ID: \(id)"
+    )
     activationContinuations[id] = continuation
   }
 
@@ -64,83 +68,29 @@ internal actor StreamContinuationManager {
     id: UUID,
     continuation: AsyncStream<Result<ActivationState, any Error>>.Continuation
   ) {
+    assert(
+      activationCompletionContinuations[id] == nil,
+      "Duplicate continuation registration for activation completion stream with ID: \(id)"
+    )
     activationCompletionContinuations[id] = continuation
-  }
-
-  internal func registerReachability(
-    id: UUID,
-    continuation: AsyncStream<Bool>.Continuation
-  ) {
-    reachabilityContinuations[id] = continuation
-  }
-
-  internal func registerPairedAppInstalled(
-    id: UUID,
-    continuation: AsyncStream<Bool>.Continuation
-  ) {
-    pairedAppInstalledContinuations[id] = continuation
-  }
-
-  internal func registerPaired(
-    id: UUID,
-    continuation: AsyncStream<Bool>.Continuation
-  ) {
-    pairedContinuations[id] = continuation
-  }
-
-  internal func registerMessageReceived(
-    id: UUID,
-    continuation: AsyncStream<ConnectivityReceiveResult>.Continuation
-  ) {
-    messageReceivedContinuations[id] = continuation
-  }
-
-  internal func registerTypedMessage(
-    id: UUID,
-    continuation: AsyncStream<any Messagable>.Continuation
-  ) {
-    typedMessageContinuations[id] = continuation
-  }
-
-  internal func registerSendResult(
-    id: UUID,
-    continuation: AsyncStream<ConnectivitySendResult>.Continuation
-  ) {
-    sendResultContinuations[id] = continuation
   }
 
   // MARK: - Removal
 
   internal func removeActivation(id: UUID) {
+    assert(
+      activationContinuations[id] != nil,
+      "Attempting to remove non-existent activation continuation with ID: \(id)"
+    )
     activationContinuations.removeValue(forKey: id)
   }
 
   internal func removeActivationCompletion(id: UUID) {
+    assert(
+      activationCompletionContinuations[id] != nil,
+      "Attempting to remove non-existent activation completion continuation with ID: \(id)"
+    )
     activationCompletionContinuations.removeValue(forKey: id)
-  }
-
-  internal func removeReachability(id: UUID) {
-    reachabilityContinuations.removeValue(forKey: id)
-  }
-
-  internal func removePairedAppInstalled(id: UUID) {
-    pairedAppInstalledContinuations.removeValue(forKey: id)
-  }
-
-  internal func removePaired(id: UUID) {
-    pairedContinuations.removeValue(forKey: id)
-  }
-
-  internal func removeMessageReceived(id: UUID) {
-    messageReceivedContinuations.removeValue(forKey: id)
-  }
-
-  internal func removeTypedMessage(id: UUID) {
-    typedMessageContinuations.removeValue(forKey: id)
-  }
-
-  internal func removeSendResult(id: UUID) {
-    sendResultContinuations.removeValue(forKey: id)
   }
 
   // MARK: - Yielding Values
@@ -153,42 +103,6 @@ internal actor StreamContinuationManager {
 
   internal func yieldActivationCompletion(_ result: Result<ActivationState, any Error>) {
     for continuation in activationCompletionContinuations.values {
-      continuation.yield(result)
-    }
-  }
-
-  internal func yieldReachability(_ isReachable: Bool) {
-    for continuation in reachabilityContinuations.values {
-      continuation.yield(isReachable)
-    }
-  }
-
-  internal func yieldPairedAppInstalled(_ isPairedAppInstalled: Bool) {
-    for continuation in pairedAppInstalledContinuations.values {
-      continuation.yield(isPairedAppInstalled)
-    }
-  }
-
-  internal func yieldPaired(_ isPaired: Bool) {
-    for continuation in pairedContinuations.values {
-      continuation.yield(isPaired)
-    }
-  }
-
-  internal func yieldMessageReceived(_ result: ConnectivityReceiveResult) {
-    for continuation in messageReceivedContinuations.values {
-      continuation.yield(result)
-    }
-  }
-
-  internal func yieldTypedMessage(_ message: any Messagable) {
-    for continuation in typedMessageContinuations.values {
-      continuation.yield(message)
-    }
-  }
-
-  internal func yieldSendResult(_ result: ConnectivitySendResult) {
-    for continuation in sendResultContinuations.values {
       continuation.yield(result)
     }
   }

@@ -31,6 +31,13 @@ public import Foundation
 public import SundialKitConnectivity
 public import SundialKitCore
 
+#if canImport(UIKit)
+  import UIKit
+#endif
+#if canImport(AppKit)
+  import AppKit
+#endif
+
 /// Actor-based WatchConnectivity observer providing AsyncStream APIs
 ///
 /// `ConnectivityObserver` manages communication between iPhone and Apple Watch
@@ -75,8 +82,14 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
   internal let session: any ConnectivitySession
   internal let messageRouter: MessageRouter
   internal let continuationManager: StreamContinuationManager
+
+  /// Manages connectivity activation state and stream continuations
   public let stateManager: ConnectivityStateManager
+
+  /// Handles distribution of incoming messages to stream subscribers
   public let messageDistributor: MessageDistributor
+
+  internal var appLifecycleTask: Task<Void, Never>?
 
   // MARK: - Initialization
 
@@ -88,6 +101,12 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
     self.messageDistributor = MessageDistributor(
       continuationManager: continuationManager,
       messageDecoder: messageDecoder
+    )
+
+    // Ensure session doesn't already have a delegate
+    assert(
+      session.delegate == nil,
+      "Session already has a delegate - multiple delegates will cause undefined behavior"
     )
     session.delegate = self
   }
@@ -116,6 +135,22 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
   /// - Throws: `ConnectivityError.sessionNotSupported` if not supported
   public func activate() throws {
     try session.activate()
+    setupAppLifecycleObserver()
+  }
+
+  /// Checks for pending application context that may have arrived while the app was inactive.
+  ///
+  /// This method is provided for manual checking, but is **automatically called** in the
+  /// following scenarios:
+  /// - After successful session activation
+  /// - When the session becomes reachable
+  /// - When the app returns to the foreground (via app lifecycle notifications)
+  ///
+  /// Most apps will not need to call this method directly.
+  public func checkPendingApplicationContext() async {
+    if let pendingContext = session.receivedApplicationContext {
+      await handleApplicationContext(pendingContext, error: nil)
+    }
   }
 
   /// Gets the current activation state snapshot
@@ -150,4 +185,8 @@ public actor ConnectivityObserver: ConnectivitySessionDelegate, StateHandling, M
       await stateManager.isPaired
     }
   #endif
+
+  deinit {
+    appLifecycleTask?.cancel()
+  }
 }

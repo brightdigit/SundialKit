@@ -31,6 +31,10 @@ import Foundation
 import SundialKitConnectivity
 import SundialKitCore
 
+#if canImport(os.log)
+  import os.log
+#endif
+
 /// Internal helper for dispatching received messages to stream subscribers.
 ///
 /// `MessageDispatcher` handles the distribution of incoming messages to various
@@ -70,8 +74,14 @@ internal struct MessageDispatcher {
     _ message: ConnectivityMessage,
     replyHandler: @escaping @Sendable ([String: any Sendable]) -> Void,
     to messageRegistry: StreamContinuationRegistry<ConnectivityReceiveResult>,
-    and typedRegistry: StreamContinuationRegistry<Messagable>
+    and typedRegistry: StreamContinuationRegistry<any Messagable>
   ) {
+    // Verify decoder exists if typed subscribers are registered
+    assert(
+      messageDecoder != nil || typedRegistry.isEmpty,
+      "Typed message subscribers exist but no decoder is configured"
+    )
+
     // Send to raw stream subscribers
     let result = ConnectivityReceiveResult(message: message, context: .replyWith(replyHandler))
     messageRegistry.yield(result)
@@ -82,9 +92,11 @@ internal struct MessageDispatcher {
         let decoded = try decoder.decode(message)
         typedRegistry.yield(decoded)
       } catch {
-        // Decoding failed - log but don't crash (raw stream still gets the message)
-        #warning("Error silently swallowed - replace print() with proper logging (OSLog/Logger)")
-        print("Failed to decode message: \(error)")
+        // Decoding failed - crash in debug, log in production
+        assertionFailure("Failed to decode message: \(error)")
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          SundialLogger.stream.error("Failed to decode message: \(String(describing: error))")
+        }
       }
     }
   }
@@ -98,9 +110,9 @@ internal struct MessageDispatcher {
   ///   - typedRegistry: Registry of typed message stream continuations
   internal func dispatchApplicationContext(
     _ context: ConnectivityMessage,
-    error: Error?,
+    error: (any Error)?,
     to messageRegistry: StreamContinuationRegistry<ConnectivityReceiveResult>,
-    and typedRegistry: StreamContinuationRegistry<Messagable>
+    and typedRegistry: StreamContinuationRegistry<any Messagable>
   ) {
     // Send to raw stream subscribers
     let result = ConnectivityReceiveResult(message: context, context: .applicationContext)
@@ -112,9 +124,13 @@ internal struct MessageDispatcher {
         let decoded = try decoder.decode(context)
         typedRegistry.yield(decoded)
       } catch {
-        // Decoding failed - log but don't crash (raw stream still gets the message)
-        #warning("Error silently swallowed - replace print() with proper logging (OSLog/Logger)")
-        print("Failed to decode application context: \(error)")
+        // Decoding failed - crash in debug, log in production
+        assertionFailure("Failed to decode application context: \(error)")
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          SundialLogger.stream.error(
+            "Failed to decode application context: \(String(describing: error))"
+          )
+        }
       }
     }
   }
@@ -139,9 +155,13 @@ internal struct MessageDispatcher {
         let decoded = try decoder.decodeBinary(data)
         typedRegistry.yield(decoded)
       } catch {
-        // Decoding failed - log the error
-        #warning("Error silently swallowed - replace print() with proper logging (OSLog/Logger)")
-        print("Failed to decode binary message: \(error)")
+        // Decoding failed - crash in debug, log in production
+        assertionFailure("Failed to decode binary message: \(error)")
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          SundialLogger.stream.error(
+            "Failed to decode binary message: \(String(describing: error))"
+          )
+        }
       }
     }
   }

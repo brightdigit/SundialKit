@@ -58,7 +58,9 @@ extension MessageHandling {
   /// - Parameters:
   ///   - applicationContext: The updated application context
   ///   - error: Optional error that occurred during context update
-  internal func handleApplicationContext(_ applicationContext: ConnectivityMessage, error: Error?)
+  internal func handleApplicationContext(
+    _ applicationContext: ConnectivityMessage, error: (any Error)?
+  )
     async
   {
     await messageDistributor.handleApplicationContext(applicationContext, error: error)

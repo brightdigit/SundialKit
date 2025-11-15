@@ -4,6 +4,9 @@ import Foundation
 @testable import SundialKitCore
 
 internal final class MockSession: ConnectivitySession, @unchecked Sendable {
+  var receivedApplicationContext: ConnectivityMessage? {
+    lastAppContext
+  }
   internal var lastMessageSent: ConnectivityMessage?
   internal var lastAppContext: ConnectivityMessage?
   internal var nextReplyResult: Result<ConnectivityMessage, any Error>?

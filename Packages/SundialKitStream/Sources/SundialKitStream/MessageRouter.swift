@@ -31,6 +31,10 @@ import Foundation
 import SundialKitConnectivity
 import SundialKitCore
 
+#if canImport(os.log)
+  import os.log
+#endif
+
 /// Internal helper for routing messages through appropriate transports.
 ///
 /// `MessageRouter` encapsulates the logic for selecting the best transport
@@ -82,8 +86,25 @@ internal struct MessageRouter {
         throw error
       }
     } else {
-      // No way to deliver the message
-      throw SundialError.missingCompanion
+      // No way to deliver the message - determine specific reason
+      // Check if devices are paired at all
+      if !session.isPaired {
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          SundialLogger.stream.error(
+            "MessageRouter: Cannot send - devices not paired (isPaired=\(session.isPaired))"
+          )
+        }
+        throw ConnectivityError.deviceNotPaired
+      } else {
+        // Devices are paired but app not installed
+        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+          SundialLogger.stream.error(
+            // swiftlint:disable:next line_length
+            "MessageRouter: Cannot send - companion app not installed (isPaired=\(session.isPaired), isPairedAppInstalled=\(session.isPairedAppInstalled))"
+          )
+        }
+        throw ConnectivityError.companionAppNotInstalled
+      }
     }
   }
 
@@ -104,7 +125,13 @@ internal struct MessageRouter {
   ) async throws -> ConnectivitySendResult {
     guard session.isReachable else {
       // Binary messages require reachability - can't use application context
-      throw SundialError.missingCompanion
+      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+        SundialLogger.stream.error(
+          // swiftlint:disable:next line_length
+          "MessageRouter: Cannot send binary - not reachable (isReachable=\(session.isReachable), isPaired=\(session.isPaired), isPairedAppInstalled=\(session.isPairedAppInstalled))"
+        )
+      }
+      throw ConnectivityError.notReachable
     }
 
     return try await withCheckedThrowingContinuation { continuation in

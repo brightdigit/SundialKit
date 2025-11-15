@@ -82,77 +82,65 @@
   // MARK: - Default Notification Methods
 
   extension ConnectivityObserverManaging where Self: ConnectivityManager {
-    /// Notifies observers of activation state change on main queue.
+    /// Notifies observers of activation state change.
+    ///
+    /// Observers are responsible for thread management.
+    /// Use @MainActor on your observer for UI updates.
     internal func notifyActivationStateChanged(_ state: ActivationState) {
-      DispatchQueue.main.async { [weak self] in
-        guard let self = self else {
-          return
-        }
-        observerRegistry.notify { observer in
-          observer.connectivityManager(self, didChangeActivationState: state)
-        }
+      observerRegistry.notify { observer in
+        observer.connectivityManager(self, didChangeActivationState: state)
       }
     }
 
-    /// Notifies observers of reachability change on main queue.
+    /// Notifies observers of reachability change.
+    ///
+    /// Observers are responsible for thread management.
+    /// Use @MainActor on your observer for UI updates.
     internal func notifyReachabilityChanged(_ isReachable: Bool) {
-      DispatchQueue.main.async { [weak self] in
-        guard let self = self else {
-          return
-        }
-        observerRegistry.notify { observer in
-          observer.connectivityManager(self, didChangeReachability: isReachable)
-        }
+      observerRegistry.notify { observer in
+        observer.connectivityManager(self, didChangeReachability: isReachable)
       }
     }
 
-    /// Notifies observers of companion app installation status change on main queue.
+    /// Notifies observers of companion app installation status change.
+    ///
+    /// Observers are responsible for thread management.
+    /// Use @MainActor on your observer for UI updates.
     internal func notifyCompanionAppInstalledChanged(_ isInstalled: Bool) {
-      DispatchQueue.main.async { [weak self] in
-        guard let self = self else {
-          return
-        }
-        observerRegistry.notify { observer in
-          observer.connectivityManager(self, didChangeCompanionAppInstalled: isInstalled)
-        }
+      observerRegistry.notify { observer in
+        observer.connectivityManager(self, didChangeCompanionAppInstalled: isInstalled)
       }
     }
 
     #if os(iOS)
-      /// Notifies observers of paired status change on main queue (iOS only).
+      /// Notifies observers of paired status change (iOS only).
+      ///
+      /// Observers are responsible for thread management.
+      /// Use @MainActor on your observer for UI updates.
       internal func notifyPairedStatusChanged(_ isPaired: Bool) {
-        DispatchQueue.main.async { [weak self] in
-          guard let self = self else {
-            return
-          }
-          observerRegistry.notify { observer in
-            observer.connectivityManager(self, didChangePairedStatus: isPaired)
-          }
+        observerRegistry.notify { observer in
+          observer.connectivityManager(self, didChangePairedStatus: isPaired)
         }
       }
     #endif
 
-    /// Notifies observers of received message on main queue.
+    /// Notifies observers of received message.
+    ///
+    /// Observers are responsible for thread management.
+    /// Use @MainActor on your observer for UI updates.
     internal func notifyMessageReceived(_ message: ConnectivityMessage) {
-      DispatchQueue.main.async { [weak self] in
-        guard let self = self else {
-          return
-        }
-        observerRegistry.notify { observer in
-          observer.connectivityManager(self, didReceiveMessage: message)
-        }
+      observerRegistry.notify { observer in
+        observer.connectivityManager(self, didReceiveMessage: message)
       }
     }
 
-    /// Notifies observers of application context update on main queue.
+    /// Notifies observers of application context update.
+    ///
+    /// Observers are responsible for thread management.
+    /// Use @MainActor on your observer for UI updates.
     internal func notifyApplicationContextReceived(_ context: ConnectivityMessage) {
-      DispatchQueue.main.async { [weak self] in
-        guard let self = self else {
-          return
-        }
-        observerRegistry.notify { observer in
-          observer.connectivityManager(self, didReceiveApplicationContext: context)
-        }
+      observerRegistry.notify { observer in
+        observer.connectivityManager(self, didReceiveApplicationContext: context)
       }
     }
   }

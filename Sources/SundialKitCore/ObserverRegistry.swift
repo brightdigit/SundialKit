@@ -84,7 +84,7 @@ public actor ObserverRegistry<Observer: Sendable> {
   /// Note: Requires Observer to be Equatable for removal.
   /// Consider using a wrapper with identity if needed.
   ///
-  /// - Parameter observer: The observer to remove
+  /// - Parameter predicate: Defines which observers to remove.
   public func removeAll(where predicate: @Sendable (Observer) -> Bool) {
     observers.removeAll(where: predicate)
   }

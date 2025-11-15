@@ -193,3 +193,5 @@ dev-debug.log
 
 .mcp.json
 build
+# Local Xcode configuration
+Examples/Sundial/Local.xcconfig

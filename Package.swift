@@ -70,7 +70,7 @@ let package = Package(
     .iOS(.v16),
     .watchOS(.v9),
     .tvOS(.v16),
-    .macOS(.v10_15)
+    .macOS(.v11)
   ],
   products: [
     // Core protocols and types

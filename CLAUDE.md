@@ -188,7 +188,7 @@ SundialKit v2.0.0 uses a layered architecture separating protocols, wrappers, an
 ## Platform Support
 
 - **Swift Version**: Swift 6.1+ required (v2.0.0+)
-- **Deployment Targets**: iOS 13, watchOS 6, tvOS 13, macOS 10.13
+- **Deployment Targets**: iOS 16, watchOS 9, tvOS 16, macOS 11.0
 - Requires Combine framework (macOS 10.15+, iOS 13+, watchOS 6+, tvOS 13+)
 - WatchConnectivity only available on iOS and watchOS (not macOS/tvOS)
 - **Note**: v2.0.0 dropped support for Swift 5.9, 5.10, and 6.0 to enable Swift Testing framework migration

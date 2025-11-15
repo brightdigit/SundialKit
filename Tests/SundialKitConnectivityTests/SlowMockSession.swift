@@ -16,6 +16,10 @@
   @available(macOS, unavailable)
   @available(tvOS, unavailable)
   internal final class SlowMockSession: ConnectivitySession, @unchecked Sendable {
+    var receivedApplicationContext: SundialKitCore.ConnectivityMessage? {
+      lastAppContext
+    }
+
     internal var lastMessageSent: ConnectivityMessage?
     internal var lastAppContext: ConnectivityMessage?
     internal var nextReplyResult: Result<ConnectivityMessage, any Error>?
