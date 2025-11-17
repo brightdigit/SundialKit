@@ -186,7 +186,7 @@ jobs:
     needs: [archive-demo]
     timeout-minutes: 90
     if: |
-      (github.ref == 'refs/heads/v2.0.0' || github.ref == 'refs/heads/main') &&
+      (github.ref == 'refs/heads/v2.0.0' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/fix/build-2-upload-validation') &&
       !contains(github.event.head_commit.message, '[skip ci]')
     steps:
       - uses: actions/checkout@v4
