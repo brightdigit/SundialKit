@@ -43,7 +43,7 @@ platform :ios do
       upload_to_testflight(
         api_key: api_key,
         ipa: options[:pulse_ipa],
-        skip_waiting_for_build_processing: true
+        wait_processing_timeout_duration: 1800
       )
     end
 
@@ -52,7 +52,7 @@ platform :ios do
       upload_to_testflight(
         api_key: api_key,
         ipa: options[:flow_ipa],
-        skip_waiting_for_build_processing: true
+        wait_processing_timeout_duration: 1800
       )
     end
   end
