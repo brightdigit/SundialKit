@@ -718,7 +718,7 @@
         "id": 9,
         "title": "Migrate all tests to Swift Testing",
         "description": "Convert entire test suite from XCTest to Swift Testing framework across all packages (requires Swift 6.1+ - Swift 5.9/5.10/6.0 support dropped). Deferred until demo app (Task 13) validates core functionality works correctly.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "1",
           "2",
@@ -740,7 +740,7 @@
             "description": "Convert all SundialKitCore test files from XCTest to Swift Testing, including protocol conformance tests and mock implementations",
             "dependencies": [],
             "details": "Replace XCTestCase with @Test functions and @Suite for organization. Convert all XCTAssert statements to Swift Testing assertions (#expect, #require). Update mock implementations to use Swift Testing patterns. Ensure Sendable conformance tests are properly migrated. Update test file imports from XCTest to Testing framework.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Run migrated tests to ensure all pass, verify code coverage remains at same level or higher, validate that mock implementations work correctly with new framework",
             "parentId": "undefined"
           },
@@ -752,7 +752,7 @@
               1
             ],
             "details": "Convert NetworkObserverTests, NWPathMonitorTests, NWInterfaceTests, and PathStatusNetworkTests from XCTest to Swift Testing. Migrate MockPathMonitor and MockNetworkPing to Swift Testing patterns. Convert observer notification tests using @Test with async support. Update thread safety tests to use Swift Testing concurrency features. Convert state change tests to use parameterized testing with @Test(arguments:). Ensure platform-specific behavior tests work on all supported platforms.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify all network state transitions are properly tested, validate mock implementations trigger correct behaviors, ensure concurrent observer tests pass reliably",
             "parentId": "undefined"
           },
@@ -764,7 +764,7 @@
               1
             ],
             "details": "Migrate ConnectivityObserver tests (ConnectivityObserverInternalTests, ConnectivityObserverMessageTests, ConnectivityObserverPropertyTests) to Swift Testing. Convert MockConnectivitySession and delegate pattern tests. Update platform-specific tests using @available annotations with Swift Testing. Convert message sending/receiving tests to use async testing patterns. Migrate timeout and fallback mechanism tests. Convert reachability change tests to use parameterized testing for different scenarios.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test on both iOS and watchOS simulators, verify platform-specific delegate methods are properly tested, ensure message routing logic is fully covered",
             "parentId": "undefined"
           },
@@ -777,7 +777,7 @@
               3
             ],
             "details": "Convert PassthroughSubjectTests and publisher testing from XCTest expectations to Swift Testing async/await patterns. Migrate PassthroughSubject tests and anyPublisher(for:) extension tests. Update subscription lifecycle tests using Swift Testing features. Convert publisher value and completion tests to use #expect with async support. Ensure all reactive streams are properly tested.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify all publishers emit expected values, test error propagation through publishers, validate subscription cleanup and memory management",
             "parentId": "undefined"
           },
@@ -789,7 +789,7 @@
               1
             ],
             "details": "Convert MessagableTests, MessageDecoderTests, ConnectivitySendContextTests, and ConnectivityReceiveContextTests from XCTest to Swift Testing. Migrate encoding/decoding tests to use Swift Testing assertions. Update MockMessage implementations to Swift Testing patterns. Convert type registration tests using parameterized testing for multiple message types. Convert ConnectivityMessage dictionary tests. Ensure property list compatibility tests are properly migrated.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test encoding/decoding roundtrips for all message types, verify type safety with invalid messages, validate property list compatibility",
             "parentId": "undefined"
           },
@@ -805,7 +805,7 @@
               5
             ],
             "details": "Update GitHub Actions workflow to use swift test with Swift Testing support. Configure code coverage reporting to work with Swift Testing output. Update test result formatting for GitHub Actions annotations. Ensure parallel test execution is properly configured. Add test performance tracking and reporting. Update matrix testing for all supported platforms.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify CI pipeline runs successfully on all platforms, ensure coverage reports are generated correctly, validate test results are properly displayed in GitHub",
             "parentId": "undefined"
           },
@@ -821,7 +821,7 @@
               5
             ],
             "details": "Create common test utilities using Swift Testing patterns (fixtures, helpers, custom assertions). Document Swift Testing best practices and patterns specific to SundialKit. Create migration guide from XCTest to Swift Testing for future contributors. Develop example test patterns for different scenarios (async, actors, publishers). Update README with testing instructions using Swift Testing.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Review documentation for completeness and accuracy, validate example code compiles and runs, ensure utilities are used consistently across test suite",
             "parentId": "undefined"
           }
@@ -1086,7 +1086,7 @@
         "id": 13,
         "title": "Migrate Sundial demo application to SundialKit v2.0.0 monorepo",
         "description": "Import the Sundial iOS/watchOS demo application from the external repository into the SundialKit monorepo using a phased approach. Phase 1: Import with git subtree add and maintain v1.0.0 APIs as validation baseline. Phase 2: Migrate to SundialKit v2.0.0 APIs with SundialKitCombine and SundialKitStream as those plugins complete.",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [
           "1",
           "2",
@@ -1127,7 +1127,7 @@
               2
             ],
             "details": "Add executable product definition to root Package.swift: .executable(name: \"SundialDemo\", targets: [\"SundialDemo\"]). Define corresponding target with dependency on SundialKit umbrella package and proper source path pointing to Examples/Sundial/. Set deployment targets to match existing iOS 14.8+ and watchOS 7.4+ requirements. Configure basic resource handling for assets and localization files. Ensure both XcodeGen and SPM build systems can coexist without conflicts. Test that swift build works for basic compilation while XcodeGen remains the primary development environment",
-            "status": "cancelled",
+            "status": "done",
             "testStrategy": "swift build compiles SundialDemo target successfully, XcodeGen project generation still works without conflicts, both build systems produce equivalent binary functionality",
             "parentId": "undefined"
           },
@@ -1139,7 +1139,7 @@
               3
             ],
             "details": "Create Tests/SundialDemoTests/ directory with integration test suite covering: network monitoring state changes, WatchConnectivity session activation and reachability, message encoding/decoding for color data, UI state updates in response to connectivity changes, error handling for connection failures, and cross-platform communication flows. Use existing SundialKit test patterns and Mock* implementations where appropriate. Configure test targets in both Package.swift and XcodeGen project for parallel test execution. Include performance benchmarks for message latency and UI responsiveness to establish baseline measurements for v2.0.0 comparison",
-            "status": "deferred",
+            "status": "done",
             "testStrategy": "All integration tests pass consistently, achieve 80%+ code coverage for demo business logic, performance benchmarks complete within expected thresholds, tests run successfully in both SPM and XcodeGen environments",
             "parentId": "undefined"
           },
@@ -1151,7 +1151,7 @@
               4
             ],
             "details": "Create Examples/Sundial/BASELINE.md documenting current v1.0.0 implementation including: import statements and dependency structure, NetworkObserver and ConnectivityObserver usage patterns, Combine publisher chains and @Published property subscriptions, message encoding/decoding with ColorMessage, error handling approaches, and UI update mechanisms. Document XcodeGen configuration details including project.yml structure, target definitions, and build settings. Create MIGRATION.md outlining Phase 2 roadmap: SundialKitCombine compatibility migration steps, SundialKitStream modern async/await conversion, timeline dependencies on Tasks 5 and 7 completion, testing strategy for ensuring feature parity, and success criteria for each migration phase",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Documentation accurately reflects current implementation details, migration roadmap provides clear actionable steps, code examples in documentation compile and run correctly",
             "parentId": "undefined"
           },
@@ -1163,7 +1163,7 @@
               5
             ],
             "details": "Update .github/workflows/ci.yml to include Sundial demo build verification using both XcodeGen and SPM. Add specific job matrix for demo testing across iOS 14.8+ and watchOS 7.4+ platforms. Configure integration test execution in CI environment with proper simulator setup. Add demo build status checks as required GitHub Actions for pull requests affecting core components (Tasks 1,2,3). Include performance regression detection by comparing benchmark results against baseline measurements. Configure build artifact collection for demo applications to enable manual testing on devices",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "CI successfully builds demo using both build systems, integration tests pass consistently in CI environment, performance benchmarks complete within acceptable variance from baseline",
             "parentId": "undefined"
           },
@@ -1175,7 +1175,7 @@
               6
             ],
             "details": "Test demo's effectiveness as integration test bed by simulating core component changes and verifying regression detection. Validate demo catches breaking changes in Tasks 1,2,3 components through automated testing. Confirm demo provides meaningful feedback for NetworkMonitor and ConnectivityManager development. Test demo's ability to validate real-world usage patterns including network state transitions, WatchConnectivity session lifecycle, message transmission reliability, and UI responsiveness. Document integration feedback loop for core component developers including test failure interpretation, debugging guidance, and performance impact assessment",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Demo successfully detects regressions when core components change, provides actionable feedback for development teams, integration tests complete within reasonable CI time limits, real device testing validates simulator results",
             "parentId": "undefined"
           },
@@ -1184,7 +1184,7 @@
             "title": "Migrate Sundial demo to SundialKitCombine for v1 compatibility",
             "description": "Update the imported Sundial app to use SundialKitCombine plugin while maintaining existing Combine-based architecture with @Published properties, NetworkObserver, and ConnectivityObserver wrappers",
             "details": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               5,
               "13.5"
@@ -1197,7 +1197,7 @@
             "title": "Implement modern async/await variant using SundialKitStream",
             "description": "Create a modern Swift concurrency implementation of the Sundial demo using SundialKitStream plugin with actor-based NetworkObserver and ConnectivityObserver, AsyncStream APIs, and proper @MainActor annotations",
             "details": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               7,
               "13.5"
@@ -1210,7 +1210,7 @@
             "title": "Add binary messaging demonstration with SundialKitBinary",
             "description": "Integrate SundialKitBinary plugin to demonstrate efficient binary serialization for color messages, comparing message sizes and performance against dictionary-based approach",
             "details": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               8,
               "13.8",
@@ -1224,7 +1224,7 @@
             "title": "Extract shared SwiftUI components for both implementations",
             "description": "Create reusable SwiftUI views (ColorPickerView, ColorDisplayView, NetworkStatusView, ConnectionStatusView) that work with both Combine and Stream implementations through protocol abstractions",
             "details": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               "13.8",
               "13.9"
@@ -1237,7 +1237,7 @@
             "title": "Create comprehensive documentation comparing v1 and v2 implementations",
             "description": "Document both Combine and Stream implementations with architecture comparison, migration patterns, performance benchmarks, and best practices. Include side-by-side code examples showing the differences between approaches",
             "details": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               "13.8",
               "13.9",
@@ -1261,7 +1261,7 @@
       ],
       "created": "2025-10-27T17:19:15.396Z",
       "description": "Tasks for master context",
-      "updated": "2025-11-01T20:58:22.476Z"
+      "updated": "2025-11-17T19:36:26.088Z"
     }
   }
 }
