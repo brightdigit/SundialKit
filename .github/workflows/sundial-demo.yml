@@ -184,6 +184,7 @@ jobs:
     name: Deploy to TestFlight
     runs-on: macos-26
     needs: [archive-demo]
+    timeout-minutes: 90
     if: |
       (github.ref == 'refs/heads/v2.0.0' || github.ref == 'refs/heads/main') &&
       !contains(github.event.head_commit.message, '[skip ci]')

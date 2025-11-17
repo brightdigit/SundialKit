@@ -19,7 +19,7 @@ configFiles:
 settings:
   base:
     MARKETING_VERSION: "1.0.0"
-    CURRENT_PROJECT_VERSION: "3"
+    CURRENT_PROJECT_VERSION: "2"
     SWIFT_VERSION: "6.1"
     ENABLE_USER_SCRIPT_SANDBOXING: NO
 
@@ -52,6 +52,8 @@ targets:
     info:
       path: Resources/iOS/Info.plist
       properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: true
         LSRequiresIPhoneOS: true
@@ -108,6 +110,8 @@ targets:
     info:
       path: Resources/watchOS/Info-Combine.plist
       properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         WKApplication: true
         WKCompanionAppBundleIdentifier: com.brightdigit.sundial.combine.ios
         UISupportedInterfaceOrientations:
@@ -157,6 +161,8 @@ targets:
     info:
       path: Resources/iOS/Info.plist
       properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: true
         LSRequiresIPhoneOS: true
@@ -213,6 +219,8 @@ targets:
     info:
       path: Resources/watchOS/Info-Stream.plist
       properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         WKApplication: true
         WKCompanionAppBundleIdentifier: com.brightdigit.sundial.stream.ios
         UISupportedInterfaceOrientations:
