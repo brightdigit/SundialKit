@@ -6,26 +6,7 @@ Build network-aware apps and seamless iPhone-Apple Watch experiences.
 
 ![SundialKit Logo](logo.jpg)
 
-SundialKit is a modern Swift library that helps you build apps that respond intelligently to network changes and communicate effortlessly between iPhone and Apple Watch. It simplifies two of Apple's most powerful but complex frameworks: **Network** and **WatchConnectivity**.
-
-### What Can You Build?
-
-**Cross-Device Communication Apps**
-- Send commands between iPhone and Apple Watch (play/pause, start workout, update settings)
-- Build companion Watch apps with bidirectional messaging
-- Automatically queue messages when devices aren't reachable
-- Monitor connectivity status to enable/disable remote features in your UI
-- Handle device pairing and installation status gracefully
-
-**Network-Aware Applications**
-- Detect when users switch from WiFi to cellular and adjust media quality
-- Show offline indicators and cache content when network is unavailable
-- Warn users about expensive connections before large downloads
-
-**Adaptive User Experiences**
-- Reduce animation quality on constrained networks
-- Prefetch content only on WiFi connections
-- Provide offline-first experiences that sync when connected
+SundialKit is a modern Swift library that helps you build apps that respond intelligently to network changes and communicate effortlessly between iPhone and Apple Watch. It simplifies two of Apple's most powerful but complex frameworks: [**Network**](https://developer.apple.com/documentation/network) and [**WatchConnectivity**](https://developer.apple.com/documentation/watchconnectivity).
 
 ### Key Capabilities
 
@@ -39,8 +20,8 @@ SundialKit is a modern Swift library that helps you build apps that respond inte
 SundialKit is organized into focused packages - choose the ones you need:
 
 **Core Packages**
-- **<doc:SundialKitNetwork>** - Network connectivity monitoring using Apple's Network framework
-- **<doc:SundialKitConnectivity>** - WatchConnectivity wrapper for iPhone-Apple Watch communication
+- **<doc:SundialKitNetwork>** - Network connectivity monitoring using Apple's [Network framework](https://developer.apple.com/documentation/network)
+- **<doc:SundialKitConnectivity>** - [WatchConnectivity](https://developer.apple.com/documentation/watchconnectivity) wrapper for iPhone-Apple Watch communication
 
 **Observation Plugins** (choose based on your concurrency preference)
 - **<doc:SundialKitStream>** - Modern AsyncStream-based observers for async/await projects
@@ -58,108 +39,91 @@ SundialKit is organized into focused packages - choose the ones you need:
 
 ### Installation
 
-Swift Package Manager is Apple's decentralized dependency manager. To integrate SundialKit, add it to your `Package.swift`:
-
-#### Option A: Modern Async/Await (Recommended)
+Add SundialKit to your `Package.swift`:
 
 ```swift
-let package = Package(
-  name: "YourPackage",
-  platforms: [.iOS(.v16), .watchOS(.v9), .tvOS(.v16), .macOS(.v13)],
-  dependencies: [
-    .package(url: "https://github.com/brightdigit/SundialKit.git", from: "2.0.0")
-  ],
-  targets: [
-    .target(
-      name: "YourTarget",
-      dependencies: [
-        .product(name: "SundialKitStream", package: "SundialKit"),
-        .product(name: "SundialKitNetwork", package: "SundialKit"),
-        .product(name: "SundialKitConnectivity", package: "SundialKit")
-      ]
-    )
-  ]
-)
+dependencies: [
+  .package(url: "https://github.com/brightdigit/SundialKit.git", from: "2.0.0")
+]
 ```
-
-#### Option B: Combine + SwiftUI
-
-```swift
-let package = Package(
-  name: "YourPackage",
-  platforms: [.iOS(.v13), .watchOS(.v6), .tvOS(.v13), .macOS(.v10_15)],
-  dependencies: [
-    .package(url: "https://github.com/brightdigit/SundialKit.git", from: "2.0.0")
-  ],
-  targets: [
-    .target(
-      name: "YourTarget",
-      dependencies: [
-        .product(name: "SundialKitCombine", package: "SundialKit"),
-        .product(name: "SundialKitNetwork", package: "SundialKit"),
-        .product(name: "SundialKitConnectivity", package: "SundialKit")
-      ]
-    )
-  ]
-)
-```
-
-#### Option C: Umbrella Import (All Core Modules)
-
-For accessing all core types without observation plugins:
-
-```swift
-.product(name: "SundialKit", package: "SundialKit")
-```
-
-This re-exports SundialKitCore, SundialKitNetwork, and SundialKitConnectivity.
 
 ### Network Monitoring
 
-Monitor network connectivity using ``NetworkMonitor``, which wraps Apple's `NWPathMonitor`:
+Monitor network connectivity using ``NetworkObserver`` from observation plugins.
+
+> Warning: **TODO** Add more text before code samples explaining what these samples do
+
+> Warning: **TODO** Add a default initializer for the NetworkObserver(s) which use the default NWPathMonitor and a nil Ping monitor
+
+**Using SundialKitCombine:**
 
 ```swift
+import SundialKitCombine
 import SundialKitNetwork
+import Combine
 
-// Create a monitor with optional ping support
-let monitor = NetworkMonitor(
-  monitor: NWPathMonitorAdapter(),
+// Create observer with @MainActor isolation
+let observer = NetworkObserver(
+  monitor: NWPathMonitor(),
   ping: nil
 )
 
-// Add an observer for state changes
-let observerId = monitor.addObserver { state in
-  print("Network status: \(state.pathStatus)")
-  print("Is expensive: \(state.isExpensive)")
-}
-
 // Start monitoring
-monitor.start(queue: .global())
+observer.start()
 
-// Later, remove the observer
-monitor.removeObserver(id: observerId)
+// Use @Published properties
+var cancellables = Set<AnyCancellable>()
+
+observer.$pathStatus
+  .sink { status in
+    print("Network status: \(status)")
+  }
+  .store(in: &cancellables)
+
+observer.$isExpensive
+  .sink { isExpensive in
+    print("Is expensive: \(isExpensive)")
+  }
+  .store(in: &cancellables)
 ```
 
-### WatchConnectivity Communication
-
-Use ``ConnectivitySession`` and related types for iPhone/Apple Watch communication:
+**Using SundialKitStream:**
 
 ```swift
-import SundialKitConnectivity
+import SundialKitStream
+import SundialKitNetwork
 
-// Create a session wrapper
-let session = WatchConnectivitySession()
+// Create actor-based observer
+let observer = NetworkObserver(
+  monitor: NWPathMonitor(),
+  ping: nil
+)
 
-// Activate the session
-try session.activate()
+// Start monitoring
+await observer.start()
 
-// Send a message
-let result = try await session.sendMessage(["key": "value"])
+// Consume path status updates
+Task {
+  for await status in await observer.pathStatusStream {
+    print("Network status: \(status)")
+  }
+}
+
+// Check expensive status
+Task {
+  for await isExpensive in await observer.isExpensiveStream {
+    print("Is expensive: \(isExpensive)")
+  }
+}
 ```
 
 ### Type-Safe Messaging with Messagable
 
 Create type-safe messages using ``Messagable``:
+
+> Warning: **TODO** Add more text before code samples explaining what these samples do
+
+> Warning: **TODO** Explain that key uses the type but is overridable
 
 ```swift
 struct ColorMessage: Messagable {
@@ -168,63 +132,138 @@ struct ColorMessage: Messagable {
   let green: Double
   let blue: Double
 
-  init?(from parameters: [String: Any]?) {
-    guard let params = parameters,
-          let red = params["red"] as? Double,
-          let green = params["green"] as? Double,
-          let blue = params["blue"] as? Double else {
-      return nil
+  init(from parameters: [String: any Sendable]) throws {
+    guard let red = parameters["red"] as? Double,
+          let green = parameters["green"] as? Double,
+          let blue = parameters["blue"] as? Double else {
+      throw SerializationError.missingField("color components")
     }
     self.red = red
     self.green = green
     self.blue = blue
   }
 
-  func parameters() -> [String: Any] {
+  func parameters() -> [String: any Sendable] {
     ["red": red, "green": green, "blue": blue]
   }
 }
 
 // Decode received messages
 let decoder = MessageDecoder(messagableTypes: [ColorMessage.self])
-if let message = decoder.decode(receivedDictionary) as? ColorMessage {
-  print("Received color: RGB(\(message.red), \(message.green), \(message.blue))")
+do {
+  let message = try decoder.decode(receivedDictionary)
+  if let colorMessage = message as? ColorMessage {
+    print("Received color: RGB(\(colorMessage.red), \(colorMessage.green), \(colorMessage.blue))")
+  }
+} catch {
+  print("Failed to decode: \(error)")
 }
 ```
 
 ### Binary Messaging with BinaryMessagable
 
-For efficient binary serialization, use ``BinaryMessagable``:
+For efficient binary serialization (Protobuf, MessagePack, etc.), use ``BinaryMessagable``:
+
+> Warning: **TODO** Add more text before code samples explaining what these samples do
+
+> Warning: **TODO** Make the Message and BinaryMessagable different data to remove confusion
+
+> Warning: **TODO** In the intro for BinaryMessagable explain that the example uses swift-protobuf with a link to the package documentation
+
+> Warning: **TODO** The BinaryMessagable example uses an in-between type rather than just adding an extension on a protobuf type
 
 ```swift
-struct BinaryColorMessage: BinaryMessagable {
-  static let key = "binaryColor"
-  let data: Data
+struct ImageMessage: BinaryMessagable {
+  static let key = "image"
+  let imageData: Data
 
-  init(data: Data) {
-    self.data = data
+  // BinaryMessagable requirement: decode from binary data
+  init(from data: Data) throws {
+    // Data is already in the format you need (JPEG, PNG, Protobuf, etc.)
+    self.imageData = data
   }
 
-  init?(from parameters: [String: Any]?) {
-    guard let params = parameters,
-          let data = params["data"] as? Data else {
-      return nil
-    }
-    self.data = data
-  }
-
-  func parameters() -> [String: Any] {
-    ["data": data]
-  }
-
-  func binaryData() throws -> Data {
-    data
-  }
-
-  static func from(binaryData: Data) throws -> Self {
-    Self(data: binaryData)
+  // BinaryMessagable requirement: encode to binary data
+  func encode() throws -> Data {
+    // Return the binary representation
+    imageData
   }
 }
+
+// BinaryMessagable provides automatic Messagable conformance
+// No need to implement init(from parameters:) or parameters()
+let decoder = MessageDecoder(messagableTypes: [ImageMessage.self])
+```
+
+### WatchConnectivity Communication
+
+Communicate between iPhone and Apple Watch using ``ConnectivityObserver`` from observation plugins.
+
+> Warning: **TODO** Add more text before code samples explaining what these samples do
+
+> Warning: **TODO** In the WatchConnectivity example, have both the Message and BinaryMessagable types in the decoder
+
+**Using SundialKitCombine:**
+
+```swift
+import SundialKitCombine
+import SundialKitConnectivity
+import Combine
+
+// Create observer with message decoder
+let observer = ConnectivityObserver(
+  messageDecoder: MessageDecoder(messagableTypes: [ColorMessage.self])
+)
+
+// Activate session
+try observer.activate()
+
+// Listen for typed messages
+var cancellables = Set<AnyCancellable>()
+
+observer.typedMessageReceived
+  .sink { message in
+    if let colorMessage = message as? ColorMessage {
+      print("Received color: \(colorMessage)")
+    }
+  }
+  .store(in: &cancellables)
+
+// Send messages
+Task {
+  let message = ColorMessage(/* ... */)
+  let result = try await observer.send(message)
+  print("Sent via: \(result.context)")
+}
+```
+
+**Using SundialKitStream:**
+
+```swift
+import SundialKitStream
+import SundialKitConnectivity
+
+// Create actor-based observer
+let observer = ConnectivityObserver(
+  messageDecoder: MessageDecoder(messagableTypes: [ColorMessage.self])
+)
+
+// Activate session
+try await observer.activate()
+
+// Listen for typed messages using AsyncStream
+Task {
+  for await message in await observer.typedMessageStream() {
+    if let colorMessage = message as? ColorMessage {
+      print("Received color: \(colorMessage)")
+    }
+  }
+}
+
+// Send messages
+let message = ColorMessage(/* ... */)
+let result = try await observer.send(message)
+print("Sent via: \(result.context)")
 ```
 
 ### Choosing Your Observation Plugin

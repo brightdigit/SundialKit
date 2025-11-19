@@ -20,7 +20,7 @@ import SwiftProtobuf
 
 extension Sundial_Demo_ColorMessage: BinaryMessagable {
   public init(from data: Data) throws {
-    try self.init(serializedData: data)
+    try self.init(serializedBytes: data)
   }
 
   public func encode() throws -> Data {
