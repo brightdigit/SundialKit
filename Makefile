@@ -1,4 +1,4 @@
-.PHONY: help build test lint format clean
+.PHONY: help build test lint format clean docs-preview docs-build docs-clean
 
 # Default target
 help:
@@ -8,6 +8,9 @@ help:
 	@echo "  lint           - Run linting and formatting checks (strict mode)"
 	@echo "  format         - Format code only (no linting)"
 	@echo "  clean          - Clean build artifacts"
+	@echo "  docs-preview   - Preview documentation with auto-rebuild"
+	@echo "  docs-build     - Build documentation without preview server"
+	@echo "  docs-clean     - Clean documentation build artifacts"
 	@echo "  help           - Show this help message"
 
 # Build the package
@@ -35,3 +38,18 @@ clean:
 	@echo "🧹 Cleaning build artifacts..."
 	@swift package clean
 	@rm -rf .build
+
+# Preview documentation with auto-rebuild
+docs-preview:
+	@echo "📖 Starting documentation preview..."
+	@./Scripts/preview-docs.sh Sources/SundialKit/SundialKit.docc
+
+# Build documentation without preview server
+docs-build:
+	@echo "📚 Building documentation..."
+	@./Scripts/preview-docs.sh Sources/SundialKit/SundialKit.docc --no-server --no-watch
+
+# Clean documentation build artifacts
+docs-clean:
+	@echo "🧹 Cleaning documentation artifacts..."
+	@rm -rf .build/docs .build/symbol-graphs .build/docc
