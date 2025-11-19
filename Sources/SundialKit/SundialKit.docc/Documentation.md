@@ -1,42 +1,57 @@
 # ``SundialKit``
 
-Swift 6.1+ reactive communications library with modern concurrency support for Apple platforms.
+Build network-aware apps and seamless iPhone-Apple Watch experiences.
 
 ## Overview
 
 ![SundialKit Logo](logo.jpg)
 
-SundialKit v2.0.0 provides reactive interfaces for network connectivity monitoring and WatchConnectivity communication. The library uses a **three-layer architecture** that separates protocols, implementations, and observation patterns:
+SundialKit is a modern Swift library that helps you build apps that respond intelligently to network changes and communicate effortlessly between iPhone and Apple Watch. It simplifies two of Apple's most powerful but complex frameworks: **Network** and **WatchConnectivity**.
 
-**Layer 1: Core Protocols & Types** (SundialKitCore)
-- Protocol definitions for network and connectivity abstractions
-- Sendable-safe value types and error enums
-- No concrete implementations or observers
+### What Can You Build?
 
-**Layer 1: Implementations** (SundialKitNetwork, SundialKitConnectivity)
-- Concrete wrappers over Apple's Network and WatchConnectivity frameworks
-- Message encoding/decoding with ``Messagable`` and ``BinaryMessagable``
-- Platform-specific delegate handling
+**Cross-Device Communication Apps**
+- Send commands between iPhone and Apple Watch (play/pause, start workout, update settings)
+- Build companion Watch apps with bidirectional messaging
+- Automatically queue messages when devices aren't reachable
+- Monitor connectivity status to enable/disable remote features in your UI
+- Handle device pairing and installation status gracefully
 
-**Layer 2: Observation Plugins** (Choose your concurrency model)
-- **SundialKitStream**: Actor-based observers with AsyncStream APIs
-- **SundialKitCombine**: @MainActor observers with Combine publishers
+**Network-Aware Applications**
+- Detect when users switch from WiFi to cellular and adjust media quality
+- Show offline indicators and cache content when network is unavailable
+- Warn users about expensive connections before large downloads
 
-### Features
+**Adaptive User Experiences**
+- Reduce animation quality on constrained networks
+- Prefetch content only on WiFi connections
+- Provide offline-first experiences that sync when connected
 
-* Monitor network connectivity and quality using Apple's Network framework
-* Communicate between iPhone and Apple Watch via WatchConnectivity
-* Type-safe message encoding with ``Messagable`` protocol
-* Efficient binary serialization with ``BinaryMessagable`` protocol
-* Swift 6.1 strict concurrency compliance
-* Zero @unchecked Sendable in plugin packages
+### Key Capabilities
+
+* **Monitor network connectivity** - Know when WiFi/cellular changes, connection quality, and data costs
+* **Communicate across devices** - Send messages between iPhone and Apple Watch seamlessly
+* **Type-safe messaging** - Encode/decode messages with ``Messagable`` and ``BinaryMessagable`` protocols
+* **Backwards compatible** - Supports both modern AsyncStream APIs and Combine publishers
+
+### Available Packages
+
+SundialKit is organized into focused packages - choose the ones you need:
+
+**Core Packages**
+- **<doc:SundialKitNetwork>** - Network connectivity monitoring using Apple's Network framework
+- **<doc:SundialKitConnectivity>** - WatchConnectivity wrapper for iPhone-Apple Watch communication
+
+**Observation Plugins** (choose based on your concurrency preference)
+- **<doc:SundialKitStream>** - Modern AsyncStream-based observers for async/await projects
+- **<doc:SundialKitCombine>** - Combine-based observers with @Published properties for SwiftUI
 
 ### Requirements
 
 **v2.0.0+ (Current)**
 
 - Xcode 16.0 or later
-- Swift 6.1 or later (strict concurrency)
+- Swift 6.1 or later
 - **Core modules**: iOS 13+ / watchOS 6+ / tvOS 13+ / macOS 10.13+
 - **SundialKitStream plugin**: iOS 16+ / watchOS 9+ / tvOS 16+ / macOS 13+
 - **SundialKitCombine plugin**: iOS 13+ / watchOS 6+ / tvOS 13+ / macOS 10.15+
@@ -212,19 +227,19 @@ struct BinaryColorMessage: BinaryMessagable {
 }
 ```
 
-### Choosing a Concurrency Model
+### Choosing Your Observation Plugin
 
-**SundialKitStream** (Modern Async/Await):
+**<doc:SundialKitStream>** (Modern Async/Await):
+- AsyncStream-based APIs for reactive patterns
 - Actor-based observers with natural thread safety
-- AsyncStream APIs for reactive patterns
-- Ideal for Swift 6.1+ projects using async/await
+- Ideal for new projects using async/await
 
-**SundialKitCombine** (@MainActor + Combine):
-- @MainActor isolation for UI safety
+**<doc:SundialKitCombine>** (@MainActor + Combine):
 - @Published properties and Combine publishers
-- Compatible with iOS 13+ and SwiftUI
+- @MainActor isolation for UI safety
+- Compatible with iOS 13+ and SwiftUI projects
 
-See the respective plugin documentation for detailed usage examples.
+Both plugins work with the same core <doc:SundialKitNetwork> and <doc:SundialKitConnectivity> packages - just choose the observation style that fits your project.
 
 ## Topics
 
