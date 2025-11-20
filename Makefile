@@ -42,14 +42,14 @@ clean:
 # Preview documentation with auto-rebuild
 docs-preview:
 	@echo "📖 Starting documentation preview..."
-	@./Scripts/preview-docs.sh Sources/SundialKit/SundialKit.docc
+	@./Scripts/preview-docs.sh Sources/SundialKit/SundialKit.docc Sources/SundialKitCore/SundialKitCore.docc
 
 # Build documentation without preview server
 docs-build:
 	@echo "📚 Building documentation..."
-	@./Scripts/preview-docs.sh Sources/SundialKit/SundialKit.docc --no-server --no-watch
+	@./Scripts/preview-docs.sh Sources/SundialKit/SundialKit.docc Sources/SundialKitCore/SundialKitCore.docc --no-server --no-watch
 
 # Clean documentation build artifacts
 docs-clean:
 	@echo "🧹 Cleaning documentation artifacts..."
-	@rm -rf .build/docs .build/symbol-graphs .build/docc
+	@rm -rf .build/docs .build/docs-preview .build/symbol-graphs .build/docc
