@@ -29,11 +29,39 @@
 
 public import SundialKitCore
 
-/// Context of the message received
+/// Context indicating how a message was received and how to handle it.
+///
+/// This enum distinguishes between interactive messages that expect a reply
+/// and one-way state updates sent via application context.
+///
+/// ## Example
+///
+/// ```swift
+/// // Using SundialKitStream
+/// for await result in await observer.messageStream() {
+///   switch result.context {
+///   case .replyWith(let handler):
+///     // Interactive message - send a reply
+///     print("Received: \(result.message)")
+///     handler(["status": "acknowledged"])
+///
+///   case .applicationContext:
+///     // One-way update - no reply expected
+///     print("State update: \(result.message)")
+///   }
+/// }
+/// ```
 public enum ConnectivityReceiveContext: Sendable {
-  /// Received as a sent message with a reply handler
+  /// Received as an interactive message with a reply handler.
+  ///
+  /// The associated handler should be called to send a reply back to the sender.
+  /// This corresponds to WatchConnectivity's `session(_:didReceiveMessage:replyHandler:)`.
   case replyWith(@Sendable (ConnectivityMessage) -> Void)
-  /// Received as application context.
+
+  /// Received as a one-way application context update.
+  ///
+  /// No reply is expected or possible. This corresponds to WatchConnectivity's
+  /// `session(_:didReceiveApplicationContext:)`.
   case applicationContext
 
   /// The reply handler if it contains one.
