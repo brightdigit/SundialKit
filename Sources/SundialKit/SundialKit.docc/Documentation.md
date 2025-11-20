@@ -49,26 +49,22 @@ dependencies: [
 
 ### Network Monitoring
 
-Monitor network connectivity using ``NetworkObserver`` from observation plugins.
+Monitor network connectivity using ``NetworkObserver`` from observation plugins. The observer tracks network status changes (WiFi, cellular, wired), connection quality (expensive, constrained), and interface availability using Apple's Network framework.
 
-> Warning: **TODO** Add more text before code samples explaining what these samples do
+#### Quick Start
 
-> Warning: **TODO** Add a default initializer for the NetworkObserver(s) which use the default NWPathMonitor and a nil Ping monitor
+For most use cases, use the default initializer which automatically configures network monitoring:
 
 **Using SundialKitCombine:**
 
 ```swift
 import SundialKitCombine
-import SundialKitNetwork
 import Combine
 
-// Create observer with @MainActor isolation
-let observer = NetworkObserver(
-  monitor: NWPathMonitor(),
-  ping: nil
-)
+// Create observer with default configuration
+let observer = NetworkObserver()
 
-// Start monitoring
+// Start monitoring on main queue
 observer.start()
 
 // Use @Published properties
@@ -91,13 +87,9 @@ observer.$isExpensive
 
 ```swift
 import SundialKitStream
-import SundialKitNetwork
 
-// Create actor-based observer
-let observer = NetworkObserver(
-  monitor: NWPathMonitor(),
-  ping: nil
-)
+// Create observer with default configuration
+let observer = NetworkObserver()
 
 // Start monitoring
 await observer.start()
@@ -119,15 +111,14 @@ Task {
 
 ### Type-Safe Messaging with Messagable
 
-Create type-safe messages using ``Messagable``:
+The ``Messagable`` protocol enables type-safe message encoding and decoding for WatchConnectivity communication. Instead of working with raw dictionaries, you define custom message types that are automatically serialized and deserialized. This provides compile-time type safety and eliminates common runtime errors from manual dictionary handling.
 
-> Warning: **TODO** Add more text before code samples explaining what these samples do
-
-> Warning: **TODO** Explain that key uses the type but is overridable
+> Note: Each `Messagable` type has a `key` property that identifies the message type. By default, the key uses the type's name (e.g., `"ColorMessage"`), but you can override it with a custom identifier.
 
 ```swift
 struct ColorMessage: Messagable {
-  static let key = "color"
+  static let key = "color"  // Optional: defaults to "ColorMessage"
+
   let red: Double
   let green: Double
   let blue: Double
@@ -148,8 +139,9 @@ struct ColorMessage: Messagable {
   }
 }
 
-// Decode received messages
+// Use MessageDecoder to route messages to the correct type
 let decoder = MessageDecoder(messagableTypes: [ColorMessage.self])
+
 do {
   let message = try decoder.decode(receivedDictionary)
   if let colorMessage = message as? ColorMessage {
@@ -162,46 +154,73 @@ do {
 
 ### Binary Messaging with BinaryMessagable
 
-For efficient binary serialization (Protobuf, MessagePack, etc.), use ``BinaryMessagable``:
+For efficient binary serialization of complex data structures or large payloads, use ``BinaryMessagable``. This protocol is ideal for Protobuf, MessagePack, or other binary formats, providing better performance and smaller message sizes than dictionary-based `Messagable`.
 
-> Warning: **TODO** Add more text before code samples explaining what these samples do
+The key advantage: `BinaryMessagable` automatically implements the `Messagable` protocol, so you only need to define binary encoding/decoding methods. The framework handles dictionary conversion internally.
 
-> Warning: **TODO** Make the Message and BinaryMessagable different data to remove confusion
-
-> Warning: **TODO** In the intro for BinaryMessagable explain that the example uses swift-protobuf with a link to the package documentation
-
-> Warning: **TODO** The BinaryMessagable example uses an in-between type rather than just adding an extension on a protobuf type
+**Example using [swift-protobuf](https://github.com/apple/swift-protobuf):**
 
 ```swift
-struct ImageMessage: BinaryMessagable {
-  static let key = "image"
-  let imageData: Data
+import SwiftProtobuf
 
-  // BinaryMessagable requirement: decode from binary data
-  init(from data: Data) throws {
-    // Data is already in the format you need (JPEG, PNG, Protobuf, etc.)
-    self.imageData = data
+// Define your message in a .proto file, then extend the generated type
+extension UserProfile: BinaryMessagable {
+  // key defaults to "UserProfile" (type name)
+
+  // Only implement these two binary methods
+  public init(from data: Data) throws {
+    try self.init(serializedData: data)  // SwiftProtobuf decoder
   }
 
-  // BinaryMessagable requirement: encode to binary data
-  func encode() throws -> Data {
-    // Return the binary representation
-    imageData
+  public func encode() throws -> Data {
+    try serializedData()  // SwiftProtobuf encoder
   }
+
+  // init(from parameters:) and parameters() are auto-implemented!
 }
 
-// BinaryMessagable provides automatic Messagable conformance
-// No need to implement init(from parameters:) or parameters()
-let decoder = MessageDecoder(messagableTypes: [ImageMessage.self])
+// Use with MessageDecoder just like Messagable types
+let decoder = MessageDecoder(messagableTypes: [
+  UserProfile.self  // BinaryMessagable works seamlessly
+])
+```
+
+**Simple binary example (custom format):**
+
+```swift
+struct TemperatureReading: BinaryMessagable {
+  let celsius: Float
+  let timestamp: UInt64
+
+  init(celsius: Float, timestamp: UInt64) {
+    self.celsius = celsius
+    self.timestamp = timestamp
+  }
+
+  // Decode from raw binary data
+  public init(from data: Data) throws {
+    guard data.count == 12 else {  // 4 bytes + 8 bytes
+      throw SerializationError.invalidDataSize
+    }
+    celsius = data.withUnsafeBytes { $0.load(as: Float.self) }
+    timestamp = data.dropFirst(4).withUnsafeBytes { $0.load(as: UInt64.self) }
+  }
+
+  // Encode to raw binary data
+  public func encode() throws -> Data {
+    var data = Data()
+    withUnsafeBytes(of: celsius) { data.append(contentsOf: $0) }
+    withUnsafeBytes(of: timestamp) { data.append(contentsOf: $0) }
+    return data
+  }
+}
 ```
 
 ### WatchConnectivity Communication
 
-Communicate between iPhone and Apple Watch using ``ConnectivityObserver`` from observation plugins.
+Communicate between iPhone and Apple Watch using ``ConnectivityObserver`` from observation plugins. The observer handles WatchConnectivity session management, message routing, and automatic transport selection based on device reachability.
 
-> Warning: **TODO** Add more text before code samples explaining what these samples do
-
-> Warning: **TODO** In the WatchConnectivity example, have both the Message and BinaryMessagable types in the decoder
+> Important: Dictionary-based messages have a size limit of approximately 65KB when using `sendMessage`. See [Apple's WatchConnectivity documentation](https://developer.apple.com/documentation/watchconnectivity/wcsession) for details on message size limits.
 
 **Using SundialKitCombine:**
 
@@ -210,9 +229,12 @@ import SundialKitCombine
 import SundialKitConnectivity
 import Combine
 
-// Create observer with message decoder
+// Create observer with message decoder supporting multiple types
 let observer = ConnectivityObserver(
-  messageDecoder: MessageDecoder(messagableTypes: [ColorMessage.self])
+  messageDecoder: MessageDecoder(messagableTypes: [
+    ColorMessage.self,      // Dictionary-based message
+    UserProfile.self        // Binary protobuf message
+  ])
 )
 
 // Activate session
@@ -223,15 +245,18 @@ var cancellables = Set<AnyCancellable>()
 
 observer.typedMessageReceived
   .sink { message in
+    // Handle different message types
     if let colorMessage = message as? ColorMessage {
       print("Received color: \(colorMessage)")
+    } else if let profile = message as? UserProfile {
+      print("Received profile: \(profile.name)")
     }
   }
   .store(in: &cancellables)
 
 // Send messages
 Task {
-  let message = ColorMessage(/* ... */)
+  let message = ColorMessage(red: 1.0, green: 0.5, blue: 0.0)
   let result = try await observer.send(message)
   print("Sent via: \(result.context)")
 }
@@ -243,9 +268,12 @@ Task {
 import SundialKitStream
 import SundialKitConnectivity
 
-// Create actor-based observer
+// Create actor-based observer supporting multiple message types
 let observer = ConnectivityObserver(
-  messageDecoder: MessageDecoder(messagableTypes: [ColorMessage.self])
+  messageDecoder: MessageDecoder(messagableTypes: [
+    ColorMessage.self,      // Dictionary-based message
+    UserProfile.self        // Binary protobuf message
+  ])
 )
 
 // Activate session
@@ -254,14 +282,17 @@ try await observer.activate()
 // Listen for typed messages using AsyncStream
 Task {
   for await message in await observer.typedMessageStream() {
+    // Handle different message types
     if let colorMessage = message as? ColorMessage {
       print("Received color: \(colorMessage)")
+    } else if let profile = message as? UserProfile {
+      print("Received profile: \(profile.name)")
     }
   }
 }
 
 // Send messages
-let message = ColorMessage(/* ... */)
+let message = ColorMessage(red: 1.0, green: 0.5, blue: 0.0)
 let result = try await observer.send(message)
 print("Sent via: \(result.context)")
 ```

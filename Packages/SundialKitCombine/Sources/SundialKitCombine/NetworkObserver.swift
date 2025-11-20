@@ -163,4 +163,38 @@
       self.init(monitor: monitor, ping: nil, queue: queue)
     }
   }
+
+  #if canImport(Network)
+    public import Network
+
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    extension NetworkObserver where MonitorType == NWPathMonitor, PingType == NeverPing {
+      /// Creates `NetworkObserver` with default `NWPathMonitor` and no ping
+      ///
+      /// This is the simplest way to create a network observer for most use cases.
+      /// The observer uses Apple's `NWPathMonitor` to track network connectivity
+      /// changes without ping-based verification. The observer is @MainActor isolated,
+      /// making it safe to use directly with SwiftUI.
+      ///
+      /// ## Example Usage
+      ///
+      /// ```swift
+      /// import SundialKitCombine
+      ///
+      /// let observer = NetworkObserver()
+      /// observer.start()
+      ///
+      /// observer.$pathStatus
+      ///   .sink { status in
+      ///     print("Network status: \(status)")
+      ///   }
+      ///   .store(in: &cancellables)
+      /// ```
+      ///
+      /// - Parameter queue: The dispatch queue for network monitoring (defaults to `.main`)
+      public convenience init(queue: DispatchQueue = .main) {
+        self.init(monitor: NWPathMonitor(), ping: nil, queue: queue)
+      }
+    }
+  #endif
 #endif

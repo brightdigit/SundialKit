@@ -45,3 +45,32 @@ extension NetworkObserver {
     self.init(monitor: monitor, pingOrNil: ping)
   }
 }
+
+#if canImport(Network)
+  public import Network
+
+  @available(macOS 13, iOS 16, watchOS 9, tvOS 16, *)
+  extension NetworkObserver where MonitorType == NWPathMonitor, PingType == NeverPing {
+    /// Creates `NetworkObserver` with default `NWPathMonitor` and no ping
+    ///
+    /// This is the simplest way to create a network observer for most use cases.
+    /// The observer uses Apple's `NWPathMonitor` to track network connectivity
+    /// changes without ping-based verification.
+    ///
+    /// ## Example Usage
+    ///
+    /// ```swift
+    /// import SundialKitStream
+    ///
+    /// let observer = NetworkObserver()
+    /// await observer.start(queue: .global())
+    ///
+    /// for await status in observer.pathStatusStream {
+    ///   print("Network status: \(status)")
+    /// }
+    /// ```
+    public init() {
+      self.init(monitor: NWPathMonitor(), pingOrNil: nil)
+    }
+  }
+#endif
