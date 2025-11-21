@@ -41,9 +41,11 @@
       #expect(await !manager.isReachable)
 
       mockSession.isReachable = true
+      await Task.yield()  // Yield to allow unstructured Task in delegate handler to run
       #expect(await manager.isReachable)
 
       mockSession.isReachable = false
+      await Task.yield()  // Yield to allow unstructured Task in delegate handler to run
       #expect(await !manager.isReachable)
     }
 

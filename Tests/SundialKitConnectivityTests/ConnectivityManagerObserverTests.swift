@@ -25,7 +25,8 @@
 
       mockSession.activationState = .activated
 
-      // Check manager state directly - no waiting needed
+      // Yield to allow unstructured Task in delegate handler to run
+      await Task.yield()
       #expect(await manager.activationState == .activated)
     }
 
@@ -39,7 +40,8 @@
 
       mockSession.isReachable = true
 
-      // Check manager state directly - no waiting needed
+      // Yield to allow unstructured Task in delegate handler to run
+      await Task.yield()
       #expect(await manager.isReachable == true)
     }
 
@@ -53,7 +55,8 @@
 
       mockSession.isPairedAppInstalled = true
 
-      // Check manager state directly - no waiting needed
+      // Yield to allow unstructured Task in delegate handler to run
+      await Task.yield()
       #expect(await manager.isPairedAppInstalled == true)
     }
 
@@ -68,7 +71,8 @@
 
         mockSession.isPaired = true
 
-        // Check manager state directly - no waiting needed
+        // Yield to allow unstructured Task in delegate handler to run
+        await Task.yield()
         #expect(await manager.isPaired == true)
       }
     #endif
@@ -120,7 +124,8 @@
 
       mockSession.isReachable = true
 
-      // Check manager state directly - no waiting needed
+      // Yield to allow unstructured Task in delegate handler to run
+      await Task.yield()
       #expect(await manager.isReachable == true)
     }
   }
