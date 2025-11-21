@@ -23,7 +23,7 @@ SundialKitNetwork provides protocol-based abstractions over Apple's [Network fra
 
 SundialKitNetwork provides the foundational network monitoring protocols and types. To use these in your application, you'll need to choose an observation plugin that matches your preferred concurrency model:
 
-- **SundialKitCombine** - For SwiftUI apps using `@MainActor` and Combine publishers
+- **SundialKitCombine** - For SwiftUI apps using Combine publishers
 - **SundialKitStream** - For modern Swift apps using actors and AsyncStreams
 
 Both plugins provide `NetworkObserver` classes that wrap SundialKitNetwork's protocols with reactive APIs. The examples below show how to use each approach.
@@ -32,7 +32,7 @@ Both plugins provide `NetworkObserver` classes that wrap SundialKitNetwork's pro
 
 #### Using with SundialKitCombine
 
-The Combine-based observer is ideal for SwiftUI applications where you want to bind network state directly to your UI. All updates happen on the main thread, making it safe to update views directly from the observers.
+The Combine-based observer is ideal for SwiftUI applications where you want to bind network state directly to your UI.
 
 ```swift
 import SundialKitCombine

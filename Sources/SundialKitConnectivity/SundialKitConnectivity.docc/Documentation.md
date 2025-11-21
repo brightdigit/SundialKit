@@ -25,7 +25,7 @@ SundialKitConnectivity provides a modern, type-safe wrapper around Apple's [Watc
 
 SundialKitConnectivity provides the foundational WatchConnectivity protocols and messaging types. To use these in your application, you'll need to choose an observation plugin that matches your preferred concurrency model:
 
-- **SundialKitCombine** - For SwiftUI apps using `@MainActor` and Combine publishers
+- **SundialKitCombine** - For SwiftUI apps using Combine publishers
 - **SundialKitStream** - For modern Swift apps using actors and AsyncStreams
 
 Both plugins provide `ConnectivityObserver` classes that handle session management and message routing automatically. The examples below demonstrate how to define and send type-safe messages using each approach.
@@ -130,11 +130,11 @@ With binary serialization, you can transfer complex data structures efficiently.
 
 ### Session Management
 
-Once you've defined your message types, you'll use a `ConnectivityObserver` to manage the WatchConnectivity session and send/receive messages. The observer handles session activation, monitors reachability, and automatically chooses the best transport method based on whether the counterpart device is currently available.
+Once you've defined your message types, you'll use a `ConnectivityObserver` to manage the WatchConnectivity session and send/receive messages. The observer handles session activation and monitors reachability.
 
 #### Using with SundialKitCombine
 
-The Combine-based observer is perfect for SwiftUI applications. It provides `@Published` properties for session state and Combine publishers for incoming messages, making it easy to update your UI reactively. All updates happen on the main thread.
+The Combine-based observer is perfect for SwiftUI applications. It provides `@Published` properties for session state and Combine publishers for incoming messages, making it easy to update your UI reactively.
 
 ```swift
 import SundialKitCombine

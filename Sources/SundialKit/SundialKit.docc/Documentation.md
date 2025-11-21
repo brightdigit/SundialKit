@@ -304,9 +304,8 @@ print("Sent via: \(result.context)")
 - Actor-based observers with natural thread safety
 - Ideal for new projects using async/await
 
-**<doc:SundialKitCombine>** (@MainActor + Combine):
+**<doc:SundialKitCombine>** (Combine Publishers):
 - @Published properties and Combine publishers
-- @MainActor isolation for UI safety
 - Compatible with iOS 13+ and SwiftUI projects
 
 Both plugins work with the same core <doc:SundialKitNetwork> and <doc:SundialKitConnectivity> packages - just choose the observation style that fits your project.

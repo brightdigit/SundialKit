@@ -1,14 +1,13 @@
 # ``SundialKitCombine``
 
-Combine-based observation plugin for SundialKit with @MainActor isolation and @Published properties.
+Combine-based observation plugin for SundialKit with @Published properties.
 
 ## Overview
 
-SundialKitCombine provides @MainActor-isolated observers that deliver state updates via @Published properties and Combine publishers. This plugin is designed for SwiftUI projects and apps requiring backward compatibility with iOS 13+.
+SundialKitCombine provides observers that deliver state updates via @Published properties and Combine publishers. This plugin is designed for SwiftUI projects and apps requiring backward compatibility with iOS 13+.
 
 ### Key Features
 
-- **@MainActor Isolation**: All state updates occur on the main thread
 - **@Published Properties**: Direct binding to SwiftUI views
 - **Combine Publishers**: Full reactive programming support
 - **Swift 6.1 Strict Concurrency**: Zero `@unchecked Sendable` conformances
