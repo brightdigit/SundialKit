@@ -6,7 +6,7 @@
 [subrepo]
 	remote = git@github.com:brightdigit/SundialKitStream.git
 	branch = v1.0.0
-	commit = 8234353fdd6f7fc0137eb1b2dc535158dc259846
-	parent = d1bc1efef94d727eeae66db1f5f01af6a4777963
+	commit = 1c16d63a15c99a0b38c1eeb7e94e632af77da2af
+	parent = b49da06cbd4a78091c390dd604301f9aba121f06
 	method = merge
 	cmdver = 0.4.9
