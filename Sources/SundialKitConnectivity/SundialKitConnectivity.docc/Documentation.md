@@ -4,6 +4,8 @@ WatchConnectivity abstraction for seamless iPhone-Apple Watch communication.
 
 ## Overview
 
+![SundialKit Logo](logo.png)
+
 SundialKitConnectivity provides a modern, type-safe wrapper around Apple's [WatchConnectivity framework](https://developer.apple.com/documentation/watchconnectivity), making it simple to send messages between iPhone and Apple Watch. It handles session lifecycle, automatic transport selection, and provides type-safe messaging through the ``Messagable`` and ``BinaryMessagable`` protocols.
 
 ### Key Features

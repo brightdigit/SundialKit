@@ -4,6 +4,8 @@ Network connectivity monitoring using Apple's Network framework.
 
 ## Overview
 
+![SundialKit Logo](logo.png)
+
 SundialKitNetwork provides protocol-based abstractions over Apple's [Network framework](https://developer.apple.com/documentation/network), making it simple to monitor network connectivity changes in your apps. It tracks network status (WiFi, cellular, wired), connection quality (expensive, constrained), and interface availability with a clean, type-safe API.
 
 ### Key Features
