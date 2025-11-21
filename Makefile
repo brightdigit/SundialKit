@@ -42,12 +42,12 @@ clean:
 # Preview documentation with auto-rebuild
 docs-preview:
 	@echo "📖 Starting documentation preview..."
-	@./Scripts/preview-docs.sh Sources/SundialKit/SundialKit.docc Sources/SundialKitCore/SundialKitCore.docc
+	@./Scripts/preview-docs.sh Sources/SundialKit/SundialKit.docc Sources/SundialKitCore/SundialKitCore.docc Sources/SundialKitNetwork/SundialKitNetwork.docc Sources/SundialKitConnectivity/SundialKitConnectivity.docc
 
 # Build documentation without preview server
 docs-build:
 	@echo "📚 Building documentation..."
-	@./Scripts/preview-docs.sh Sources/SundialKit/SundialKit.docc Sources/SundialKitCore/SundialKitCore.docc --no-server --no-watch
+	@./Scripts/preview-docs.sh Sources/SundialKit/SundialKit.docc Sources/SundialKitCore/SundialKitCore.docc Sources/SundialKitNetwork/SundialKitNetwork.docc Sources/SundialKitConnectivity/SundialKitConnectivity.docc --no-server --no-watch
 
 # Clean documentation build artifacts
 docs-clean:
