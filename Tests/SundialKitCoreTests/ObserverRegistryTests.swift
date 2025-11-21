@@ -169,12 +169,9 @@ struct ObserverRegistryTests {
     await registry.add(observer2)
     await registry.add(observer3)
 
-    registry.notify { observer in
+    await registry.notify { observer in
       observer.receivedValues.append(42)
     }
-
-    // Wait for async notifications to complete
-    try await Task.sleep(forMilliseconds: 200)
 
     #expect(observer1.receivedValues == [42])
     #expect(observer2.receivedValues == [42])
@@ -190,12 +187,9 @@ struct ObserverRegistryTests {
     await registry.add(observer1)
     await registry.add(observer2)
 
-    registry.notify { observer in
+    await registry.notify { observer in
       observer.receivedValues.append(99)
     }
-
-    // Wait for async notifications to complete
-    try await Task.sleep(forMilliseconds: 200)
 
     // Both observers should receive the notification (strong references)
     #expect(observer1.receivedValues == [99])
