@@ -41,10 +41,10 @@
       #expect(await !manager.isReachable)
 
       mockSession.isReachable = true
-      try await waitUntil { await manager.isReachable }
+      #expect(await manager.isReachable)
 
       mockSession.isReachable = false
-      try await waitUntil { await !manager.isReachable }
+      #expect(await !manager.isReachable)
     }
 
     @Test("Paired app installed updates from delegate")
