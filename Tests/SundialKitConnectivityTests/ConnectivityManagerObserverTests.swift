@@ -21,7 +21,7 @@
       let manager = ConnectivityManager(session: mockSession)
 
       let observer = TestObserver()
-      manager.addObserver(observer)
+      await manager.addObserver(observer)
 
       mockSession.activationState = .activated
 
@@ -35,7 +35,7 @@
       let manager = ConnectivityManager(session: mockSession)
 
       let observer = TestObserver()
-      manager.addObserver(observer)
+      await manager.addObserver(observer)
 
       mockSession.isReachable = true
 
@@ -49,7 +49,7 @@
       let manager = ConnectivityManager(session: mockSession)
 
       let observer = TestObserver()
-      manager.addObserver(observer)
+      await manager.addObserver(observer)
 
       mockSession.isPairedAppInstalled = true
 
@@ -64,7 +64,7 @@
         let manager = ConnectivityManager(session: mockSession)
 
         let observer = TestObserver()
-        manager.addObserver(observer)
+        await manager.addObserver(observer)
 
         mockSession.isPaired = true
 
@@ -79,7 +79,7 @@
       let manager = ConnectivityManager(session: mockSession)
 
       let observer = TestObserver()
-      manager.addObserver(observer)
+      await manager.addObserver(observer)
 
       let testMessage: ConnectivityMessage = ["test": "data"]
       mockSession.receiveMessage(testMessage) { _ in }
@@ -94,8 +94,8 @@
       let manager = ConnectivityManager(session: mockSession)
 
       let observer = TestObserver()
-      manager.addObserver(observer)
-      manager.removeObserver(observer)
+      await manager.addObserver(observer)
+      await manager.removeObserver(observer)
 
       mockSession.isReachable = true
 
@@ -113,8 +113,8 @@
 
       let observer1 = TestObserver()
       let observer2 = TestObserver()
-      manager.addObserver(observer1)
-      manager.addObserver(observer2)
+      await manager.addObserver(observer1)
+      await manager.addObserver(observer2)
 
       mockSession.isReachable = true
 

@@ -36,29 +36,25 @@
   extension ConnectivityObserverManaging where Self: Actor {
     /// Adds an observer for state changes.
     ///
-    /// This is a nonisolated method that schedules observer registration
+    /// This method awaits the completion of observer registration
     /// on the actor's isolation domain.
     ///
     /// - Parameter observer: The observer to add.
     /// - Note: Observers are stored with strong references - caller must manage lifecycle.
-    public nonisolated func addObserver(_ observer: any ConnectivityStateObserver) {
-      Task {
-        await observerRegistry.add(observer)
-      }
+    public func addObserver(_ observer: any ConnectivityStateObserver) async {
+      await observerRegistry.add(observer)
     }
 
     /// Removes observers matching the predicate.
     ///
-    /// This is a nonisolated method that schedules observer removal
+    /// This method awaits the completion of observer removal
     /// on the actor's isolation domain.
     ///
     /// - Parameter predicate: Closure to identify observers to remove.
-    public nonisolated func removeObservers(
+    public func removeObservers(
       where predicate: @Sendable @escaping (any ConnectivityStateObserver) -> Bool
-    ) {
-      Task {
-        await observerRegistry.removeAll(where: predicate)
-      }
+    ) async {
+      await observerRegistry.removeAll(where: predicate)
     }
   }
 #endif
