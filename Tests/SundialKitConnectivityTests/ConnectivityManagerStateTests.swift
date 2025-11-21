@@ -41,10 +41,12 @@
       #expect(await !manager.isReachable)
 
       mockSession.isReachable = true
-      try await waitUntil { await manager.isReachable }
+      await Task.yield()  // Yield to allow unstructured Task in delegate handler to run
+      #expect(await manager.isReachable)
 
       mockSession.isReachable = false
-      try await waitUntil { await !manager.isReachable }
+      await Task.yield()  // Yield to allow unstructured Task in delegate handler to run
+      #expect(await !manager.isReachable)
     }
 
     @Test("Paired app installed updates from delegate")

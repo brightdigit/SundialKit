@@ -92,10 +92,8 @@ public actor ObserverRegistry<Observer: Sendable> {
   /// Notifies all registered observers by executing the provided action.
   ///
   /// - Parameter action: The closure to execute for each observer
-  public nonisolated func notify(_ action: @Sendable @escaping (Observer) async -> Void) {
-    Task {
-      await notifyIsolated(action)
-    }
+  public func notify(_ action: @Sendable @escaping (Observer) async -> Void) async {
+    await notifyIsolated(action)
   }
 
   // MARK: - Actor-Isolated Methods

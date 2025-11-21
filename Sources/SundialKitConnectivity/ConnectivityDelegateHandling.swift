@@ -98,37 +98,27 @@
       activationDidCompleteWith activationState: ActivationState,
       error: (any Error)?
     ) {
-      Task {
-        await self.handleActivation(activationState, error: error)
-      }
+      self.handleActivation(activationState, error: error)
     }
 
     /// Called when the session becomes inactive (iOS only).
     public func sessionDidBecomeInactive(_: any ConnectivitySession) {
-      Task {
-        await handleSessionInactive()
-      }
+      handleSessionInactive()
     }
 
     /// Called when the session deactivates (iOS only).
     public func sessionDidDeactivate(_: any ConnectivitySession) {
-      Task {
-        await handleSessionDeactivate()
-      }
+      handleSessionDeactivate()
     }
 
     /// Called when companion state changes.
     public func sessionCompanionStateDidChange(_ session: any ConnectivitySession) {
-      Task {
-        await handleCompanionStateChange(session)
-      }
+      handleCompanionStateChange(session)
     }
 
     /// Called when reachability changes.
     public func sessionReachabilityDidChange(_ session: any ConnectivitySession) {
-      Task {
-        await handleReachabilityChange(session.isReachable)
-      }
+      handleReachabilityChange(session.isReachable)
     }
 
     /// Called when a message is received.
@@ -137,9 +127,7 @@
       didReceiveMessage message: ConnectivityMessage,
       replyHandler: @escaping ConnectivityHandler
     ) {
-      Task {
-        await handleMessageReceived(message)
-      }
+      handleMessageReceived(message)
     }
 
     /// Called when application context is received.
@@ -148,9 +136,7 @@
       didReceiveApplicationContext applicationContext: ConnectivityMessage,
       error: (any Error)?
     ) {
-      Task {
-        await handleApplicationContextReceived(applicationContext, error: error)
-      }
+      handleApplicationContextReceived(applicationContext, error: error)
     }
 
     /// Called when binary message data is received.
@@ -159,9 +145,7 @@
       didReceiveMessageData messageData: Data,
       replyHandler: @escaping @Sendable (Data) -> Void
     ) {
-      Task {
-        await handleBinaryMessageReceived(messageData, replyHandler: replyHandler)
-      }
+      handleBinaryMessageReceived(messageData, replyHandler: replyHandler)
     }
   }
 #endif
