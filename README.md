@@ -256,37 +256,38 @@ Let's first talk about how `WatchConnectivity` status works.
 
 ### Connection Status
 
-With `WatchConnectivity` there's a variety of properties which tell you the status of connection between devices. Here's an example using SundialKitCombine to monitor `isReachable` and `activationState`:
+With `WatchConnectivity` there's a variety of properties which tell you the status of connection between devices. Here's an example using SundialKitStream to monitor `isReachable` and `activationState`:
 
 ```swift
 import SwiftUI
-import SundialKitCombine
+import SundialKitStream
 import SundialKitConnectivity
-import Combine
 
 @MainActor
-class WatchConnectivityObject: ObservableObject {
-  // Create the ConnectivityObserver
-  let observer = ConnectivityObserver()
+@Observable
+class WatchConnectivityModel {
+  var isReachable: Bool = false
+  var activationState: ActivationState = .notActivated
 
-  // Published properties for isReachable and activationState
-  @Published var isReachable: Bool = false
-  @Published var activationState: ActivationState = .notActivated
+  private let observer = ConnectivityObserver()
 
-  private var cancellables = Set<AnyCancellable>()
-
-  init() {
-    // Bind the observer's @Published properties to our own
-    observer.$isReachable
-      .assign(to: &$isReachable)
-
-    observer.$activationState
-      .assign(to: &$activationState)
-  }
-
-  func activate() throws {
+  func start() async throws {
     // Activate the WatchConnectivity session
-    try observer.activate()
+    try await observer.activate()
+
+    // Monitor activation state
+    Task {
+      for await state in observer.activationStates() {
+        self.activationState = state
+      }
+    }
+
+    // Monitor reachability
+    Task {
+      for await reachable in observer.reachabilityStream() {
+        self.isReachable = reachable
+      }
+    }
   }
 }
 ```
@@ -294,25 +295,22 @@ class WatchConnectivityObject: ObservableObject {
 There are 3 important pieces:
 
 1. The `ConnectivityObserver` called `observer`
-2. On `init`, we bind the observer's `@Published` properties to our own published properties
-3. An `activate` method which needs to be called to activate the session for `WatchConnectivity`
+2. A `start()` method that activates the session and sets up AsyncStream listeners
+3. Tasks that monitor state changes using `for await` loops
 
-For our `SwiftUI` `View`, we need to `activate` the session at `onAppear` and can use the published properties in the `View`:
+For our `SwiftUI` `View`, we use the `.task` modifier to start monitoring:
 
 ```swift
 struct WatchConnectivityView: View {
-  @StateObject var connectivityObject = WatchConnectivityObject()
+  @State private var model = WatchConnectivityModel()
 
   var body: some View {
     VStack {
-      Text("Session: \(connectivityObject.activationState.description)")
-      Text(
-        connectivityObject.isReachable ?
-          "Reachable" : "Not Reachable"
-      )
+      Text("Session: \(model.activationState.description)")
+      Text(model.isReachable ? "Reachable" : "Not Reachable")
     }
-    .onAppear {
-      try? connectivityObject.activate()
+    .task {
+      try? await model.start()
     }
   }
 }
@@ -324,47 +322,48 @@ Besides `isReachable` and `activationState`, you also have access to:
 * `isPaired`
 * `isCompanionAppInstalled` (watchOS only)
 
-All of these properties are available as `@Published` properties on the `ConnectivityObserver`.
+All of these properties can be monitored via AsyncStream methods on the `ConnectivityObserver`.
 
 ### Sending and Receiving Messages
 
-To send and receive messages through our `ConnectivityObserver`, we use async methods and Combine publishers:
+To send and receive messages through our `ConnectivityObserver`, we use async methods and AsyncStream:
 
-- `messageReceived` PassthroughSubject - for listening to messages
+- `messageStream()` - AsyncStream for listening to messages
 - `sendMessage(_:)` async method - for sending messages
 
-**SundialKit** uses `[String: any Sendable]` dictionaries for sending and receiving messages, which use the typealias `ConnectivityMessage`. Let's expand upon the previous `WatchConnectivityObject` to handle messaging:
+**SundialKit** uses `[String: any Sendable]` dictionaries for sending and receiving messages, which use the typealias `ConnectivityMessage`. Let's expand upon the previous `WatchConnectivityModel` to handle messaging:
 
 ```swift
 import SwiftUI
-import SundialKitCombine
+import SundialKitStream
 import SundialKitConnectivity
-import Combine
 
 @MainActor
-class WatchConnectivityObject: ObservableObject {
-  let observer = ConnectivityObserver()
+@Observable
+class WatchConnectivityModel {
+  var isReachable: Bool = false
+  var lastReceivedMessage: String = ""
 
-  @Published var isReachable: Bool = false
-  @Published var lastReceivedMessage: String = ""
+  private let observer = ConnectivityObserver()
 
-  private var cancellables = Set<AnyCancellable>()
+  func start() async throws {
+    try await observer.activate()
 
-  init() {
-    // Bind isReachable
-    observer.$isReachable
-      .assign(to: &$isReachable)
+    // Monitor reachability
+    Task {
+      for await reachable in observer.reachabilityStream() {
+        self.isReachable = reachable
+      }
+    }
 
     // Listen for received messages
-    observer.messageReceived
-      .compactMap { result in
-        result.message["message"] as? String
+    Task {
+      for await result in observer.messageStream() {
+        if let message = result.message["message"] as? String {
+          self.lastReceivedMessage = message
+        }
       }
-      .assign(to: &$lastReceivedMessage)
-  }
-
-  func activate() throws {
-    try observer.activate()
+    }
   }
 
   func sendMessage(_ message: String) async throws {
@@ -375,31 +374,31 @@ class WatchConnectivityObject: ObservableObject {
 }
 ```
 
-We can now create a simple SwiftUI View using our updated `WatchConnectivityObject`:
+We can now create a simple SwiftUI View using our updated `WatchConnectivityModel`:
 
 ```swift
 struct WatchMessageDemoView: View {
-  @StateObject var connectivityObject = WatchConnectivityObject()
-  @State var message: String = ""
+  @State private var model = WatchConnectivityModel()
+  @State private var message: String = ""
 
   var body: some View {
     VStack {
-      Text(connectivityObject.isReachable ? "Reachable" : "Not Reachable")
+      Text(model.isReachable ? "Reachable" : "Not Reachable")
 
-      TextField("Message", text: self.$message)
+      TextField("Message", text: $message)
 
       Button("Send") {
         Task {
-          try? await connectivityObject.sendMessage(message)
+          try? await model.sendMessage(message)
         }
       }
-      .disabled(!connectivityObject.isReachable)
+      .disabled(!model.isReachable)
 
       Text("Last received message:")
-      Text(connectivityObject.lastReceivedMessage)
+      Text(model.lastReceivedMessage)
     }
-    .onAppear {
-      try? connectivityObject.activate()
+    .task {
+      try? await model.start()
     }
   }
 }
@@ -455,35 +454,38 @@ Now configure our `ConnectivityObserver` with a `MessageDecoder` and use typed m
 
 ```swift
 import SwiftUI
-import SundialKitCombine
+import SundialKitStream
 import SundialKitConnectivity
-import Combine
 
 @MainActor
-class WatchConnectivityObject: ObservableObject {
+@Observable
+class WatchConnectivityModel {
+  var isReachable: Bool = false
+  var lastReceivedMessage: String = ""
+
   // Create observer with MessageDecoder for typed message handling
-  let observer = ConnectivityObserver(
+  private let observer = ConnectivityObserver(
     messageDecoder: MessageDecoder(messagableTypes: [Message.self])
   )
 
-  @Published var isReachable: Bool = false
-  @Published var lastReceivedMessage: String = ""
+  func start() async throws {
+    try await observer.activate()
 
-  private var cancellables = Set<AnyCancellable>()
-
-  init() {
-    observer.$isReachable
-      .assign(to: &$isReachable)
+    // Monitor reachability
+    Task {
+      for await reachable in observer.reachabilityStream() {
+        self.isReachable = reachable
+      }
+    }
 
     // Listen for typed messages
-    observer.typedMessageReceived
-      .compactMap { $0 as? Message }
-      .map(\.text)
-      .assign(to: &$lastReceivedMessage)
-  }
-
-  func activate() throws {
-    try observer.activate()
+    Task {
+      for await message in observer.typedMessageStream() {
+        if let textMessage = message as? Message {
+          self.lastReceivedMessage = textMessage.text
+        }
+      }
+    }
   }
 
   func sendMessage(_ text: String) async throws {
@@ -495,7 +497,7 @@ class WatchConnectivityObject: ObservableObject {
 }
 ```
 
-The `MessageDecoder` automatically routes incoming messages to the correct type based on the message's `key` field, and the `typedMessageReceived` publisher emits already-decoded `Messagable` instances.
+The `MessageDecoder` automatically routes incoming messages to the correct type based on the message's `key` field, and the `typedMessageStream()` AsyncStream provides already-decoded `Messagable` instances.
 
 # Demo Applications
 
