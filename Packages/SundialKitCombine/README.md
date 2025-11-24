@@ -13,7 +13,7 @@ Combine-based observation plugin for SundialKit with @Published properties and r
 ## Table of Contents
 
 * [Overview](#overview)
-* [Why Choose SundialKitCombine](#why-choose-sundialkit combine)
+* [Why Choose SundialKitCombine](#why-choose-sundialkitcombine)
 * [Key Features](#key-features)
 * [Requirements](#requirements)
 * [Installation](#installation)
@@ -23,7 +23,7 @@ Combine-based observation plugin for SundialKit with @Published properties and r
   * [Type-Safe Messaging with Messagable](#type-safe-messaging-with-messagable)
   * [Reactive Message Filtering](#reactive-message-filtering)
 * [Architecture](#architecture)
-* [Comparison with SundialKitStream](#comparison-with-sundialkit stream)
+* [Comparison with SundialKitStream](#comparison-with-sundialkitstream)
 * [Documentation](#documentation)
 * [Related Packages](#related-packages)
 * [License](#license)
@@ -447,4 +447,30 @@ This code is distributed under the MIT license. See the [LICENSE](https://github
 
 ## Contributing
 
-SundialKitCombine is part of the SundialKit v2.0.0 monorepo during development. For issues, feature requests, or contributions, please visit the [main SundialKit repository](https://github.com/brightdigit/SundialKit).
+We welcome contributions to SundialKitCombine! Here's how you can help:
+
+### Reporting Issues
+
+If you find a bug or have a feature request, please [open an issue](https://github.com/brightdigit/SundialKitCombine/issues) on GitHub. Include:
+- A clear description of the issue or feature
+- Steps to reproduce (for bugs)
+- Expected vs actual behavior
+- Your environment (Swift version, platform, OS version)
+
+### Submitting Pull Requests
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/my-feature`)
+3. Make your changes with clear, descriptive commits
+4. Add or update tests as needed
+5. Ensure all tests pass (`swift test`)
+6. Run linting and formatting (`swift-format`)
+7. Push to your fork and submit a pull request
+
+### Code Standards
+
+- Follow Swift API Design Guidelines
+- Maintain Swift 6.1 strict concurrency compliance
+- Write comprehensive tests for new features
+- Document public APIs with clear doc comments
+- Keep changes focused and atomic
