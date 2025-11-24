@@ -52,7 +52,8 @@
 /// }
 /// ```
 ///
-/// > Important: Attempting to send messages in ``notActivated`` or ``inactive`` states is a programmer error.
+/// > Important: Attempting to send messages in
+/// ``notActivated`` or ``inactive`` states is a programmer error.
 public enum ActivationState: Int, Sendable {
   /// The session is not activated.
   ///

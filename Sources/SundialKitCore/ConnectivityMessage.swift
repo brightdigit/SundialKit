@@ -61,7 +61,8 @@
 /// ]
 /// ```
 ///
-/// > Important: While the type system enforces `Sendable`, it cannot enforce property list types at compile time.
+/// > Important: While the type system enforces `Sendable`,
+/// it cannot enforce property list types at compile time.
 /// > Using invalid types will result in runtime errors when sending messages.
 public typealias ConnectivityMessage = [String: any Sendable]
 
