@@ -59,7 +59,7 @@ let package = Package(
     )
   ],
   dependencies: [
-    .package(name: "SundialKit", path: "../../")
+    .package(url: "https://github.com/brightdigit/SundialKit.git", branch: "v2.0.0")
   ],
   targets: [
     .target(
