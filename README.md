@@ -41,7 +41,7 @@ Swift 6.1+ reactive communications library with modern concurrency support for A
 - **Swift 6.1 Strict Concurrency**: Full compliance with Swift 6 concurrency model
 - **Three-Layer Architecture**: Protocols, wrappers, and observation layers cleanly separated
 - **Multiple Concurrency Models**: Choose between modern async/await (SundialKitStream) or Combine (SundialKitCombine)
-- **Zero @unchecked Sendable in Plugins**: Actor-based and @MainActor patterns ensure thread safety
+- **Zero @unchecked Sendable in Plugins**: Actor-based patterns ensure thread safety
 - **Modular Design**: Import only what you need - core protocols, network monitoring, or connectivity
 - **Swift Testing**: Modern test framework support (v2.0.0+)
 
@@ -134,7 +134,7 @@ For building your own observers:
 
 # Usage
 
-> **Note:** These examples use **SundialKitStream** with modern async/await patterns. For Combine-based examples and iOS 13+ support, see **[SundialKitCombine](https://github.com/brightdigit/SundialKitCombine)**.
+> **Note:** These examples use **[SundialKitStream](https://github.com/brightdigit/SundialKitStream)** with modern async/await patterns. For Combine-based examples and iOS 13+ support, see **[SundialKitCombine](https://github.com/brightdigit/SundialKitCombine)**.
 
 ## Listening to Networking Changes
 
@@ -145,7 +145,6 @@ import SwiftUI
 import SundialKitStream
 import SundialKitNetwork
 
-@MainActor
 @Observable
 class NetworkConnectivityModel {
   var pathStatus: PathStatus = .unknown
@@ -238,7 +237,6 @@ struct IpifyPing : NetworkPing {
 Next, in our model, we can create a `NetworkObserver` to use this with:
 
 ```swift
-@MainActor
 @Observable
 class NetworkModel {
   private let observer = NetworkObserver(
@@ -271,7 +269,6 @@ import SwiftUI
 import SundialKitStream
 import SundialKitConnectivity
 
-@MainActor
 @Observable
 class WatchConnectivityModel {
   var isReachable: Bool = false
@@ -346,7 +343,6 @@ import SwiftUI
 import SundialKitStream
 import SundialKitConnectivity
 
-@MainActor
 @Observable
 class WatchConnectivityModel {
   var isReachable: Bool = false
@@ -468,7 +464,6 @@ import SwiftUI
 import SundialKitStream
 import SundialKitConnectivity
 
-@MainActor
 @Observable
 class WatchConnectivityModel {
   var isReachable: Bool = false
@@ -514,7 +509,7 @@ The `MessageDecoder` automatically routes incoming messages to the correct type 
 
 SundialKit includes two demo applications showcasing different concurrency approaches:
 
-- **Pulse** (`Examples/Sundial/Apps/SundialCombine`) - Combine-based reactive demo with @MainActor observers
+- **Pulse** (`Examples/Sundial/Apps/SundialCombine`) - Combine-based reactive demo
 - **Flow** (`Examples/Sundial/Apps/SundialStream`) - AsyncStream/actor-based demo with modern Swift concurrency
 
 Both apps demonstrate:

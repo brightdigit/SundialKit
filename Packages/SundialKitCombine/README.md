@@ -27,13 +27,12 @@ Combine-based observation plugin for SundialKit with @Published properties and r
 * [Documentation](#documentation)
 * [Related Packages](#related-packages)
 * [License](#license)
-* [Contributing](#contributing)
 
 ## Overview
 
 **SundialKitCombine** provides observers that deliver state updates via @Published properties and Combine publishers. This plugin is designed for SwiftUI projects and apps requiring backward compatibility with iOS 13+, offering seamless integration with the Combine framework and SwiftUI's reactive data flow.
 
-Part of **[SundialKit](https://github.com/brightdigit/SundialKit) v2.0.0** - A Swift 6.1+ reactive communications library for Apple platforms.
+**SundialKitCombine** is a part of **[SundialKit](https://github.com/brightdigit/SundialKit)** - a reactive communications library for Apple platforms.
 
 ## Why Choose SundialKitCombine
 
@@ -444,33 +443,3 @@ For comprehensive documentation, see:
 ## License
 
 This code is distributed under the MIT license. See the [LICENSE](https://github.com/brightdigit/SundialKitCombine/LICENSE) file for more info.
-
-## Contributing
-
-We welcome contributions to SundialKitCombine! Here's how you can help:
-
-### Reporting Issues
-
-If you find a bug or have a feature request, please [open an issue](https://github.com/brightdigit/SundialKitCombine/issues) on GitHub. Include:
-- A clear description of the issue or feature
-- Steps to reproduce (for bugs)
-- Expected vs actual behavior
-- Your environment (Swift version, platform, OS version)
-
-### Submitting Pull Requests
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/my-feature`)
-3. Make your changes with clear, descriptive commits
-4. Add or update tests as needed
-5. Ensure all tests pass (`swift test`)
-6. Run linting and formatting (`swift-format`)
-7. Push to your fork and submit a pull request
-
-### Code Standards
-
-- Follow Swift API Design Guidelines
-- Maintain Swift 6.1 strict concurrency compliance
-- Write comprehensive tests for new features
-- Document public APIs with clear doc comments
-- Keep changes focused and atomic
