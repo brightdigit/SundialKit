@@ -4,7 +4,7 @@ Build network-aware apps and seamless iPhone-Apple Watch experiences.
 
 ## Overview
 
-![SundialKit Logo](logo.jpg)
+![SundialKit Logo](logo.png)
 
 SundialKit is a modern Swift library that helps you build apps that respond intelligently to network changes and communicate effortlessly between iPhone and Apple Watch. It simplifies two of Apple's most powerful but complex frameworks: [**Network**](https://developer.apple.com/documentation/network) and [**WatchConnectivity**](https://developer.apple.com/documentation/watchconnectivity).
 
