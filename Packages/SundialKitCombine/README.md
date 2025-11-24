@@ -10,6 +10,25 @@ Combine-based observation plugin for SundialKit with @Published properties and r
 [![Twitter](https://img.shields.io/badge/twitter-@brightdigit-blue.svg?style=flat)](http://twitter.com/brightdigit)
 ![GitHub](https://img.shields.io/github/license/brightdigit/SundialKitCombine)
 
+## Table of Contents
+
+* [Overview](#overview)
+* [Why Choose SundialKitCombine](#why-choose-sundialkit combine)
+* [Key Features](#key-features)
+* [Requirements](#requirements)
+* [Installation](#installation)
+* [Usage](#usage)
+  * [Network Monitoring](#network-monitoring)
+  * [WatchConnectivity Communication](#watchconnectivity-communication)
+  * [Type-Safe Messaging with Messagable](#type-safe-messaging-with-messagable)
+  * [Reactive Message Filtering](#reactive-message-filtering)
+* [Architecture](#architecture)
+* [Comparison with SundialKitStream](#comparison-with-sundialkit stream)
+* [Documentation](#documentation)
+* [Related Packages](#related-packages)
+* [License](#license)
+* [Contributing](#contributing)
+
 ## Overview
 
 **SundialKitCombine** provides observers that deliver state updates via @Published properties and Combine publishers. This plugin is designed for SwiftUI projects and apps requiring backward compatibility with iOS 13+, offering seamless integration with the Combine framework and SwiftUI's reactive data flow.

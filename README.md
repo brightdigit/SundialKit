@@ -66,13 +66,7 @@ Swift 6.1+ reactive communications library with modern concurrency support for A
 
 Swift Package Manager is Apple's decentralized dependency manager to integrate libraries to your Swift projects. It is now fully integrated with Xcode 16+.
 
-## Choose Your Concurrency Model
-
-SundialKit v2.0.0 offers two observation plugins - choose based on your project needs:
-
-### Option A: Modern Async/Await (Recommended)
-
-For new projects using async/await and Swift concurrency:
+Add SundialKit to your `Package.swift`:
 
 ```swift
 let package = Package(
@@ -95,32 +89,9 @@ let package = Package(
 )
 ```
 
-### Option B: Combine + SwiftUI
+> **Need Combine support?** If you need to support iOS 13+ or prefer Combine publishers, see **[SundialKitCombine](https://github.com/brightdigit/SundialKitCombine)**.
 
-For projects using Combine or needing backward compatibility with iOS 13+:
-
-```swift
-let package = Package(
-  name: "YourPackage",
-  platforms: [.iOS(.v13), .watchOS(.v6), .tvOS(.v13), .macOS(.v10_15)],
-  dependencies: [
-    .package(url: "https://github.com/brightdigit/SundialKit.git", from: "2.0.0"),
-    .package(url: "https://github.com/brightdigit/SundialKitCombine.git", from: "1.0.0")
-  ],
-  targets: [
-    .target(
-      name: "YourTarget",
-      dependencies: [
-        .product(name: "SundialKitCombine", package: "SundialKitCombine"),
-        .product(name: "SundialKitNetwork", package: "SundialKit"),
-        .product(name: "SundialKitConnectivity", package: "SundialKit")
-      ]
-    )
-  ]
-)
-```
-
-### Understanding SundialKit Architecture
+## Understanding SundialKit Architecture
 
 SundialKit v2.0.0 has two types of features:
 
@@ -163,15 +134,11 @@ For building your own observers:
 
 # Usage
 
-SundialKit v2.0.0 provides two ways to monitor network connectivity and device communication. Choose the approach that fits your project:
+> **Note:** These examples use **SundialKitStream** with modern async/await patterns. For Combine-based examples and iOS 13+ support, see **[SundialKitCombine](https://github.com/brightdigit/SundialKitCombine)**.
 
 ## Listening to Networking Changes
 
 **SundialKit** uses Apple's `Network` framework to monitor network connectivity, providing detailed information about network status, quality, and interface types.
-
-### Option A: Using SundialKitStream (Async/Await)
-
-For modern Swift concurrency with async/await:
 
 ```swift
 import SwiftUI
@@ -228,65 +195,6 @@ struct NetworkView: View {
     }
     .task {
       model.start()
-    }
-  }
-}
-```
-
-### Option B: Using SundialKitCombine (Combine + SwiftUI)
-
-For projects using Combine or requiring iOS 13+ compatibility:
-
-```swift
-import SwiftUI
-import SundialKitCombine
-import SundialKitNetwork
-import Combine
-
-@MainActor
-class NetworkConnectivityObject: ObservableObject {
-  // NetworkObserver is @MainActor, so all access is on main thread
-  let observer = NetworkObserver(
-    monitor: NWPathMonitorAdapter(),
-    ping: nil
-  )
-
-  // Access pathStatus directly via @Published property
-  @Published var pathStatus: PathStatus = .unknown
-  @Published var isExpensive: Bool = false
-  @Published var isConstrained: Bool = false
-
-  private var cancellables = Set<AnyCancellable>()
-
-  init() {
-    // Observer's @Published properties automatically update on MainActor
-    observer.$pathStatus
-      .assign(to: &$pathStatus)
-
-    observer.$isExpensive
-      .assign(to: &$isExpensive)
-
-    observer.$isConstrained
-      .assign(to: &$isConstrained)
-  }
-
-  func start() {
-    // Start monitoring (defaults to main queue for @MainActor observer)
-    observer.start()
-  }
-}
-
-struct NetworkView: View {
-  @StateObject var connectivity = NetworkConnectivityObject()
-
-  var body: some View {
-    VStack {
-      Text("Status: \(connectivity.pathStatus.description)")
-      Text("Expensive: \(connectivity.isExpensive ? "Yes" : "No")")
-      Text("Constrained: \(connectivity.isConstrained ? "Yes" : "No")")
-    }
-    .onAppear {
-      connectivity.start()
     }
   }
 }

@@ -10,6 +10,24 @@ Modern async/await observation plugin for SundialKit with actor-based concurrenc
 [![Twitter](https://img.shields.io/badge/twitter-@brightdigit-blue.svg?style=flat)](http://twitter.com/brightdigit)
 ![GitHub](https://img.shields.io/github/license/brightdigit/SundialKitStream)
 
+## Table of Contents
+
+* [Overview](#overview)
+* [Why Choose SundialKitStream](#why-choose-sundialkit stream)
+* [Key Features](#key-features)
+* [Requirements](#requirements)
+* [Installation](#installation)
+* [Usage](#usage)
+  * [Network Monitoring](#network-monitoring)
+  * [WatchConnectivity Communication](#watchconnectivity-communication)
+  * [Type-Safe Messaging with Messagable](#type-safe-messaging-with-messagable)
+* [Architecture](#architecture)
+* [Comparison with SundialKitCombine](#comparison-with-sundialkit combine)
+* [Documentation](#documentation)
+* [Related Packages](#related-packages)
+* [License](#license)
+* [Contributing](#contributing)
+
 ## Overview
 
 **SundialKitStream** provides actor-based observers that deliver state updates via AsyncStream APIs. This plugin is designed for Swift 6.1+ projects using modern concurrency patterns, offering natural thread safety through Swift's actor isolation model and seamless integration with async/await code.
