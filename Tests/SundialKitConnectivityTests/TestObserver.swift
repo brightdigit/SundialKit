@@ -25,7 +25,7 @@
     internal var lastMessage: ConnectivityMessage?
     internal var lastContext: ConnectivityMessage?
 
-    internal nonisolated func connectivityManager(
+    nonisolated internal func connectivityManager(
       _: ConnectivityManager,
       didChangeActivationState activationState: ActivationState
     ) {
@@ -34,7 +34,7 @@
       }
     }
 
-    internal nonisolated func connectivityManager(
+    nonisolated internal func connectivityManager(
       _: ConnectivityManager,
       didChangeReachability isReachable: Bool
     ) {
@@ -43,7 +43,7 @@
       }
     }
 
-    internal nonisolated func connectivityManager(
+    nonisolated internal func connectivityManager(
       _: ConnectivityManager,
       didChangeCompanionAppInstalled isInstalled: Bool
     ) {
@@ -53,7 +53,7 @@
     }
 
     #if os(iOS)
-      internal nonisolated func connectivityManager(
+      nonisolated internal func connectivityManager(
         _: ConnectivityManager,
         didChangePairedStatus isPaired: Bool
       ) {
@@ -63,7 +63,7 @@
       }
     #endif
 
-    internal nonisolated func connectivityManager(
+    nonisolated internal func connectivityManager(
       _: ConnectivityManager,
       didReceiveMessage message: ConnectivityMessage
     ) {
@@ -72,7 +72,7 @@
       }
     }
 
-    internal nonisolated func connectivityManager(
+    nonisolated internal func connectivityManager(
       _: ConnectivityManager,
       didReceiveApplicationContext context: ConnectivityMessage
     ) {

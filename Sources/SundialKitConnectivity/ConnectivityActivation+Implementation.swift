@@ -89,7 +89,7 @@
     /// Default implementation for synchronous activation.
     ///
     /// - Throws: `ConnectivityError` if activation fails.
-    public nonisolated func activate() throws {
+    nonisolated public func activate() throws {
       try session.activate()
     }
   }

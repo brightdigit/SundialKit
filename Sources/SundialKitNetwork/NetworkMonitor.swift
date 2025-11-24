@@ -78,21 +78,21 @@ public actor NetworkMonitor<
 
   // MARK: - Public Properties (NetworkMonitoring)
   /// The current status of the network path.
-  public nonisolated var pathStatus: PathStatus {
+  nonisolated public var pathStatus: PathStatus {
     get async {
       await state.pathStatus
     }
   }
 
   /// Indicates whether the network connection is expensive.
-  public nonisolated var isExpensive: Bool {
+  nonisolated public var isExpensive: Bool {
     get async {
       await state.isExpensive
     }
   }
 
   /// Indicates whether the network connection is constrained.
-  public nonisolated var isConstrained: Bool {
+  nonisolated public var isConstrained: Bool {
     get async {
       await state.isConstrained
     }
@@ -127,14 +127,14 @@ public actor NetworkMonitor<
   // MARK: - Lifecycle (NetworkMonitoring)
   /// Starts monitoring network connectivity.
   /// - Parameter queue: The dispatch queue on which to deliver network updates
-  public nonisolated func start(queue: DispatchQueue) {
+  nonisolated public func start(queue: DispatchQueue) {
     Task {
       await startIsolated(queue: queue)
     }
   }
 
   /// Stops monitoring network connectivity.
-  public nonisolated func stop() {
+  nonisolated public func stop() {
     Task {
       await stopIsolated()
     }

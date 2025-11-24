@@ -120,42 +120,42 @@
     // MARK: - Nonisolated Delegate Methods
 
     /// Handles session activation completion.
-    public nonisolated func handleActivation(_ state: ActivationState, error: (any Error)?) {
+    nonisolated public func handleActivation(_ state: ActivationState, error: (any Error)?) {
       Task {
         await self.isolatedHandleActivation(state, error: error)
       }
     }
 
     /// Handles session becoming inactive.
-    public nonisolated func handleSessionInactive() {
+    nonisolated public func handleSessionInactive() {
       Task {
         await self.isolatedActiveState(.inactive)
       }
     }
 
     /// Handles session deactivation.
-    public nonisolated func handleSessionDeactivate() {
+    nonisolated public func handleSessionDeactivate() {
       Task {
         await self.isolatedActiveState(.notActivated)
       }
     }
 
     /// Handles reachability changes.
-    public nonisolated func handleReachabilityChange(_ isReachable: Bool) {
+    nonisolated public func handleReachabilityChange(_ isReachable: Bool) {
       Task {
         await self.isolatedReachabilityChanged(isReachable)
       }
     }
 
     /// Handles companion device state changes.
-    public nonisolated func handleCompanionStateChange(_ session: any ConnectivitySession) {
+    nonisolated public func handleCompanionStateChange(_ session: any ConnectivitySession) {
       Task {
         await self.isolatedSessionStateChanged(session)
       }
     }
 
     /// Handles received messages.
-    public nonisolated func handleMessageReceived(_ message: ConnectivityMessage) {
+    nonisolated public func handleMessageReceived(_ message: ConnectivityMessage) {
       Task {
         // Notify observers of received message
         await self.notifyMessageReceived(message)
@@ -163,7 +163,7 @@
     }
 
     /// Handles application context updates.
-    public nonisolated func handleApplicationContextReceived(
+    nonisolated public func handleApplicationContextReceived(
       _ applicationContext: ConnectivityMessage,
       error: (any Error)?
     ) {
@@ -179,7 +179,7 @@
     }
 
     /// Handles received binary message data.
-    public nonisolated func handleBinaryMessageReceived(
+    nonisolated public func handleBinaryMessageReceived(
       _: Data,
       replyHandler: @escaping @Sendable (Data) -> Void
     ) {
