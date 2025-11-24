@@ -7,6 +7,6 @@
 	remote = git@github.com:brightdigit/SundialKitStream.git
 	branch = v1.0.0
 	commit = 1c16d63a15c99a0b38c1eeb7e94e632af77da2af
-	parent = b49da06cbd4a78091c390dd604301f9aba121f06
+	parent = d78e9fbce800bdf5bb7013afe4f87ffcfda1edac
 	method = merge
 	cmdver = 0.4.9
