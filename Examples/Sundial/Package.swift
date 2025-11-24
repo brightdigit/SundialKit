@@ -34,18 +34,18 @@ let package = Package(
     ),
     // SundialKit core (parent package)
     .package(
-      name: "SundialKit",
-      path: "../.."
+      url: "https://github.com/brightdigit/SundialKit.git",
+      branch: "v2.0.0"
     ),
-    // SundialKitCombine plugin (subrepo)
+    // SundialKitCombine plugin
     .package(
-      name: "SundialKitCombine",
-      path: "../../Packages/SundialKitCombine"
+      url: "https://github.com/brightdigit/SundialKitCombine.git",
+      branch: "v1.0.0"
     ),
-    // SundialKitStream plugin (subrepo)
+    // SundialKitStream plugin
     .package(
-      name: "SundialKitStream",
-      path: "../../Packages/SundialKitStream"
+      url: "https://github.com/brightdigit/SundialKitStream.git",
+      branch: "v1.0.0"
     )
   ],
   targets: [

@@ -34,14 +34,14 @@ let swiftSettings: [SwiftSetting] = [
   .enableExperimentalFeature("WarnUnsafeReflection"),
 
   // Enhanced compiler checking
-  .unsafeFlags([
-    "-warn-concurrency",
-    "-enable-actor-data-race-checks",
-    "-strict-concurrency=complete",
-    "-enable-testing",
-    "-Xfrontend", "-warn-long-function-bodies=100",
-    "-Xfrontend", "-warn-long-expression-type-checking=100"
-  ])
+  // .unsafeFlags([
+  //   "-warn-concurrency",
+  //   "-enable-actor-data-race-checks",
+  //   "-strict-concurrency=complete",
+  //   "-enable-testing",
+  //   "-Xfrontend", "-warn-long-function-bodies=100",
+  //   "-Xfrontend", "-warn-long-expression-type-checking=100"
+  // ])
 ]
 
 // MARK: - Architecture Overview
@@ -57,9 +57,9 @@ let swiftSettings: [SwiftSetting] = [
 //       - MessageDecoder (type-safe message decoding)
 //   • SundialKit: Umbrella module re-exporting all three
 //
-// Layer 2 - Plugin Packages (separate repositories via git-subrepo):
-//   • SundialKitCombine: Combine-based observers (Packages/SundialKitCombine/)
-//   • SundialKitStream: Actor-based observers (Packages/SundialKitStream/)
+// Layer 2 - Plugin Packages (separate repositories):
+//   • SundialKitCombine: Combine-based observers (brightdigit/SundialKitCombine)
+//   • SundialKitStream: Actor-based observers (brightdigit/SundialKitStream)
 //
 // Note: Messagable and BinaryMessagable are NOT separate packages.
 // They are built-in features of SundialKitConnectivity.

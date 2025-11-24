@@ -347,140 +347,62 @@ Task {
 
 ## Repository Structure & GitHub Workflow Integration
 
-### Monorepo Development Strategy (v2.0.0)
+### Package Structure (v2.0.0)
 
-SundialKit v2.0.0 uses a **monorepo-first development approach** with git-subrepo:
+SundialKit v2.0.0 uses a **modular Swift Package Manager architecture**:
 
 **Repository Structure:**
-- **Main Monorepo** (`brightdigit/SundialKit`): Contains SundialKitCore, SundialKitNetwork, SundialKitConnectivity, SundialKit umbrella, SundialKitBinary, and SundialKitMessagable
-- **Plugin Subrepos** (in `Packages/`): SundialKitStream, SundialKitCombine
-  - Linked via git-subrepo to separate repositories
-  - Tracked on `v1.0.0` branch during development
-- **Built-in Plugins**: SundialKitBinary and SundialKitMessagable are implemented directly in the monorepo as built-in features
-- **After v2.0.0**: Sever subrepo ties and finalize distribution strategy
+- **Main Repository** (`brightdigit/SundialKit`): Contains SundialKitCore, SundialKitNetwork, SundialKitConnectivity, SundialKit umbrella, and built-in features (SundialKitBinary, SundialKitMessagable)
+- **Plugin Packages**: SundialKitStream and SundialKitCombine are distributed as separate Swift packages
+  - `brightdigit/SundialKitStream` (tag: 1.0.0-alpha.1) - Modern async/await observers
+  - `brightdigit/SundialKitCombine` (tag: 1.0.0-alpha.1) - Combine-based observers
 
-**Benefits:**
-- Single source of truth during development
-- Easy coordination across packages
-- Simplified dependency management
-- Flexibility to choose distribution model later
+**Package Dependencies:**
 
-#### Git-Subrepo Workflow
+SundialKit uses standard Swift Package Manager dependencies. The Package.swift file references plugin packages as remote dependencies:
 
-**What is git-subrepo?**
-Git-subrepo is a simpler alternative to git submodules for managing external repositories within a project. Unlike submodules, subrepos are automatically cloned when users clone the main repository—no special commands needed.
+```swift
+dependencies: [
+    .package(url: "https://github.com/brightdigit/SundialKitStream.git", from: "1.0.0-alpha.1"),
+    .package(url: "https://github.com/brightdigit/SundialKitCombine.git", from: "1.0.0-alpha.1")
+]
+```
 
-**Key Differences from Git Submodules:**
-- Simpler command-line usage
-- Users get all subrepos automatically on clone
-- No need to install git-subrepo for basic repository usage
-- Keeps git history clean by condensing upstream changes into single commits
-
-**Basic Commands:**
+**Working with Dependencies:**
 
 ```bash
-# Clone a subrepo (initial setup - already done for plugins)
-git subrepo clone <remote-url> <subdir> [-b <branch>]
+# Update all package dependencies
+swift package update
 
-# Pull upstream changes from subrepo
-git subrepo pull <subdir>
+# Resolve dependencies
+swift package resolve
 
-# Push local changes to subrepo
-git subrepo push <subdir>
-
-# Check status of all subrepos
-git subrepo status
-
-# Check status of specific subrepo
-git subrepo status <subdir>
+# Clean and rebuild
+swift package clean
+swift build
 ```
 
-**Plugin Subrepo Locations:**
-- `Packages/SundialKitStream` → `git@github.com:brightdigit/SundialKitStream.git` (branch: v1.0.0)
-- `Packages/SundialKitCombine` → `git@github.com:brightdigit/SundialKitCombine.git` (branch: v1.0.0)
+### GitHub Issues & Pull Requests
 
-**Built-in Plugins (not subrepos):**
-- SundialKitBinary - Implemented directly in main monorepo
-- SundialKitMessagable - Implemented directly in main monorepo
-
-**The .gitrepo File:**
-Each subrepo directory contains a `.gitrepo` file that stores metadata about the upstream repository:
-```ini
-[subrepo]
-    remote = git@github.com:brightdigit/SundialKitStream.git
-    branch = v1.0.0
-    commit = <upstream-commit-sha>
-    parent = <local-commit-sha>
-```
-
-**Development Workflow:**
-
-1. **Working on Plugin Code:**
-   ```bash
-   # Edit files in Packages/SundialKitStream/
-   git add Packages/SundialKitStream/
-   git commit -m "feat(stream): add new feature"
-
-   # Push changes to the plugin's separate repository
-   git subrepo push Packages/SundialKitStream
-   ```
-
-2. **Pulling Updates from Plugins:**
-   ```bash
-   # Pull latest changes from plugin repo
-   git subrepo pull Packages/SundialKitStream
-
-   # Or update all subrepo plugins
-   git subrepo pull Packages/SundialKitStream
-   git subrepo pull Packages/SundialKitCombine
-
-   # Note: SundialKitBinary and SundialKitMessagable are built-in (not subrepos)
-   ```
-
-3. **Checking Subrepo Status:**
-   ```bash
-   # See status of all subrepos
-   git subrepo status
-
-   # Output shows which subrepos have local changes
-   ```
-
-**Best Practices:**
-- Treat plugin code in `Packages/` like normal code changes
-- Commit and push changes to main repo first, then push to subrepo
-- Pull from subrepos before making modifications
-- Use `git subrepo status` regularly to check sync state
-- Each `git subrepo push` creates a commit in the plugin's repository
-
-### GitHub Issues & Pull Requests (Task Master Integration)
-
-This project uses GitHub Issues and Pull Requests integrated with Task Master:
-- **Each main task** (1, 2, 3, etc.) gets a GitHub issue and feature branch
-- **Subtasks** (1.1, 1.2, etc.) are tracked as task lists in the issue or as sub-issues
+This project uses GitHub Issues and Pull Requests with component-based organization:
+- **Each major feature** gets a GitHub issue and feature branch
+- **Subtasks** are tracked as task lists in the issue or as sub-issues
 - **Component/Package labeling** is required for all issues and PRs
-  - Issue titles prefixed with component: `[Core] Task 1: ...`, `[Network] Task 2: ...`, `[WatchConnectivity] Task 3: ...`
+  - Issue titles prefixed with component: `[Core] Feature: ...`, `[Network] Feature: ...`, `[WatchConnectivity] Feature: ...`
   - GitHub labels applied: `component:core`, `component:network`, `component:watchconnectivity`, `component:combine`, `component:stream`, etc.
-  - Components documented in Task Master: `Component: Core`
-- **Feature branches** follow the pattern: `feature/[component-]task-<id>-<description>`
-- **Commit messages** reference component and task: `feat(core/task-1.1): description (#issue-number)`
-- **Pull requests** include component scope: `feat(core): Task 1 - Description`
-- **Pull requests** are created when all subtasks complete, closing the related issue
+- **Feature branches** follow the pattern: `feature/[component-]<description>`
+- **Commit messages** reference component: `feat(core): description (#issue-number)`
+- **Pull requests** include component scope: `feat(core): Feature Description`
+- **Pull requests** are created when work is complete, closing the related issue
 
 **Component Labels:**
 - `component:core` - SundialKitCore protocols and types
 - `component:network` - SundialKitNetwork implementation
 - `component:watchconnectivity` - SundialKitConnectivity implementation
-- `component:combine` - SundialKitCombine plugin (v1 compatibility, subrepo)
-- `component:messagable` - SundialKitMessagable built-in (v1 compatibility, monorepo)
-- `component:stream` - SundialKitStream plugin (modern async/await, subrepo)
-- `component:binary` - SundialKitBinary built-in (modern serialization, monorepo)
-- `component:infrastructure` - Build, CI/CD, tooling, git-subrepo
+- `component:combine` - SundialKitCombine plugin package (v1 compatibility)
+- `component:messagable` - SundialKitMessagable built-in (v1 compatibility)
+- `component:stream` - SundialKitStream plugin package (modern async/await)
+- `component:binary` - SundialKitBinary built-in (modern serialization)
+- `component:infrastructure` - Build, CI/CD, tooling, package management
 - `component:docs` - Documentation and examples
 - `component:tests` - Testing infrastructure and Swift Testing migration
-
-
-See `.taskmaster/CLAUDE.md` for detailed GitHub integration workflow and commands.
-
-## Task Master AI Instructions
-**Import Task Master's development workflow commands and guidelines, treat as if import is in the main CLAUDE.md file.**
-@./.taskmaster/CLAUDE.md
