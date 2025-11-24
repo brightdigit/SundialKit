@@ -42,8 +42,6 @@ targets:
         buildPhase: resources
       - path: Resources/iOS/Assets.xcassets
         buildPhase: resources
-      - path: Resources/iOS/Info.plist
-        buildPhase: none
     dependencies:
       - package: Sundial
         product: SundialDemoCombine
@@ -102,8 +100,6 @@ targets:
         buildPhase: resources
       - path: Resources/watchOS/Assets.xcassets
         buildPhase: resources
-      - path: Resources/watchOS/Info-Combine.plist
-        buildPhase: none
     dependencies:
       - package: Sundial
         product: SundialDemoCombine
@@ -151,8 +147,6 @@ targets:
         buildPhase: resources
       - path: Resources/iOS/Assets.xcassets
         buildPhase: resources
-      - path: Resources/iOS/Info.plist
-        buildPhase: none
     dependencies:
       - package: Sundial
         product: SundialDemoStream
@@ -211,8 +205,6 @@ targets:
         buildPhase: resources
       - path: Resources/watchOS/Assets.xcassets
         buildPhase: resources
-      - path: Resources/watchOS/Info-Stream.plist
-        buildPhase: none
     dependencies:
       - package: Sundial
         product: SundialDemoStream
