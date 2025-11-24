@@ -1,7 +1,7 @@
 # SundialKitStream
 
 <p align="center">
-    <img alt="SundialKit" title="SundialKit" src="https://raw.githubusercontent.com/brightdigit/SundialKit/main/Assets/logo.svg" height="150">
+    <img alt="SundialKit" title="SundialKit" src="Sources/SundialKitStream/SundialKitStream.docc/Resources/logo.png" height="150">
 </p>
 
 Modern async/await observation plugin for SundialKit with actor-based concurrency safety.

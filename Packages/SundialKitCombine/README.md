@@ -1,7 +1,7 @@
 # SundialKitCombine
 
 <p align="center">
-    <img alt="SundialKit" title="SundialKit" src="https://raw.githubusercontent.com/brightdigit/SundialKit/main/Assets/logo.svg" height="150">
+    <img alt="SundialKit" title="SundialKit" src="Sources/SundialKitCombine/SundialKitCombine.docc/Resources/logo.png" height="150">
 </p>
 
 Combine-based observation plugin for SundialKit with @Published properties and reactive publishers.

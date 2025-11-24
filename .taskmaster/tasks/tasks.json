@@ -2,7 +2,7 @@
   "master": {
     "tasks": [
       {
-        "id": 1,
+        "id": "1",
         "title": "Create SundialKitCore protocols and types",
         "description": "Define core protocols (NetworkMonitoring, ConnectivityManagement) and value types with Sendable conformance for plugin system",
         "status": "done",
@@ -74,7 +74,7 @@
         "expansionPrompt": "Break down into: 1) Define NetworkMonitoring protocol with all required methods and properties, 2) Define ConnectivityManagement protocol with messaging interfaces, 3) Create PathStatus enum with nested types (Interface OptionSet, UnsatisfiedReason), 4) Implement typed error enums (NetworkError, ConnectivityError, SerializationError) with WCError mapping helpers, 5) Add Sendable conformance and documentation to all types"
       },
       {
-        "id": 2,
+        "id": "2",
         "title": "Extract NetworkMonitor from NetworkObserver",
         "description": "Create non-reactive NetworkMonitor class in SundialKitNetwork target by extracting core logic from v1.0.0 NetworkObserver in Sources/SundialKit/Network/NetworkObserver.swift",
         "status": "done",
@@ -204,7 +204,7 @@
         "updatedAt": "2025-10-22T15:22:06.963Z"
       },
       {
-        "id": 3,
+        "id": "3",
         "title": "Extract ConnectivityManager from ConnectivityObserver",
         "description": "Create non-reactive ConnectivityManager class in SundialKitConnectivity target for WatchConnectivity management",
         "status": "done",
@@ -315,7 +315,7 @@
         "expansionPrompt": "Break down into: 1) Create ConnectivityManager class implementing ConnectivityManagement protocol, 2) Extract ConnectivitySession abstraction over WCSession from existing code, 3) Implement platform-specific delegate methods with iOS/watchOS guards, 4) Bridge delegate-based activation to async/await with continuations and timeout handling, 5) Extract message routing logic (sendMessage with updateApplicationContext fallback), 6) Implement observer pattern for state change notifications, 7) Handle error mapping from WCError to ConnectivityError, 8) Create comprehensive platform-specific tests"
       },
       {
-        "id": 4,
+        "id": "4",
         "title": "Create SundialKit umbrella target",
         "description": "Configure umbrella target that re-exports SundialKitCore, SundialKitNetwork, and SundialKitConnectivity for convenience",
         "details": "Create SundialKit umbrella target:\n1. Update Package.swift to define SundialKit product\n2. Create SundialKit.swift with @_exported imports:\n   - @_exported import SundialKitCore\n   - @_exported import SundialKitNetwork  \n   - @_exported import SundialKitConnectivity\n3. Configure platform restrictions (iOS 13+, watchOS 6+ - most restrictive)\n4. No additional code - pure re-export target\n5. Update documentation to explain import options:\n   - Individual imports for selective features\n   - SundialKit import for everything\n6. Verify all public APIs are accessible through umbrella import\n\nPackage.swift configuration:\n- Product definition with all three targets\n- Proper dependency declarations\n- Platform version specifications",
@@ -368,7 +368,7 @@
         "expansionPrompt": "Break down into: 1) Update Package.swift to define SundialKit product with proper dependencies and platform restrictions, 2) Create SundialKit.swift file with @_exported imports for all three modules, 3) Write tests to verify all public APIs are accessible through umbrella import"
       },
       {
-        "id": 5,
+        "id": "5",
         "title": "Implement SundialKitCombine compatibility plugin",
         "description": "Create Combine-based plugin package providing v1.0.0 API compatibility with NetworkObserver and ConnectivityObserver",
         "status": "done",
@@ -457,7 +457,7 @@
         "expansionPrompt": "Break down into: 1) Create NetworkObserver wrapper around NetworkMonitor with @Published properties, 2) Implement all v1.0.0 publishers using PassthroughSubject utilities, 3) Create ConnectivityObserver wrapper around ConnectivityManager, 4) Implement message publishers (sendingMessageSubject, messageReceivedPublisher, replyMessagePublisher), 5) Bridge observer callbacks to Combine publishers, 6) Verify complete v1.0.0 API compatibility with existing tests"
       },
       {
-        "id": 6,
+        "id": "6",
         "title": "Implement SundialKitMessagable compatibility plugin",
         "description": "Create dictionary-based messaging plugin maintaining v1.0.0 Messagable protocol and MessageDecoder with GitHub Issue #34 for Component: Messagable Plugin",
         "status": "done",
@@ -520,7 +520,7 @@
         "expansionPrompt": "Break down into: 1) Port Messagable protocol with all required methods from v1.0.0, 2) Port MessageDecoder class with type registry implementation, 3) Add ConnectivityMessage typealias and helper extensions, 4) Create comprehensive tests for encoding/decoding and backwards compatibility"
       },
       {
-        "id": 7,
+        "id": "7",
         "title": "Implement SundialKitStream modern async plugin",
         "description": "Create actor-based AsyncStream plugin with NetworkStream and ConnectivityStream using Swift 6.1 strict concurrency",
         "details": "Create modern SundialKitStream plugin with Swift 6.1:\n1. actor NetworkStream implementation:\n   - Wrap NetworkMonitor with actor isolation\n   - pathStatusStream: AsyncStream<PathStatus>\n   - isExpensiveStream: AsyncStream<Bool>\n   - isConstrainedStream: AsyncStream<Bool>\n   - async func currentStatus() -> PathStatus\n   - Implement NetworkStateObserver, bridge to AsyncStream\n2. actor ConnectivityStream implementation:\n   - Wrap ConnectivityManager with actor isolation\n   - activationStateStream: AsyncStream<ActivationState>\n   - isReachableStream: AsyncStream<Bool>\n   - messageStream: AsyncStream<ReceivedMessage>\n   - async func send<M>(_ message: M) throws\n   - async func activate() throws(ConnectivityError)\n3. Full Swift 6.1 strict concurrency enabled\n4. No @available guards - declare platforms in Package.swift\n5. Thread-safe by default via actor isolation\n6. No swift-async-algorithms dependency\n\nPlatform: iOS 13+, macOS 10.15+, watchOS 6+, tvOS 13+",
@@ -628,7 +628,7 @@
         "expansionPrompt": "Break down into: 1) Create actor NetworkStream with proper isolation, 2) Implement AsyncStream bridges for network state properties, 3) Create actor ConnectivityStream with message handling, 4) Implement AsyncStream for connectivity state and messages, 5) Add async send and activate methods with typed throws, 6) Ensure Swift 6.1 strict concurrency compliance, 7) Write actor isolation and stream tests"
       },
       {
-        "id": 8,
+        "id": "8",
         "title": "Implement SundialKitBinary serialization plugin",
         "description": "Create format-agnostic binary serialization plugin with BinarySerializable protocol for efficient WatchConnectivity messaging",
         "details": "IMPLEMENTATION COMPLETE - Built-in feature in SundialKitConnectivity (NOT a separate package/plugin).\n\nImplementation Location:\n- Sources/SundialKitConnectivity/BinaryMessagable.swift (protocol definition)\n- Sources/SundialKitConnectivity/BinaryMessageEncoder.swift (encoding with type footer)\n\nTest Location:\n- Tests/SundialKitConnectivityTests/BinaryMessagableTests.swift\n\nThis was implemented as a built-in feature of the SundialKitConnectivity module. Extends the Messagable pattern with efficient binary serialization support. Format-agnostic design supports JSON, Protobuf, MessagePack, CBOR, and custom binary formats.",
@@ -715,7 +715,7 @@
         "expansionPrompt": "Break down into: 1) Define BinarySerializable protocol with Data conversion methods, 2) Implement WatchConnectivity integration with sendMessageData, 3) Add fallback mechanism using base64 encoding for updateApplicationContext, 4) Implement generic send and request methods with type safety, 5) Add message size validation and error handling, 6) Create tests for various binary formats and edge cases"
       },
       {
-        "id": 9,
+        "id": "9",
         "title": "Migrate all tests to Swift Testing",
         "description": "Convert entire test suite from XCTest to Swift Testing framework across all packages (requires Swift 6.1+ - Swift 5.9/5.10/6.0 support dropped). Deferred until demo app (Task 13) validates core functionality works correctly.",
         "status": "done",
@@ -831,7 +831,7 @@
         "expansionPrompt": "Break down into: 1) Migrate SundialKitCore tests to Swift Testing with @Test and @Suite, 2) Migrate NetworkMonitor tests including mock implementations, 3) Migrate ConnectivityManager tests with platform-specific scenarios, 4) Convert SundialKitCombine plugin tests, 5) Convert SundialKitMessagable plugin tests, 6) Convert SundialKitStream plugin tests, 7) Convert SundialKitBinary plugin tests, 8) Update CI/CD configuration for Swift Testing, 9) Create testing utilities and documentation"
       },
       {
-        "id": 10,
+        "id": "10",
         "title": "Create documentation and example applications",
         "description": "Develop comprehensive documentation, migration guides, and example apps demonstrating all v2.0.0 features and migration paths",
         "details": "Documentation and examples:\n1. API Documentation:\n   - DocC documentation for all packages\n   - Inline code documentation\n   - Architecture diagrams\n   - Plugin development guide\n2. Migration Documentation:\n   - MIGRATION.md with step-by-step guide\n   - Compatibility matrix (v1 vs v2)\n   - Common migration patterns\n   - Troubleshooting guide\n3. Example Applications:\n   - V1 compatibility app (Combine + Messagable)\n   - Modern async/await app (Stream)\n   - Binary messaging examples (JSON, custom)\n   - Mixed approach app (Combine + Binary)\n   - iPhone/Watch communication demo\n4. README Updates:\n   - Main README.md with quick start\n   - PLUGINS.md explaining architecture\n   - Update CLAUDE.md for AI assistance\n5. Binary Format Examples:\n   - JSON via Codable\n   - Protobuf integration guide\n   - MessagePack example\n   - Custom binary format\n6. Real-world integration:\n   - Bitness app case study\n   - Performance comparisons\n   - Best practices from production use",
@@ -843,7 +843,7 @@
           "7",
           "8"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -851,9 +851,10 @@
             "description": "Generate comprehensive DocC documentation for SundialKitCore, SundialKitNetwork, SundialKitConnectivity, and all plugin packages with inline code documentation and architecture diagrams",
             "dependencies": [],
             "details": "Set up DocC configuration for the entire SundialKit v2.0.0 package. Document all public protocols, classes, structs, and enums with detailed descriptions. Include code examples for each major API. Create architecture diagrams showing the relationship between core packages and plugins. Document the plugin system architecture with clear examples of how to create custom plugins. Ensure all public APIs have proper documentation comments with parameters, return values, and usage examples.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify DocC builds without warnings, all public APIs are documented, code examples compile correctly, and documentation renders properly in Xcode",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-11-24T16:15:32.988Z"
           },
           {
             "id": 2,
@@ -863,9 +864,10 @@
               1
             ],
             "details": "Create MIGRATION.md file with detailed step-by-step instructions for migrating from v1.0.0 to v2.0.0. Include a compatibility matrix showing v1 vs v2 API differences. Document breaking changes and their solutions. Provide migration patterns for NetworkObserver to NetworkMonitor + plugins, ConnectivityObserver to ConnectivityManager + plugins, and Messagable to BinarySerializable. Include troubleshooting section for common migration issues. Add code snippets showing before/after examples for typical use cases.",
-            "status": "pending",
+            "status": "cancelled",
             "testStrategy": "Test migration guide by converting an actual v1 project to v2, verify all code examples compile, validate compatibility matrix accuracy",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-11-24T16:16:46.447Z"
           },
           {
             "id": 5,
@@ -875,9 +877,10 @@
               1
             ],
             "details": "Create comprehensive examples showing different binary serialization formats with SundialKitBinary plugin. Implement JSON serialization using Codable with proper error handling. Add Protobuf integration guide with .proto file examples and Swift code generation. Include MessagePack example with size comparisons. Develop custom binary format example showing bit-packing for maximum efficiency. Compare message sizes and performance across all formats. Include proper versioning and backward compatibility strategies. Show fallback handling when messages exceed WatchConnectivity size limits.\n<info added on 2025-10-26T22:06:37.564Z>\nI'll first analyze the codebase to understand the current documentation structure and binary messaging implementation before updating the subtask focus.Based on my analysis of the codebase, I can see that SundialKit has an existing binary messaging system with `BinaryMessagable` protocol, `BinaryMessageEncoder`, and comprehensive test examples. The user wants to shift from creating full example applications to focused documentation with inline code snippets showing different binary formats.\n\nShift focus from comprehensive example applications to creating inline documentation code snippets. Develop code examples showing JSON serialization via Codable, Protobuf integration using existing BinaryMessagable protocol from Sources/SundialKitConnectivity/BinaryMessagable.swift, MessagePack implementation leveraging the BinaryMessageEncoder.swift footer system, and custom binary format examples using bit-packing techniques. Include size comparison tables and performance metrics in documentation format. Reference existing test patterns from Tests/SundialKitConnectivityTests/BinaryMessagableTests.swift as foundation for documentation examples. Focus on demonstrating the type discrimination footer system and automatic Messagable conformance. Create versioning strategy examples and backward compatibility patterns suitable for documentation rather than full applications.\n</info added on 2025-10-26T22:06:37.564Z>",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify all serialization formats work correctly, test round-trip encoding/decoding, validate size limits are enforced, benchmark performance differences",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-11-24T16:16:42.839Z"
           },
           {
             "id": 7,
@@ -899,17 +902,19 @@
               7
             ],
             "details": "Create detailed case study documenting v2.0.0 integration in Bitness app production environment. Include performance benchmarks comparing v1 Combine approach vs v2 plugin-based architecture. Measure memory usage, battery impact, and message latency across different scenarios. Document best practices discovered during production deployment. Show real-world error handling and recovery strategies. Include metrics on binary message size reduction using different formats. Provide decision matrix for choosing between Combine, Stream, or custom observers. Document lessons learned and optimization techniques for high-frequency messaging scenarios.",
-            "status": "pending",
+            "status": "cancelled",
             "testStrategy": "Validate performance metrics with actual measurements, verify case study accuracy with production data, test optimization recommendations work as described",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-11-24T16:16:50.552Z"
           }
         ],
         "complexity": 7,
         "recommendedSubtasks": 8,
-        "expansionPrompt": "Break down into: 1) Create DocC documentation for all public APIs, 2) Write MIGRATION.md with step-by-step v1 to v2 guide, 3) Create v1 compatibility example app using Combine and Messagable plugins, 4) Create modern async/await example using Stream plugin, 5) Create binary messaging examples with multiple formats, 6) Develop iPhone/Watch communication demo app, 7) Update README and PLUGINS documentation, 8) Create real-world integration guide with performance comparisons"
+        "expansionPrompt": "Break down into: 1) Create DocC documentation for all public APIs, 2) Write MIGRATION.md with step-by-step v1 to v2 guide, 3) Create v1 compatibility example app using Combine and Messagable plugins, 4) Create modern async/await example using Stream plugin, 5) Create binary messaging examples with multiple formats, 6) Develop iPhone/Watch communication demo app, 7) Update README and PLUGINS documentation, 8) Create real-world integration guide with performance comparisons",
+        "updatedAt": "2025-11-24T16:16:50.552Z"
       },
       {
-        "id": 11,
+        "id": "11",
         "title": "Set up multi-repository structure with git subrepo",
         "description": "Set up git-subrepo for the 2 plugin repositories (SundialKitStream, SundialKitCombine) that will be linked to the main SundialKit monorepo. Note: SundialKitBinary and SundialKitMessagable are built-in features of SundialKitConnectivity, not separate packages/subrepos.",
         "status": "done",
@@ -1001,7 +1006,7 @@
         "updatedAt": "2025-10-12T21:30:05.278Z"
       },
       {
-        "id": 12,
+        "id": "12",
         "title": "Remove git subrepos and finalize repository structure",
         "description": "After migration is complete, remove git subrepo tracking from the umbrella repository to transition to standard package dependencies",
         "details": "",
@@ -1083,7 +1088,7 @@
         ]
       },
       {
-        "id": 13,
+        "id": "13",
         "title": "Migrate Sundial demo application to SundialKit v2.0.0 monorepo",
         "description": "Import the Sundial iOS/watchOS demo application from the external repository into the SundialKit monorepo using a phased approach. Phase 1: Import with git subtree add and maintain v1.0.0 APIs as validation baseline. Phase 2: Migrate to SundialKit v2.0.0 APIs with SundialKitCombine and SundialKitStream as those plugins complete.",
         "status": "done",
@@ -1253,15 +1258,12 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-26T22:23:41.061Z",
+      "lastModified": "2025-11-24T16:16:50.553Z",
       "taskCount": 13,
-      "completedCount": 9,
+      "completedCount": 11,
       "tags": [
         "master"
-      ],
-      "created": "2025-10-27T17:19:15.396Z",
-      "description": "Tasks for master context",
-      "updated": "2025-11-17T19:36:26.088Z"
+      ]
     }
   }
 }

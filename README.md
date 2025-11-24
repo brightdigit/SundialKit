@@ -1,5 +1,5 @@
 <p align="center">
-    <img alt="SundialKit" title="SundialKit" src="Assets/logo.svg" height="200">
+    <img alt="SundialKit" title="SundialKit" src="Sources/SundialKitNetwork/SundialKitNetwork.docc/Resources/logo.png" height="200">
 </p>
 <h1 align="center"> SundialKit </h1>
 
@@ -17,9 +17,6 @@ Swift 6.1+ reactive communications library with modern concurrency support for A
 
 [![Codecov](https://img.shields.io/codecov/c/github/brightdigit/SundialKit)](https://codecov.io/gh/brightdigit/SundialKit)
 [![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/brightdigit/SundialKit)](https://www.codefactor.io/repository/github/brightdigit/SundialKit)
-
-
-![Communication between iPhone and Apple Watch using Demo App](Assets/Readme-Sundial.gif "Communication between iPhone and Apple Watch using Demo App")
 
 # Table of Contents
 
@@ -346,8 +343,6 @@ Besides networking, **SundialKit** also provides an easier reactive interface in
 1. Various connection statuses like `isReachable`, `isInstalled`, etc..
 2. Send messages between the iPhone and paired Apple Watch
 3. Easy encoding and decoding of messages between devices into `WatchConnectivity` friendly dictionaries.
-
-![Showing changes to `isReachable` using SundialKit](Assets/Reachable-Sundial.gif "Showing changes to `isReachable` using SundialKit")
 
 Let's first talk about how `WatchConnectivity` status works.
 
