@@ -235,13 +235,21 @@ struct IpifyPing : NetworkPing {
 }
 ```
 
-Next, in our `ObservableObject`, we can create a ``NetworkObserver`` to use this with:
+Next, in our model, we can create a `NetworkObserver` to use this with:
 
 ```swift
-  @Published var nwObject = NetworkObserver(ping:
-    // use the shared `URLSession` and check every 10.0 seconds
-    IpifyPing(session: .shared, timeInterval: 10.0)
-   )
+@MainActor
+@Observable
+class NetworkModel {
+  private let observer = NetworkObserver(
+    monitor: NWPathMonitorAdapter(),
+    ping: IpifyPing(session: .shared, timeInterval: 10.0)
+  )
+
+  func start() {
+    observer.start(queue: .global())
+  }
+}
 ```
 
 ## Communication between iPhone and Apple Watch
@@ -444,11 +452,14 @@ struct Message: Messagable {
 }
 ```
 
-There are three requirements for implementing `Messagable`:
+There are two requirements for implementing `Messagable`:
 
 * `init(from:)` - Create the object from a dictionary, throwing an error if invalid
 * `parameters()` - Return a dictionary with all the parameters needed to recreate the object
-* `key` - A string that identifies the type and must be unique within the `MessageDecoder`
+
+Optionally, you can provide:
+
+* `key` - A static string that identifies the type and must be unique within the `MessageDecoder` (if not provided, the type name is used)
 
 Now configure our `ConnectivityObserver` with a `MessageDecoder` and use typed messages:
 
