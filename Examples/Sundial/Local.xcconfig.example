@@ -1,0 +1,20 @@
+// Local development configuration template
+// This file is required for building the Sundial demo apps
+//
+// === Local Development Setup ===
+// 1. Copy this file:
+//      cp Local.xcconfig.example Local.xcconfig
+//
+// 2. Edit Local.xcconfig and replace YOUR_TEAM_ID_HERE with your Apple Developer Team ID
+//
+// To find your Team ID:
+//   - Run: security find-identity -v -p codesigning
+//   - Or check: Xcode → Settings → Accounts → Team ID
+//
+// === CI/CD ===
+// GitHub Actions automatically generates Local.xcconfig from the DEVELOPMENT_TEAM secret
+// See: .github/workflows/sundial-demo.yml
+//
+// Note: Local.xcconfig is git-ignored and should never be committed
+
+DEVELOPMENT_TEAM = YOUR_TEAM_ID_HERE

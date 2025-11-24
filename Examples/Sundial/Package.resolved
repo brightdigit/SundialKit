@@ -1,0 +1,42 @@
+{
+  "originHash" : "bcffed5faba58ad50ad8d46c6e39483df39f089d954e6e2b5d6c4ad885bf0b30",
+  "pins" : [
+    {
+      "identity" : "sundialkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/brightdigit/SundialKit.git",
+      "state" : {
+        "branch" : "v2.0.0",
+        "revision" : "8f45f90709976bcd13e63c00dfd20b2f7ad98400"
+      }
+    },
+    {
+      "identity" : "sundialkitcombine",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/brightdigit/SundialKitCombine.git",
+      "state" : {
+        "branch" : "v1.0.0",
+        "revision" : "70c5854f965f81be2b337644ded8270b6e42ec96"
+      }
+    },
+    {
+      "identity" : "sundialkitstream",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/brightdigit/SundialKitStream.git",
+      "state" : {
+        "branch" : "v1.0.0",
+        "revision" : "5dcfed6d4148748e0768f008b3d25a524095a46a"
+      }
+    },
+    {
+      "identity" : "swift-protobuf",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-protobuf.git",
+      "state" : {
+        "revision" : "c6fe6442e6a64250495669325044052e113e990c",
+        "version" : "1.32.0"
+      }
+    }
+  ],
+  "version" : 3
+}

@@ -17,7 +17,7 @@ on:
       - '*WIP'
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ "main" ]
+    branches: [ "main" , "v2.0.0" ]
   schedule:
     - cron: '20 11 * * 3'
 

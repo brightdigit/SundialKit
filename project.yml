@@ -4,10 +4,14 @@ settings:
 packages:
   SundialKit:
     path: .
+  SundialKitCombine:
+    path: Packages/SundialKitCombine
+  SundialKitStream:
+    path: Packages/SundialKitStream
 aggregateTargets:
   Lint:
     buildScripts:
-      - path: Scripts/lint.sh
+      - path: Scripts/lint-all.sh
         name: Lint
         basedOnDependencyAnalysis: false
     schemes: {}

@@ -1,3 +1,11 @@
 function_body_length:
   - 25
   - 35
+
+file_length:
+  warning: 500
+  error: 600
+
+disabled_rules:
+  - explicit_acl
+  - explicit_top_level_acl

@@ -1,0 +1,3 @@
+apple_id("leogdion@brightdigit.com")
+itc_team_id("2108001")
+team_id(ENV["DEVELOPMENT_TEAM"])
