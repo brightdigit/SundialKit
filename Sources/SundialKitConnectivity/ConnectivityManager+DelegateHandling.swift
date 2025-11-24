@@ -67,7 +67,7 @@
       }
 
       // Notify observers of activation state change
-      self.notifyActivationStateChanged(state)
+      await self.notifyActivationStateChanged(state)
     }
 
     /// Clears activation continuation and timeout task.
@@ -84,7 +84,7 @@
       self.activationState = activationState
 
       // Notify observers of activation state change
-      self.notifyActivationStateChanged(activationState)
+      await self.notifyActivationStateChanged(activationState)
     }
 
     // MARK: - Reachability Handling
@@ -96,7 +96,7 @@
       self.isReachable = isReachable
 
       // Notify observers of reachability change
-      self.notifyReachabilityChanged(isReachable)
+      await self.notifyReachabilityChanged(isReachable)
     }
 
     // MARK: - Companion State Handling
@@ -111,9 +111,9 @@
       #endif
 
       // Notify observers of companion state changes
-      self.notifyCompanionAppInstalledChanged(session.isPairedAppInstalled)
+      await self.notifyCompanionAppInstalledChanged(session.isPairedAppInstalled)
       #if os(iOS)
-        self.notifyPairedStatusChanged(session.isPaired)
+        await self.notifyPairedStatusChanged(session.isPaired)
       #endif
     }
 
@@ -156,8 +156,10 @@
 
     /// Handles received messages.
     public nonisolated func handleMessageReceived(_ message: ConnectivityMessage) {
-      // Notify observers of received message
-      self.notifyMessageReceived(message)
+      Task {
+        // Notify observers of received message
+        await self.notifyMessageReceived(message)
+      }
     }
 
     /// Handles application context updates.
@@ -170,8 +172,10 @@
         return
       }
 
-      // Notify observers of context update
-      self.notifyApplicationContextReceived(applicationContext)
+      Task {
+        // Notify observers of context update
+        await self.notifyApplicationContextReceived(applicationContext)
+      }
     }
 
     /// Handles received binary message data.

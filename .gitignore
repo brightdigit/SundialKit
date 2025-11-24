@@ -195,3 +195,4 @@ dev-debug.log
 build
 # Local Xcode configuration
 Examples/Sundial/Local.xcconfig
+.docc-build

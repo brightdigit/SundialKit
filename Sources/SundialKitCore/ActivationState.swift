@@ -31,6 +31,29 @@
 ///
 /// These states correspond to `WCSessionActivationState` and represent the lifecycle
 /// of a connectivity session between an iPhone and Apple Watch.
+///
+/// ## State Transitions
+///
+/// The typical state flow:
+/// 1. Session starts in ``notActivated``
+/// 2. After calling activate, transitions to ``activated``
+/// 3. On deactivation, transitions through ``inactive`` before returning to ``notActivated``
+///
+/// ## Example
+///
+/// ```swift
+/// switch activationState {
+/// case .notActivated:
+///   print("Session not yet activated - call activate()")
+/// case .inactive:
+///   print("Session deactivating - can receive but cannot send")
+/// case .activated:
+///   print("Session active - can send and receive messages")
+/// }
+/// ```
+///
+/// > Important: Attempting to send messages in
+/// ``notActivated`` or ``inactive`` states is a programmer error.
 public enum ActivationState: Int, Sendable {
   /// The session is not activated.
   ///

@@ -29,13 +29,51 @@
 
 public import SundialKitCore
 
-/// Result from sending a message
+/// Result context from sending a message, indicating delivery method and outcome.
+///
+/// This enum represents the outcome of a send operation, including whether it succeeded,
+/// how it was sent (application context vs direct message), what transport was used
+/// (dictionary vs binary), and any reply received.
+///
+/// ## Example
+///
+/// ```swift
+/// let result = try await observer.send(myMessage)
+/// switch result.context {
+/// case .reply(let replyMessage, transport: .binary):
+///   print("Sent via binary transport, received reply: \(replyMessage)")
+///
+/// case .applicationContext(transport: .dictionary):
+///   print("Sent via application context (counterpart unreachable)")
+///
+/// case .failure(let error):
+///   print("Send failed: \(error)")
+/// }
+/// ```
 public enum ConnectivitySendContext: Sendable {
-  /// Sent via application context
+  /// Message sent via application context (background delivery).
+  ///
+  /// Used when the counterpart device is unreachable. The message will be delivered
+  /// when the devices can communicate. This corresponds to WatchConnectivity's
+  /// `updateApplicationContext(_:)`.
+  ///
+  /// - Parameter transport: The transport mechanism used (`.dictionary` or `.binary`)
   case applicationContext(transport: MessageTransport)
-  /// Sent via message with reply received
+
+  /// Message sent successfully with a reply received.
+  ///
+  /// Used when the counterpart device is reachable and responded to the message.
+  /// This corresponds to WatchConnectivity's `sendMessage(_:replyHandler:)` or
+  /// `sendMessageData(_:replyHandler:)`.
+  ///
+  /// - Parameters:
+  ///   - reply: The reply message received from the counterpart
+  ///   - transport: The transport mechanism used (`.dictionary` or `.binary`)
   case reply(ConnectivityMessage, transport: MessageTransport)
-  /// Failure
+
+  /// Message send failed with an error.
+  ///
+  /// - Parameter error: The error that caused the send to fail
   case failure(any Error)
 }
 

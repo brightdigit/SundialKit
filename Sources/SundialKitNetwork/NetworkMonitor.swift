@@ -182,7 +182,7 @@ public actor NetworkMonitor<
 
   // MARK: - Private Methods
 
-  private func handlePathUpdate(_ path: Monitor.PathType) {
+  private func handlePathUpdate(_ path: Monitor.PathType) async {
     let newState = NetworkState(
       pathStatus: path.pathStatus,
       isExpensive: path.isExpensive,
@@ -194,17 +194,17 @@ public actor NetworkMonitor<
 
     // Notify observers
     if oldState.pathStatus != newState.pathStatus {
-      observers.notify { observer in
+      await observers.notify { observer in
         await observer.networkMonitor(didUpdatePathStatus: newState.pathStatus)
       }
     }
     if oldState.isExpensive != newState.isExpensive {
-      observers.notify { observer in
+      await observers.notify { observer in
         await observer.networkMonitor(didUpdateExpensive: newState.isExpensive)
       }
     }
     if oldState.isConstrained != newState.isConstrained {
-      observers.notify { observer in
+      await observers.notify { observer in
         await observer.networkMonitor(didUpdateConstrained: newState.isConstrained)
       }
     }

@@ -44,18 +44,18 @@
     /// Adds an observer for state changes.
     ///
     /// - Parameter observer: The observer to add.
-    func addObserver(_ observer: any ConnectivityStateObserver)
+    func addObserver(_ observer: any ConnectivityStateObserver) async
 
     /// Removes a specific observer.
     ///
     /// - Parameter observer: The observer to remove.
-    func removeObserver(_ observer: any ConnectivityStateObserver)
+    func removeObserver(_ observer: any ConnectivityStateObserver) async
 
     /// Removes observers matching the predicate.
     ///
     /// - Parameter predicate: Closure to identify observers to remove.
     func removeObservers(
-      where predicate: @Sendable @escaping (any ConnectivityStateObserver) -> Bool)
+      where predicate: @Sendable @escaping (any ConnectivityStateObserver) -> Bool) async
   }
 
   // MARK: - Default Implementation
@@ -66,8 +66,8 @@
     /// Uses identity comparison to match observers.
     ///
     /// - Parameter observer: The observer to remove.
-    public func removeObserver(_ observer: any ConnectivityStateObserver) {
-      removeObservers { storedObserver in
+    public func removeObserver(_ observer: any ConnectivityStateObserver) async {
+      await removeObservers { storedObserver in
         // Compare by object identity
         guard let lhs = storedObserver as AnyObject?,
           let rhs = observer as AnyObject?
@@ -86,8 +86,8 @@
     ///
     /// Observers are responsible for thread management.
     /// Use @MainActor on your observer for UI updates.
-    internal func notifyActivationStateChanged(_ state: ActivationState) {
-      observerRegistry.notify { observer in
+    internal func notifyActivationStateChanged(_ state: ActivationState) async {
+      await observerRegistry.notify { observer in
         observer.connectivityManager(self, didChangeActivationState: state)
       }
     }
@@ -96,8 +96,8 @@
     ///
     /// Observers are responsible for thread management.
     /// Use @MainActor on your observer for UI updates.
-    internal func notifyReachabilityChanged(_ isReachable: Bool) {
-      observerRegistry.notify { observer in
+    internal func notifyReachabilityChanged(_ isReachable: Bool) async {
+      await observerRegistry.notify { observer in
         observer.connectivityManager(self, didChangeReachability: isReachable)
       }
     }
@@ -106,8 +106,8 @@
     ///
     /// Observers are responsible for thread management.
     /// Use @MainActor on your observer for UI updates.
-    internal func notifyCompanionAppInstalledChanged(_ isInstalled: Bool) {
-      observerRegistry.notify { observer in
+    internal func notifyCompanionAppInstalledChanged(_ isInstalled: Bool) async {
+      await observerRegistry.notify { observer in
         observer.connectivityManager(self, didChangeCompanionAppInstalled: isInstalled)
       }
     }
@@ -117,8 +117,8 @@
       ///
       /// Observers are responsible for thread management.
       /// Use @MainActor on your observer for UI updates.
-      internal func notifyPairedStatusChanged(_ isPaired: Bool) {
-        observerRegistry.notify { observer in
+      internal func notifyPairedStatusChanged(_ isPaired: Bool) async {
+        await observerRegistry.notify { observer in
           observer.connectivityManager(self, didChangePairedStatus: isPaired)
         }
       }
@@ -128,8 +128,8 @@
     ///
     /// Observers are responsible for thread management.
     /// Use @MainActor on your observer for UI updates.
-    internal func notifyMessageReceived(_ message: ConnectivityMessage) {
-      observerRegistry.notify { observer in
+    internal func notifyMessageReceived(_ message: ConnectivityMessage) async {
+      await observerRegistry.notify { observer in
         observer.connectivityManager(self, didReceiveMessage: message)
       }
     }
@@ -138,8 +138,8 @@
     ///
     /// Observers are responsible for thread management.
     /// Use @MainActor on your observer for UI updates.
-    internal func notifyApplicationContextReceived(_ context: ConnectivityMessage) {
-      observerRegistry.notify { observer in
+    internal func notifyApplicationContextReceived(_ context: ConnectivityMessage) async {
+      await observerRegistry.notify { observer in
         observer.connectivityManager(self, didReceiveApplicationContext: context)
       }
     }

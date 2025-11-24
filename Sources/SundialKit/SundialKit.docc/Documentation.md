@@ -1,20 +1,31 @@
 # ``SundialKit``
 
-Communications library across Apple platforms.
+Build network-aware apps and seamless iPhone-Apple Watch experiences.
 
 ## Overview
 
 ![SundialKit Logo](logo.jpg)
 
-For easier use in reactive user interfaces, especially with `SwiftUI` and `Combine`, I've created a library which abstracts and maps common connectivity APIs. Particularly in my app Heartwitch, I mapped the functionality of _WatchConnectivity_ and _Network_ over to track the user's ability to connect to the Internet as well as the ability for their iPhone to connect to their Apple Watch via _WatchConnectivity_
+SundialKit is a modern Swift library that helps you build apps that respond intelligently to network changes and communicate effortlessly between iPhone and Apple Watch. It simplifies two of Apple's most powerful but complex frameworks: [**Network**](https://developer.apple.com/documentation/network) and [**WatchConnectivity**](https://developer.apple.com/documentation/watchconnectivity).
 
-### Features
+### Key Capabilities
 
-* Monitor network connectivity and quality
-* Communicate between iPhone and Apple Watch
-   - Monitor connectivity between devices
-   - Send messages back and forth between iPhone and Apple Watch
-   - Abstract messages for easier _encoding_ and _decoding_
+* **Monitor network connectivity** - Know when WiFi/cellular changes, connection quality, and data costs
+* **Communicate across devices** - Send messages between iPhone and Apple Watch seamlessly
+* **Type-safe messaging** - Encode/decode messages with ``Messagable`` and ``BinaryMessagable`` protocols
+* **Backwards compatible** - Supports both modern AsyncStream APIs and Combine publishers
+
+### Available Packages
+
+SundialKit is organized into focused packages - choose the ones you need:
+
+**Core Packages**
+- **<doc:SundialKitNetwork>** - Network connectivity monitoring using Apple's [Network framework](https://developer.apple.com/documentation/network)
+- **<doc:SundialKitConnectivity>** - [WatchConnectivity](https://developer.apple.com/documentation/watchconnectivity) wrapper for iPhone-Apple Watch communication
+
+**Observation Plugins** (choose based on your concurrency preference)
+- **<doc:SundialKitStream>** - Modern AsyncStream-based observers for async/await projects
+- **<doc:SundialKitCombine>** - Combine-based observers with @Published properties for SwiftUI
 
 ### Requirements
 
@@ -22,415 +33,337 @@ For easier use in reactive user interfaces, especially with `SwiftUI` and `Combi
 
 - Xcode 16.0 or later
 - Swift 6.1 or later
-- iOS 13.0 / watchOS 6.0 / tvOS 13.0 / macOS 10.13 or later deployment targets
-
-**v1.x (Legacy)**
-
-- Xcode 13.2.1 or later
-- Swift 5.9+
-- iOS 13.0 / watchOS 6.0 / tvOS 13.0 / macOS 11 or later deployment targets
+- **Core modules**: iOS 13+ / watchOS 6+ / tvOS 13+ / macOS 10.13+
+- **SundialKitStream plugin**: iOS 16+ / watchOS 9+ / tvOS 16+ / macOS 13+
+- **SundialKitCombine plugin**: iOS 13+ / watchOS 6+ / tvOS 13+ / macOS 10.15+
 
 ### Installation
 
-Swift Package Manager is Apple's decentralized dependency manager to integrate libraries to your Swift projects. It is now fully integrated with Xcode 13.
+Add SundialKit to your `Package.swift`:
 
-To integrate **SundialKit** into your project using SPM, specify it in your Package.swift file:
+```swift
+dependencies: [
+  .package(url: "https://github.com/brightdigit/SundialKit.git", from: "2.0.0")
+]
+```
 
-```swift    
-let package = Package(
-  ...
-  dependencies: [
-    .package(url: "https://github.com/brightdigit/SundialKit", from: "0.2.0")
-  ],
-  targets: [
-      .target(
-          name: "YourTarget",
-          dependencies: ["SundialKit", ...]),
-      ...
-  ]
+### Network Monitoring
+
+Monitor network connectivity using ``NetworkObserver`` from observation plugins. The observer tracks network status changes (WiFi, cellular, wired), connection quality (expensive, constrained), and interface availability using Apple's Network framework.
+
+#### Quick Start
+
+For most use cases, use the default initializer which automatically configures network monitoring:
+
+**Using SundialKitCombine:**
+
+```swift
+import SundialKitCombine
+import Combine
+
+// Create observer with default configuration
+let observer = NetworkObserver()
+
+// Start monitoring on main queue
+observer.start()
+
+// Use @Published properties
+var cancellables = Set<AnyCancellable>()
+
+observer.$pathStatus
+  .sink { status in
+    print("Network status: \(status)")
+  }
+  .store(in: &cancellables)
+
+observer.$isExpensive
+  .sink { isExpensive in
+    print("Is expensive: \(isExpensive)")
+  }
+  .store(in: &cancellables)
+```
+
+**Using SundialKitStream:**
+
+```swift
+import SundialKitStream
+
+// Create observer with default configuration
+let observer = NetworkObserver()
+
+// Start monitoring
+await observer.start()
+
+// Consume path status updates
+Task {
+  for await status in await observer.pathStatusStream {
+    print("Network status: \(status)")
+  }
+}
+
+// Check expensive status
+Task {
+  for await isExpensive in await observer.isExpensiveStream {
+    print("Is expensive: \(isExpensive)")
+  }
+}
+```
+
+### Type-Safe Messaging with Messagable
+
+The ``Messagable`` protocol enables type-safe message encoding and decoding for WatchConnectivity communication. Instead of working with raw dictionaries, you define custom message types that are automatically serialized and deserialized. This provides compile-time type safety and eliminates common runtime errors from manual dictionary handling.
+
+> Note: Each `Messagable` type has a `key` property that identifies the message type. By default, the key uses the type's name (e.g., `"ColorMessage"`), but you can override it with a custom identifier.
+
+```swift
+struct ColorMessage: Messagable {
+  static let key = "color"  // Optional: defaults to "ColorMessage"
+
+  let red: Double
+  let green: Double
+  let blue: Double
+
+  init(from parameters: [String: any Sendable]) throws {
+    guard let red = parameters["red"] as? Double,
+          let green = parameters["green"] as? Double,
+          let blue = parameters["blue"] as? Double else {
+      throw SerializationError.missingField("color components")
+    }
+    self.red = red
+    self.green = green
+    self.blue = blue
+  }
+
+  func parameters() -> [String: any Sendable] {
+    ["red": red, "green": green, "blue": blue]
+  }
+}
+
+// Use MessageDecoder to route messages to the correct type
+let decoder = MessageDecoder(messagableTypes: [ColorMessage.self])
+
+do {
+  let message = try decoder.decode(receivedDictionary)
+  if let colorMessage = message as? ColorMessage {
+    print("Received color: RGB(\(colorMessage.red), \(colorMessage.green), \(colorMessage.blue))")
+  }
+} catch {
+  print("Failed to decode: \(error)")
+}
+```
+
+### Binary Messaging with BinaryMessagable
+
+For efficient binary serialization of complex data structures or large payloads, use ``BinaryMessagable``. This protocol is ideal for Protobuf, MessagePack, or other binary formats, providing better performance and smaller message sizes than dictionary-based `Messagable`.
+
+The key advantage: `BinaryMessagable` automatically implements the `Messagable` protocol, so you only need to define binary encoding/decoding methods. The framework handles dictionary conversion internally.
+
+**Example using [swift-protobuf](https://github.com/apple/swift-protobuf):**
+
+```swift
+import SwiftProtobuf
+
+// Define your message in a .proto file, then extend the generated type
+extension UserProfile: BinaryMessagable {
+  // key defaults to "UserProfile" (type name)
+
+  // Only implement these two binary methods
+  public init(from data: Data) throws {
+    try self.init(serializedData: data)  // SwiftProtobuf decoder
+  }
+
+  public func encode() throws -> Data {
+    try serializedData()  // SwiftProtobuf encoder
+  }
+
+  // init(from parameters:) and parameters() are auto-implemented!
+}
+
+// Use with MessageDecoder just like Messagable types
+let decoder = MessageDecoder(messagableTypes: [
+  UserProfile.self  // BinaryMessagable works seamlessly
+])
+```
+
+**Simple binary example (custom format):**
+
+```swift
+struct TemperatureReading: BinaryMessagable {
+  let celsius: Float
+  let timestamp: UInt64
+
+  init(celsius: Float, timestamp: UInt64) {
+    self.celsius = celsius
+    self.timestamp = timestamp
+  }
+
+  // Decode from raw binary data
+  public init(from data: Data) throws {
+    guard data.count == 12 else {  // 4 bytes + 8 bytes
+      throw SerializationError.invalidDataSize
+    }
+    celsius = data.withUnsafeBytes { $0.load(as: Float.self) }
+    timestamp = data.dropFirst(4).withUnsafeBytes { $0.load(as: UInt64.self) }
+  }
+
+  // Encode to raw binary data
+  public func encode() throws -> Data {
+    var data = Data()
+    withUnsafeBytes(of: celsius) { data.append(contentsOf: $0) }
+    withUnsafeBytes(of: timestamp) { data.append(contentsOf: $0) }
+    return data
+  }
+}
+```
+
+### WatchConnectivity Communication
+
+Communicate between iPhone and Apple Watch using ``ConnectivityObserver`` from observation plugins. The observer handles WatchConnectivity session management, message routing, and automatic transport selection based on device reachability.
+
+> Important: Dictionary-based messages have a size limit of approximately 65KB when using `sendMessage`. See [Apple's WatchConnectivity documentation](https://developer.apple.com/documentation/watchconnectivity/wcsession) for details on message size limits.
+
+**Using SundialKitCombine:**
+
+```swift
+import SundialKitCombine
+import SundialKitConnectivity
+import Combine
+
+// Create observer with message decoder supporting multiple types
+let observer = ConnectivityObserver(
+  messageDecoder: MessageDecoder(messagableTypes: [
+    ColorMessage.self,      // Dictionary-based message
+    UserProfile.self        // Binary protobuf message
+  ])
 )
-```
 
-If this is for an Xcode project simply import the [Github repository](https://github.com/brightdigit/SundialKit) at:
+// Activate session
+try observer.activate()
 
-```
-https://github.com/brightdigit/SundialKit
-```
+// Listen for typed messages
+var cancellables = Set<AnyCancellable>()
 
-### Listening to Networking Changes
-
-In the past `Reachability` or `AFNetworking` has been used to judge the network connectivity of a device. **SundialKit** uses the `Network` framework to listen to changes in connectivity providing all the information available.
-
-**SundialKit** provides a ``NetworkObserver`` which allows you to listen to a variety of publishers related to the network. This is especially useful if you are using `SwiftUI` in particular. With `SwiftUI`, you can create an `ObservableObject` which contains a ``NetworkObserver``:
-
-```swift
-import SwiftUI
-import SundialKit
-
-class NetworkConnectivityObject : ObservableObject {
-  // our NetworkObserver
-  let connectivityObserver = NetworkObserver()
-  
-  // our published property for pathStatus initially set to `.unknown`
-  @Published var pathStatus : PathStatus = .unknown
-
-  init () {
-    // set the pathStatus changes to our published property
-    connectivityObserver
-      .pathStatusPublisher
-      .receive(on: DispatchQueue.main)
-      .assign(to: &self.$pathStatus)
-  }
-  
-  // need to start listening
-  func start () {
-    self.connectivityObserver.start(queue: .global())
-  }
-}
-```
-
-There are 3 important pieces:
-
-1. The ``NetworkObserver`` called `connectivityObserver`
-2. On `init`, we use `Combine` to listen to the publisher and store each new ``PathStatus`` to our `@Published` property.
-3. A `start` method which needs to be called to ``NetworkObserver/start(queue:)`` start listening to the `NetworkObserver`.
-
-Therefore for our `SwiftUI` `View`, we need to `start` listening `onAppear` and can use the ``PathStatus`` property in the `View`:
-
-```swift
-
-struct NetworkObserverView: View {
-  @StateObject var connectivityObject = NetworkConnectivityObject()
-    var body: some View {
-      // Use the `message` property to display text of the `pathStatus`
-      Text(self.connectivityObject.pathStatus.message).onAppear{
-        // start the NetworkObserver
-        self.connectivityObject.start()
-      }
-    }
-}
-```
-
-Besides ``NetworkObserver/pathStatusPublisher``, you also have access to:
-
-* `isExpensive` via ``NetworkObserver/isExpensivePublisher``
-* `isConstrained` via ``NetworkObserver/isConstrainedPublisher``
-
-### Verify Connectivity with ``NetworkPing``
-
-In addition to utilizing `NWPathMonitor`, you can setup a periodic ping by implementing ``NetworkPing``. Here's an example which calls the _ipify_ API to verify there's an ip address:
-
-```swift
-struct IpifyPing : NetworkPing {
-  typealias StatusType = String?
-
-  let session: URLSession
-  let timeInterval: TimeInterval
-
-  public func shouldPing(onStatus status: PathStatus) -> Bool {
-    switch status {
-    case .unknown, .unsatisfied:
-      return false
-    case .requiresConnection, .satisfied:
-      return true
+observer.typedMessageReceived
+  .sink { message in
+    // Handle different message types
+    if let colorMessage = message as? ColorMessage {
+      print("Received color: \(colorMessage)")
+    } else if let profile = message as? UserProfile {
+      print("Received profile: \(profile.name)")
     }
   }
+  .store(in: &cancellables)
 
-  static let url : URL = .init(string: "https://api.ipify.org")!
-
-  func onPing(_ closure: @escaping (String?) -> Void) {
-    session.dataTask(with: IpifyPing.url) { data, _, _ in
-      closure(data.flatMap{String(data: $0, encoding: .utf8)})
-    }.resume()
-  }
+// Send messages
+Task {
+  let message = ColorMessage(red: 1.0, green: 0.5, blue: 0.0)
+  let result = try await observer.send(message)
+  print("Sent via: \(result.context)")
 }
 ```
 
-Next, in our `ObservableObject`, we can create a ``NetworkObserver`` to use this with:
+**Using SundialKitStream:**
 
 ```swift
-  @Published var nwObject = NetworkObserver(ping:
-    // use the shared `URLSession` and check every 10.0 seconds
-    IpifyPing(session: .shared, timeInterval: 10.0)
-   )
-```
+import SundialKitStream
+import SundialKitConnectivity
 
-### Communication between iPhone and Apple Watch
+// Create actor-based observer supporting multiple message types
+let observer = ConnectivityObserver(
+  messageDecoder: MessageDecoder(messagableTypes: [
+    ColorMessage.self,      // Dictionary-based message
+    UserProfile.self        // Binary protobuf message
+  ])
+)
 
-Besides networking, **SundialKit** also provides an easier reactive interface into `WatchConnectivity`. This includes:
+// Activate session
+try await observer.activate()
 
-1. Various connection statuses like `isReachable`, `isInstalled`, etc..
-2. Send messages between the iPhone and paired Apple Watch
-3. Easy encoding and decoding of messages between devices into `WatchConnectivity` friendly dictionaries.
-
-Let's first talk about how `WatchConnectivity` status works.
-
-#### Connection Status
-
-With `WatchConnectivity` there's a variety of properties which tell you the status of connection between devices. Here's a similar example to ``NetworkObserver/pathStatusPublisher`` using ``ConnectivityObserver/isReachablePublisher``:
-
-
-```swift
-import SwiftUI
-import SundialKit
-
-class WatchConnectivityObject : ObservableObject {
-
-  // our ConnectivityObserver
-  let connectivityObserver = ConnectivityObserver()
-
-  // our published property for isReachable initially set to false
-  @Published var isReachable : Bool = false
-
-  init () {
-    // set the isReachable changes to our published property
-    connectivityObserver
-      .isReachablePublisher
-      .receive(on: DispatchQueue.main)
-      .assign(to: &self.$isReachable)
-  }
-  
-  func activate () {
-    // activate the WatchConnectivity session
-    try! self.connectivityObserver.activate()
-  }
-}
-```
-
-Again, there are 3 important pieces:
-
-1. The ``ConnectivityObserver`` called `connectivityObserver`
-2. On `init`, we use `Combine` to listen to the publisher and store each new `isReachable` via ``ConnectivityObserver/isReachablePublisher`` to our `@Published` property.
-3. An ``ConnectivityObserver/activate()`` method which needs to be called to activate the session for `WatchConnectivity`.
-
-Therefore for our `SwiftUI` `View`, we need to ``ConnectivityObserver/activate()`` the session at `onAppear` and can use the `isReachable` property in the `View`:
-
-```swift
-
-struct WatchConnectivityView: View {
-  @StateObject var connectivityObject = WatchConnectivityObject()
-  var body: some View {
-    Text(
-      connectivityObject.isReachable ? 
-        "Reachable" : "Not Reachable"
-    )
-    .onAppear{
-      self.connectivityObject.activate()
+// Listen for typed messages using AsyncStream
+Task {
+  for await message in await observer.typedMessageStream() {
+    // Handle different message types
+    if let colorMessage = message as? ColorMessage {
+      print("Received color: \(colorMessage)")
+    } else if let profile = message as? UserProfile {
+      print("Received profile: \(profile.name)")
     }
   }
 }
+
+// Send messages
+let message = ColorMessage(red: 1.0, green: 0.5, blue: 0.0)
+let result = try await observer.send(message)
+print("Sent via: \(result.context)")
 ```
 
-Besides `isReachable`, you also have access to:
+### Choosing Your Observation Plugin
 
-* `activationState` via ``ConnectivityObserver/activationStatePublisher``
-* `isReachable` via ``ConnectivityObserver/isReachablePublisher``
-* `isPairedAppInstalled` via ``ConnectivityObserver/isPairedAppInstalledPublisher``
-* `isPaired` via ``ConnectivityObserver/isPairedPublisher``
+**<doc:SundialKitStream>** (Modern Async/Await):
+- AsyncStream-based APIs for reactive patterns
+- Actor-based observers with natural thread safety
+- Ideal for new projects using async/await
 
-Additionally there's also a set of publishers for sending, receiving, and replying to messages between the iPhone and paired Apple Watch.
+**<doc:SundialKitCombine>** (Combine Publishers):
+- @Published properties and Combine publishers
+- Compatible with iOS 13+ and SwiftUI projects
 
-### Sending and Receiving Messages
-
-To send and receive messages through our ``ConnectivityObserver`` we can access two properties:
-
-- ``ConnectivityObserver/messageReceivedPublisher`` - for listening to messages
-- ``ConnectivityObserver/sendingMessageSubject`` - for sending messages
-
-**SundialKit** uses `[String:Any]` dictionaries for sending and receiving messages, which use the typealias ``ConnectivityMessage``. Let's expand upon the previous `WatchConnectivityObject` and use those properties: 
-
-```swift
-class WatchConnectivityObject : ObservableObject {
-
-  // our ConnectivityObserver
-  let connectivityObserver = ConnectivityObserver()
-
-  // our published property for isReachable initially set to false
-  @Published var isReachable : Bool = false
-
-  // our published property for the last message received
-  @Published var lastReceivedMessage : String = ""
-
-  init () {
-    // set the isReachable changes to our published property
-    connectivityObserver
-      .isReachablePublisher
-      .receive(on: DispatchQueue.main)
-      .assign(to: &self.$isReachable)
-
-    // set the lastReceivedMessage based on the dictionary's _message_ key
-    connectivityObserver
-      .messageReceivedPublisher
-      .compactMap({ received in
-        received.message["message"] as? String
-      })
-      .receive(on: DispatchQueue.main)
-      .assign(to: &self.$lastReceivedMessage)
-  }
-  
-  func activate () {
-    // activate the WatchConnectivity session
-    try! self.connectivityObserver.activate()
-  }
-
-  func sendMessage(_ message: String) {
-    // create a dictionary with the message in the message key
-    self.connectivityObserver.sendingMessageSubject.send(["message" : message])
-  }
-}
-```
-
-We can now create a simple SwiftUI View using our updated `WatchConnectivityObject`:
-
-```swift
-struct WatchMessageDemoView: View {
-  @StateObject var connectivityObject = WatchMessageObject()
-  @State var message : String = ""
-  var body: some View {
-    VStack{
-      Text(connectivityObject.isReachable ? "Reachable" : "Not Reachable").onAppear{
-        self.connectivityObject.activate()
-      }
-      TextField("Message", text: self.$message)
-      Button("Send") {
-        self.connectivityObject.sendMessage(self.message)
-      }
-      
-      Text("Last received message:")
-      Text(self.connectivityObject.lastReceivedMessage)
-    }
-  }
-}
-```
-
-### Using _Messagable_ to Communicate
-
-We can even abstract the ``ConnectivityMessage`` using a ``MessageDecoder``. To do this we need to create a special type which implements ``Messagable``:
-
-```swift
-struct Message : Messagable {
-  internal init(text: String) {
-    self.text = text
-  }
-  
-  static let key: String = "_message"
-  
-  enum Parameters : String {
-    case text
-  }
-  
-  init?(from parameters: [String : Any]?) {
-    guard let text = parameters?[Parameters.text.rawValue] as? String else {
-      return nil
-    }
-    
-    self.text = text
-  }
-  
-  func parameters() -> [String : Any] {
-    return [
-      Parameters.text.rawValue : self.text
-    ]
-  }
-  
-  let text : String
-}
-```
-
-There are three requirements for implementing ``Messagable``:
-
-* ``Messagable/init(from:)`` - try to create the object based on the dictionary, return nil if it's invalid
-* ``Messagable/parameters()`` - return a dictionary with all the parameters need to recreate the object
-* ``Messagable/key`` - return a string which identifies the type and is unique to the ``MessageDecoder``
-
-Now that we have our implmentation of ``Messagable``, we can use it in our `WatchConnectivityObject`:
-
-```swift
-class WatchConnectivityObject : ObservableObject {
-
-  // our ConnectivityObserver
-  let connectivityObserver = ConnectivityObserver()
-
-  // create a `MessageDecoder` which can decode our new `Message` type
-  let messageDecoder = MessageDecoder(messagableTypes: [Message.self])
-
-  // our published property for isReachable initially set to false
-  @Published var isReachable : Bool = false
-
-  // our published property for the last message received
-  @Published var lastReceivedMessage : String = ""
-
-  init () {
-    // set the isReachable changes to our published property
-    connectivityObserver
-      .isReachablePublisher
-      .receive(on: DispatchQueue.main)
-      .assign(to: &self.$isReachable)
-
-    
-    connectivityObserver
-      // get the ``ConnectivityReceiveResult/message`` part of the ``ConnectivityReceiveResult``
-      .map(\.message)
-      // use our `messageDecoder` to call ``MessageDecoder/decode(_:)``
-      .compactMap(self.messageDecoder.decode)
-      // check it's our `Message`
-      .compactMap{$0 as? Message}
-      // get the `text` property
-      .map(\.text)
-      .receive(on: DispatchQueue.main)
-      // set it to our published property
-      .assign(to: &self.$lastReceivedMessage)
-  }
-  
-  func activate () {
-    // activate the WatchConnectivity session
-    try! self.connectivityObserver.activate()
-  }
-
-  func sendMessage(_ message: String) {
-    // create a dictionary using ``Messagable/message()``
-    self.connectivityObserver.sendingMessageSubject.send(Message(text: message).message())
-  }
-}
-```
-
-## License 
-
-This code is distributed under the MIT license. See the [LICENSE](https://github.com/brightdigit/SundialKit/LICENSE) file for more info.
+Both plugins work with the same core <doc:SundialKitNetwork> and <doc:SundialKitConnectivity> packages - just choose the observation style that fits your project.
 
 ## Topics
 
-### Listening to Networking Changes
+### Core Types
 
-- ``NetworkObserver``
-- ``PathMonitor``
 - ``PathStatus``
+- ``ActivationState``
+- ``ConnectivityMessage``
+
+### Core Protocols
+
+- ``NetworkMonitoring``
+- ``ConnectivityManagement``
+- ``PathMonitor``
 - ``NetworkPath``
 - ``NetworkPing``
+- ``Interfaceable``
+
+### Network Monitoring
+
+- ``NetworkMonitor``
+- ``NetworkStateObserver``
 - ``NeverPing``
 
-### Communication between iPhone and Apple Watch
+### WatchConnectivity
 
-- ``ConnectivityObserver``
+- ``ConnectivitySession``
+- ``ConnectivitySessionDelegate``
+- ``ConnectivityStateObserver``
+- ``NeverConnectivitySession``
 
-#### Connection Status
+### Message Sending and Receiving
 
-- ``ActivationState``
-
-#### Communicating Messages between iPhone and Apple Watch
-
-- ``ConnectivityHandler``
-- ``ConnectivityMessage``
-- ``ConnectivityReceiveContext``
 - ``ConnectivityReceiveResult``
-- ``ConnectivitySendContext``
+- ``ConnectivityReceiveContext``
 - ``ConnectivitySendResult``
+- ``ConnectivitySendContext``
+- ``MessageTransport``
+- ``SendOptions``
+- ``ConnectivityHandler``
 
-#### Abstracting WatchConnectivity Messages
+### Type-Safe Messaging
 
 - ``Messagable``
 - ``MessageDecoder``
+- ``BinaryMessagable``
+- ``BinaryMessageEncoder``
 
 ### Error Handling
 
+- ``NetworkError``
+- ``ConnectivityError``
+- ``SerializationError``
 - ``SundialError``
+
+### Utilities
+
+- ``ObserverRegistry``
