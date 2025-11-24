@@ -10,7 +10,7 @@ SundialKitCombine provides observers that deliver state updates via @Published p
 
 ### Why Choose SundialKitCombine
 
-If you're building a SwiftUI application or need to support iOS 13+, SundialKitCombine is the perfect choice. It leverages Combine's publisher infrastructure to provide reactive state updates that bind naturally to SwiftUI views. The @Published properties work seamlessly with SwiftUI's observation system, automatically triggering view updates when network or connectivity state changes.
+If you're building a SwiftUI application and need to support iOS 13+, SundialKitCombine is the perfect choice. It leverages Combine's publisher infrastructure to provide reactive state updates that bind naturally to SwiftUI views. The @Published properties work seamlessly with SwiftUI's observation system, automatically triggering view updates when network or connectivity state changes.
 
 **Choose SundialKitCombine when you:**
 - Building SwiftUI applications with reactive data binding
@@ -40,13 +40,14 @@ Add SundialKit to your `Package.swift`:
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/brightdigit/SundialKit.git", from: "2.0.0")
+  .package(url: "https://github.com/brightdigit/SundialKit.git", from: "2.0.0"),
+  .package(url: "https://github.com/brightdigit/SundialKitCombine.git", from: "1.0.0")
 ],
 targets: [
   .target(
     name: "YourTarget",
     dependencies: [
-      .product(name: "SundialKitCombine", package: "SundialKit"),
+      .product(name: "SundialKitCombine", package: "SundialKitCombine"),
       .product(name: "SundialKitNetwork", package: "SundialKit"),  // For network monitoring
       .product(name: "SundialKitConnectivity", package: "SundialKit")  // For WatchConnectivity
     ]
@@ -56,7 +57,7 @@ targets: [
 
 ## Network Monitoring
 
-Monitor network connectivity changes using the @MainActor-based ``NetworkObserver``. The observer provides @Published properties for network state that automatically update your SwiftUI views, plus Combine publishers for advanced reactive patterns.
+Monitor network connectivity changes using ``NetworkObserver``. The observer provides @Published properties for network state that automatically update your SwiftUI views, plus Combine publishers for advanced reactive patterns.
 
 ### Basic Network Monitoring
 
@@ -124,8 +125,6 @@ struct NetworkStatusView: View {
 }
 ```
 
-Because both `NetworkConnectivityObject` and the observer use @MainActor isolation, all updates happen on the main thread automatically - no manual dispatch needed.
-
 ### Understanding PathStatus
 
 The ``PathStatus`` enum represents the current state of the network path:
@@ -135,44 +134,64 @@ The ``PathStatus`` enum represents the current state of the network path:
 - **`.requiresConnection`** - Network may be available but requires user action (e.g., connecting to WiFi)
 - **`.unknown`** - Initial state before first update
 
-### Advanced Combine Patterns
+### Ping Integration
 
-Because the observer provides Combine publishers, you can use the full power of Combine operators:
+Monitor network connectivity with periodic pings to verify actual internet access beyond path availability:
 
 ```swift
-// Debounce rapid network changes
-observer.$pathStatus
-  .debounce(for: .seconds(1), scheduler: DispatchQueue.main)
-  .sink { status in
-    print("Stable network status: \(status)")
-  }
-  .store(in: &cancellables)
+import SundialKitCombine
+import SundialKitNetwork
 
-// Combine multiple signals
-Publishers.CombineLatest(observer.$isExpensive, observer.$isConstrained)
-  .sink { isExpensive, isConstrained in
-    if isExpensive || isConstrained {
-      print("Network conditions suggest reducing data usage")
+struct IpifyPing: NetworkPing, Sendable {
+  typealias StatusType = String?
+
+  let session: URLSession
+  let timeInterval: TimeInterval
+
+  func shouldPing(onStatus status: PathStatus) -> Bool {
+    switch status {
+    case .unknown, .unsatisfied:
+      return false
+    case .requiresConnection, .satisfied:
+      return true
     }
   }
-  .store(in: &cancellables)
 
-// React to specific transitions
-observer.$pathStatus
-  .removeDuplicates()
-  .sink { status in
-    if status == .satisfied {
-      print("Network became available - sync data")
-    }
+  func onPing(_ closure: @escaping (String?) -> Void) {
+    let url = URL(string: "https://api.ipify.org")!
+    session.dataTask(with: url) { data, _, _ in
+      closure(data.flatMap { String(data: $0, encoding: .utf8) })
+    }.resume()
   }
-  .store(in: &cancellables)
+}
+
+@MainActor
+class PingNetworkObject: ObservableObject {
+  let observer: NetworkObserver<NWPathMonitorAdapter, IpifyPing>
+
+  @Published var ipAddress: String?
+
+  init() {
+    observer = NetworkObserver(
+      monitor: NWPathMonitorAdapter(),
+      ping: IpifyPing(session: .shared, timeInterval: 10.0)
+    )
+
+    observer.$pingStatus
+      .assign(to: &$ipAddress)
+  }
+
+  func start() {
+    observer.start()
+  }
+}
 ```
 
-This reactive approach makes it easy to build sophisticated network-aware behaviors.
+The ping verifies actual internet connectivity by making a real network request. This catches cases where the network path is technically satisfied but internet access is blocked (captive portals, DNS issues, etc.).
 
 ## WatchConnectivity Communication
 
-Communicate between iPhone and Apple Watch using the @MainActor-based ``ConnectivityObserver``. The observer provides @Published properties for session state and Combine publishers for incoming messages, making WatchConnectivity straightforward in SwiftUI apps.
+Communicate between iPhone and Apple Watch using ``ConnectivityObserver``. The observer provides @Published properties for session state and Combine publishers for incoming messages, making WatchConnectivity straightforward in SwiftUI apps.
 
 ### Session Activation and State
 
@@ -299,72 +318,6 @@ observer.messageReceived
 ```
 
 Combine's operators give you fine-grained control over how messages are processed and delivered to your app.
-
-## Ping Integration
-
-Monitor network connectivity with periodic pings to verify actual internet access beyond path availability:
-
-```swift
-import SundialKitCombine
-import SundialKitNetwork
-
-struct IpifyPing: NetworkPing, Sendable {
-  typealias StatusType = String?
-
-  let session: URLSession
-  let timeInterval: TimeInterval
-
-  func shouldPing(onStatus status: PathStatus) -> Bool {
-    switch status {
-    case .unknown, .unsatisfied:
-      return false
-    case .requiresConnection, .satisfied:
-      return true
-    }
-  }
-
-  func onPing(_ closure: @escaping (String?) -> Void) {
-    let url = URL(string: "https://api.ipify.org")!
-    session.dataTask(with: url) { data, _, _ in
-      closure(data.flatMap { String(data: $0, encoding: .utf8) })
-    }.resume()
-  }
-}
-
-@MainActor
-class PingNetworkObject: ObservableObject {
-  let observer: NetworkObserver<NWPathMonitorAdapter, IpifyPing>
-
-  @Published var ipAddress: String?
-
-  init() {
-    observer = NetworkObserver(
-      monitor: NWPathMonitorAdapter(),
-      ping: IpifyPing(session: .shared, timeInterval: 10.0)
-    )
-
-    observer.$pingStatus
-      .assign(to: &$ipAddress)
-  }
-
-  func start() {
-    observer.start()
-  }
-}
-```
-
-The ping verifies actual internet connectivity by making a real network request. This catches cases where the network path is technically satisfied but internet access is blocked (captive portals, DNS issues, etc.).
-
-### @MainActor and Thread Safety
-
-All SundialKitCombine observers use @MainActor isolation, ensuring:
-
-- **Main Thread Updates**: All @Published property changes happen on the main thread automatically
-- **SwiftUI Safety**: No need to manually dispatch to main queue before updating UI
-- **Compile-Time Guarantees**: Swift 6.1 strict concurrency prevents threading issues at compile time
-- **Zero @unchecked Sendable**: Everything is properly isolated without workarounds
-
-This makes it safe to bind observer properties directly to SwiftUI views without additional synchronization code.
 
 ## Topics
 

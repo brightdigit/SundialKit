@@ -1,6 +1,6 @@
 # ``SundialKitStream``
 
-Modern async/await observation plugin for SundialKit with actor-based thread safety.
+Modern async/await observation plugin for SundialKit with actor-based concurrency safety.
 
 ## Overview
 
@@ -38,13 +38,14 @@ Add SundialKit to your `Package.swift`:
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/brightdigit/SundialKit.git", from: "2.0.0")
+  .package(url: "https://github.com/brightdigit/SundialKit.git", from: "2.0.0"),
+  .package(url: "https://github.com/brightdigit/SundialKitStream.git", from: "1.0.0")
 ],
 targets: [
   .target(
     name: "YourTarget",
     dependencies: [
-      .product(name: "SundialKitStream", package: "SundialKit"),
+      .product(name: "SundialKitStream", package: "SundialKitStream"),
       .product(name: "SundialKitNetwork", package: "SundialKit"),  // For network monitoring
       .product(name: "SundialKitConnectivity", package: "SundialKit")  // For WatchConnectivity
     ]
@@ -277,20 +278,6 @@ struct NetworkStatusView: View {
   }
 }
 ```
-
-The `@MainActor` annotation ensures all UI updates happen on the main thread, while the AsyncStreams run on background queues. SwiftUI's `.task` modifier handles Task lifecycle automatically - starting when the view appears and cancelling when it disappears.
-
-### Actor-Based Architecture Benefits
-
-By using actors for your observers and `@MainActor` for your SwiftUI models, you get:
-
-- **Thread Safety**: Actor isolation prevents data races at compile time
-- **No Manual Locking**: Swift's actor system handles synchronization automatically
-- **Structured Concurrency**: Tasks are tied to view lifecycle through `.task`
-- **Cancellation Support**: AsyncStreams respect Task cancellation when views disappear
-- **Zero @unchecked Sendable**: Everything is properly isolated with Swift 6.1 strict concurrency
-
-This architecture makes it impossible to accidentally update UI from background threads or create race conditions in state management.
 
 ## Topics
 
