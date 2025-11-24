@@ -279,6 +279,226 @@ struct NetworkStatusView: View {
 }
 ```
 
+## Type-Safe Messaging
+
+SundialKitConnectivity provides two protocols for defining custom message types: ``Messagable`` for dictionary-based messages and ``BinaryMessagable`` for efficient binary serialization. Both work seamlessly with ConnectivityObserver to provide compile-time type safety for your iPhone-Apple Watch communication.
+
+### Dictionary-Based Messages with Messagable
+
+The ``Messagable`` protocol enables type-safe message encoding and decoding. Instead of working with raw dictionaries, you define custom message types that are automatically serialized and deserialized:
+
+```swift
+import SundialKitConnectivity
+
+struct ColorMessage: Messagable {
+  static let key = "color"  // Identifier for this message type
+
+  let red: Double
+  let green: Double
+  let blue: Double
+
+  init(red: Double, green: Double, blue: Double) {
+    self.red = red
+    self.green = green
+    self.blue = blue
+  }
+
+  init(from parameters: [String: any Sendable]) throws {
+    guard let red = parameters["red"] as? Double,
+          let green = parameters["green"] as? Double,
+          let blue = parameters["blue"] as? Double else {
+      throw SerializationError.missingField("color components")
+    }
+    self.red = red
+    self.green = green
+    self.blue = blue
+  }
+
+  func parameters() -> [String: any Sendable] {
+    ["red": red, "green": green, "blue": blue]
+  }
+}
+```
+
+The `key` property identifies the message type, allowing the receiver to route it to the correct handler. The `parameters()` method converts your type to a dictionary, and the `init(from:)` initializer reconstructs it from received data.
+
+### Binary Serialization with BinaryMessagable
+
+For larger datasets or complex data structures, ``BinaryMessagable`` provides efficient binary serialization. This approach works seamlessly with Protocol Buffers, MessagePack, or any custom binary format:
+
+```swift
+import SundialKitConnectivity
+import SwiftProtobuf
+
+// Extend your Protobuf-generated type
+extension UserProfile: BinaryMessagable {
+  // key defaults to "UserProfile" (type name)
+
+  public init(from data: Data) throws {
+    try self.init(serializedData: data)  // SwiftProtobuf decoder
+  }
+
+  public func encode() throws -> Data {
+    try serializedData()  // SwiftProtobuf encoder
+  }
+
+  // init(from parameters:) and parameters() auto-implemented!
+}
+```
+
+**Custom binary format example:**
+
+```swift
+struct TemperatureReading: BinaryMessagable {
+  let celsius: Float
+  let timestamp: UInt64
+
+  init(celsius: Float, timestamp: UInt64) {
+    self.celsius = celsius
+    self.timestamp = timestamp
+  }
+
+  public init(from data: Data) throws {
+    guard data.count == 12 else {  // 4 + 8 bytes
+      throw SerializationError.invalidDataSize
+    }
+    celsius = data.withUnsafeBytes { $0.load(as: Float.self) }
+    timestamp = data.dropFirst(4).withUnsafeBytes { $0.load(as: UInt64.self) }
+  }
+
+  public func encode() throws -> Data {
+    var data = Data()
+    withUnsafeBytes(of: celsius) { data.append(contentsOf: $0) }
+    withUnsafeBytes(of: timestamp) { data.append(contentsOf: $0) }
+    return data
+  }
+}
+```
+
+### SwiftUI Integration with AsyncStreams
+
+Here's a complete example showing how to use custom message types with SwiftUI and async/await:
+
+```swift
+import SwiftUI
+import SundialKitStream
+import SundialKitConnectivity
+
+@MainActor
+@Observable
+class WatchMessenger {
+  let observer: ConnectivityObserver
+
+  var receivedColor: Color?
+  var isReachable: Bool = false
+  var activationState: ActivationState = .notActivated
+
+  init() {
+    // Create actor-based observer with message decoder
+    observer = ConnectivityObserver(
+      messageDecoder: MessageDecoder(messagableTypes: [
+        ColorMessage.self,
+        TemperatureReading.self
+      ])
+    )
+  }
+
+  func start() {
+    // Listen for typed messages using AsyncStream
+    Task {
+      for await message in await observer.typedMessageStream() {
+        if let colorMessage = message as? ColorMessage {
+          receivedColor = Color(
+            red: colorMessage.red,
+            green: colorMessage.green,
+            blue: colorMessage.blue
+          )
+        } else if let temp = message as? TemperatureReading {
+          print("Temperature: \(temp.celsius)°C at \(temp.timestamp)")
+        }
+      }
+    }
+
+    // Monitor reachability
+    Task {
+      for await reachable in await observer.reachabilityStream() {
+        isReachable = reachable
+      }
+    }
+
+    // Monitor activation state
+    Task {
+      for await state in await observer.activationStates() {
+        activationState = state
+      }
+    }
+  }
+
+  func activate() async throws {
+    try await observer.activate()
+  }
+
+  func sendColor(red: Double, green: Double, blue: Double) async throws {
+    let message = ColorMessage(red: red, green: green, blue: blue)
+    let result = try await observer.send(message)
+    print("Sent via: \(result.context)")
+  }
+}
+
+struct WatchColorView: View {
+  @State private var messenger = WatchMessenger()
+
+  var body: some View {
+    VStack(spacing: 20) {
+      Text("WatchConnectivity")
+        .font(.headline)
+
+      Text("Session: \(messenger.activationState.description)")
+      Text("Reachable: \(messenger.isReachable ? "Yes" : "No")")
+
+      if let color = messenger.receivedColor {
+        Rectangle()
+          .fill(color)
+          .frame(width: 100, height: 100)
+          .cornerRadius(10)
+
+        Text("Received Color")
+          .font(.caption)
+      }
+
+      Button("Send Red") {
+        Task {
+          try? await messenger.sendColor(red: 1.0, green: 0.0, blue: 0.0)
+        }
+      }
+      .disabled(!messenger.isReachable)
+
+      Button("Send Blue") {
+        Task {
+          try? await messenger.sendColor(red: 0.0, green: 0.0, blue: 1.0)
+        }
+      }
+      .disabled(!messenger.isReachable)
+    }
+    .padding()
+    .task {
+      try? await messenger.activate()
+      messenger.start()
+    }
+  }
+}
+```
+
+This example demonstrates:
+- Creating a `MessageDecoder` with multiple custom message types
+- Using AsyncStreams to consume typed messages, reachability, and activation state
+- Converting received messages to SwiftUI views with the `@Observable` macro
+- Sending type-safe messages from button actions
+- Automatic UI updates when messages arrive or session state changes
+- Structured concurrency with the `.task` modifier for lifecycle management
+
+> Important: Dictionary-based messages have a size limit of approximately 65KB. For larger data, use ``BinaryMessagable`` for efficient serialization or consider file transfer methods.
+
 ## Topics
 
 ### Network Monitoring
