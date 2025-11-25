@@ -1,6 +1,6 @@
 # Sundial Demo Application
 
-A comprehensive iOS/watchOS demonstration of SundialKit v2.0.0 capabilities, with focus on:
+A comprehensive iOS/watchOS demonstration of SundialKit v2.0.0-alpha.1 capabilities, with focus on:
 - **Binary protobuf messaging** with `BinaryMessagable`
 - **Latency measurement** across different transport methods
 - **Transport route comparison** (sendMessage vs updateApplicationContext)
