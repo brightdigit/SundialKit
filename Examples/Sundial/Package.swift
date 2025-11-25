@@ -35,17 +35,17 @@ let package = Package(
     // SundialKit core (parent package)
     .package(
       url: "https://github.com/brightdigit/SundialKit.git",
-      branch: "v2.0.0"
+      from: "2.0.0-alpha.1"
     ),
     // SundialKitCombine plugin
     .package(
       url: "https://github.com/brightdigit/SundialKitCombine.git",
-      branch: "v1.0.0"
+      from: "1.0.0-alpha.1"
     ),
     // SundialKitStream plugin
     .package(
       url: "https://github.com/brightdigit/SundialKitStream.git",
-      branch: "v1.0.0"
+      from: "1.0.0-alpha.1"
     )
   ],
   targets: [
