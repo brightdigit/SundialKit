@@ -92,7 +92,7 @@ public struct LatencyGraph: View {
     Chart {
       ForEach(measurements.indices, id: \.self) { index in
         let measurement = measurements[index]
-        let rttMs = measurement.roundTripTime * 1000
+        let rttMs = measurement.roundTripTime * 1_000
 
         LineMark(
           x: .value("Sequence", measurement.sequenceNumber),

@@ -45,7 +45,7 @@ extension Sundial_Demo_LatencyTestRequest {
     case .medium:
       size = 500
     case .large:
-      size = 5000
+      size = 5_000
     case .UNRECOGNIZED:
       size = 50
     }

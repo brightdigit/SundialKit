@@ -1,9 +1,6 @@
 //
-//  ConnectivityReceiveContextTests.swift
-//  SundialKit
-//
-//  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+// ConnectivityReceiveContextTests.swift
+// Copyright (c) 2025 BrightDigit.
 //
 
 import Testing

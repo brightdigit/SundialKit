@@ -1,8 +1,6 @@
 //
-//  TestObserver.swift
-//  SundialKit
-//
-//  Created by Leo Dion on 10/24/25.
+// TestNetworkStateObserver.swift
+// Copyright (c) 2025 BrightDigit.
 //
 
 @testable import SundialKitCore
