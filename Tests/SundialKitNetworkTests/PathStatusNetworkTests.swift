@@ -1,9 +1,6 @@
 //
-//  PathStatusNetworkTests.swift
-//  SundialKit
-//
-//  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+// PathStatusNetworkTests.swift
+// Copyright (c) 2025 BrightDigit.
 //
 
 import Foundation

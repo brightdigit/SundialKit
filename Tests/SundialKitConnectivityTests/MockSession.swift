@@ -1,3 +1,8 @@
+//
+// MockSession.swift
+// Copyright (c) 2025 BrightDigit.
+//
+
 import Foundation
 
 @testable import SundialKitConnectivity

@@ -1,9 +1,8 @@
 //
-//  File.swift
+// MockMessage.swift
+// Copyright (c) 2025 BrightDigit.
 //
-//
-//  Created by Leo Dion on 5/20/22.
-//
+
 import Foundation
 import SundialKitCore
 

@@ -1,9 +1,8 @@
 //
-//  File.swift
+// MockNetworkPing.swift
+// Copyright (c) 2025 BrightDigit.
 //
-//
-//  Created by Leo Dion on 5/19/22.
-//
+
 import Foundation
 
 @testable import SundialKitCore
