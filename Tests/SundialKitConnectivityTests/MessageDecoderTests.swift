@@ -1,9 +1,6 @@
 //
-//  MessageDecoderTests.swift
-//  SundialKit
-//
-//  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+// MessageDecoderTests.swift
+// Copyright (c) 2025 BrightDigit.
 //
 
 import Testing

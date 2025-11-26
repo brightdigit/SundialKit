@@ -473,7 +473,7 @@ final class StreamMessageLabViewModel {
       var sensor = Sundial_Demo_ComplexMessage.SensorData()
       sensor.temperature = Float.random(in: -10...40)  // Celsius
       sensor.humidity = Float.random(in: 0...100)  // Percentage
-      sensor.pressure = Float.random(in: 980...1050)  // hPa
+      sensor.pressure = Float.random(in: 980...1_050)  // hPa
       sensor.readingTimeMs = Date().millisecondsSince1970
       return sensor
     }
