@@ -1,9 +1,6 @@
 //
-//  NWPathMonitorTests.swift
-//  SundialKit
-//
-//  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+// NWPathMonitorTests.swift
+// Copyright (c) 2025 BrightDigit.
 //
 
 import Foundation
