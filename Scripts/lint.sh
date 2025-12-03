@@ -85,7 +85,6 @@ if [ -z "$FORMAT_ONLY" ]; then
 fi
 
 $PACKAGE_DIR/Scripts/header.sh -d  $PACKAGE_DIR/Sources -c "Leo Dion" -o "BrightDigit" -p "SundialKit"
-$PACKAGE_DIR/Scripts/header.sh -d  $PACKAGE_DIR/Tests -c "Leo Dion" -o "BrightDigit" -p "SundialKit"
 
 if [ -z "$CI" ]; then
 	run_command $TOOL_CMD periphery scan $PERIPHERY_OPTIONS --disable-update-check

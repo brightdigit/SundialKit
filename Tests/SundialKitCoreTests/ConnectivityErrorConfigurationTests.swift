@@ -1,5 +1,5 @@
 //
-//  ConnectivityErrorConfigurationTests.swift
+//  ConnectivityError+ConfigurationTests.swift
 //  SundialKit
 //
 //  Created by Leo Dion.
