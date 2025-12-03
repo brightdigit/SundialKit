@@ -51,7 +51,7 @@ extension Sundial_Demo_ComplexMessage {
     var sensor1 = Sundial_Demo_ComplexMessage.SensorData()
     sensor1.temperature = 22.5
     sensor1.humidity = 45.0
-    sensor1.pressure = 1_013.25
+    sensor1.pressure = 1013.25
     sensor1.readingTimeMs = Date.nowMilliseconds
     msg.sensors = [sensor1]
 

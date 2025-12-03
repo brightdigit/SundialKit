@@ -34,7 +34,7 @@ public final class LatencyTracker: ObservableObject {
 
     /// Round-trip time in milliseconds
     public var rttMilliseconds: Double {
-      roundTripTime * 1_000
+      roundTripTime * 1000
     }
 
     public init(

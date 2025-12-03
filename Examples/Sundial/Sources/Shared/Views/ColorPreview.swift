@@ -105,7 +105,7 @@ public struct ColorPreview: View {
         if let timestamp = timestamp {
         #if os(watchOS)
           Text(timestamp, style: .relative)
-
+            
             .font(.system(size: 10, weight: .semibold))
           #else
           Text(timestamp, style: .time)

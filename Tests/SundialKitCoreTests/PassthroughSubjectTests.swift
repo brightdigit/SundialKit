@@ -1,6 +1,9 @@
 //
-// PassthroughSubjectTests.swift
-// Copyright (c) 2025 BrightDigit.
+//  PassthroughSubjectTests.swift
+//  SundialKit
+//
+//  Created by Leo Dion.
+//  Copyright © 2025 BrightDigit.
 //
 
 import Foundation
