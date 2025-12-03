@@ -34,9 +34,9 @@ jobs:
           # iOS Builds - Xcode 26.x on macOS-26
           - type: ios
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.0.app"
+            xcode: "/Applications/Xcode_26.2.app"
             deviceName: "iPhone 17 Pro"
-            osVersion: "26.0.1"
+            osVersion: "26.2"
             download-platform: true
 
           - type: ios
@@ -49,9 +49,9 @@ jobs:
           # watchOS Builds - Xcode 26.x on macOS-26
           - type: watchos
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.0.app"
+            xcode: "/Applications/Xcode_26.2.app"
             deviceName: "Apple Watch Ultra 3 (49mm)"
-            osVersion: "26.0"
+            osVersion: "26.2"
             download-platform: true
 
           - type: watchos
@@ -129,7 +129,7 @@ jobs:
           working-directory: ${{ env.DEMO_PATH }}
 
       - name: Select Xcode
-        run: sudo xcode-select -s "/Applications/Xcode_26.0.app"
+        run: sudo xcode-select -s "/Applications/Xcode_26.1.app"
 
       - name: Setup SSH for AppCerts repository
         uses: webfactory/ssh-agent@v0.9.0
