@@ -1,6 +1,9 @@
 //
-// ConnectivityManagerTestHelpers.swift
-// Copyright (c) 2025 BrightDigit.
+//  ConnectivityManagerTestHelpers.swift
+//  SundialKit
+//
+//  Created by Leo Dion.
+//  Copyright © 2025 BrightDigit.
 //
 
 #if canImport(WatchConnectivity)

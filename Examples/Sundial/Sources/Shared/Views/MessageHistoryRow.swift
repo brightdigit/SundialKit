@@ -83,7 +83,7 @@ public struct MessageHistoryRow: View {
   }
 
   private var sizeFormatted: String {
-    let kb = Double(size) / 1_024.0
+    let kb = Double(size) / 1024.0
     if kb < 1 {
       return "\(size) B"
     } else {
@@ -95,7 +95,7 @@ public struct MessageHistoryRow: View {
     guard let rtt = rtt else {
       return "—"
     }
-    let ms = rtt * 1_000
+    let ms = rtt * 1000
     return String(format: "%.1f ms", ms)
   }
 
@@ -169,7 +169,7 @@ public struct MessageHistoryRow: View {
           MessageHistoryRow(
             timestamp: Date().addingTimeInterval(-10),
             method: .sendMessageData,
-            size: 1_024,
+            size: 1024,
             rtt: 0.018,
             success: true
           )
@@ -196,7 +196,7 @@ public struct MessageHistoryRow: View {
           MessageHistoryRow(
             timestamp: Date().addingTimeInterval(-40),
             method: .sendMessageData,
-            size: 16_384,
+            size: 16384,
             rtt: 0.045,
             success: true
           )
