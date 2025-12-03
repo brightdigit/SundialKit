@@ -39,7 +39,7 @@
       )
     }
 
-    #if os(iOS)
+    #if os(iOS) || os(visionOS)
 
       internal func sessionDidBecomeInactive(_: WCSession) {
         delegate?.sessionDidBecomeInactive(self)

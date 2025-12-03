@@ -9,7 +9,7 @@
   extension WCSession {
     /// polyfill for whether the app is installed on the other device
     public var isPairedAppInstalled: Bool {
-      #if os(iOS)
+      #if os(iOS) || os(visionOS)
         return isWatchAppInstalled
       #else
         return isCompanionAppInstalled
