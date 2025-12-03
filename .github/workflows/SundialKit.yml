@@ -49,15 +49,20 @@ jobs:
         include:
           # SPM Build Matrix - Xcode 16.x+ (Swift 6.x)
           - runs-on: macos-26
-            xcode: "/Applications/Xcode_26.1.app"
+            xcode: "/Applications/Xcode_26.2.app"
           - runs-on: macos-26
-            xcode: "/Applications/Xcode_26.0.app"
+            xcode: "/Applications/Xcode_26.1.app"
           - runs-on: macos-15
             xcode: "/Applications/Xcode_16.4.app"
-          - runs-on: macos-15
-            xcode: "/Applications/Xcode_16.3.app"
 
           # iOS Build Matrix - Xcode 16.x+ (Swift 6.x)
+          - type: ios
+            runs-on: macos-26
+            xcode: "/Applications/Xcode_26.2.app"
+            deviceName: "iPhone 17 Pro"
+            osVersion: "26.2"
+            download-platform: true
+
           - type: ios
             runs-on: macos-26
             xcode: "/Applications/Xcode_26.1.app"
@@ -66,35 +71,22 @@ jobs:
             download-platform: true
 
           - type: ios
-            runs-on: macos-26
-            xcode: "/Applications/Xcode_26.0.app"
-            deviceName: "iPhone 17 Pro"
-            osVersion: "26.0.1"
-            download-platform: true
-
-          - type: ios
             runs-on: macos-15
             xcode: "/Applications/Xcode_16.4.app"
             deviceName: "iPhone 16e"
             osVersion: "18.5"
 
-          - type: ios
-            runs-on: macos-15
-            xcode: "/Applications/Xcode_16.3.app"
-            deviceName: "iPhone 16"
-            osVersion: "18.4"
-
           # watchOS Build Matrix - Xcode 16.x+ (Swift 6.x)
           - type: watchos
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.1.app"
+            xcode: "/Applications/Xcode_26.2.app"
             deviceName: "Apple Watch Ultra 3 (49mm)"
-            osVersion: "26.0"
+            osVersion: "26.2"
             download-platform: true
 
           - type: watchos
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.0.app"
+            xcode: "/Applications/Xcode_26.1.app"
             deviceName: "Apple Watch Ultra 3 (49mm)"
             osVersion: "26.0"
             download-platform: true
@@ -105,11 +97,13 @@ jobs:
             deviceName: "Apple Watch Series 10 (46mm)"
             osVersion: "11.5"
 
-          - type: watchos
-            runs-on: macos-15
-            xcode: "/Applications/Xcode_16.3.app"
-            deviceName: "Apple Watch Series 10 (42mm)"
-            osVersion: "11.4"
+          # visionOS Build Matrix - Xcode 16.x+ (Swift 6.x)
+          - type: visionOS
+            runs-on: macos-26
+            xcode: "/Applications/Xcode_26.2.app"
+            deviceName: "Apple Vision Pro"
+            osVersion: "26.2"
+            download-platform: true
 
     steps:
       - uses: actions/checkout@v4
