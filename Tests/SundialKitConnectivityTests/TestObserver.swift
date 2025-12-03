@@ -1,6 +1,9 @@
 //
-// TestObserver.swift
-// Copyright (c) 2025 BrightDigit.
+//  TestObserver.swift
+//  SundialKit
+//
+//  Created by Leo Dion.
+//  Copyright © 2025 BrightDigit.
 //
 
 #if canImport(WatchConnectivity)
