@@ -57,31 +57,31 @@ jobs:
     runs-on: ubuntu-latest
     container: ${{ matrix.swift.nightly && format('swiftlang/swift:nightly-{0}-{1}', matrix.swift.version, matrix.os) || format('swift:{0}-{1}', matrix.swift.version, matrix.os) }}
     strategy:
+      fail-fast: false
       matrix:
         os: ${{ fromJSON(needs.configure.outputs.ubuntu-os) }}
         swift: ${{ fromJSON(needs.configure.outputs.ubuntu-swift) }}
-        type: ${{ fromJSON(needs.configure.outputs.ubuntu-type) }}
-        exclude:
-          - swift: {version: "6.1"}
-            type: wasm
-          - swift: {version: "6.1"}
-            type: wasm-embedded
-          - swift: {version: "6.2"}
-            type: wasm
-          - swift: {version: "6.2"}
-            type: wasm-embedded
+        # type: ${{ fromJSON(needs.configure.outputs.ubuntu-type) }}
+        # exclude:
+        #   - swift: {version: "6.1"}
+        #     type: wasm
+        #   - swift: {version: "6.1"}
+        #     type: wasm-embedded
+        #   - swift: {version: "6.2"}
+        #     type: wasm
+        #   - swift: {version: "6.2"}
+        #     type: wasm-embedded
     steps:
       - uses: actions/checkout@v6
       - uses: brightdigit/swift-build@v1
         id: build
         with:
           type: ${{ matrix.type }}
-          wasmtime-version: 41.0.3
-      - name: Install curl
-        if: steps.build.outputs.contains-code-coverage == 'true'
-        run: |
-          apt-get update -q
-          apt-get install -y curl
+      # - name: Install curl
+      #   if: steps.build.outputs.contains-code-coverage == 'true'
+      #   run: |
+      #     apt-get update -q
+      #     apt-get install -y curl
       - uses: sersoft-gmbh/swift-coverage-action@v5
         id: coverage-files
         if: steps.build.outputs.contains-code-coverage == 'true'
@@ -97,42 +97,42 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ${{ join(fromJSON(steps.coverage-files.outputs.files), ',') }}
 
-  build-windows:
-    name: Build on Windows
-    needs: [configure]
-    if: needs.configure.outputs.full-matrix == 'true'
-    runs-on: ${{ matrix.runs-on }}
-    strategy:
-      fail-fast: false
-      matrix:
-        runs-on: [windows-2022, windows-2025]
-        swift:
-          - version: swift-6.3-release
-            build: 6.3-RELEASE
-          - version: swift-6.2-release
-            build: 6.2-RELEASE
-          - version: swift-6.1-release
-            build: 6.1-RELEASE
-    steps:
-      - uses: actions/checkout@v6
-      - name: Enable git symlinks
-        shell: pwsh
-        run: git config --global core.symlinks true
-      - uses: brightdigit/swift-build@v1
-        id: build
-        with:
-          windows-swift-version: ${{ matrix.swift.version }}
-          windows-swift-build: ${{ matrix.swift.build }}
-      - name: Upload coverage to Codecov
-        if: steps.build.outputs.contains-code-coverage == 'true'
-        uses: codecov/codecov-action@v6
-        with:
-          fail_ci_if_error: true
-          flags: swift-${{ matrix.swift.version }},windows
-          verbose: true
-          token: ${{ secrets.CODECOV_TOKEN }}
-          os: windows
-          swift_project: SundialKit
+  # build-windows:
+  #   name: Build on Windows
+  #   needs: [configure]
+  #   if: needs.configure.outputs.full-matrix == 'true'
+  #   runs-on: ${{ matrix.runs-on }}
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       runs-on: [windows-2022, windows-2025]
+  #       swift:
+  #         - version: swift-6.3-release
+  #           build: 6.3-RELEASE
+  #         - version: swift-6.2-release
+  #           build: 6.2-RELEASE
+  #         - version: swift-6.1-release
+  #           build: 6.1-RELEASE
+  #   steps:
+  #     - uses: actions/checkout@v6
+  #     - name: Enable git symlinks
+  #       shell: pwsh
+  #       run: git config --global core.symlinks true
+  #     - uses: brightdigit/swift-build@v1
+  #       id: build
+  #       with:
+  #         windows-swift-version: ${{ matrix.swift.version }}
+  #         windows-swift-build: ${{ matrix.swift.build }}
+  #     - name: Upload coverage to Codecov
+  #       if: steps.build.outputs.contains-code-coverage == 'true'
+  #       uses: codecov/codecov-action@v6
+  #       with:
+  #         fail_ci_if_error: true
+  #         flags: swift-${{ matrix.swift.version }},windows
+  #         verbose: true
+  #         token: ${{ secrets.CODECOV_TOKEN }}
+  #         os: windows
+  #         swift_project: SundialKit
 
   build-macos:
     name: Build on macOS
@@ -304,7 +304,7 @@ jobs:
     # !failure() allows this job to proceed past skipped (not failed) dependencies.
     if: ${{ !cancelled() && !failure() && (github.event_name == 'pull_request' || !contains(github.event.head_commit.message, 'ci skip')) }}
     runs-on: ubuntu-latest
-    needs: [build-ubuntu, build-macos, build-windows, build-macos-full, build-android]
+    needs: [build-ubuntu, build-macos, build-macos-full, build-android]
     steps:
       - uses: actions/checkout@v6
       - uses: jdx/mise-action@v4

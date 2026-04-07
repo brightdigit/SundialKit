@@ -24,7 +24,7 @@
         "lldb.library": "/usr/lib/liblldb.so"
       },
       "extensions": [
-        "sswg.swift-lang"
+        "swift-server.swift"
       ]
     }
   },

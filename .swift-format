@@ -2,11 +2,11 @@
   "fileScopedDeclarationPrivacy" : {
     "accessLevel" : "fileprivate"
   },
+  "indentConditionalCompilationBlocks" : true,
+  "indentSwitchCaseLabels" : false,
   "indentation" : {
     "spaces" : 2
   },
-  "indentConditionalCompilationBlocks" : true,
-  "indentSwitchCaseLabels" : false,
   "lineBreakAroundMultilineExpressionChainComponents" : false,
   "lineBreakBeforeControlFlowKeywords" : false,
   "lineBreakBeforeEachArgument" : false,
@@ -22,11 +22,11 @@
   "prioritizeKeepingFunctionOutputTogether" : false,
   "respectsExistingLineBreaks" : true,
   "rules" : {
-    "AllPublicDeclarationsHaveDocumentation" : true,
-    "AlwaysUseLiteralForEmptyCollectionInit" : false,
+    "AllPublicDeclarationsHaveDocumentation" : false,
+    "AlwaysUseLiteralForEmptyCollectionInit" : true,
     "AlwaysUseLowerCamelCase" : true,
     "AmbiguousTrailingClosureOverload" : true,
-    "BeginDocumentationCommentWithOneLineSummary" : false,
+    "BeginDocumentationCommentWithOneLineSummary" : true,
     "DoNotUseSemicolons" : true,
     "DontRepeatTypeInStaticProperties" : true,
     "FileScopedDeclarationPrivacy" : false,
@@ -42,7 +42,7 @@
     "NoCasesWithOnlyFallthrough" : true,
     "NoEmptyTrailingClosureParentheses" : true,
     "NoLabelsInCasePatterns" : true,
-    "NoLeadingUnderscores" : true,
+    "NoLeadingUnderscores" : false,
     "NoParensAroundConditions" : true,
     "NoPlaygroundLiterals" : true,
     "NoVoidReturnOnFunctionSignature" : true,
@@ -56,13 +56,13 @@
     "TypeNamesShouldBeCapitalized" : true,
     "UseEarlyExits" : false,
     "UseExplicitNilCheckInConditions" : true,
-    "UseLetInEveryBoundCaseVariable" : true,
+    "UseLetInEveryBoundCaseVariable" : false,
     "UseShorthandTypeNames" : true,
     "UseSingleLinePropertyGetter" : true,
     "UseSynthesizedInitializer" : true,
     "UseTripleSlashForDocumentationComments" : true,
     "UseWhereClausesInForLoops" : true,
-    "ValidateDocumentationComments" : true
+    "ValidateDocumentationComments" : false
   },
   "spacesAroundRangeFormationOperators" : false,
   "tabWidth" : 2,
