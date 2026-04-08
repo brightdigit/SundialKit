@@ -61,16 +61,7 @@ jobs:
       matrix:
         os: ${{ fromJSON(needs.configure.outputs.ubuntu-os) }}
         swift: ${{ fromJSON(needs.configure.outputs.ubuntu-swift) }}
-        # type: ${{ fromJSON(needs.configure.outputs.ubuntu-type) }}
-        # exclude:
-        #   - swift: {version: "6.1"}
-        #     type: wasm
-        #   - swift: {version: "6.1"}
-        #     type: wasm-embedded
-        #   - swift: {version: "6.2"}
-        #     type: wasm
-        #   - swift: {version: "6.2"}
-        #     type: wasm-embedded
+        type: ${{ fromJSON(needs.configure.outputs.ubuntu-type) }}
     steps:
       - uses: actions/checkout@v6
       - uses: brightdigit/swift-build@v1
