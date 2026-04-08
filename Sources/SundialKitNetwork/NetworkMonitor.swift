@@ -31,7 +31,6 @@ public import Foundation
 public import SundialKitCore
 
 #if canImport(Dispatch)
-
   /// A non-reactive network monitor that implements the `NetworkMonitoring` protocol.
   ///
   /// `NetworkMonitor` provides network connectivity monitoring without requiring Combine,
@@ -223,5 +222,4 @@ public import SundialKitCore
       self.init(monitor: monitor, ping: nil)
     }
   }
-
 #endif
