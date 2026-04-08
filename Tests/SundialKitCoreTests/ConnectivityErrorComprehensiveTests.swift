@@ -78,13 +78,7 @@ struct ConnectivityErrorComprehensiveTests {
       for error in Self.allErrors {
         #expect(error.errorDescription != nil, "Missing errorDescription for \(error)")
         #expect(error.failureReason != nil, "Missing failureReason for \(error)")
-        let missingSuggestion = "Missing recoverySuggestion for \(error)"
-        #expect(error.recoverySuggestion != nil, missingSuggestion)
-
-        // Ensure strings are not empty
-        let descriptionExists = error.errorDescription != nil
-        let failureExists = error.failureReason != nil
-        let suggestionExists = error.recoverySuggestion != nil
+        #expect(error.recoverySuggestion != nil, "Missing recoverySuggestion for \(error)")
 
         #expect(
           error.errorDescription?.isEmpty == false,
