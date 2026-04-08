@@ -25,7 +25,7 @@ internal struct TestBinaryMessage: BinaryMessagable {
     guard data.count == MemoryLayout<UInt32>.size else {
       throw SerializationError.invalidDataSize
     }
-    value = data.withUnsafeBytes { $0.load(as: UInt32.self) }
+    value = data.withUnsafeBytes { $0.loadUnaligned(as: UInt32.self) }
   }
 
   // Binary encoding (no type info)
