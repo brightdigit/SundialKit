@@ -312,3 +312,5 @@ jobs:
           cache: true
       - name: Lint
         run: ./Scripts/lint.sh
+        env:
+          LINT_MODE: STRICT

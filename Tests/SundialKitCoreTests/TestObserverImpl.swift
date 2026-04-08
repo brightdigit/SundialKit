@@ -1,9 +1,9 @@
 //
-//  WatchConnectivitySessionProtocol.swift
+//  ObserverRegistryTestHelpers.swift
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2026 BrightDigit.
+//  Copyright © 2025 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -27,9 +27,8 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#if canImport(WatchConnectivity)
+// MARK: - Test Observer Implementation
 
-  import WatchConnectivity
-  internal typealias WatchConnectivitySessionProtocol =
-    ConnectivitySession & WCSessionDelegate
-#endif
+final class TestObserverImpl: @unchecked Sendable {
+  var receivedValues: [Int] = []
+}

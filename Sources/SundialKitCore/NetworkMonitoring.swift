@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -32,7 +32,8 @@ public import Foundation
 /// A protocol for monitoring network connectivity status and characteristics.
 ///
 /// Types conforming to `NetworkMonitoring` provide real-time information about
-/// network connectivity, including path status, cost characteristics, and data constraints.
+/// network connectivity, including path status, cost characteristics,
+/// and data constraints.
 /// This protocol serves as the foundation for various reactive implementations
 /// (Combine-based, AsyncStream-based) of network monitoring.
 ///

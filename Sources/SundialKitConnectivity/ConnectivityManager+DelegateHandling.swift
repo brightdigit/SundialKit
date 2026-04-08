@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -44,7 +44,9 @@
     /// - Parameters:
     ///   - state: The activation state.
     ///   - error: Any error that occurred during activation.
-    internal func isolatedHandleActivation(_ state: ActivationState, error: (any Error)?) async {
+    internal func isolatedHandleActivation(
+      _ state: ActivationState, error: (any Error)?
+    ) async {
       // Update activation state
       self.activationState = state
 
@@ -120,7 +122,9 @@
     // MARK: - Nonisolated Delegate Methods
 
     /// Handles session activation completion.
-    nonisolated public func handleActivation(_ state: ActivationState, error: (any Error)?) {
+    nonisolated public func handleActivation(
+      _ state: ActivationState, error: (any Error)?
+    ) {
       Task {
         await self.isolatedHandleActivation(state, error: error)
       }
@@ -148,7 +152,9 @@
     }
 
     /// Handles companion device state changes.
-    nonisolated public func handleCompanionStateChange(_ session: any ConnectivitySession) {
+    nonisolated public func handleCompanionStateChange(
+      _ session: any ConnectivitySession
+    ) {
       Task {
         await self.isolatedSessionStateChanged(session)
       }

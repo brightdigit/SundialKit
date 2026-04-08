@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -38,9 +38,11 @@ import SundialKitCore
 ///
 /// ## Thread Safety
 ///
-/// This class uses `@unchecked Sendable` with careful synchronization. This is safe because:
+/// This class uses `@unchecked Sendable` with careful synchronization.
+/// This is safe because:
 /// - The `ping` and `statusProvider` properties are immutable (let)
-/// - The `timer` property is only accessed on the dispatch queue where it was created
+/// - The `timer` property is only accessed on the dispatch queue
+///   where it was created
 /// - Timer event handlers execute on the same queue, preventing concurrent access
 /// - All timer operations (start/stop) are serialized on the queue
 internal final class PingCoordinator<Ping: NetworkPing & Sendable>: @unchecked Sendable {

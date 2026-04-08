@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -34,7 +34,8 @@
   /// Protocol for types that support connectivity session activation.
   ///
   /// This protocol defines the interface for activating connectivity sessions,
-  /// including both synchronous and asynchronous activation patterns with timeout support.
+  /// including both synchronous and asynchronous activation patterns
+  /// with timeout support.
   @available(macOS, unavailable)
   @available(tvOS, unavailable)
   public protocol ConnectivityActivation {
@@ -58,7 +59,9 @@
     /// Sets the activation continuation.
     ///
     /// - Parameter continuation: The continuation to store.
-    func setActivationContinuation(_ continuation: CheckedContinuation<Void, any Error>) async
+    func setActivationContinuation(
+      _ continuation: CheckedContinuation<Void, any Error>
+    ) async
 
     /// Sets the activation timeout task.
     ///

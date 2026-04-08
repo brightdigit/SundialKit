@@ -1,5 +1,5 @@
 //
-//  WatchConnectivitySessionProtocol.swift
+//  SundialLogger+Custom.swift
 //  SundialKit
 //
 //  Created by Leo Dion.
@@ -27,9 +27,31 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#if canImport(WatchConnectivity)
-
-  import WatchConnectivity
-  internal typealias WatchConnectivitySessionProtocol =
-    ConnectivitySession & WCSessionDelegate
+#if canImport(os)
+  package import os.log
 #endif
+
+extension SundialLogger {
+  // MARK: - Type Methods
+
+  #if canImport(os)
+    /// Create a custom logger for specific categories
+    /// - Parameters:
+    ///   - subsystem: Reverse DNS notation subsystem identifier
+    ///   - category: Category within the subsystem
+    /// - Returns: Configured Logger instance
+    @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
+    package static func custom(subsystem: String, category: String) -> Logger {
+      Logger(subsystem: subsystem, category: category)
+    }
+  #else
+    /// Create a custom logger for specific categories
+    /// - Parameters:
+    ///   - subsystem: Reverse DNS notation subsystem identifier
+    ///   - category: Category within the subsystem
+    /// - Returns: Configured FallbackLogger instance
+    package static func custom(subsystem: String, category: String) -> FallbackLogger {
+      FallbackLogger(subsystem: subsystem, category: category)
+    }
+  #endif
+}

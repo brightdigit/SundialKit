@@ -54,7 +54,9 @@ struct ConnectivityErrorSessionTests {
     #if canImport(WatchConnectivity)
       let error = ConnectivityError.sessionNotSupported
 
-      #expect(error.errorDescription == "WatchConnectivity is not supported on this device.")
+      let sessionNotSupportedDescription =
+        "WatchConnectivity is not supported on this device."
+      #expect(error.errorDescription == sessionNotSupportedDescription)
       #expect(
         error.failureReason
           == "WatchConnectivity is only available on iPhone and Apple Watch devices."
@@ -73,14 +75,17 @@ struct ConnectivityErrorSessionTests {
     #if canImport(WatchConnectivity)
       let error = ConnectivityError.sessionNotActivated
 
-      #expect(error.errorDescription == "The connectivity session has not been activated.")
+      let sessionNotActivatedDescription =
+        "The connectivity session has not been activated."
+      #expect(error.errorDescription == sessionNotActivatedDescription)
       #expect(
         error.failureReason
           == "The session must be activated before sending or receiving messages."
       )
       #expect(
         error.recoverySuggestion
-          == "Call activate() on the connectivity manager before using messaging features."
+          == "Call activate() on the connectivity manager"
+          + " before using messaging features."
       )
     #else
       Issue.record("WatchConnectivity not available on this platform")
@@ -93,7 +98,9 @@ struct ConnectivityErrorSessionTests {
       let error = ConnectivityError.sessionInactive
 
       #expect(error.errorDescription == "The connectivity session is inactive.")
-      #expect(error.failureReason == "The session is transitioning to a deactivated state.")
+      let sessionInactiveReason =
+        "The session is transitioning to a deactivated state."
+      #expect(error.failureReason == sessionInactiveReason)
       #expect(
         error.recoverySuggestion
           == "Wait for the session to become active again or reactivate it."

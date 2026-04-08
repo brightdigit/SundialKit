@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -38,7 +38,8 @@ public import Foundation
 /// This enum is maintained for backward compatibility with SundialKit 1.x.
 /// New code should use the more specific error types.
 @available(
-  *, deprecated, message: "Use ConnectivityError, NetworkError, or SerializationError instead"
+  *, deprecated,
+  message: "Use ConnectivityError, NetworkError, or SerializationError instead"
 )
 public enum SundialError: Error, Sendable {
   /// If WCSession.isSupported() returns false, this error is thrown.
@@ -73,7 +74,8 @@ extension SundialError: LocalizedError {
       return "WatchConnectivity is only available on iPhone and Apple Watch devices."
     case .missingCompanion:
       return
-        "This device is not paired with a companion device or the companion app is not installed."
+        "This device is not paired with a companion device"
+        + " or the companion app is not installed."
     }
   }
 

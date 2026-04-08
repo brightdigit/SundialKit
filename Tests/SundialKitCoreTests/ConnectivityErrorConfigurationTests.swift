@@ -55,12 +55,13 @@ struct ConnectivityErrorConfigurationTests {
       let error = ConnectivityError.sessionMissingDelegate
 
       #expect(
-        error.errorDescription == "The connectivity session is missing a required delegate."
+        error.errorDescription
+          == "The connectivity session is missing a required delegate."
       )
-      #expect(
-        error.failureReason
-          == "A delegate must be set on the WatchConnectivity session before it can be activated."
-      )
+      let expectedMissingDelegateReason =
+        "A delegate must be set on the WatchConnectivity session"
+        + " before it can be activated."
+      #expect(error.failureReason == expectedMissingDelegateReason)
       #expect(
         error.recoverySuggestion
           == "Set a delegate on the WatchConnectivity session before calling activate()."
@@ -96,12 +97,12 @@ struct ConnectivityErrorConfigurationTests {
 
       #expect(error.errorDescription == "Message delivery failed.")
       #expect(
-        error.failureReason == "The message could not be delivered to the counterpart device."
+        error.failureReason
+          == "The message could not be delivered to the counterpart device."
       )
-      #expect(
-        error.recoverySuggestion
-          == "Ensure the counterpart device is reachable and try sending the message again."
-      )
+      let expectedDeliveryRecovery =
+        "Ensure the counterpart device is reachable and try sending the message again."
+      #expect(error.recoverySuggestion == expectedDeliveryRecovery)
     #else
       Issue.record("WatchConnectivity not available on this platform")
     #endif
@@ -116,10 +117,10 @@ struct ConnectivityErrorConfigurationTests {
         error.errorDescription
           == "The app is watch-only and cannot use certain connectivity features."
       )
-      #expect(
-        error.failureReason
-          == "This is a watch-only app that requires a companion iOS app for full connectivity features."
-      )
+      let expectedWatchOnlyReason =
+        "This is a watch-only app that requires a companion iOS app"
+        + " for full connectivity features."
+      #expect(error.failureReason == expectedWatchOnlyReason)
       #expect(
         error.recoverySuggestion
           == "Install the companion iOS app to enable full connectivity features."

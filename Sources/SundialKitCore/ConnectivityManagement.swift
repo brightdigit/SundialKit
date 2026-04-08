@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -106,7 +106,8 @@ public protocol ConnectivityManagement {
   /// - Both devices are within Bluetooth range
   /// - The session is activated
   ///
-  /// When `true`, you can send messages using ``sendMessage(_:replyHandler:errorHandler:)``
+  /// When `true`, you can send messages using
+  /// ``sendMessage(_:replyHandler:errorHandler:)``
   /// and expect immediate delivery. When `false`, use ``updateApplicationContext(_:)``
   /// to queue data for delivery when the counterpart becomes available.
   var isReachable: Bool { get async }
