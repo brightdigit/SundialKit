@@ -47,7 +47,7 @@ package enum SundialLogger {
       private let subsystem: String
       private let category: String
 
-      fileprivate init(subsystem: String, category: String) {
+      internal init(subsystem: String, category: String) {
         self.subsystem = subsystem
         self.category = category
       }
