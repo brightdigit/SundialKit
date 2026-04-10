@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -40,7 +40,8 @@
     /// on the actor's isolation domain.
     ///
     /// - Parameter observer: The observer to add.
-    /// - Note: Observers are stored with strong references - caller must manage lifecycle.
+    /// - Note: Observers are stored with strong references - caller must manage
+    ///   lifecycle.
     public func addObserver(_ observer: any ConnectivityStateObserver) async {
       await observerRegistry.add(observer)
     }

@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -31,7 +31,8 @@
   public import Combine
 
   extension PassthroughSubject {
-    /// Creates a publisher that emits values from a specific key path of the subject's output.
+    /// Creates a publisher that emits values from a specific key path
+    /// of the subject's output.
     ///
     /// - Parameter keyPath: A key path to a property of the output type.
     /// - Returns: A type-erased publisher that emits values from the specified key path.

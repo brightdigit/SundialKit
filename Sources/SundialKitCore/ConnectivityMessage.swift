@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -30,7 +30,8 @@
 /// A type alias for messages exchanged via WatchConnectivity.
 ///
 /// Represents the dictionary-based message format required by WatchConnectivity.
-/// Messages must contain only property list types (String, Number, Date, Data, Array, Dictionary).
+/// Messages must contain only property list types
+/// (String, Number, Date, Data, Array, Dictionary).
 ///
 /// ## Valid Value Types
 ///

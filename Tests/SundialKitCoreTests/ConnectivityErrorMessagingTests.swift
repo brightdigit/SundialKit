@@ -55,14 +55,13 @@ struct ConnectivityErrorMessagingTests {
       let error = ConnectivityError.messageReplyFailed
 
       #expect(error.errorDescription == "The message reply operation failed.")
-      #expect(
-        error.failureReason == "The counterpart encountered an error while processing the message."
-      )
-      #expect(
-        error.recoverySuggestion
-          // swiftlint:disable:next line_length
-          == "Check the message format and try again. The counterpart may need to handle the message differently."
-      )
+      let replyFailedReason =
+        "The counterpart encountered an error while processing the message."
+      #expect(error.failureReason == replyFailedReason)
+      let replyFailedSuggestion =
+        "Check the message format and try again."
+        + " The counterpart may need to handle the message differently."
+      #expect(error.recoverySuggestion == replyFailedSuggestion)
     #else
       Issue.record("WatchConnectivity not available on this platform")
     #endif
@@ -74,12 +73,13 @@ struct ConnectivityErrorMessagingTests {
       let error = ConnectivityError.messageReplyTimedOut
 
       #expect(error.errorDescription == "The message reply timed out.")
-      #expect(
-        error.failureReason == "The counterpart did not respond within the timeout period."
-      )
+      let replyTimedOutReason =
+        "The counterpart did not respond within the timeout period."
+      #expect(error.failureReason == replyTimedOutReason)
       #expect(
         error.recoverySuggestion
-          == "Try sending the message again. Consider checking if the counterpart is responsive."
+          == "Try sending the message again."
+          + " Consider checking if the counterpart is responsive."
       )
     #else
       Issue.record("WatchConnectivity not available on this platform")
@@ -91,16 +91,17 @@ struct ConnectivityErrorMessagingTests {
     #if canImport(WatchConnectivity)
       let error = ConnectivityError.invalidParameter
 
-      #expect(error.errorDescription == "Invalid parameter provided to connectivity operation.")
+      let invalidParamDescription =
+        "Invalid parameter provided to connectivity operation."
+      #expect(error.errorDescription == invalidParamDescription)
       #expect(
         error.failureReason
           == "One or more parameters do not meet the required format or constraints."
       )
-      #expect(
-        error.recoverySuggestion
-          // swiftlint:disable:next line_length
-          == "Ensure all message data uses property list types (String, Number, Date, Data, Array, Dictionary)."
-      )
+      let invalidParameterSuggestion =
+        "Ensure all message data uses property list types"
+        + " (String, Number, Date, Data, Array, Dictionary)."
+      #expect(error.recoverySuggestion == invalidParameterSuggestion)
     #else
       Issue.record("WatchConnectivity not available on this platform")
     #endif
@@ -111,8 +112,12 @@ struct ConnectivityErrorMessagingTests {
     #if canImport(WatchConnectivity)
       let error = ConnectivityError.payloadTooLarge
 
-      #expect(error.errorDescription == "The message payload exceeds the maximum size limit.")
-      #expect(error.failureReason == "The data exceeds WatchConnectivity's transfer size limits.")
+      let payloadTooLargeDescription =
+        "The message payload exceeds the maximum size limit."
+      #expect(error.errorDescription == payloadTooLargeDescription)
+      let payloadTooLargeReason =
+        "The data exceeds WatchConnectivity's transfer size limits."
+      #expect(error.failureReason == payloadTooLargeReason)
       #expect(
         error.recoverySuggestion
           == "Reduce the message size or split the data into multiple smaller messages."
@@ -130,11 +135,12 @@ struct ConnectivityErrorMessagingTests {
       #expect(error.errorDescription == "The message payload contains unsupported types.")
       #expect(
         error.failureReason
-          == "The message contains types that cannot be transmitted via WatchConnectivity."
+          == "The message contains types that cannot be"
+          + " transmitted via WatchConnectivity."
       )
-      #expect(
-        error.recoverySuggestion == "Use only property list types in message dictionaries."
-      )
+      let payloadUnsupportedSuggestion =
+        "Use only property list types in message dictionaries."
+      #expect(error.recoverySuggestion == payloadUnsupportedSuggestion)
     #else
       Issue.record("WatchConnectivity not available on this platform")
     #endif

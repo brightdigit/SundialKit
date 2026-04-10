@@ -34,18 +34,8 @@
 
     while Date() < deadline {
       attempts += 1
-      // Yield to allow pending tasks to execute before checking condition
       await Task.yield()
       if await condition() {
-        let elapsed = Date().timeIntervalSince(startTime)
-        if elapsed > 1.0 {
-          // Log if it took more than 1 second
-          if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
-            SundialLogger.test.debug(
-              "waitUntil: condition met after \(elapsed)s (\(attempts) attempts)"
-            )
-          }
-        }
         return
       }
       try await Task.sleep(forMilliseconds: pollInterval)
@@ -53,8 +43,12 @@
 
     let elapsed = Date().timeIntervalSince(startTime)
     if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
-      SundialLogger.test.debug("waitUntil: timeout after \(elapsed)s (\(attempts) attempts)")
+      SundialLogger.test.debug(
+        "waitUntil: timeout after \(elapsed)s (\(attempts) attempts)"
+      )
     }
-    Issue.record("Timeout waiting for condition after \(elapsed)s (\(attempts) attempts)")
+    Issue.record(
+      "Timeout waiting for condition after \(elapsed)s (\(attempts) attempts)"
+    )
   }
 #endif

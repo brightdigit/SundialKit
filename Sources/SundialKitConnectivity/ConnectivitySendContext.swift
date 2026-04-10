@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -94,7 +94,8 @@ extension ConnectivitySendContext {
   ///   - result: The result of sending a message
   ///   - transport: The transport mechanism used (defaults to `.dictionary`)
   public init(
-    _ result: Result<ConnectivityMessage, any Error>, transport: MessageTransport = .dictionary
+    _ result: Result<ConnectivityMessage, any Error>,
+    transport: MessageTransport = .dictionary
   ) {
     switch result {
     case .success(let message):

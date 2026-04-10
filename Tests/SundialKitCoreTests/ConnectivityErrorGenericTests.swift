@@ -55,9 +55,9 @@ struct ConnectivityErrorGenericTests {
       let error = ConnectivityError.genericErrorCode(999)
 
       #expect(error.errorDescription == "Connectivity error: 999")
-      #expect(
-        error.failureReason == "An unexpected error occurred during the connectivity operation."
-      )
+      let genericReason =
+        "An unexpected error occurred during the connectivity operation."
+      #expect(error.failureReason == genericReason)
       #expect(
         error.recoverySuggestion
           == "Check the underlying error for more details and try the operation again."

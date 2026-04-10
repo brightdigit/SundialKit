@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -40,7 +40,8 @@ extension ConnectivityError {
     internal static let sessionNotActivated = LocalizedInfo(
       description: "The connectivity session has not been activated.",
       reason: "The session must be activated before sending or receiving messages.",
-      suggestion: "Call activate() on the connectivity manager before using messaging features."
+      suggestion:
+        "Call activate() on the connectivity manager before using messaging features."
     )
 
     internal static let sessionInactive = LocalizedInfo(
@@ -52,7 +53,8 @@ extension ConnectivityError {
     internal static let deviceNotPaired = LocalizedInfo(
       description: "No companion device is paired.",
       reason: "This device is not paired with a companion device.",
-      suggestion: "Pair an Apple Watch with this iPhone or an iPhone with this Apple Watch."
+      suggestion:
+        "Pair an Apple Watch with this iPhone or an iPhone with this Apple Watch."
     )
 
     internal static let companionAppNotInstalled = LocalizedInfo(
@@ -63,9 +65,11 @@ extension ConnectivityError {
 
     internal static let notReachable = LocalizedInfo(
       description: "The counterpart device is not currently reachable.",
-      reason: "The device may be out of range, powered off, or the app may not be running.",
+      reason:
+        "The device may be out of range, powered off, or the app may not be running.",
       suggestion:
-        "Ensure both devices are powered on, within range, and the app is running on the counterpart."
+        "Ensure both devices are powered on, within range,"
+        + " and the app is running on the counterpart."
     )
 
     internal static let messageReplyFailed = LocalizedInfo(
@@ -81,25 +85,29 @@ extension ConnectivityError {
       description: "The message reply timed out.",
       reason: "The counterpart did not respond within the timeout period.",
       suggestion:
-        "Try sending the message again. Consider checking if the counterpart is responsive."
+        "Try sending the message again."
+        + " Consider checking if the counterpart is responsive."
     )
 
     internal static let invalidParameter = LocalizedInfo(
       description: "Invalid parameter provided to connectivity operation.",
       reason: "One or more parameters do not meet the required format or constraints.",
       suggestion:
-        "Ensure all message data uses property list types (String, Number, Date, Data, Array, Dictionary)."
+        "Ensure all message data uses property list types"
+        + " (String, Number, Date, Data, Array, Dictionary)."
     )
 
     internal static let payloadTooLarge = LocalizedInfo(
       description: "The message payload exceeds the maximum size limit.",
       reason: "The data exceeds WatchConnectivity's transfer size limits.",
-      suggestion: "Reduce the message size or split the data into multiple smaller messages."
+      suggestion:
+        "Reduce the message size or split the data into multiple smaller messages."
     )
 
     internal static let payloadUnsupportedTypes = LocalizedInfo(
       description: "The message payload contains unsupported types.",
-      reason: "The message contains types that cannot be transmitted via WatchConnectivity.",
+      reason:
+        "The message contains types that cannot be transmitted via WatchConnectivity.",
       suggestion: "Use only property list types in message dictionaries."
     )
 
@@ -123,8 +131,11 @@ extension ConnectivityError {
 
     internal static let sessionMissingDelegate = LocalizedInfo(
       description: "The connectivity session is missing a required delegate.",
-      reason: "A delegate must be set on the WatchConnectivity session before it can be activated.",
-      suggestion: "Set a delegate on the WatchConnectivity session before calling activate()."
+      reason:
+        "A delegate must be set on the WatchConnectivity session"
+        + " before it can be activated.",
+      suggestion:
+        "Set a delegate on the WatchConnectivity session before calling activate()."
     )
 
     internal static let fileAccessDenied = LocalizedInfo(
@@ -136,13 +147,15 @@ extension ConnectivityError {
     internal static let deliveryFailed = LocalizedInfo(
       description: "Message delivery failed.",
       reason: "The message could not be delivered to the counterpart device.",
-      suggestion: "Ensure the counterpart device is reachable and try sending the message again."
+      suggestion:
+        "Ensure the counterpart device is reachable and try sending the message again."
     )
 
     internal static let watchOnlyApp = LocalizedInfo(
       description: "The app is watch-only and cannot use certain connectivity features.",
       reason:
-        "This is a watch-only app that requires a companion iOS app for full connectivity features.",
+        "This is a watch-only app that requires a companion iOS app"
+        + " for full connectivity features.",
       suggestion: "Install the companion iOS app to enable full connectivity features."
     )
 
