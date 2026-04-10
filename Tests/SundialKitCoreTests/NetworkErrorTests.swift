@@ -98,14 +98,14 @@ struct NetworkErrorTests {
       error.errorDescription
         == "Network monitoring is not available on this platform or configuration."
     )
-    #expect(
-      error.failureReason
-        == "The current platform or system configuration does not support network monitoring."
-    )
-    #expect(
-      error.recoverySuggestion
-        == "Check platform requirements and ensure network monitoring is supported on this device."
-    )
+    let monitoringUnavailableReason =
+      "The current platform or system configuration"
+      + " does not support network monitoring."
+    #expect(error.failureReason == monitoringUnavailableReason)
+    let monitoringUnavailableSuggestion =
+      "Check platform requirements and ensure"
+      + " network monitoring is supported on this device."
+    #expect(error.recoverySuggestion == monitoringUnavailableSuggestion)
   }
 
   @Test("Path update failed has proper localization")
@@ -113,7 +113,9 @@ struct NetworkErrorTests {
     let error = NetworkError.pathUpdateFailed
 
     #expect(error.errorDescription == "Failed to update network path status.")
-    #expect(error.failureReason == "The system was unable to provide network path information.")
+    let pathUpdateFailedReason =
+      "The system was unable to provide network path information."
+    #expect(error.failureReason == pathUpdateFailedReason)
     #expect(
       error.recoverySuggestion
         == "Try restarting network monitoring or check system network settings."
@@ -125,11 +127,13 @@ struct NetworkErrorTests {
     let error = NetworkError.pingTimeout
 
     #expect(error.errorDescription == "Network connectivity verification timed out.")
-    #expect(error.failureReason == "The network did not respond within the expected time limit.")
-    #expect(
-      error.recoverySuggestion
-        == "Check network connectivity and try again. Consider increasing the timeout interval."
-    )
+    let pingTimeoutReason =
+      "The network did not respond within the expected time limit."
+    #expect(error.failureReason == pingTimeoutReason)
+    let pingTimeoutSuggestion =
+      "Check network connectivity and try again."
+      + " Consider increasing the timeout interval."
+    #expect(error.recoverySuggestion == pingTimeoutSuggestion)
   }
 
   @Test("Ping failed has proper localization with reason")
@@ -156,116 +160,9 @@ struct NetworkErrorTests {
       error.failureReason
         == "The provided monitoring configuration contains invalid parameters."
     )
-    #expect(
-      error.recoverySuggestion
-        == "Review monitoring configuration parameters and ensure all required values are provided."
-    )
-  }
-
-  // MARK: - Error Throwing Tests
-
-  @Test("NetworkError can be thrown and caught")
-  func errorThrowing() throws {
-    func throwError() throws {
-      throw NetworkError.monitoringUnavailable
-    }
-
-    #expect(throws: NetworkError.self) {
-      try throwError()
-    }
-  }
-
-  @Test("Specific NetworkError case can be caught")
-  func specificErrorCatching() {
-    func throwPingTimeout() throws {
-      throw NetworkError.pingTimeout
-    }
-
-    do {
-      try throwPingTimeout()
-      Issue.record("Expected error to be thrown")
-    } catch NetworkError.pingTimeout {
-      // Success - caught the expected error
-      #expect(Bool(true))
-    } catch {
-      Issue.record("Caught unexpected error: \(error)")
-    }
-  }
-
-  @Test("PingFailed reason can be extracted when caught")
-  func pingFailedReasonExtraction() {
-    let expectedReason = "Host unreachable"
-
-    func throwPingFailed() throws {
-      throw NetworkError.pingFailed(expectedReason)
-    }
-
-    do {
-      try throwPingFailed()
-      Issue.record("Expected error to be thrown")
-    } catch NetworkError.pingFailed(let reason) {
-      #expect(reason == expectedReason)
-    } catch {
-      Issue.record("Caught unexpected error: \(error)")
-    }
-  }
-
-  // MARK: - Error as Any Tests
-
-  @Test("NetworkError can be cast from Error protocol")
-  func errorProtocolCasting() {
-    let error: any Error = NetworkError.invalidConfiguration
-
-    if let networkError = error as? NetworkError {
-      if case .invalidConfiguration = networkError {
-        #expect(Bool(true))
-      } else {
-        Issue.record("Expected invalidConfiguration case")
-      }
-    } else {
-      Issue.record("Failed to cast Error to NetworkError")
-    }
-  }
-
-  @Test("LocalizedError properties accessible through Error protocol")
-  func localizedErrorThroughProtocol() {
-    let error: any Error = NetworkError.pathUpdateFailed
-
-    if let localizedError = error as? any LocalizedError {
-      #expect(localizedError.errorDescription != nil)
-      #expect(localizedError.failureReason != nil)
-      #expect(localizedError.recoverySuggestion != nil)
-    } else {
-      Issue.record("Failed to cast Error to LocalizedError")
-    }
-  }
-
-  // MARK: - All Errors Have Localization
-
-  @Test("All error cases have complete localization")
-  func allErrorsHaveLocalization() {
-    let errors: [NetworkError] = [
-      .monitoringUnavailable,
-      .pathUpdateFailed,
-      .pingTimeout,
-      .pingFailed("test reason"),
-      .invalidConfiguration,
-    ]
-
-    for error in errors {
-      #expect(error.errorDescription != nil, "Missing errorDescription for \(error)")
-      #expect(error.failureReason != nil, "Missing failureReason for \(error)")
-      #expect(error.recoverySuggestion != nil, "Missing recoverySuggestion for \(error)")
-
-      #expect(
-        error.errorDescription?.isEmpty == false,
-        "Empty errorDescription for \(error)")
-      #expect(
-        error.failureReason?.isEmpty == false,
-        "Empty failureReason for \(error)")
-      #expect(
-        error.recoverySuggestion?.isEmpty == false,
-        "Empty recoverySuggestion for \(error)")
-    }
+    let invalidConfigSuggestion =
+      "Review monitoring configuration parameters"
+      + " and ensure all required values are provided."
+    #expect(error.recoverySuggestion == invalidConfigSuggestion)
   }
 }

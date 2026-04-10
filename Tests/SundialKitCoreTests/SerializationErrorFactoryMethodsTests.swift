@@ -75,7 +75,9 @@ struct SerializationErrorFactoryMethodsTests {
     let key = "age"
     let expected = "Int"
     let actual = "String"
-    let error = SerializationError.typeMismatch(key: key, expected: expected, actual: actual)
+    let error = SerializationError.typeMismatch(
+      key: key, expected: expected, actual: actual
+    )
 
     #expect(error.kind == .typeMismatch)
     #expect(error.context.key == key)

@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -120,7 +120,9 @@ extension NetworkError: LocalizedError {
   public var failureReason: String? {
     switch self {
     case .monitoringUnavailable:
-      return "The current platform or system configuration does not support network monitoring."
+      return
+        "The current platform or system configuration"
+        + " does not support network monitoring."
     case .pathUpdateFailed:
       return "The system was unable to provide network path information."
     case .pingTimeout:
@@ -137,16 +139,20 @@ extension NetworkError: LocalizedError {
     switch self {
     case .monitoringUnavailable:
       return
-        "Check platform requirements and ensure network monitoring is supported on this device."
+        "Check platform requirements and ensure"
+        + " network monitoring is supported on this device."
     case .pathUpdateFailed:
       return "Try restarting network monitoring or check system network settings."
     case .pingTimeout:
-      return "Check network connectivity and try again. Consider increasing the timeout interval."
+      return
+        "Check network connectivity and try again."
+        + " Consider increasing the timeout interval."
     case .pingFailed:
       return "Verify network configuration and ensure the target is reachable."
     case .invalidConfiguration:
       return
-        "Review monitoring configuration parameters and ensure all required values are provided."
+        "Review monitoring configuration parameters"
+        + " and ensure all required values are provided."
     }
   }
 }

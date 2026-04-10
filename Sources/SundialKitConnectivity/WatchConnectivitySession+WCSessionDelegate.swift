@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -63,7 +63,7 @@
       )
     }
 
-    #if os(iOS)
+    #if os(iOS) || os(visionOS)
 
       internal func sessionDidBecomeInactive(_: WCSession) {
         delegate?.sessionDidBecomeInactive(self)
@@ -87,7 +87,7 @@
     internal func sessionReachabilityDidChange(_ session: WCSession) {
       if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
         SundialLogger.connectivity.debug(
-          "WCSession.sessionReachabilityDidChange fired - isReachable: \(session.isReachable)"
+          "sessionReachabilityDidChange - isReachable: \(session.isReachable)"
         )
       }
       delegate?.sessionReachabilityDidChange(self)

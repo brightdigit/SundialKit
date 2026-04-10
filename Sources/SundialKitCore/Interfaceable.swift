@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -30,7 +30,8 @@
 /// Defines an object which can be used as a path interface.
 ///
 /// This protocol is primarily used internally for converting platform-specific
-/// network interface types (like `NWInterface.InterfaceType`) to ``PathStatus/Interface`` values.
+/// network interface types (like `NWInterface.InterfaceType`)
+/// to ``PathStatus/Interface`` values.
 ///
 /// ## Overview
 ///
@@ -56,7 +57,8 @@
 /// }
 /// ```
 ///
-/// > Note: This protocol is typically not used directly by consumer code. It's implemented
+/// > Note: This protocol is typically not used directly by consumer code.
+/// > It's implemented
 /// > by SundialKitNetwork to bridge Apple's Network framework types.
 public protocol Interfaceable {
   /// Integer value which matches the ``PathStatus/Interface`` values.

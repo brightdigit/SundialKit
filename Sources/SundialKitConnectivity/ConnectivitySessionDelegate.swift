@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -30,7 +30,8 @@
 public import Foundation
 public import SundialKitCore
 
-/// Delegate protocol for receiving WatchConnectivity session lifecycle and message events.
+/// Delegate protocol for receiving WatchConnectivity session
+/// lifecycle and message events.
 ///
 /// Implement this protocol to receive callbacks about session activation, state changes,
 /// and message delivery from a `ConnectivitySession`.

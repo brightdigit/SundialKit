@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -35,9 +35,16 @@ public import SundialKitCore
 
   @available(macOS 11.0, iOS 14.2, watchOS 7.1, tvOS 14.2, *)
   extension PathStatus.UnsatisfiedReason {
+    // MARK: - Private Types
+
+    private typealias NWReason = NWPath.UnsatisfiedReason
+    private typealias SDKReason = PathStatus.UnsatisfiedReason
+
+    // MARK: - Private Properties
+
     /// Dictionary mapping for known NWPath.UnsatisfiedReason cases
-    private static let mappings: [NWPath.UnsatisfiedReason: PathStatus.UnsatisfiedReason] = {
-      var mappings: [NWPath.UnsatisfiedReason: PathStatus.UnsatisfiedReason] = [
+    private static let mappings: [NWReason: SDKReason] = {
+      var mappings: [NWReason: SDKReason] = [
         .notAvailable: .notAvailable,
         .cellularDenied: .cellularDenied,
         .wifiDenied: .wifiDenied,
@@ -45,7 +52,7 @@ public import SundialKitCore
       ]
 
       // Add vpnInactive mapping on newer platforms where it's available
-      if #available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, *) {
+      if #available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *) {
         mappings[.vpnInactive] = .vpnInactive
       }
 

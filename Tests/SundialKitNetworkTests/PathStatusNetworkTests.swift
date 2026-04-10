@@ -38,7 +38,8 @@ internal struct PathStatusNetworkTests {
       arguments: [
         (
           NWPath.Status.satisfied, NWPath.UnsatisfiedReason.cellularDenied,
-          [PathStatus.Interface.loopback, .cellular], PathStatus.satisfied([.loopback, .cellular])
+          [PathStatus.Interface.loopback, .cellular],
+          PathStatus.satisfied([.loopback, .cellular])
         ),
         (
           NWPath.Status.requiresConnection, NWPath.UnsatisfiedReason.cellularDenied,
@@ -46,15 +47,18 @@ internal struct PathStatusNetworkTests {
         ),
         (
           NWPath.Status.unsatisfied, NWPath.UnsatisfiedReason.cellularDenied,
-          [PathStatus.Interface.loopback, .cellular], PathStatus.unsatisfied(.cellularDenied)
+          [PathStatus.Interface.loopback, .cellular],
+          PathStatus.unsatisfied(.cellularDenied)
         ),
         (
           NWPath.Status.unsatisfied, NWPath.UnsatisfiedReason.notAvailable,
-          [PathStatus.Interface.loopback, .cellular], PathStatus.unsatisfied(.notAvailable)
+          [PathStatus.Interface.loopback, .cellular],
+          PathStatus.unsatisfied(.notAvailable)
         ),
         (
           NWPath.Status.unsatisfied, NWPath.UnsatisfiedReason.localNetworkDenied,
-          [PathStatus.Interface.loopback, .cellular], PathStatus.unsatisfied(.localNetworkDenied)
+          [PathStatus.Interface.loopback, .cellular],
+          PathStatus.unsatisfied(.localNetworkDenied)
         ),
         (
           NWPath.Status.unsatisfied, NWPath.UnsatisfiedReason.wifiDenied,
@@ -69,7 +73,9 @@ internal struct PathStatusNetworkTests {
       expected: PathStatus
     ) throws {
       #if canImport(Network)
-        assertStatus(status, reason: reason, interfaces: interfaces, equalsPathStatus: expected)
+        assertStatus(
+          status, reason: reason, interfaces: interfaces, equalsPathStatus: expected
+        )
       #endif
     }
   #endif

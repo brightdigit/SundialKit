@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -33,7 +33,8 @@
   import WatchConnectivity
 
   extension WatchConnectivitySession {
-    /// Whether the counterpart device is currently reachable for immediate message delivery.
+    /// Whether the counterpart device is currently reachable
+    /// for immediate message delivery.
     public var isReachable: Bool {
       session.isReachable
     }
@@ -63,8 +64,9 @@
 
     /// The most recent application context received from the counterpart device.
     ///
-    /// This property contains the latest context dictionary sent via `updateApplicationContext(_:)`,
-    /// even if it arrived while the app was inactive. Returns `nil` if no context has been received
+    /// This property contains the latest context dictionary sent via
+    /// `updateApplicationContext(_:)`, even if it arrived while the app was inactive.
+    /// Returns `nil` if no context has been received
     /// or if the context dictionary is empty.
     public var receivedApplicationContext: ConnectivityMessage? {
       let context = session.receivedApplicationContext
@@ -100,7 +102,8 @@
       session.sendMessage(
         message as [String: Any]
       ) { response in
-        // WatchConnectivity only supports property list types which are inherently Sendable
+        // WatchConnectivity only supports property list types which are
+        // inherently Sendable
         let sendableResponse = ConnectivityMessage(forceCasting: response)
         completion(.success(sendableResponse))
       } errorHandler: { error in

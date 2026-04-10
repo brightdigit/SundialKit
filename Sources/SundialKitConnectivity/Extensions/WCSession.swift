@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -33,7 +33,7 @@
   extension WCSession {
     /// polyfill for whether the app is installed on the other device
     public var isPairedAppInstalled: Bool {
-      #if os(iOS)
+      #if os(iOS) || os(visionOS)
         return isWatchAppInstalled
       #else
         return isCompanionAppInstalled

@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -39,7 +39,8 @@
   ///
   /// ## Thread Safety
   ///
-  /// This class uses `@unchecked Sendable` with `NSLock` for synchronization. This is safe because:
+  /// This class uses `@unchecked Sendable` with `NSLock` for synchronization.
+  /// This is safe because:
   /// - The `session` property is immutable (let)
   /// - The mutable `delegate` property is protected by `delegateLock`
   /// - All delegate accesses acquire the lock before reading/writing
