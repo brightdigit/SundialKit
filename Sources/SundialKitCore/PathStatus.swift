@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -63,7 +63,8 @@ public enum PathStatus: Equatable, Sendable {
   /// - Parameter interface: The network interface that satisfies the path.
   case satisfied(Interface)
 
-  /// The path is not currently available, but establishing a new connection may activate the path.
+  /// The path is not currently available,
+  /// but establishing a new connection may activate the path.
   case requiresConnection
 
   /// Unknown status.

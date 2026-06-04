@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -37,7 +37,8 @@
 /// The typical state flow:
 /// 1. Session starts in ``notActivated``
 /// 2. After calling activate, transitions to ``activated``
-/// 3. On deactivation, transitions through ``inactive`` before returning to ``notActivated``
+/// 3. On deactivation, transitions through ``inactive``
+///    before returning to ``notActivated``
 ///
 /// ## Example
 ///
@@ -58,7 +59,8 @@ public enum ActivationState: Int, Sendable {
   /// The session is not activated.
   ///
   /// When in this state, no communication occurs between the Watch app and iOS app.
-  /// It is a programmer error to try to send data to the counterpart app while in this state.
+  /// It is a programmer error to try to send data to the counterpart app
+  /// while in this state.
   case notActivated = 0
 
   /// The session was active but is transitioning to the deactivated state.

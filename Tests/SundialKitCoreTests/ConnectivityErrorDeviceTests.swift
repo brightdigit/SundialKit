@@ -70,13 +70,14 @@ struct ConnectivityErrorDeviceTests {
     #if canImport(WatchConnectivity)
       let error = ConnectivityError.companionAppNotInstalled
 
-      #expect(
-        error.errorDescription == "The companion app is not installed on the paired device."
-      )
-      #expect(
-        error.failureReason == "The corresponding app is not installed on the paired device."
-      )
-      #expect(error.recoverySuggestion == "Install the companion app on the paired device.")
+      let companionAppDescription =
+        "The companion app is not installed on the paired device."
+      #expect(error.errorDescription == companionAppDescription)
+      let companionAppReason =
+        "The corresponding app is not installed on the paired device."
+      #expect(error.failureReason == companionAppReason)
+      let companionAppSuggestion = "Install the companion app on the paired device."
+      #expect(error.recoverySuggestion == companionAppSuggestion)
     #else
       Issue.record("WatchConnectivity not available on this platform")
     #endif
@@ -87,14 +88,17 @@ struct ConnectivityErrorDeviceTests {
     #if canImport(WatchConnectivity)
       let error = ConnectivityError.notReachable
 
-      #expect(error.errorDescription == "The counterpart device is not currently reachable.")
+      let notReachableDescription =
+        "The counterpart device is not currently reachable."
+      #expect(error.errorDescription == notReachableDescription)
       #expect(
         error.failureReason
           == "The device may be out of range, powered off, or the app may not be running."
       )
       #expect(
         error.recoverySuggestion
-          == "Ensure both devices are powered on, within range, and the app is running on the counterpart."
+          == "Ensure both devices are powered on, within range,"
+          + " and the app is running on the counterpart."
       )
     #else
       Issue.record("WatchConnectivity not available on this platform")

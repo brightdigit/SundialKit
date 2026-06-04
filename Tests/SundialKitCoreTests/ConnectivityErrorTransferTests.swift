@@ -55,10 +55,12 @@ struct ConnectivityErrorTransferTests {
       let error = ConnectivityError.transferTimedOut
 
       #expect(error.errorDescription == "The data transfer operation timed out.")
-      #expect(error.failureReason == "The transfer did not complete within the expected time.")
-      #expect(
-        error.recoverySuggestion == "Check network connectivity and try the transfer again."
-      )
+      let transferTimedOutReason =
+        "The transfer did not complete within the expected time."
+      #expect(error.failureReason == transferTimedOutReason)
+      let transferTimedOutSuggestion =
+        "Check network connectivity and try the transfer again."
+      #expect(error.recoverySuggestion == transferTimedOutSuggestion)
     #else
       Issue.record("WatchConnectivity not available on this platform")
     #endif
@@ -70,9 +72,9 @@ struct ConnectivityErrorTransferTests {
       let error = ConnectivityError.insufficientSpace
 
       #expect(error.errorDescription == "Insufficient storage space for the transfer.")
-      #expect(
-        error.failureReason == "The receiving device does not have enough available storage."
-      )
+      let insufficientSpaceReason =
+        "The receiving device does not have enough available storage."
+      #expect(error.failureReason == insufficientSpaceReason)
       #expect(
         error.recoverySuggestion
           == "Free up storage space on the receiving device and retry the transfer."
@@ -91,7 +93,9 @@ struct ConnectivityErrorTransferTests {
       #expect(
         error.failureReason == "The specified file cannot be accessed or does not exist."
       )
-      #expect(error.recoverySuggestion == "Verify the file path is correct and the file exists.")
+      let fileNotAccessibleSuggestion =
+        "Verify the file path is correct and the file exists."
+      #expect(error.recoverySuggestion == fileNotAccessibleSuggestion)
     #else
       Issue.record("WatchConnectivity not available on this platform")
     #endif

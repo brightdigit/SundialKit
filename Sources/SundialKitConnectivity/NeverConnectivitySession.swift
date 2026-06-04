@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -30,7 +30,8 @@
 public import Foundation
 public import SundialKitCore
 
-/// A no-op implementation of `ConnectivitySession` for platforms without WatchConnectivity.
+/// A no-op implementation of `ConnectivitySession` for platforms without
+/// WatchConnectivity.
 ///
 /// Used on macOS and tvOS where WatchConnectivity is not available.
 /// All operations throw or return inactive/unavailable states.

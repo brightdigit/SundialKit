@@ -3,7 +3,7 @@
 //  SundialKit
 //
 //  Created by Leo Dion.
-//  Copyright © 2025 BrightDigit.
+//  Copyright © 2026 BrightDigit.
 //
 //  Permission is hereby granted, free of charge, to any person
 //  obtaining a copy of this software and associated documentation
@@ -55,7 +55,8 @@ public enum ConnectivityReceiveContext: Sendable {
   /// Received as an interactive message with a reply handler.
   ///
   /// The associated handler should be called to send a reply back to the sender.
-  /// This corresponds to WatchConnectivity's `session(_:didReceiveMessage:replyHandler:)`.
+  /// This corresponds to WatchConnectivity's
+  /// `session(_:didReceiveMessage:replyHandler:)`.
   case replyWith(@Sendable (ConnectivityMessage) -> Void)
 
   /// Received as a one-way application context update.
