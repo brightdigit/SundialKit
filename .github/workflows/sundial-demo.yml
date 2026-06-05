@@ -31,20 +31,20 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # iOS Build - Xcode 26.4 on macOS-26
+          # iOS Build - Xcode 26.5 on macOS-26
           - type: ios
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.4.app"
+            xcode: "/Applications/Xcode_26.5.app"
             deviceName: "iPhone 17 Pro"
-            osVersion: "26.4"
+            osVersion: "26.5"
             download-platform: true
 
-          # watchOS Build - Xcode 26.4 on macOS-26
+          # watchOS Build - Xcode 26.5 on macOS-26
           - type: watchos
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.4.app"
+            xcode: "/Applications/Xcode_26.5.app"
             deviceName: "Apple Watch Ultra 3 (49mm)"
-            osVersion: "26.4"
+            osVersion: "26.5"
             download-platform: true
 
     steps:
@@ -111,7 +111,13 @@ jobs:
           working-directory: ${{ env.DEMO_PATH }}
 
       - name: Select Xcode
-        run: sudo xcode-select -s "/Applications/Xcode_26.4.app"
+        run: sudo xcode-select -s "/Applications/Xcode_26.5.app"
+
+      - name: Download iOS platform
+        run: xcodebuild -downloadPlatform iOS
+
+      - name: Download watchOS platform
+        run: xcodebuild -downloadPlatform watchOS
 
       - name: Setup SSH for AppCerts repository
         uses: webfactory/ssh-agent@v0.9.0
@@ -144,7 +150,7 @@ jobs:
           FASTLANE_KEYCHAIN_PASSWORD: ${{ steps.keychain.outputs.password }}
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
-          APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
+          APP_STORE_CONNECT_API_KEY_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_BASE64 }}
           DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
 
       - name: Upload Pulse IPA
@@ -199,7 +205,7 @@ jobs:
         env:
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
-          APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
+          APP_STORE_CONNECT_API_KEY_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_BASE64 }}
 
       - name: Increment build number and commit
         if: success()

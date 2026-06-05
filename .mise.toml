@@ -5,8 +5,8 @@ ruby = "3.3.0"
 # Swift development tools (migrated from Mint)
 # Using Swift Package Manager plugins
 "spm:swiftlang/swift-format" = "602.0.0"
-swiftlint = "0.61.0"
-"spm:peripheryapp/periphery" = "3.2.0"
+"aqua:realm/SwiftLint" = "0.62.2"
+"spm:peripheryapp/periphery" = "3.7.4"
 
 # Xcode project generation
 xcodegen = "2.43.0"
