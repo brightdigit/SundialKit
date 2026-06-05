@@ -255,7 +255,10 @@ jobs:
         swift:
           - version: "6.2"
           - version: "6.3"
-        android-api-level: [33, 34, 35, 36]
+        # API 36 dropped: Swift 6.x Android SDK lacks API-36 CRT objects
+        # (crtbegin_dynamic.o/crtend_android.o), link fails. Re-add when the
+        # SDK ships an NDK r28+ sysroot. See skiptools/swift-android-action.
+        android-api-level: [33, 34, 35]
     steps:
       - uses: actions/checkout@v6
       - name: Free disk space
