@@ -137,7 +137,7 @@ jobs:
         include:
           # SPM Build — no platform type; matrix.type evaluates to '' by design
           - runs-on: macos-26
-            xcode: "/Applications/Xcode_26.2.app"
+            xcode: "/Applications/Xcode_26.5.app"
           - runs-on: macos-26
             xcode: "/Applications/Xcode_26.1.app"
           - runs-on: macos-15
@@ -146,9 +146,9 @@ jobs:
           # iOS Build Matrix - Xcode 16.x+ (Swift 6.x)
           - type: ios
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.2.app"
+            xcode: "/Applications/Xcode_26.5.app"
             deviceName: "iPhone 17 Pro"
-            osVersion: "26.2"
+            osVersion: "26.5"
             download-platform: true
 
           - type: ios
@@ -167,9 +167,9 @@ jobs:
           # watchOS Build Matrix - Xcode 16.x+ (Swift 6.x)
           - type: watchos
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.2.app"
+            xcode: "/Applications/Xcode_26.5.app"
             deviceName: "Apple Watch Ultra 3 (49mm)"
-            osVersion: "26.2"
+            osVersion: "26.5"
             download-platform: true
 
           - type: watchos
@@ -188,9 +188,9 @@ jobs:
           # visionOS Build Matrix - Xcode 16.x+ (Swift 6.x)
           - type: visionos
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.2.app"
+            xcode: "/Applications/Xcode_26.5.app"
             deviceName: "Apple Vision Pro"
-            osVersion: "26.2"
+            osVersion: "26.5"
             download-platform: true   
 
     steps:
