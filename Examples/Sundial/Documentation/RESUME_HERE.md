@@ -18,7 +18,7 @@
 - ✅ Build scripts and documentation
 
 ### Shared UI Components (Phase 2) ✅ NEW!
-- ✅ Mint setup for swift-protobuf tools (Mintfile)
+- ✅ mise setup for swift-protobuf tools (.mise.toml)
 - ✅ Generated Swift code from .proto schemas (3 files)
 - ✅ MetricCard.swift - Reusable metric display
 - ✅ ColorPreview.swift - Color circle with metadata
@@ -59,9 +59,9 @@ Documentation/
   └── RESUME_HERE.md (this file)
 
 Scripts/
-  └── generate-protos.sh                   ✅ UPDATED (uses Mint)
+  └── generate-protos.sh                   ✅ UPDATED (uses mise)
 
-Mintfile                                    ✅ NEW!
+.mise.toml                                  ✅ NEW!
 Package.swift
 Package.resolved                            ✅ NEW!
 README.md
