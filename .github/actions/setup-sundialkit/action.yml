@@ -1,0 +1,50 @@
+name: Setup SundialKit
+description: Replaces the local SundialKit path dependency with a remote reference, pinned to the branch's current commit
+
+inputs:
+  branch:
+    description: SundialKit branch to use (leave empty to keep the local path dependency)
+
+runs:
+  using: composite
+  steps:
+    # Resolve the branch to its current HEAD commit and pin the dependency by
+    # `revision:` rather than `branch:`. This makes the dependency content-addressed,
+    # so `swift package dump-package` (which swift-build@v1 hashes for its cache key)
+    # changes whenever the SundialKit branch advances — otherwise a new SundialKit commit
+    # on the same branch yields a stale cache hit and is never rebuilt. Falls back to a
+    # `branch:` pin if the ref can't be resolved (e.g. offline).
+    - name: Update Package.swift (Unix)
+      if: inputs.branch != '' && runner.os != 'Windows'
+      shell: bash
+      run: |
+        BRANCH='${{ inputs.branch }}'
+        REF=$(git ls-remote https://github.com/brightdigit/SundialKit.git "$BRANCH" | head -n1 | cut -f1)
+        if [ -n "$REF" ]; then
+          REQ='revision: "'"$REF"'"'
+          echo "Pinning SundialKit to $BRANCH @ $REF"
+        else
+          REQ='branch: "'"$BRANCH"'"'
+          echo "Could not resolve $BRANCH to a commit; pinning by branch"
+        fi
+        if [ "$RUNNER_OS" = "macOS" ]; then
+          sed -i '' 's|\.package(name: "SundialKit", path: "\.\./SundialKit")|.package(url: "https://github.com/brightdigit/SundialKit.git", '"$REQ"')|g' Package.swift
+        else
+          sed -i 's|\.package(name: "SundialKit", path: "\.\./SundialKit")|.package(url: "https://github.com/brightdigit/SundialKit.git", '"$REQ"')|g' Package.swift
+        fi
+        rm -f Package.resolved
+    - name: Update Package.swift (Windows)
+      if: inputs.branch != '' && runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $branch = '${{ inputs.branch }}'
+        $ref = (git ls-remote https://github.com/brightdigit/SundialKit.git $branch | Select-Object -First 1) -split "`t" | Select-Object -First 1
+        if ($ref) {
+          $req = "revision: `"$ref`""
+          Write-Host "Pinning SundialKit to $branch @ $ref"
+        } else {
+          $req = "branch: `"$branch`""
+          Write-Host "Could not resolve $branch to a commit; pinning by branch"
+        }
+        (Get-Content Package.swift) -replace '\.package\(name: "SundialKit", path: "\.\./SundialKit"\)', ".package(url: `"https://github.com/brightdigit/SundialKit.git`", $req)" | Set-Content Package.swift
+        Remove-Item -Path Package.resolved -Force -ErrorAction SilentlyContinue
