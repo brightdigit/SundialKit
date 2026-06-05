@@ -23,42 +23,25 @@ OUTPUT_DIR="$PROJECT_DIR/Sources/Shared/Generated"
 
 echo -e "${GREEN}Generating Swift code from Protocol Buffers...${NC}"
 
-# Detect OS and set Mint path
-if [ "$(uname)" = "Darwin" ]; then
-    DEFAULT_MINT_PATH="/opt/homebrew/bin/mint"
-elif [ "$(uname)" = "Linux" ] && [ -n "$GITHUB_ACTIONS" ]; then
-    DEFAULT_MINT_PATH="$GITHUB_WORKSPACE/Mint/.mint/bin/mint"
-elif [ "$(uname)" = "Linux" ]; then
-    DEFAULT_MINT_PATH="/usr/local/bin/mint"
-else
-    echo -e "${RED}Unsupported operating system${NC}"
+# Check if mise is installed
+if ! command -v mise &> /dev/null; then
+    echo -e "${RED}Error: mise not found${NC}"
+    echo "Install mise: https://mise.jdx.dev/getting-started.html"
     exit 1
 fi
 
-# Use environment MINT_CMD if set, otherwise use default path
-MINT_CMD=${MINT_CMD:-$DEFAULT_MINT_PATH}
+# Install pinned tools (reads .mise.toml). swift-protobuf provides both
+# protoc and the protoc-gen-swift plugin, so no system protoc is required.
+echo "Installing swift-protobuf via mise..."
+(cd "$PROJECT_DIR" && mise install)
 
-# Check if Mint is installed
-if ! command -v "$MINT_CMD" &> /dev/null; then
-    echo -e "${RED}Error: Mint not found at $MINT_CMD${NC}"
-    echo "Install with: brew install mint"
-    exit 1
-fi
+# Expose the mise-managed bin dir (contains protoc and protoc-gen-swift)
+PLUGIN_DIR="$( cd "$PROJECT_DIR" && dirname "$(mise which protoc-gen-swift)" )"
 
-# Set up Mint environment
-export MINT_PATH="$PROJECT_DIR/.mint"
-MINT_ARGS="-n -m $PROJECT_DIR/Mintfile --silent"
-MINT_RUN="$MINT_CMD run $MINT_ARGS"
-
-# Bootstrap Mint packages
-echo "Installing swift-protobuf via Mint..."
-$MINT_CMD bootstrap -m "$PROJECT_DIR/Mintfile"
-
-# Check if protoc is installed
-if ! command -v protoc &> /dev/null; then
-    echo -e "${RED}Error: protoc not found${NC}"
-    echo "Install with: brew install protobuf"
-    echo "Or download from: https://github.com/protocolbuffers/protobuf/releases"
+# Verify protoc is available via mise
+if [ ! -x "$PLUGIN_DIR/protoc" ]; then
+    echo -e "${RED}Error: protoc not found in mise tools at $PLUGIN_DIR${NC}"
+    echo "Ensure swift-protobuf is installed: (cd $PROJECT_DIR && mise install)"
     exit 1
 fi
 
@@ -70,10 +53,10 @@ echo "Input:  $PROTO_DIR"
 echo "Output: $OUTPUT_DIR"
 echo ""
 
-# Run protoc with Mint-managed plugin in PATH
-# Mint installs protoc-gen-swift to .mint/bin/ which protoc will find via PATH
+# Run protoc with the mise-managed plugin in PATH
+# protoc discovers protoc-gen-swift via PATH
 # Visibility=Public ensures generated types are accessible from other modules
-PATH="$MINT_PATH/bin:$PATH" protoc \
+PATH="$PLUGIN_DIR:$PATH" protoc \
   --swift_out=Visibility=Public:"$OUTPUT_DIR" \
   --proto_path="$PROTO_DIR" \
   "$PROTO_DIR"/*.proto

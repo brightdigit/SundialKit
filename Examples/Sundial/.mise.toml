@@ -1,0 +1,6 @@
+[tools]
+# Protocol Buffer Swift plugin (migrated from Mint)
+"spm:apple/swift-protobuf" = "1.38.0"
+
+[settings]
+experimental = true
