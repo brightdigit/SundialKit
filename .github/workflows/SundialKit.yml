@@ -175,8 +175,8 @@ jobs:
           - type: watchos
             runs-on: macos-26
             xcode: "/Applications/Xcode_26.1.app"
-            deviceName: "Apple Watch Ultra 3 (49mm)"
-            osVersion: "26.0"
+            deviceName: "Apple Watch Series 11 (46mm)"
+            osVersion: "26.1"
             download-platform: true
 
           - type: watchos
