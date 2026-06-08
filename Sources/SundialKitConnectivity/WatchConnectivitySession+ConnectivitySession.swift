@@ -142,6 +142,11 @@
       guard WCSession.isSupported() else {
         throw SundialError.sessionNotSupported
       }
+      // Register as the WCSession delegate here (not in `init`) so only the
+      // activated instance owns `WCSession.default`'s delegate. This prevents
+      // throwaway instances — e.g. created by SwiftUI re-evaluating a `@State`
+      // autoclosure — from hijacking delivery from the real instance.
+      session.delegate = self
       session.activate()
     }
   }

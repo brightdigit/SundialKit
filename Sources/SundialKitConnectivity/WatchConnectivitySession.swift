@@ -71,7 +71,11 @@
     internal init(session: WCSession) {
       self.session = session
       super.init()
-      session.delegate = self
+      // The WCSession delegate is registered in `activate()`, not here, so that
+      // constructing a `WatchConnectivitySession` has no global side effect. A
+      // throwaway instance (e.g. one created then immediately discarded by a
+      // SwiftUI `@State` autoclosure re-evaluation) must not hijack
+      // `WCSession.default`'s delegate from the active, activated instance.
     }
 
     override public convenience init() {
