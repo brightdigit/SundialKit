@@ -102,6 +102,11 @@
       let sendableMessage = ConnectivityMessage(forceCasting: message)
       let handler = unsafeBitCast(replyHandler, to: ConnectivityHandler.self)
       delegate?.session(self, didReceiveMessage: sendableMessage, replyHandler: handler)
+      // Auto-acknowledge so the sender's reply-expecting `sendMessage` completes
+      // immediately instead of timing out (WCErrorDomain 7012). Mirrors the binary
+      // `didReceiveMessageData` path's `replyHandler(Data())`. Consumers needing to
+      // send a real reply are not supported on this path.
+      replyHandler([:])
     }
 
     internal func session(
