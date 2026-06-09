@@ -100,13 +100,27 @@
     ) {
       // WatchConnectivity only supports property list types which are inherently Sendable
       let sendableMessage = ConnectivityMessage(forceCasting: message)
-      let handler = unsafeBitCast(replyHandler, to: ConnectivityHandler.self)
+      // Guard the WCSession reply handler so it can fire at most once. The same
+      // closure is handed to the delegate *and* auto-acknowledged below; a delegate
+      // that actually replies (e.g. via `ConnectivityReceiveContext.replyWith`) would
+      // otherwise invoke `replyHandler` twice, which is undefined behavior on the
+      // sender side.
+      var replied = false
+      let safeReply: ([String: Any]) -> Void = { response in
+        guard !replied else {
+          return
+        }
+        replied = true
+        replyHandler(response)
+      }
+      let handler = unsafeBitCast(safeReply, to: ConnectivityHandler.self)
       delegate?.session(self, didReceiveMessage: sendableMessage, replyHandler: handler)
       // Auto-acknowledge so the sender's reply-expecting `sendMessage` completes
-      // immediately instead of timing out (WCErrorDomain 7012). Mirrors the binary
-      // `didReceiveMessageData` path's `replyHandler(Data())`. Consumers needing to
-      // send a real reply are not supported on this path.
-      replyHandler([:])
+      // immediately instead of timing out (WCErrorDomain 7012). Skipped if the
+      // delegate already replied. Mirrors the binary `didReceiveMessageData` path.
+      if !replied {
+        replyHandler([:])
+      }
     }
 
     internal func session(
@@ -141,9 +155,23 @@
       didReceiveMessageData messageData: Data,
       replyHandler: @escaping (Data) -> Void
     ) {
-      let handler = unsafeBitCast(replyHandler, to: (@Sendable (Data) -> Void).self)
+      // Guard the WCSession reply handler so it can fire at most once. Unlike the
+      // dictionary path, the `ConnectivityDelegateHandling` bridge forwards this
+      // handler to consumers, so a delegate that replies plus the unconditional
+      // auto-acknowledgment below would invoke `replyHandler` twice.
+      var replied = false
+      let safeReply: (Data) -> Void = { response in
+        guard !replied else {
+          return
+        }
+        replied = true
+        replyHandler(response)
+      }
+      let handler = unsafeBitCast(safeReply, to: (@Sendable (Data) -> Void).self)
       delegate?.session(self, didReceiveMessageData: messageData, replyHandler: handler)
-      replyHandler(Data())
+      if !replied {
+        replyHandler(Data())
+      }
     }
   }
 
