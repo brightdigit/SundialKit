@@ -5,7 +5,7 @@ import PackageDescription
 internal let package = Package(
   name: "Sundial",
   platforms: [
-    // Raised to satisfy the SundialKitStream `1.0.0-alpha.3` tag, whose
+    // Raised to satisfy the SundialKitStream `bitness-v0.0.8` branch, whose
     // SundialKitContext layer the demo depends on (iOS 18 / watchOS 11 / macOS 15).
     .iOS(.v18),
     .watchOS(.v11),
@@ -45,10 +45,11 @@ internal let package = Package(
       from: "1.0.0-alpha.1"
     ),
     // SundialKitStream plugin — also vends the SundialKitContext
-    // (`ContextEngine`) product the Stream demo uses.
+    // (`ContextEngine`) product the Stream demo uses. Pinned to the
+    // `bitness-v0.0.8` branch (swap for `path: "../SundialKitStream"` locally).
     .package(
       url: "https://github.com/brightdigit/SundialKitStream.git",
-      from: "1.0.0-alpha.3"
+      branch: "bitness-v0.0.8"
     )
   ],
   targets: [
