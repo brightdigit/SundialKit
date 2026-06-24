@@ -23,20 +23,12 @@ settings:
     SWIFT_VERSION: "6.1"
     ENABLE_USER_SCRIPT_SANDBOXING: NO
 
-# Reference the local Swift Package
+# Reference the local Swift Package. Its Package.swift pins SundialKitStream to
+# the atleast-beta.6 branch (which ships SundialKitStreamContext) and pulls in the
+# SundialKit* products transitively, so the app targets only need SundialDemoStream.
 packages:
   Sundial:
     path: .
-  # Declared directly so the SundialStream app target can link SundialKitCore /
-  # SundialKitConnectivity products. Resolution is driven to the atleast-beta.6
-  # branch by SundialKitStream below.
-  SundialKit:
-    url: https://github.com/brightdigit/SundialKit.git
-    from: 2.0.0-alpha.1
-  # The branch that ships the SundialKitStreamContext (`ContextEngine`) product.
-  SundialKitStream:
-    url: https://github.com/brightdigit/SundialKitStream.git
-    branch: atleast-beta.6
 
 targets:
   # MARK: - Combine iOS App
@@ -160,16 +152,6 @@ targets:
     dependencies:
       - package: Sundial
         product: SundialDemoStream
-      - package: Sundial
-        product: SundialDemoShared
-      - package: SundialKit
-        product: SundialKitCore
-      - package: SundialKit
-        product: SundialKitConnectivity
-      - package: SundialKitStream
-        product: SundialKitStream
-      - package: SundialKitStream
-        product: SundialKitStreamContext
       - target: SundialStream-watchOS
         embed: true
     info:
@@ -228,16 +210,6 @@ targets:
     dependencies:
       - package: Sundial
         product: SundialDemoStream
-      - package: Sundial
-        product: SundialDemoShared
-      - package: SundialKit
-        product: SundialKitCore
-      - package: SundialKit
-        product: SundialKitConnectivity
-      - package: SundialKitStream
-        product: SundialKitStream
-      - package: SundialKitStream
-        product: SundialKitStreamContext
     info:
       path: Resources/watchOS/Info-Stream.plist
       properties:

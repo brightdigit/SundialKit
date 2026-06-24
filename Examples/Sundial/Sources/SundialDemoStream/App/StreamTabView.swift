@@ -47,6 +47,15 @@ public struct StreamTabView: View {
 
   public var body: some View {
     TabView {
+      #if os(iOS) || os(watchOS)
+        if #available(iOS 18.0, watchOS 11.0, *) {
+          StreamContextView()
+            .tabItem {
+              Label("Context Sync", systemImage: "circle.hexagongrid.fill")
+            }
+        }
+      #endif
+
       StreamMessageLabView()
         .tabItem {
           Label("Transport", systemImage: "arrow.left.arrow.right")

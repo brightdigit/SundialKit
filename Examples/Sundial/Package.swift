@@ -90,7 +90,10 @@ let package = Package(
       name: "SundialDemoStream",
       dependencies: [
         "SundialDemoShared",
-        .product(name: "SundialKitStream", package: "SundialKitStream")
+        .product(name: "SundialKitCore", package: "SundialKit"),
+        .product(name: "SundialKitConnectivity", package: "SundialKit"),
+        .product(name: "SundialKitStream", package: "SundialKitStream"),
+        .product(name: "SundialKitStreamContext", package: "SundialKitStream")
       ],
       path: "Sources/SundialDemoStream",
       swiftSettings: [
