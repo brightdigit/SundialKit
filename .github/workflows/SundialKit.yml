@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - main
-      - atleast-beta.6
     tags:
       - 'v[0-9]*.[0-9]*.[0-9]*'
     paths-ignore:
@@ -12,10 +11,6 @@ on:
       - 'LICENSE'
       - '.github/ISSUE_TEMPLATE/**'
   pull_request:
-    branches:
-      - main
-      - 'v[0-9]*.[0-9]*.[0-9]*'
-      - atleast-beta.6
     paths-ignore:
       - '**.md'
       - 'Docs/**'

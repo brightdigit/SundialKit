@@ -17,8 +17,10 @@ import SwiftUI
 /// - Actor-based ConnectivityObserver
 /// - AsyncStream for reactive state
 /// - @Observable instead of Combine
+/// - SundialKitStreamContext's `ContextEngine` for reliable snapshot sync
+///   (the leading "Context Sync" tab of `StreamTabView`)
 /// - Swift 6.1 strict concurrency compliant
-@available(iOS 17.0, watchOS 10.0, *)
+@available(iOS 18.0, watchOS 11.0, *)
 @main
 struct SundialStreamAppMain: App {
   var body: some Scene {

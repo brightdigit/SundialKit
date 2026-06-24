@@ -5,9 +5,11 @@ import PackageDescription
 let package = Package(
   name: "Sundial",
   platforms: [
-    .iOS(.v16),
-    .watchOS(.v9),
-    .macOS(.v13)
+    // Raised to satisfy the SundialKitStream `atleast-beta.6` branch, which the
+    // SundialKitStreamContext demo depends on (iOS 18 / watchOS 11 / macOS 15).
+    .iOS(.v18),
+    .watchOS(.v11),
+    .macOS(.v15)
   ],
   products: [
     // Shared library used by both variants
@@ -42,10 +44,11 @@ let package = Package(
       url: "https://github.com/brightdigit/SundialKitCombine.git",
       from: "1.0.0-alpha.1"
     ),
-    // SundialKitStream plugin
+    // SundialKitStream plugin — pinned to the branch that adds the
+    // SundialKitStreamContext (`ContextEngine`) product, not yet released.
     .package(
       url: "https://github.com/brightdigit/SundialKitStream.git",
-      from: "1.0.0-alpha.1"
+      branch: "atleast-beta.6"
     )
   ],
   targets: [
@@ -87,7 +90,10 @@ let package = Package(
       name: "SundialDemoStream",
       dependencies: [
         "SundialDemoShared",
-        .product(name: "SundialKitStream", package: "SundialKitStream")
+        .product(name: "SundialKitCore", package: "SundialKit"),
+        .product(name: "SundialKitConnectivity", package: "SundialKit"),
+        .product(name: "SundialKitStream", package: "SundialKitStream"),
+        .product(name: "SundialKitStreamContext", package: "SundialKitStream")
       ],
       path: "Sources/SundialDemoStream",
       swiftSettings: [
