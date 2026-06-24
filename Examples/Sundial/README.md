@@ -16,7 +16,7 @@ Examples/Sundial/
 ├── Sources/
 │   ├── Shared/                      # Common code for both variants
 │   │   ├── Models/
-│   │   │   ├── ProtoExtensions.swift      # BinaryMessagable conformance
+│   │   │   ├── *Extensions.swift          # Per-message BinaryMessagable conformances
 │   │   │   ├── LatencyTracker.swift       # Latency measurement tracking
 │   │   │   └── TransportMethod.swift      # Transport method enumeration
 │   │   ├── Views/                   # Reusable SwiftUI components
@@ -66,16 +66,15 @@ Examples/Sundial/
 The protobuf schemas need to be compiled to Swift before building:
 
 ```bash
-# Install protoc if needed
-brew install protobuf swift-protobuf
-
-# Generate Swift code from .proto files
+# Generate Swift code from the .proto files
 cd Examples/Sundial
-protoc \
-  --swift_out=Sources/Shared/Generated \
-  --proto_path=Protos \
-  Protos/*.proto
+./Scripts/generate-protos.sh
 ```
+
+`Scripts/generate-protos.sh` is the supported path: it uses [mise](https://mise.jdx.dev/) to
+provide `protoc` + the swift-protobuf plugin and passes `--swift_out=Visibility=Public:` so the
+generated types are `public`. Running `protoc` by hand without the `Visibility=Public:` prefix
+produces `internal` types, which then fail the cross-module build.
 
 This generates:
 - `color_message.pb.swift`
@@ -107,7 +106,7 @@ No wrappers needed - direct conformance!
 - Swift 6.1+
 - iOS 16.0+ Simulator or Device
 - watchOS 9.0+ Simulator or Device
-- Protocol Buffer Compiler (protoc)
+- [mise](https://mise.jdx.dev/) — provides `protoc` + swift-protobuf for `Scripts/generate-protos.sh`
 
 ### Build Steps
 
