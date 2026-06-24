@@ -1,8 +1,12 @@
 name: Sundial Demo Apps
 on:
   push:
-    branches-ignore:
-      - '*WIP'
+    branches:
+      - main
+    paths:
+      - 'Examples/Sundial/**'
+      - '.github/workflows/sundial-demo.yml'
+  pull_request:
     paths:
       - 'Examples/Sundial/**'
       - '.github/workflows/sundial-demo.yml'
