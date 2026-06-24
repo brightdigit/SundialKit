@@ -3,8 +3,8 @@ name: Sundial
 options:
   bundleIdPrefix: com.brightdigit.sundial
   deploymentTarget:
-    iOS: "16.0"
-    watchOS: "9.0"
+    iOS: "18.0"
+    watchOS: "11.0"
   developmentLanguage: en
   xcodeVersion: "16.0"
   createIntermediateGroups: true
@@ -27,6 +27,16 @@ settings:
 packages:
   Sundial:
     path: .
+  # Declared directly so the SundialStream app target can link SundialKitCore /
+  # SundialKitConnectivity products. Resolution is driven to the atleast-beta.6
+  # branch by SundialKitStream below.
+  SundialKit:
+    url: https://github.com/brightdigit/SundialKit.git
+    from: 2.0.0-alpha.1
+  # The branch that ships the SundialKitStreamContext (`ContextEngine`) product.
+  SundialKitStream:
+    url: https://github.com/brightdigit/SundialKitStream.git
+    branch: atleast-beta.6
 
 targets:
   # MARK: - Combine iOS App
@@ -35,7 +45,7 @@ targets:
     type: application
     platform: iOS
     deploymentTarget:
-      iOS: "16.0"
+      iOS: "18.0"
     sources:
       - path: Apps/SundialCombine
       - path: Resources/iOS/Sundial-Pulse.icon
@@ -93,7 +103,7 @@ targets:
     type: application
     platform: watchOS
     deploymentTarget:
-      watchOS: "9.0"
+      watchOS: "11.0"
     sources:
       - path: Apps/SundialCombine
       - path: Resources/watchOS/Sundial-Pulse.icon
@@ -140,7 +150,7 @@ targets:
     type: application
     platform: iOS
     deploymentTarget:
-      iOS: "17.0"
+      iOS: "18.0"
     sources:
       - path: Apps/SundialStream
       - path: Resources/iOS/Sundial-Flow.icon
@@ -150,6 +160,16 @@ targets:
     dependencies:
       - package: Sundial
         product: SundialDemoStream
+      - package: Sundial
+        product: SundialDemoShared
+      - package: SundialKit
+        product: SundialKitCore
+      - package: SundialKit
+        product: SundialKitConnectivity
+      - package: SundialKitStream
+        product: SundialKitStream
+      - package: SundialKitStream
+        product: SundialKitStreamContext
       - target: SundialStream-watchOS
         embed: true
     info:
@@ -198,7 +218,7 @@ targets:
     type: application
     platform: watchOS
     deploymentTarget:
-      watchOS: "10.0"
+      watchOS: "11.0"
     sources:
       - path: Apps/SundialStream
       - path: Resources/watchOS/Sundial-Flow.icon
@@ -208,6 +228,16 @@ targets:
     dependencies:
       - package: Sundial
         product: SundialDemoStream
+      - package: Sundial
+        product: SundialDemoShared
+      - package: SundialKit
+        product: SundialKitCore
+      - package: SundialKit
+        product: SundialKitConnectivity
+      - package: SundialKitStream
+        product: SundialKitStream
+      - package: SundialKitStream
+        product: SundialKitStreamContext
     info:
       path: Resources/watchOS/Info-Stream.plist
       properties:
