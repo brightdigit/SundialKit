@@ -65,79 +65,11 @@ extension MessageLabViewModel {
   }
 
   internal func buildColorMessage() throws -> Sundial_Demo_ColorMessage {
-    let components = selectedColor.rgbaComponents
-
-    var message = Sundial_Demo_ColorMessage()
-    message.red = Float(components.red)
-    message.green = Float(components.green)
-    message.blue = Float(components.blue)
-    message.alpha = Float(components.alpha)
-    message.timestampMs = Date().millisecondsSince1970
-
-    return message
+    Sundial_Demo_ColorMessage.make(from: selectedColor)
   }
 
   internal func buildComplexMessage() throws -> Sundial_Demo_ComplexMessage {
-    var message = Sundial_Demo_ComplexMessage()
-    message.color = buildColorComponent()
-    message.deviceInfo = buildDeviceInfo()
-    message.colorHistory = buildColorHistory()
-    message.sensors = buildSensorData()
-    message.messageID = "msg_\(UUID().uuidString.prefix(8))"
-    message.createdAtMs = Date().millisecondsSince1970
-
-    return message
-  }
-
-  private func buildColorComponent() -> Sundial_Demo_ColorMessage {
-    let components = selectedColor.rgbaComponents
-
-    var primaryColor = Sundial_Demo_ColorMessage()
-    primaryColor.red = Float(components.red)
-    primaryColor.green = Float(components.green)
-    primaryColor.blue = Float(components.blue)
-    primaryColor.alpha = Float(components.alpha)
-    primaryColor.timestampMs = Date().millisecondsSince1970
-    return primaryColor
-  }
-
-  private func buildDeviceInfo() -> Sundial_Demo_ComplexMessage.DeviceInfo {
-    var deviceInfo = Sundial_Demo_ComplexMessage.DeviceInfo()
-    #if os(iOS)
-      deviceInfo.deviceID = "iOS-Device"
-    #elseif os(watchOS)
-      deviceInfo.deviceID = "watchOS-Device"
-    #else
-      deviceInfo.deviceID = "Unknown-Device"
-    #endif
-    deviceInfo.osVersion = "17.0"
-    deviceInfo.appVersion = "1.0.0"
-    deviceInfo.locale = Locale.current.identifier
-    deviceInfo.bootTimeMs = Date().millisecondsSince1970
-    return deviceInfo
-  }
-
-  private func buildColorHistory() -> [Sundial_Demo_ColorMessage] {
-    (0..<3).map { _ in
-      var historyColor = Sundial_Demo_ColorMessage()
-      historyColor.red = Float.random(in: 0...1)
-      historyColor.green = Float.random(in: 0...1)
-      historyColor.blue = Float.random(in: 0...1)
-      historyColor.alpha = 1.0
-      historyColor.timestampMs = Date().millisecondsSince1970
-      return historyColor
-    }
-  }
-
-  private func buildSensorData() -> [Sundial_Demo_ComplexMessage.SensorData] {
-    (0..<5).map { _ in
-      var sensor = Sundial_Demo_ComplexMessage.SensorData()
-      sensor.temperature = Float.random(in: -10...40)  // Celsius
-      sensor.humidity = Float.random(in: 0...100)      // Percentage
-      sensor.pressure = Float.random(in: 980...1_050)  // hPa
-      sensor.readingTimeMs = Date().millisecondsSince1970
-      return sensor
-    }
+    Sundial_Demo_ComplexMessage.make(color: selectedColor)
   }
 
   // MARK: - Send Result Handling

@@ -39,13 +39,17 @@
     }
 
     internal init(from parameters: [String: any Sendable]) throws {
-      guard
-        let red = parameters[Key.red.rawValue] as? Double,
-        let green = parameters[Key.green.rawValue] as? Double,
-        let blue = parameters[Key.blue.rawValue] as? Double,
-        let alpha = parameters[Key.alpha.rawValue] as? Double
-      else {
+      guard let red = parameters[Key.red.rawValue] as? Double else {
         throw SerializationError.missingField(Key.red.rawValue)
+      }
+      guard let green = parameters[Key.green.rawValue] as? Double else {
+        throw SerializationError.missingField(Key.green.rawValue)
+      }
+      guard let blue = parameters[Key.blue.rawValue] as? Double else {
+        throw SerializationError.missingField(Key.blue.rawValue)
+      }
+      guard let alpha = parameters[Key.alpha.rawValue] as? Double else {
+        throw SerializationError.missingField(Key.alpha.rawValue)
       }
 
       self.init(
@@ -66,7 +70,7 @@
       if let int = value as? Int, int >= 0 {
         return UInt64(int)
       }
-      if let double = value as? Double, double >= 0 {
+      if let double = value as? Double, double >= 0, double <= Double(UInt64.max) {
         return UInt64(double)
       }
       return 0

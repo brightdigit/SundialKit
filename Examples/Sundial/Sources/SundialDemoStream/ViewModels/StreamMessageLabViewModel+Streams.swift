@@ -27,7 +27,7 @@ extension StreamMessageLabViewModel {
       let paired = true
     #endif
 
-    if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+    logIfAvailable {
       DemoLogger.shared.debug("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
       DemoLogger.shared.debug("INITIAL STATE (500ms after activation)")
       DemoLogger.shared.debug("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
@@ -50,7 +50,7 @@ extension StreamMessageLabViewModel {
 
   internal func consumeTypedMessages() async {
     for await message in await connectivityObserver.typedMessageStream() {
-      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+      logIfAvailable {
         DemoLogger.shared.debug(
           "Received typed message: \(String(describing: type(of: message)))"
         )
@@ -61,16 +61,14 @@ extension StreamMessageLabViewModel {
 
   internal func consumeReachability() async {
     for await reachable in await connectivityObserver.reachabilityUpdates() {
-      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
-        DemoLogger.shared.info("Reachability changed: \(reachable)")
-      }
+      logIfAvailable { DemoLogger.shared.info("Reachability changed: \(reachable)") }
       isReachable = reachable
     }
   }
 
   internal func consumeActivationState() async {
     for await state in await connectivityObserver.activationStates() {
-      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+      logIfAvailable {
         DemoLogger.shared.info("Activation state changed: \(String(describing: state))")
       }
       activationState = state
@@ -80,9 +78,7 @@ extension StreamMessageLabViewModel {
   #if os(iOS)
     internal func consumePairedStatus() async {
       for await paired in await connectivityObserver.pairedUpdates() {
-        if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
-          DemoLogger.shared.info("Paired status changed: \(paired)")
-        }
+        logIfAvailable { DemoLogger.shared.info("Paired status changed: \(paired)") }
         isPaired = paired
       }
     }
@@ -90,7 +86,7 @@ extension StreamMessageLabViewModel {
 
   internal func consumePairedAppInstalledStatus() async {
     for await installed in await connectivityObserver.pairedAppInstalledUpdates() {
-      if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
+      logIfAvailable {
         DemoLogger.shared.info("Paired app installed status changed: \(installed)")
       }
       isPairedAppInstalled = installed

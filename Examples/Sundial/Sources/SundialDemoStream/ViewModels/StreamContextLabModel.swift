@@ -73,8 +73,14 @@
         heartbeat: .seconds(3),
         reassertOnReachable: true,
         makeOutbound: { [weak self] revision in
-          self?.makeSnapshot(revision: revision)
-            ?? ColorSnapshot(red: 0, green: 0, blue: 1, alpha: 1, revision: revision)
+          guard let self else {
+            // The model owns the engine, so the engine never outlives `self` and
+            // this closure is only invoked while `self` is alive. The fallback is
+            // unreachable; assert to surface any future ownership regression.
+            assertionFailure("makeOutbound invoked after StreamContextLabModel was deallocated")
+            return ColorSnapshot(red: 0, green: 0, blue: 0, alpha: 0, revision: revision)
+          }
+          return self.makeSnapshot(revision: revision)
         },
         onInbound: { [weak self] snapshot in
           self?.apply(snapshot)

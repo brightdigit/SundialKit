@@ -77,6 +77,9 @@ internal final class MessageLabViewModel: ObservableObject {
   @Published internal var messagesSent: Int = 0
   @Published internal var messagesReceived: Int = 0
 
+  /// Latest WatchConnectivity session activation state, mirrored from the observer
+  @Published private(set) internal var connectivityActivationState: ActivationState = .notActivated
+
   // MARK: - Dependencies
 
   /// Connectivity observer for WatchConnectivity
@@ -92,10 +95,9 @@ internal final class MessageLabViewModel: ObservableObject {
     connectivityObserver.isReachable
   }
 
-  /// Current activation state
+  /// Current activation state, as a display string for `ConnectionStatusView`
   internal var activationState: String {
-    // ConnectivityObserver should expose this - placeholder for now
-    "Activated"
+    String(describing: connectivityActivationState)
   }
 
   /// Automatically selected transport method based on reachability
@@ -182,6 +184,7 @@ internal final class MessageLabViewModel: ObservableObject {
     // Subscribe to activation state changes
     connectivityObserver.$activationState
       .sink { [weak self] state in
+        self?.connectivityActivationState = state
         self?.logInfo("Activation state changed: \(String(describing: state))")
       }
       .store(in: &cancellables)

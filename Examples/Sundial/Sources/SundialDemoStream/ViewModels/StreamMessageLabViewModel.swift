@@ -145,12 +145,17 @@ internal final class StreamMessageLabViewModel {
 
   private func setupStreams() {
     streamTask = Task { @MainActor in
-      await activateAndLogInitialState()
-      await consumeAllStreams()
+      do {
+        try await activateAndLogInitialState()
+        await consumeAllStreams()
+      } catch {
+        // lastError is already set inside activateAndLogInitialState; activation
+        // failed, so the streams are never consumed against a dead session.
+      }
     }
   }
 
-  private func activateAndLogInitialState() async {
+  private func activateAndLogInitialState() async throws {
     do {
       try await connectivityObserver.activate()
       logIfAvailable { DemoLogger.shared.info("ConnectivityObserver activated successfully") }
@@ -163,6 +168,7 @@ internal final class StreamMessageLabViewModel {
       logIfAvailable {
         DemoLogger.shared.error("ConnectivityObserver activation failed: \(error)")
       }
+      throw error
     }
   }
 
