@@ -1,5 +1,13 @@
 # Lint & CodeFactor Fixes — PR #85 (`v2.0.0-alpha.3`)
 
+> **Update (superseded):** The `.codefactor.yml` exclusion described under
+> Issue 1 was later **reverted**. Instead of hiding the demo app from
+> CodeFactor, the demo code under `Examples/Sundial/` was brought into full
+> conformance with the root `.swiftlint.yml` (explicit ACL throughout, member
+> ordering, one-type-per-file splits, doc comments, etc.). `.swiftlint.yml` now
+> lints the demo (excluding only the generated protobuf sources and the nested
+> `.build`), so CodeFactor stays clean without any `.codefactor.yml`.
+
 This document details the issues found while running `Scripts/lint-all.sh` and
 resolving the failing **CodeFactor** check on
 [PR #85](https://github.com/brightdigit/SundialKit/pull/85), and the fixes applied.
