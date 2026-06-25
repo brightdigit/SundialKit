@@ -42,14 +42,14 @@ internal struct NeverConnectivitySessionTests {
 
   @Test("Activate throws session not supported error")
   internal func activateThrows() {
-    #expect(throws: SundialError.self) {
+    #expect(throws: ConnectivityError.self) {
       try session.activate()
     }
   }
 
   @Test("Update application context throws session not supported error")
   internal func updateApplicationContextThrows() {
-    #expect(throws: SundialError.self) {
+    #expect(throws: ConnectivityError.self) {
       try session.updateApplicationContext(.init())
     }
   }
@@ -58,7 +58,7 @@ internal struct NeverConnectivitySessionTests {
   internal func sendMessageReturnsError() async {
     await confirmation("Message sent with error") { confirm in
       session.sendMessage(.init()) { result in
-        guard case .failure(let error as SundialError) = result else {
+        guard case .failure(let error as ConnectivityError) = result else {
           return
         }
         #expect(error == .sessionNotSupported)
