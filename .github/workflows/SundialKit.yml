@@ -36,7 +36,7 @@ jobs:
       - name: Determine build matrix
         id: set-matrix
         run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.ref }}" == "refs/heads/atleast-beta.6" || "${{ github.event_name }}" == "pull_request" ]]; then
+          if [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.event_name }}" == "pull_request" ]]; then
             echo "full-matrix=true" >> "$GITHUB_OUTPUT"
             echo 'ubuntu-os=["noble","jammy"]' >> "$GITHUB_OUTPUT"
             echo 'ubuntu-swift=[{"version":"6.1"},{"version":"6.2"},{"version":"6.3"},{"version":"6.4.x","nightly":true}]' >> "$GITHUB_OUTPUT"
