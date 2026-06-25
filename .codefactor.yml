@@ -4,5 +4,8 @@
 # Example/demo code and vendored sub-packages are intentionally not held to the
 # library's lint standards (e.g. explicit_acl), so keep CodeFactor from flagging
 # them.
+#
+# exclude_patterns are globs: a bare directory path matches only the directory
+# itself, so the trailing `/**` is required to exclude the generated sources.
 exclude_patterns:
-  - "Examples/Sundial/Sources/Shared/Generated"
+  - "Examples/Sundial/Sources/Shared/Generated/**"
