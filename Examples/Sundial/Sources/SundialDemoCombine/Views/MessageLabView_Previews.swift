@@ -1,5 +1,5 @@
 //
-//  ProtocolComparisonView.swift
+//  MessageLabView_Previews.swift
 //  Sundial
 //
 //  Created on 10/27/25.
@@ -29,30 +29,11 @@
 
 import SwiftUI
 
-/// Tab 3: Protocol Comparison
-@available(iOS 16.0, watchOS 9.0, *)
-internal struct ProtocolComparisonView: View {
-  internal var body: some View {
-    NavigationView {
-      VStack {
-        Image(systemName: "chart.bar")
-          .font(.largeTitle)
-          .foregroundColor(.green)
-
-        Text("Protocol Comparison")
-          .font(.title2)
-          .fontWeight(.semibold)
-
-        Text("Coming soon")
-          .font(.caption)
-          .foregroundColor(.secondary)
-      }
-      .navigationTitle("Protocol")
+#if DEBUG
+  @available(iOS 16.0, watchOS 9.0, *)
+  internal struct MessageLabView_Previews: PreviewProvider {
+    internal static var previews: some View {
+      MessageLabView()
     }
   }
-}
-
-@available(iOS 17.0, watchOS 10.0, *)
-#Preview {
-  ProtocolComparisonView()
-}
+#endif

@@ -17,8 +17,8 @@ import SwiftUI
 /// allowing the same library code to be used by both the iOS and watchOS app targets.
 @available(iOS 16.0, watchOS 9.0, *)
 @main
-struct SundialCombineAppMain: App {
-  var body: some Scene {
+internal struct SundialCombineAppMain: App {
+  internal var body: some Scene {
     SundialApp().body
   }
 }

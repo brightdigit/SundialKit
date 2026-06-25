@@ -41,15 +41,15 @@ import SwiftUI
 /// ColorGridPickerView(selectedColor: $selectedColor)
 /// ```
 @available(watchOS 9.0, *)
-struct ColorGridPickerView: View {
-  @Binding var selectedColor: Color
+public struct ColorGridPickerView: View {
+  @Binding internal var selectedColor: Color
 
   private let colors: [Color] = [
     .red, .orange, .yellow, .green, .blue, .purple,
     .pink, .cyan, .mint, .indigo, .brown, .gray
   ]
 
-  var body: some View {
+  public var body: some View {
     LazyVGrid(columns: [GridItem(.adaptive(minimum: 40))], spacing: 8) {
       ForEach(colors.indices, id: \.self) { index in
         Circle()
@@ -72,30 +72,9 @@ struct ColorGridPickerView: View {
 
 // MARK: - Color Comparison Extension
 
-private extension Color {
-  func isSimilar(to other: Color) -> Bool {
+extension Color {
+  fileprivate func isSimilar(to other: Color) -> Bool {
     // Simple comparison for predefined colors
     self == other
   }
 }
-
-#if DEBUG
-  // MARK: - Previews
-
-  @available(watchOS 9.0, *)
-  struct ColorGridPickerView_Previews: PreviewProvider {
-    static var previews: some View {
-      Group {
-        ColorGridPickerView(selectedColor: .constant(.blue))
-          .previewDisplayName("Blue Selected")
-
-        ColorGridPickerView(selectedColor: .constant(.red))
-          .previewDisplayName("Red Selected")
-
-        ColorGridPickerView(selectedColor: .constant(.mint))
-          .previewDisplayName("Mint Selected")
-      }
-      .padding()
-    }
-  }
-#endif

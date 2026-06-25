@@ -14,8 +14,8 @@
   /// Wraps the ``ContextEngine`` "Context Sync" demo in a `NavigationStack` so its
   /// title renders when hosted as a tab in ``StreamTabView``.
   @available(iOS 18.0, watchOS 11.0, *)
-  struct StreamContextView: View {
-    var body: some View {
+  internal struct StreamContextView: View {
+    internal var body: some View {
       NavigationStack {
         StreamContextLabView()
       }

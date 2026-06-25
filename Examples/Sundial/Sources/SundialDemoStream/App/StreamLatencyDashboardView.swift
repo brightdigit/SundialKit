@@ -31,8 +31,8 @@ import SwiftUI
 
 /// Tab 2: Latency Dashboard (Stream variant)
 @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
-struct StreamLatencyDashboardView: View {
-  var body: some View {
+internal struct StreamLatencyDashboardView: View {
+  internal var body: some View {
     NavigationView {
       VStack {
         Image(systemName: "clock")

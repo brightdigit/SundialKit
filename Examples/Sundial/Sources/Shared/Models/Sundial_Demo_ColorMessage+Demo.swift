@@ -1,5 +1,5 @@
 //
-//  ColorMessageExtensions.swift
+//  Sundial_Demo_ColorMessage+Demo.swift
 //  Sundial Demo
 //
 //  Created by Leo Dion.
@@ -42,6 +42,11 @@ extension Sundial_Demo_ColorMessage: BinaryMessagable {
       )
     }
 
+    /// Timestamp as Date
+    public var timestamp: Date {
+      Date(millisecondsSince1970: timestampMs)
+    }
+
     /// Create from SwiftUI Color and timestamp
     public init(color: Color, timestamp: Date = Date(), source: String = "") {
       self.init()
@@ -52,11 +57,6 @@ extension Sundial_Demo_ColorMessage: BinaryMessagable {
       self.alpha = Float(components.alpha)
       self.timestampMs = timestamp.timeIntervalSince1970Milliseconds
       self.source = source
-    }
-
-    /// Timestamp as Date
-    public var timestamp: Date {
-      Date(millisecondsSince1970: timestampMs)
     }
   }
 #endif

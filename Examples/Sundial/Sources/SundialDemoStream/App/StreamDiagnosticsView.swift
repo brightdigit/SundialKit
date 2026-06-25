@@ -31,8 +31,8 @@ import SwiftUI
 
 /// Tab 4: Diagnostics (Stream variant)
 @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
-struct StreamDiagnosticsView: View {
-  var body: some View {
+internal struct StreamDiagnosticsView: View {
+  internal var body: some View {
     NavigationView {
       VStack {
         Image(systemName: "wrench.and.screwdriver")

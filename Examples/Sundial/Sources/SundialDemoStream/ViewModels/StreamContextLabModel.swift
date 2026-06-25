@@ -27,27 +27,27 @@
   @available(iOS 18.0, watchOS 11.0, *)
   @MainActor
   @Observable
-  final class StreamContextLabModel {
+  internal final class StreamContextLabModel {
     /// The color this device wants the counterpart to display.
-    var selectedColor: Color = .blue
+    internal var selectedColor: Color = .blue
 
     /// The most recent color received from the counterpart.
-    private(set) var peerColor: Color?
+    internal private(set) var peerColor: Color?
     /// When the counterpart color last arrived.
-    private(set) var peerUpdatedAt: Date?
+    internal private(set) var peerUpdatedAt: Date?
     /// The revision stamped on the most recent inbound snapshot.
-    private(set) var peerRevision: UInt64?
+    internal private(set) var peerRevision: UInt64?
 
     private var engine: ContextEngine<ColorSnapshot, ColorSnapshot>?
 
     /// Whether the counterpart app is reachable for immediate delivery.
-    var isReachable: Bool { engine?.isReachable ?? false }
+    internal var isReachable: Bool { engine?.isReachable ?? false }
     /// Whether the paired device has the counterpart app installed.
-    var isPairedAppInstalled: Bool { engine?.isPairedAppInstalled ?? false }
+    internal var isPairedAppInstalled: Bool { engine?.isPairedAppInstalled ?? false }
 
     /// A human-readable description of the latest error, if any. Activation errors
     /// take precedence — they require recreating the engine, not just retrying.
-    var statusError: String? {
+    internal var statusError: String? {
       if let error = engine?.lastActivationError {
         return "Activation failed: \(error.localizedDescription)"
       }
@@ -59,7 +59,7 @@
 
     /// Creates the engine (once), then subscribes, activates, and starts the
     /// heartbeat. Safe to call repeatedly — only the first call does work.
-    func start() async {
+    internal func start() async {
       guard engine == nil else {
         return
       }
@@ -86,13 +86,13 @@
     }
 
     /// Stops the engine's stream and heartbeat tasks.
-    func stop() {
+    internal func stop() {
       engine?.stop()
     }
 
     /// Re-sends the current color after a manual change, stamped with a fresh
     /// revision so the latest-wins context update is never deduped.
-    func colorChanged() {
+    internal func colorChanged() {
       engine?.assertNow()
     }
 

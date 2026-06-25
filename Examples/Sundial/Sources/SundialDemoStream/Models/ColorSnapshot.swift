@@ -19,18 +19,18 @@
   /// increasing ``revision`` — that keeps every application-context write a
   /// distinct payload, so a heartbeat re-assert or reconnect re-sync is never
   /// silently deduped in transit.
-  struct ColorSnapshot: RevisionedMessage {
+  internal struct ColorSnapshot: RevisionedMessage {
     private enum Key: String {
       case red, green, blue, alpha, revision
     }
 
-    let red: Double
-    let green: Double
-    let blue: Double
-    let alpha: Double
-    let revision: UInt64
+    internal let red: Double
+    internal let green: Double
+    internal let blue: Double
+    internal let alpha: Double
+    internal let revision: UInt64
 
-    init(red: Double, green: Double, blue: Double, alpha: Double, revision: UInt64) {
+    internal init(red: Double, green: Double, blue: Double, alpha: Double, revision: UInt64) {
       self.red = red
       self.green = green
       self.blue = blue
@@ -38,7 +38,7 @@
       self.revision = revision
     }
 
-    init(from parameters: [String: any Sendable]) throws {
+    internal init(from parameters: [String: any Sendable]) throws {
       guard
         let red = parameters[Key.red.rawValue] as? Double,
         let green = parameters[Key.green.rawValue] as? Double,
@@ -57,16 +57,6 @@
       )
     }
 
-    func parameters() -> [String: any Sendable] {
-      [
-        Key.red.rawValue: red,
-        Key.green.rawValue: green,
-        Key.blue.rawValue: blue,
-        Key.alpha.rawValue: alpha,
-        Key.revision.rawValue: revision,
-      ]
-    }
-
     /// Tolerant decode of the revision, which can come back from the transport as
     /// any numeric flavor depending on property-list bridging.
     private static func revision(from value: (any Sendable)?) -> UInt64 {
@@ -80,6 +70,16 @@
         return UInt64(double)
       }
       return 0
+    }
+
+    internal func parameters() -> [String: any Sendable] {
+      [
+        Key.red.rawValue: red,
+        Key.green.rawValue: green,
+        Key.blue.rawValue: blue,
+        Key.alpha.rawValue: alpha,
+        Key.revision.rawValue: revision,
+      ]
     }
   }
 #endif

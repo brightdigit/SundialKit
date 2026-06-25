@@ -1,5 +1,5 @@
 //
-//  LatencyStatsExtensions.swift
+//  Sundial_Demo_LatencyStats+Demo.swift
 //  Sundial Demo
 //
 //  Created by Leo Dion.

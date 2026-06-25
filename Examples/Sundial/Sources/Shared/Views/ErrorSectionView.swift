@@ -34,10 +34,6 @@ import SwiftUI
 public struct ErrorSectionView: View {
   public let error: String
 
-  public init(error: String) {
-    self.error = error
-  }
-
   public var body: some View {
     HStack(spacing: 12) {
       Image(systemName: "exclamationmark.triangle.fill")
@@ -55,16 +51,8 @@ public struct ErrorSectionView: View {
         .fill(Color.red.opacity(0.1))
     )
   }
-}
 
-#if DEBUG
-  // MARK: - Previews
-
-  @available(iOS 16.0, watchOS 9.0, *)
-  struct ErrorSectionView_Previews: PreviewProvider {
-    static var previews: some View {
-      ErrorSectionView(error: "Failed to send message: Connection timeout")
-        .padding()
-    }
+  public init(error: String) {
+    self.error = error
   }
-#endif
+}

@@ -13,10 +13,10 @@
 
   /// The "Context Sync" demo screen.
   @available(iOS 18.0, watchOS 11.0, *)
-  struct StreamContextLabView: View {
+  internal struct StreamContextLabView: View {
     @State private var model = StreamContextLabModel()
 
-    var body: some View {
+    internal var body: some View {
       Form {
         Section("Your Color") {
           ColorPreview(color: model.selectedColor, source: "This Device")

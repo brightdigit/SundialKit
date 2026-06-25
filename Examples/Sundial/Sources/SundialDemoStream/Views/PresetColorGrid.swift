@@ -13,15 +13,15 @@
   /// A small cross-platform color picker (SwiftUI's `ColorPicker` is unavailable on
   /// watchOS), so the demo runs identically on iPhone and Apple Watch.
   @available(iOS 18.0, watchOS 11.0, *)
-  struct PresetColorGrid: View {
-    @Binding var selectedColor: Color
+  internal struct PresetColorGrid: View {
+    @Binding internal var selectedColor: Color
 
     private let colors: [Color] = [
       .red, .orange, .yellow, .green, .mint, .teal,
       .cyan, .blue, .indigo, .purple, .pink, .brown,
     ]
 
-    var body: some View {
+    internal var body: some View {
       LazyVGrid(columns: [GridItem(.adaptive(minimum: 40), spacing: 8)], spacing: 8) {
         ForEach(colors.indices, id: \.self) { index in
           Button {

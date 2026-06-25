@@ -22,8 +22,8 @@ import SwiftUI
 /// - Swift 6.1 strict concurrency compliant
 @available(iOS 18.0, watchOS 11.0, *)
 @main
-struct SundialStreamAppMain: App {
-  var body: some Scene {
+internal struct SundialStreamAppMain: App {
+  internal var body: some Scene {
     WindowGroup {
       StreamTabView()
     }

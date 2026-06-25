@@ -34,7 +34,7 @@ public final class LatencyTracker: ObservableObject {
 
     /// Round-trip time in milliseconds
     public var rttMilliseconds: Double {
-      roundTripTime * 1000
+      roundTripTime * 1_000
     }
 
     public init(
@@ -57,25 +57,16 @@ public final class LatencyTracker: ObservableObject {
   }
 
   /// Recent measurements (limited to last 20)
-  @Published public private(set) var measurements: [Measurement] = []
+  @Published internal private(set) var measurements: [Measurement] = []
 
   /// Current sequence number
-  @Published public private(set) var currentSequence: Int = 0
-
-  public init() {}
-
-  /// Record a new measurement
-  public func recordMeasurement(_ measurement: Measurement) {
-    measurements.append(measurement)
-    if measurements.count > 20 {
-      measurements.removeFirst()
-    }
-    currentSequence = measurement.sequenceNumber + 1
-  }
+  @Published internal private(set) var currentSequence: Int = 0
 
   /// Average round-trip time
   public var averageRTT: TimeInterval {
-    guard !measurements.isEmpty else { return 0 }
+    guard !measurements.isEmpty else {
+      return 0
+    }
     return measurements.map(\.roundTripTime).reduce(0, +) / Double(measurements.count)
   }
 
@@ -91,7 +82,9 @@ public final class LatencyTracker: ObservableObject {
 
   /// Standard deviation of round-trip times
   public var standardDeviation: TimeInterval {
-    guard measurements.count > 1 else { return 0 }
+    guard measurements.count > 1 else {
+      return 0
+    }
     let mean = averageRTT
     let variance = measurements
       .map { pow($0.roundTripTime - mean, 2) }
@@ -101,26 +94,45 @@ public final class LatencyTracker: ObservableObject {
 
   /// Success rate (assumes all recorded measurements were successful)
   public var successRate: Double {
-    guard currentSequence > 0 else { return 0 }
+    guard currentSequence > 0 else {
+      return 0
+    }
     return Double(measurements.count) / Double(currentSequence)
   }
 
   /// Average encode time
   public var averageEncodeTime: TimeInterval {
-    guard !measurements.isEmpty else { return 0 }
+    guard !measurements.isEmpty else {
+      return 0
+    }
     return measurements.map(\.encodeTime).reduce(0, +) / Double(measurements.count)
   }
 
   /// Average decode time
   public var averageDecodeTime: TimeInterval {
-    guard !measurements.isEmpty else { return 0 }
+    guard !measurements.isEmpty else {
+      return 0
+    }
     return measurements.map(\.decodeTime).reduce(0, +) / Double(measurements.count)
   }
 
   /// Average network time
   public var averageNetworkTime: TimeInterval {
-    guard !measurements.isEmpty else { return 0 }
+    guard !measurements.isEmpty else {
+      return 0
+    }
     return measurements.map(\.networkTime).reduce(0, +) / Double(measurements.count)
+  }
+
+  public init() {}
+
+  /// Record a new measurement
+  public func recordMeasurement(_ measurement: Measurement) {
+    measurements.append(measurement)
+    if measurements.count > 20 {
+      measurements.removeFirst()
+    }
+    currentSequence = measurement.sequenceNumber + 1
   }
 
   /// Clear all measurements

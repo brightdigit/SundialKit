@@ -56,8 +56,6 @@ import SwiftUI
 ///    - Error reporting
 @available(iOS 16.0, watchOS 9.0, *)
 public struct SundialTabView: View {
-  public init() {}
-
   public var body: some View {
     TabView {
       MessageLabView()
@@ -81,6 +79,8 @@ public struct SundialTabView: View {
         }
     }
   }
+
+  public init() {}
 }
 
 @available(iOS 17.0, watchOS 10.0, *)

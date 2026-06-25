@@ -31,8 +31,8 @@ import SwiftUI
 
 /// Tab 2: Latency Dashboard
 @available(iOS 16.0, watchOS 9.0, *)
-struct LatencyDashboardView: View {
-  var body: some View {
+internal struct LatencyDashboardView: View {
+  internal var body: some View {
     NavigationView {
       VStack {
         Image(systemName: "clock")

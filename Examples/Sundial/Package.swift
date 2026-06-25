@@ -2,7 +2,7 @@
 
 import PackageDescription
 
-let package = Package(
+internal let package = Package(
   name: "Sundial",
   platforms: [
     // Raised to satisfy the SundialKitStream `atleast-beta.6` branch, which the

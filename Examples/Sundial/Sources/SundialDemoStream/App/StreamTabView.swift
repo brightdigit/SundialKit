@@ -43,8 +43,6 @@ import SwiftUI
 /// 4. **Diagnostics** - Coming soon
 @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
 public struct StreamTabView: View {
-  public init() {}
-
   public var body: some View {
     TabView {
       #if os(iOS) || os(watchOS)
@@ -77,6 +75,8 @@ public struct StreamTabView: View {
         }
     }
   }
+
+  public init() {}
 }
 
 @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)

@@ -44,35 +44,16 @@ import SwiftUI
 /// ```
 public struct ColorPreview: View {
   /// The color to display
-  let color: Color
+  public let color: Color
 
   /// Optional timestamp when color was sent/received
-  let timestamp: Date?
+  public let timestamp: Date?
 
   /// Optional source device (e.g., "iPhone", "Watch")
-  let source: String?
+  public let source: String?
 
   /// Size of the color circle (default: 60)
-  let size: CGFloat
-
-  /// Creates a new color preview.
-  ///
-  /// - Parameters:
-  ///   - color: The color to display
-  ///   - timestamp: When the color was sent/received
-  ///   - source: Source device name
-  ///   - size: Diameter of the color circle
-  public init(
-    color: Color,
-    timestamp: Date? = nil,
-    source: String? = nil,
-    size: CGFloat = 60
-  ) {
-    self.color = color
-    self.timestamp = timestamp
-    self.source = source
-    self.size = size
-  }
+  public let size: CGFloat
 
   public var body: some View {
     VStack(spacing: 8) {
@@ -105,7 +86,7 @@ public struct ColorPreview: View {
         if let timestamp = timestamp {
         #if os(watchOS)
           Text(timestamp, style: .relative)
-            
+
             .font(.system(size: 10, weight: .semibold))
           #else
           Text(timestamp, style: .time)
@@ -116,56 +97,23 @@ public struct ColorPreview: View {
       }
     }
   }
-}
 
-#if DEBUG
-  // MARK: - Previews
-
-  @available(iOS 14.8, watchOS 7.4, *)
-  struct ColorPreview_Previews: PreviewProvider {
-    static var previews: some View {
-      VStack(spacing: 24) {
-        HStack(spacing: 24) {
-          ColorPreview(
-            color: .red,
-            timestamp: Date(),
-            source: "iPhone"
-          )
-
-          ColorPreview(
-            color: .blue,
-            timestamp: Date().addingTimeInterval(-30),
-            source: "Watch"
-          )
-
-          ColorPreview(
-            color: .green,
-            size: 80
-          )
-        }
-
-        HStack(spacing: 16) {
-          ColorPreview(
-            color: .purple,
-            timestamp: Date(),
-            size: 40
-          )
-
-          ColorPreview(
-            color: .orange,
-            timestamp: Date(),
-            size: 40
-          )
-
-          ColorPreview(
-            color: .pink,
-            timestamp: Date(),
-            size: 40
-          )
-        }
-      }
-      .padding()
-      .previewLayout(.sizeThatFits)
-    }
+  /// Creates a new color preview.
+  ///
+  /// - Parameters:
+  ///   - color: The color to display
+  ///   - timestamp: When the color was sent/received
+  ///   - source: Source device name
+  ///   - size: Diameter of the color circle
+  public init(
+    color: Color,
+    timestamp: Date? = nil,
+    source: String? = nil,
+    size: CGFloat = 60
+  ) {
+    self.color = color
+    self.timestamp = timestamp
+    self.source = source
+    self.size = size
   }
-#endif
+}

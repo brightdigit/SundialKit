@@ -43,20 +43,10 @@ import SwiftUI
 /// ```
 public struct TransportBadge: View {
   /// The transport method to display
-  let method: TransportMethod
+  public let method: TransportMethod
 
   /// Whether this method is currently active/selected
-  let isActive: Bool
-
-  /// Creates a new transport method badge.
-  ///
-  /// - Parameters:
-  ///   - method: The transport method
-  ///   - isActive: Whether the method is currently active
-  public init(method: TransportMethod, isActive: Bool) {
-    self.method = method
-    self.isActive = isActive
-  }
+  public let isActive: Bool
 
   public var body: some View {
     HStack(spacing: 6) {
@@ -86,44 +76,14 @@ public struct TransportBadge: View {
     )
     .foregroundColor(isActive ? method.color : .secondary)
   }
-}
 
-#if DEBUG
-  // MARK: - Previews
-
-  @available(iOS 14.8, watchOS 7.4, *)
-  struct TransportBadge_Previews: PreviewProvider {
-    static var previews: some View {
-      VStack(spacing: 16) {
-        // Active states
-        HStack(spacing: 12) {
-          TransportBadge(method: .sendMessage, isActive: true)
-          TransportBadge(method: .sendMessageData, isActive: true)
-          TransportBadge(method: .updateApplicationContext, isActive: true)
-        }
-
-        // Inactive states
-        HStack(spacing: 12) {
-          TransportBadge(method: .sendMessage, isActive: false)
-          TransportBadge(method: .sendMessageData, isActive: false)
-          TransportBadge(method: .updateApplicationContext, isActive: false)
-        }
-
-        // Mixed states
-        VStack(alignment: .leading, spacing: 8) {
-          Text("Select Transport Method:")
-            .font(.caption)
-            .foregroundColor(.secondary)
-
-          HStack(spacing: 8) {
-            TransportBadge(method: .sendMessage, isActive: true)
-            TransportBadge(method: .sendMessageData, isActive: false)
-            TransportBadge(method: .updateApplicationContext, isActive: false)
-          }
-        }
-      }
-      .padding()
-      .previewLayout(.sizeThatFits)
-    }
+  /// Creates a new transport method badge.
+  ///
+  /// - Parameters:
+  ///   - method: The transport method
+  ///   - isActive: Whether the method is currently active
+  public init(method: TransportMethod, isActive: Bool) {
+    self.method = method
+    self.isActive = isActive
   }
-#endif
+}
