@@ -5,7 +5,9 @@
 # library's lint standards (e.g. explicit_acl), so keep CodeFactor from flagging
 # them.
 #
-# exclude_patterns are globs: a bare directory path matches only the directory
-# itself, so the trailing `/**` is required to exclude the generated sources.
+# exclude_patterns use CodeFactor's single-`*` glob syntax (e.g. `src/blob/*`),
+# NOT gitignore-style `**`. A trailing `/*` excludes every file in the folder.
+# Also match the protobuf sources by extension anywhere they appear.
 exclude_patterns:
-  - "Examples/Sundial/Sources/Shared/Generated/**"
+  - "Examples/Sundial/Sources/Shared/Generated/*"
+  - "*.pb.swift"

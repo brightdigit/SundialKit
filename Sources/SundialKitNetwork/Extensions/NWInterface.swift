@@ -33,7 +33,13 @@ public import SundialKitCore
 
   public import Network
 
-  // swiftlint:disable:next file_types_order
+  extension NWInterface: Interfaceable {
+    /// The integer value representing the interface type.
+    public var typeValue: Int {
+      type.value
+    }
+  }
+
   extension NWInterface.InterfaceType {
     // swiftlint:disable:next explicit_acl
     var value: Int {
@@ -56,13 +62,6 @@ public import SundialKitCore
       @unknown default:
         return 0
       }
-    }
-  }
-
-  extension NWInterface: Interfaceable {
-    /// The integer value representing the interface type.
-    public var typeValue: Int {
-      type.value
     }
   }
 #endif
