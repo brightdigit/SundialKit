@@ -1,0 +1,8 @@
+# CodeFactor configuration
+#
+# Mirror the paths already excluded from SwiftLint analysis in .swiftlint.yml.
+# Example/demo code and vendored sub-packages are intentionally not held to the
+# library's lint standards (e.g. explicit_acl), so keep CodeFactor from flagging
+# them.
+exclude_patterns:
+  - "Examples/Sundial/Sources/Shared/Generated"
