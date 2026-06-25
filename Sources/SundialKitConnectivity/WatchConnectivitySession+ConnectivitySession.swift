@@ -143,7 +143,7 @@
     /// than once on the same instance is safe — re-assigning `session.delegate = self`
     /// is a no-op and WCSession tolerates a repeated `activate()`.
     ///
-    /// - Throws: `SundialError.sessionNotSupported` if WatchConnectivity is not supported
+    /// - Throws: `ConnectivityError.sessionNotSupported` if WatchConnectivity is not supported
     public func activate() throws {
       guard WCSession.isSupported() else {
         throw ConnectivityError.sessionNotSupported
