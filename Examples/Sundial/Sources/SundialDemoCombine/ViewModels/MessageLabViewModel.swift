@@ -78,7 +78,7 @@ internal final class MessageLabViewModel: ObservableObject {
   @Published internal var messagesReceived: Int = 0
 
   /// Latest WatchConnectivity session activation state, mirrored from the observer
-  @Published private(set) internal var connectivityActivationState: ActivationState = .notActivated
+  @Published internal private(set) var connectivityActivationState: ActivationState = .notActivated
 
   // MARK: - Dependencies
 
@@ -213,7 +213,6 @@ internal final class MessageLabViewModel: ObservableObject {
     }
 
     lastError = nil
-
     do {
       let message = try buildMessage()
       logDebug("Message built successfully, type: \(type(of: message))")
