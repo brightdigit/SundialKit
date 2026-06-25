@@ -83,7 +83,7 @@ jobs:
         run: |
           apt-get update -q
           apt-get install -y curl
-      - uses: brightdigit/swift-coverage-action@fix/swift-6.4-linux-layout
+      - uses: sersoft-gmbh/swift-coverage-action@v5
         id: coverage-files
         if: steps.build.outputs.contains-code-coverage == 'true'
         with:
@@ -214,7 +214,7 @@ jobs:
       # Common Coverage Steps
       - name: Process Coverage
         if: steps.build.outputs.contains-code-coverage == 'true'
-        uses: brightdigit/swift-coverage-action@fix/swift-6.4-linux-layout
+        uses: sersoft-gmbh/swift-coverage-action@v5
 
       - name: Upload Coverage
         if: steps.build.outputs.contains-code-coverage == 'true'
@@ -294,7 +294,7 @@ jobs:
       # Common Coverage Steps
       - name: Process Coverage
         if: steps.build.outputs.contains-code-coverage == 'true'
-        uses: brightdigit/swift-coverage-action@fix/swift-6.4-linux-layout
+        uses: sersoft-gmbh/swift-coverage-action@v5
 
       - name: Upload Coverage
         if: steps.build.outputs.contains-code-coverage == 'true'
