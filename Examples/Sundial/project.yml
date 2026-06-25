@@ -24,7 +24,7 @@ settings:
     ENABLE_USER_SCRIPT_SANDBOXING: NO
 
 # Reference the local Swift Package. Its Package.swift pins SundialKitStream to
-# the atleast-beta.6 branch (which ships SundialKitStreamContext) and pulls in the
+# the v1.0.0-alpha.3 branch (which ships SundialKitStreamContext) and pulls in the
 # SundialKit* products transitively, so the app targets only need SundialDemoStream.
 packages:
   Sundial:

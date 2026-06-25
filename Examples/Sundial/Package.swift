@@ -5,7 +5,7 @@ import PackageDescription
 internal let package = Package(
   name: "Sundial",
   platforms: [
-    // Raised to satisfy the SundialKitStream `atleast-beta.6` branch, which the
+    // Raised to satisfy the SundialKitStream `v1.0.0-alpha.3` branch, which the
     // SundialKitStreamContext demo depends on (iOS 18 / watchOS 11 / macOS 15).
     .iOS(.v18),
     .watchOS(.v11),
@@ -48,7 +48,7 @@ internal let package = Package(
     // SundialKitStreamContext (`ContextEngine`) product, not yet released.
     .package(
       url: "https://github.com/brightdigit/SundialKitStream.git",
-      branch: "atleast-beta.6"
+      branch: "v1.0.0-alpha.3"
     )
   ],
   targets: [

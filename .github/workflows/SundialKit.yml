@@ -36,10 +36,10 @@ jobs:
       - name: Determine build matrix
         id: set-matrix
         run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.ref }}" == "refs/heads/atleast-beta.6" || "${{ github.event_name }}" == "pull_request" ]]; then
+          if [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.event_name }}" == "pull_request" ]]; then
             echo "full-matrix=true" >> "$GITHUB_OUTPUT"
             echo 'ubuntu-os=["noble","jammy"]' >> "$GITHUB_OUTPUT"
-            echo 'ubuntu-swift=[{"version":"6.1"},{"version":"6.2"},{"version":"6.3"}]' >> "$GITHUB_OUTPUT"
+            echo 'ubuntu-swift=[{"version":"6.1"},{"version":"6.2"},{"version":"6.3"},{"version":"6.4.x","nightly":true}]' >> "$GITHUB_OUTPUT"
             echo 'ubuntu-type=["","wasm","wasm-embedded"]' >> "$GITHUB_OUTPUT"
           else
             echo "full-matrix=false" >> "$GITHUB_OUTPUT"
@@ -53,6 +53,8 @@ jobs:
     needs: [configure]
     runs-on: ubuntu-latest
     container: ${{ matrix.swift.nightly && format('swiftlang/swift:nightly-{0}-{1}', matrix.swift.version, matrix.os) || format('swift:{0}-{1}', matrix.swift.version, matrix.os) }}
+    # Nightly toolchains are unstable; don't let them fail the workflow.
+    continue-on-error: ${{ matrix.swift.nightly || false }}
     strategy:
       matrix:
         os: ${{ fromJSON(needs.configure.outputs.ubuntu-os) }}
@@ -62,6 +64,13 @@ jobs:
           - swift: {version: "6.1"}
             type: wasm
           - swift: {version: "6.1"}
+            type: wasm-embedded
+          # Nightly Swift 6.4: noble-only, standard SPM build (no jammy, no wasm SDK).
+          - swift: {version: "6.4.x", nightly: true}
+            os: "jammy"
+          - swift: {version: "6.4.x", nightly: true}
+            type: wasm
+          - swift: {version: "6.4.x", nightly: true}
             type: wasm-embedded
     steps:
       - uses: actions/checkout@v6
