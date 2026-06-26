@@ -5,7 +5,7 @@ import PackageDescription
 internal let package = Package(
   name: "Sundial",
   platforms: [
-    // Raised to satisfy the SundialKitStream `v1.0.0-alpha.3` branch, which the
+    // Raised to satisfy the SundialKitStream `1.0.0-alpha.3` tag, which the
     // SundialKitStreamContext demo depends on (iOS 18 / watchOS 11 / macOS 15).
     .iOS(.v18),
     .watchOS(.v11),
@@ -37,18 +37,18 @@ internal let package = Package(
     // SundialKit core (parent package)
     .package(
       url: "https://github.com/brightdigit/SundialKit.git",
-      from: "2.0.0-alpha.1"
+      from: "2.0.0-alpha.3"
     ),
     // SundialKitCombine plugin
     .package(
       url: "https://github.com/brightdigit/SundialKitCombine.git",
       from: "1.0.0-alpha.1"
     ),
-    // SundialKitStream plugin — pinned to the branch that adds the
-    // SundialKitStreamContext (`ContextEngine`) product, not yet released.
+    // SundialKitStream plugin — provides the SundialKitStreamContext
+    // (`ContextEngine`) product.
     .package(
       url: "https://github.com/brightdigit/SundialKitStream.git",
-      branch: "v1.0.0-alpha.3"
+      from: "1.0.0-alpha.3"
     )
   ],
   targets: [
