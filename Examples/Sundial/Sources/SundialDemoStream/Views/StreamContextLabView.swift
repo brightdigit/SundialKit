@@ -2,7 +2,7 @@
 //  StreamContextLabView.swift
 //  Sundial
 //
-//  The "Context Sync" demo screen for SundialKitStreamContext's `ContextEngine`.
+//  The "Context Sync" demo screen for SundialKitContext's `ContextEngine`.
 //
 //  Copyright (c) 2026 BrightDigit.
 //

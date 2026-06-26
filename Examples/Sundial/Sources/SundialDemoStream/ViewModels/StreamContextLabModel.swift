@@ -14,8 +14,8 @@
   import Observation
   import SundialDemoShared
   import SundialKitConnectivity
+  import SundialKitContext
   import SundialKitStream
-  import SundialKitStreamContext
   import SwiftUI
 
   /// Drives a ``ContextEngine`` that syncs the locally selected color to the paired

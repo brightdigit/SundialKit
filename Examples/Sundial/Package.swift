@@ -5,8 +5,8 @@ import PackageDescription
 internal let package = Package(
   name: "Sundial",
   platforms: [
-    // Raised to satisfy the SundialKitStream `1.0.0-alpha.3` tag, which the
-    // SundialKitStreamContext demo depends on (iOS 18 / watchOS 11 / macOS 15).
+    // Raised to satisfy the SundialKitStream `1.0.0-alpha.3` tag, whose
+    // SundialKitContext layer the demo depends on (iOS 18 / watchOS 11 / macOS 15).
     .iOS(.v18),
     .watchOS(.v11),
     .macOS(.v15)
@@ -44,8 +44,8 @@ internal let package = Package(
       url: "https://github.com/brightdigit/SundialKitCombine.git",
       from: "1.0.0-alpha.1"
     ),
-    // SundialKitStream plugin — provides the SundialKitStreamContext
-    // (`ContextEngine`) product.
+    // SundialKitStream plugin — also vends the SundialKitContext
+    // (`ContextEngine`) product the Stream demo uses.
     .package(
       url: "https://github.com/brightdigit/SundialKitStream.git",
       from: "1.0.0-alpha.3"
@@ -92,7 +92,8 @@ internal let package = Package(
         "SundialDemoShared",
         .product(name: "SundialKitCore", package: "SundialKit"),
         .product(name: "SundialKitConnectivity", package: "SundialKit"),
-        .product(name: "SundialKitStream", package: "SundialKitStream")
+        .product(name: "SundialKitStream", package: "SundialKitStream"),
+        .product(name: "SundialKitContext", package: "SundialKitStream")
       ],
       path: "Sources/SundialDemoStream",
       swiftSettings: [

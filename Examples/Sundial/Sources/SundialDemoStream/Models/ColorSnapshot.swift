@@ -2,7 +2,7 @@
 //  ColorSnapshot.swift
 //  Sundial
 //
-//  A revisioned color snapshot synced via SundialKitStreamContext's ContextEngine.
+//  A revisioned color snapshot synced via SundialKitContext's ContextEngine.
 //
 //  Copyright (c) 2026 BrightDigit.
 //
@@ -10,8 +10,8 @@
 #if os(iOS) || os(watchOS)
   import Foundation
   import SundialKitConnectivity
+  import SundialKitContext
   import SundialKitCore
-  import SundialKitStreamContext
 
   /// The whole "current color" a device wants its counterpart to display.
   ///

@@ -19,12 +19,12 @@ configFiles:
 settings:
   base:
     MARKETING_VERSION: "1.0.0"
-    CURRENT_PROJECT_VERSION: "5"
+    CURRENT_PROJECT_VERSION: "6"
     SWIFT_VERSION: "6.1"
     ENABLE_USER_SCRIPT_SANDBOXING: NO
 
 # Reference the local Swift Package. Its Package.swift pins SundialKitStream to
-# the 1.0.0-alpha.3 tag (which ships SundialKitStreamContext) and pulls in the
+# the 1.0.0-alpha.3 tag (which ships SundialKitContext) and pulls in the
 # SundialKit* products transitively, so the app targets only need SundialDemoStream.
 packages:
   Sundial:
