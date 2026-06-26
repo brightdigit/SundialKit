@@ -10,7 +10,8 @@ import Foundation
 import SundialKitCore
 import SundialKitNetwork
 
-/// A NetworkPing implementation that verifies connectivity by fetching the public IP address from ipify.org.
+/// A NetworkPing implementation that verifies connectivity by fetching the
+/// public IP address from ipify.org.
 ///
 /// Example usage:
 /// ```swift
@@ -23,6 +24,14 @@ import SundialKitNetwork
 public struct IpifyPing: NetworkPing, Sendable {
   /// The public IP address returned from ipify.org, or nil if the request failed.
   public typealias StatusType = String?
+
+  /// The ipify.org API endpoint for retrieving the public IP address.
+  public static let url: URL = {
+    guard let url = URL(string: "https://api.ipify.org") else {
+      fatalError("Invalid ipify URL")
+    }
+    return url
+  }()
 
   /// The URLSession used for making network requests.
   public let session: URLSession
@@ -53,15 +62,13 @@ public struct IpifyPing: NetworkPing, Sendable {
     }
   }
 
-  /// The ipify.org API endpoint for retrieving the public IP address.
-  public static let url: URL = .init(string: "https://api.ipify.org")!
-
   /// Performs a network ping by fetching the public IP address.
   ///
   /// - Parameter closure: Called with the resulting IP address string, or nil if the request failed.
   public func onPing(_ closure: @escaping (String?) -> Void) {
-    session.dataTask(with: IpifyPing.url) { data, _, _ in
+    let task = session.dataTask(with: IpifyPing.url) { data, _, _ in
       closure(data.flatMap { String(data: $0, encoding: .utf8) })
-    }.resume()
+    }
+    task.resume()
   }
 }

@@ -47,11 +47,11 @@ import SwiftUI
 /// )
 /// ```
 @available(iOS 16.0, watchOS 9.0, *)
-struct ColorSelectorView: View {
-  @Binding var selectedColor: Color
-  let onRandomize: () -> Void
+public struct ColorSelectorView: View {
+  @Binding internal var selectedColor: Color
+  public let onRandomize: () -> Void
 
-  var body: some View {
+  public var body: some View {
     VStack(spacing: 12) {
       HStack {
         Text("Color")
@@ -92,35 +92,3 @@ struct ColorSelectorView: View {
     )
   }
 }
-
-#if DEBUG
-  // MARK: - Previews
-
-  @available(iOS 16.0, watchOS 9.0, *)
-  struct ColorSelectorView_Previews: PreviewProvider {
-    static var previews: some View {
-      Group {
-        ScrollView{
-          ColorSelectorView(
-            selectedColor: .constant(.blue),
-            onRandomize: {}
-          )
-        }
-        .previewDisplayName("Blue")
-
-        ColorSelectorView(
-          selectedColor: .constant(.red),
-          onRandomize: {}
-        )
-        .previewDisplayName("Red")
-
-        ColorSelectorView(
-          selectedColor: .constant(.mint),
-          onRandomize: {}
-        )
-        .previewDisplayName("Mint")
-      }
-      .padding()
-    }
-  }
-#endif

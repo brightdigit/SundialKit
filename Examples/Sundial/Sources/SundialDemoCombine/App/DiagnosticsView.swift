@@ -31,8 +31,8 @@ import SwiftUI
 
 /// Tab 4: Diagnostics
 @available(iOS 16.0, watchOS 9.0, *)
-struct DiagnosticsView: View {
-  var body: some View {
+internal struct DiagnosticsView: View {
+  internal var body: some View {
     NavigationView {
       VStack {
         Image(systemName: "wrench.and.screwdriver")

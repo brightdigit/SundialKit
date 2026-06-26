@@ -22,7 +22,7 @@ internal struct ConnectivitySendContextTests {
 
     guard
       case .failure = ConnectivitySendContext(
-        .failure(SundialError.sessionNotSupported)
+        .failure(ConnectivityError.sessionNotSupported)
       )
     else {
       Issue.record("Should be a failure")

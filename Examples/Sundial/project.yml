@@ -3,8 +3,8 @@ name: Sundial
 options:
   bundleIdPrefix: com.brightdigit.sundial
   deploymentTarget:
-    iOS: "16.0"
-    watchOS: "9.0"
+    iOS: "18.0"
+    watchOS: "11.0"
   developmentLanguage: en
   xcodeVersion: "16.0"
   createIntermediateGroups: true
@@ -23,7 +23,9 @@ settings:
     SWIFT_VERSION: "6.1"
     ENABLE_USER_SCRIPT_SANDBOXING: NO
 
-# Reference the local Swift Package
+# Reference the local Swift Package. Its Package.swift pins SundialKitStream to
+# the 1.0.0-alpha.3 tag (which ships SundialKitStreamContext) and pulls in the
+# SundialKit* products transitively, so the app targets only need SundialDemoStream.
 packages:
   Sundial:
     path: .
@@ -35,7 +37,7 @@ targets:
     type: application
     platform: iOS
     deploymentTarget:
-      iOS: "16.0"
+      iOS: "18.0"
     sources:
       - path: Apps/SundialCombine
       - path: Resources/iOS/Sundial-Pulse.icon
@@ -93,7 +95,7 @@ targets:
     type: application
     platform: watchOS
     deploymentTarget:
-      watchOS: "9.0"
+      watchOS: "11.0"
     sources:
       - path: Apps/SundialCombine
       - path: Resources/watchOS/Sundial-Pulse.icon
@@ -140,7 +142,7 @@ targets:
     type: application
     platform: iOS
     deploymentTarget:
-      iOS: "17.0"
+      iOS: "18.0"
     sources:
       - path: Apps/SundialStream
       - path: Resources/iOS/Sundial-Flow.icon
@@ -198,7 +200,7 @@ targets:
     type: application
     platform: watchOS
     deploymentTarget:
-      watchOS: "10.0"
+      watchOS: "11.0"
     sources:
       - path: Apps/SundialStream
       - path: Resources/watchOS/Sundial-Flow.icon

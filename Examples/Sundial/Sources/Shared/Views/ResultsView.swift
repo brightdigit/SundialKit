@@ -37,6 +37,81 @@ public struct ResultsView: View {
   public let messagesSent: Int
   public let messagesReceived: Int
 
+  public var body: some View {
+    VStack(alignment: .leading, spacing: 16) {
+      Text("Results")
+        .font(.headline)
+
+      HStack(spacing: 16) {
+        sentColumn
+        Divider()
+        receivedColumn
+      }
+      .frame(maxWidth: .infinity)
+      .padding()
+      .background(
+        RoundedRectangle(cornerRadius: 12)
+          .fill(Color.grayBackgroundColor)
+      )
+    }
+  }
+
+  private var sentColumn: some View {
+    VStack(spacing: 12) {
+      Text("Sent")
+        .font(.caption)
+        .foregroundColor(.secondary)
+
+      if let sent = lastSentColor {
+        ColorPreview(
+          color: sent.color,
+          timestamp: sent.timestamp,
+          source: "This Device"
+        )
+      } else {
+        placeholderPreview
+      }
+
+      Text("\(messagesSent)")
+        .font(.caption2)
+        .foregroundColor(.secondary)
+    }
+  }
+
+  private var receivedColumn: some View {
+    VStack(spacing: 12) {
+      Text("Received")
+        .font(.caption)
+        .foregroundColor(.secondary)
+
+      if let received = lastReceivedColor {
+        ColorPreview(
+          color: received.color,
+          timestamp: received.timestamp,
+          source: "Counterpart"
+        )
+      } else {
+        placeholderPreview
+      }
+
+      Text("\(messagesReceived)")
+        .font(.caption2)
+        .foregroundColor(.secondary)
+    }
+  }
+
+  private var placeholderPreview: some View {
+    ColorPreview(
+      color: .gray.opacity(0.3),
+      size: 60
+    )
+    .overlay(
+      Text("—")
+        .font(.title)
+        .foregroundColor(.secondary)
+    )
+  }
+
   public init(
     lastSentColor: ColorWithMetadata?,
     lastReceivedColor: ColorWithMetadata?,
@@ -48,104 +123,4 @@ public struct ResultsView: View {
     self.messagesSent = messagesSent
     self.messagesReceived = messagesReceived
   }
-
-  public var body: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      Text("Results")
-        .font(.headline)
-
-      HStack(spacing: 16) {
-        // Sent
-        VStack(spacing: 12) {
-          Text("Sent")
-            .font(.caption)
-            .foregroundColor(.secondary)
-
-          if let sent = lastSentColor {
-            ColorPreview(
-              color: sent.color,
-              timestamp: sent.timestamp,
-              source: "This Device"
-            )
-          } else {
-            ColorPreview(
-              color: .gray.opacity(0.3),
-              size: 60
-            )
-            .overlay(
-              Text("—")
-                .font(.title)
-                .foregroundColor(.secondary)
-            )
-          }
-
-          Text("\(messagesSent)")
-            .font(.caption2)
-            .foregroundColor(.secondary)
-        }
-
-        Divider()
-
-        // Received
-        VStack(spacing: 12) {
-          Text("Received")
-            .font(.caption)
-            .foregroundColor(.secondary)
-
-          if let received = lastReceivedColor {
-            ColorPreview(
-              color: received.color,
-              timestamp: received.timestamp,
-              source: "Counterpart"
-            )
-          } else {
-            ColorPreview(
-              color: .gray.opacity(0.3),
-              size: 60
-            )
-            .overlay(
-              Text("—")
-                .font(.title)
-                .foregroundColor(.secondary)
-            )
-          }
-
-          Text("\(messagesReceived)")
-            .font(.caption2)
-            .foregroundColor(.secondary)
-        }
-      }
-      .frame(maxWidth: .infinity)
-      .padding()
-      .background(
-        RoundedRectangle(cornerRadius: 12)
-          .fill(Color.grayBackgroundColor)
-      )
-    }
-  }
 }
-
-#if DEBUG
-  // MARK: - Previews
-
-  @available(iOS 16.0, watchOS 9.0, *)
-  struct ResultsView_Previews: PreviewProvider {
-    static var previews: some View {
-      ResultsView(
-        lastSentColor: ColorWithMetadata(
-          color: .blue,
-          timestamp: Date(),
-          source: "This Device"
-        ),
-        lastReceivedColor: ColorWithMetadata(
-          color: .red,
-          timestamp: Date(),
-          source: "Counterpart"
-        ),
-        messagesSent: 5,
-        messagesReceived: 3
-      )
-      .padding()
-    }
-  }
-#endif

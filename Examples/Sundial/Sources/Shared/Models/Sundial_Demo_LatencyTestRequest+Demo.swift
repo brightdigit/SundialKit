@@ -1,5 +1,5 @@
 //
-//  LatencyTestRequestExtensions.swift
+//  Sundial_Demo_LatencyTestRequest+Demo.swift
 //  Sundial Demo
 //
 //  Created by Leo Dion.
@@ -45,7 +45,7 @@ extension Sundial_Demo_LatencyTestRequest {
     case .medium:
       size = 500
     case .large:
-      size = 5000
+      size = 5_000
     case .UNRECOGNIZED:
       size = 50
     }

@@ -42,10 +42,10 @@ import SwiftUI
 /// 3. Results Display - Sent/received colors with metadata
 /// 4. Connection Status - Footer with reachability and session state
 @available(iOS 16.0, watchOS 9.0, *)
-struct MessageLabView: View {
+internal struct MessageLabView: View {
   @StateObject private var viewModel = MessageLabViewModel()
 
-  var body: some View {
+  internal var body: some View {
     NavigationView {
       ScrollView {
         LazyVStack(spacing: 24, pinnedViews: .sectionHeaders) {
@@ -99,14 +99,3 @@ struct MessageLabView: View {
     )
   }
 }
-
-#if DEBUG
-  // MARK: - Previews
-
-  @available(iOS 16.0, watchOS 9.0, *)
-  struct MessageLabView_Previews: PreviewProvider {
-    static var previews: some View {
-      MessageLabView()
-    }
-  }
-#endif

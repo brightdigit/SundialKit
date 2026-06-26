@@ -37,8 +37,8 @@ import SwiftUI
 /// - @Observable instead of Combine
 /// - Swift 6.1 strict concurrency compliant
 @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
-struct SundialStreamApp: App {
-  var body: some Scene {
+internal struct SundialStreamApp: App {
+  internal var body: some Scene {
     WindowGroup {
       StreamTabView()
     }

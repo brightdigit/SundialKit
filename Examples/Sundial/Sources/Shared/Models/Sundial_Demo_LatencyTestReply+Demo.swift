@@ -1,5 +1,5 @@
 //
-//  LatencyTestReplyExtensions.swift
+//  Sundial_Demo_LatencyTestReply+Demo.swift
 //  Sundial Demo
 //
 //  Created by Leo Dion.
@@ -44,7 +44,9 @@ extension Sundial_Demo_LatencyTestReply {
   }
 
   /// Calculate round-trip time from the original request
-  public func roundTripTime(from request: Sundial_Demo_LatencyTestRequest) -> TimeInterval {
+  public func roundTripTime(
+    from request: Sundial_Demo_LatencyTestRequest
+  ) -> TimeInterval {
     let sendTime = Date(millisecondsSince1970: request.sendTimestampMs)
     let replyTime = Date(millisecondsSince1970: replyTimestampMs)
     return replyTime.timeIntervalSince(sendTime)

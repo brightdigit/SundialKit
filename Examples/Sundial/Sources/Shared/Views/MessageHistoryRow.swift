@@ -46,48 +46,26 @@ import SwiftUI
 /// ```
 public struct MessageHistoryRow: View {
   /// When the message was sent
-  let timestamp: Date
+  public let timestamp: Date
 
   /// Transport method used
-  let method: TransportMethod
+  public let method: TransportMethod
 
   /// Payload size in bytes
-  let size: Int
+  public let size: Int
 
   /// Round-trip time in seconds (nil if no reply expected)
-  let rtt: TimeInterval?
+  public let rtt: TimeInterval?
 
   /// Whether the send was successful
-  let success: Bool
-
-  /// Creates a new message history row.
-  ///
-  /// - Parameters:
-  ///   - timestamp: When message was sent
-  ///   - method: Transport method used
-  ///   - size: Payload size in bytes
-  ///   - rtt: Round-trip time (nil for one-way messages)
-  ///   - success: Whether send succeeded
-  public init(
-    timestamp: Date,
-    method: TransportMethod,
-    size: Int,
-    rtt: TimeInterval?,
-    success: Bool
-  ) {
-    self.timestamp = timestamp
-    self.method = method
-    self.size = size
-    self.rtt = rtt
-    self.success = success
-  }
+  public let success: Bool
 
   private var sizeFormatted: String {
-    let kb = Double(size) / 1024.0
-    if kb < 1 {
+    let kilobytes = Double(size) / 1_024.0
+    if kilobytes < 1 {
       return "\(size) B"
     } else {
-      return String(format: "%.1f KB", kb)
+      return String(format: "%.1f KB", kilobytes)
     }
   }
 
@@ -95,8 +73,8 @@ public struct MessageHistoryRow: View {
     guard let rtt = rtt else {
       return "—"
     }
-    let ms = rtt * 1000
-    return String(format: "%.1f ms", ms)
+    let milliseconds = rtt * 1_000
+    return String(format: "%.1f ms", milliseconds)
   }
 
   public var body: some View {
@@ -147,63 +125,26 @@ public struct MessageHistoryRow: View {
         .fill(Color.subtleBackgroundColor)
     )
   }
-}
 
-#if DEBUG
-  // MARK: - Previews
-
-  @available(iOS 14.8, watchOS 7.4, *)
-  struct MessageHistoryRow_Previews: PreviewProvider {
-    static var previews: some View {
-      ScrollView {
-        VStack(spacing: 8) {
-          // Successful messages with RTT
-          MessageHistoryRow(
-            timestamp: Date(),
-            method: .sendMessage,
-            size: 256,
-            rtt: 0.023,
-            success: true
-          )
-
-          MessageHistoryRow(
-            timestamp: Date().addingTimeInterval(-10),
-            method: .sendMessageData,
-            size: 1024,
-            rtt: 0.018,
-            success: true
-          )
-
-          // One-way message (no RTT)
-          MessageHistoryRow(
-            timestamp: Date().addingTimeInterval(-20),
-            method: .updateApplicationContext,
-            size: 512,
-            rtt: nil,
-            success: true
-          )
-
-          // Failed message
-          MessageHistoryRow(
-            timestamp: Date().addingTimeInterval(-30),
-            method: .sendMessage,
-            size: 128,
-            rtt: nil,
-            success: false
-          )
-
-          // Large payload
-          MessageHistoryRow(
-            timestamp: Date().addingTimeInterval(-40),
-            method: .sendMessageData,
-            size: 16384,
-            rtt: 0.045,
-            success: true
-          )
-        }
-        .padding()
-      }
-      .previewLayout(.sizeThatFits)
-    }
+  /// Creates a new message history row.
+  ///
+  /// - Parameters:
+  ///   - timestamp: When message was sent
+  ///   - method: Transport method used
+  ///   - size: Payload size in bytes
+  ///   - rtt: Round-trip time (nil for one-way messages)
+  ///   - success: Whether send succeeded
+  public init(
+    timestamp: Date,
+    method: TransportMethod,
+    size: Int,
+    rtt: TimeInterval?,
+    success: Bool
+  ) {
+    self.timestamp = timestamp
+    self.method = method
+    self.size = size
+    self.rtt = rtt
+    self.success = success
   }
-#endif
+}

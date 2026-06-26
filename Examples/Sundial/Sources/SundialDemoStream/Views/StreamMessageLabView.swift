@@ -42,10 +42,10 @@ import SwiftUI
 /// 3. Results Display - Sent/received colors with metadata
 /// 4. Connection Status - Footer with reachability and session state
 @available(iOS 17.0, watchOS 10.0, macOS 14.0, *)
-struct StreamMessageLabView: View {
+internal struct StreamMessageLabView: View {
   @State private var viewModel = StreamMessageLabViewModel()
 
-  var body: some View {
+  internal var body: some View {
     NavigationView {
       ScrollView {
         LazyVStack(spacing: 24, pinnedViews: .sectionHeaders) {

@@ -33,9 +33,9 @@ import Testing
 
 // Placeholder tests for Phase 5
 @Suite("Placeholder Tests")
-struct PlaceholderTests {
+internal struct PlaceholderTests {
   @Test("Placeholder test")
-  func placeholder() {
+  internal func placeholder() {
     // Tests will be added in Phase 5
   }
 }

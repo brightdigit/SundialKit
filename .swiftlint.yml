@@ -115,7 +115,12 @@ excluded:
   - DerivedData
   - .build
   - Mint
-  - Examples
+  # Generated protobuf sources are marked `swiftlint:disable all` and must not
+  # be hand-edited; the rest of the demo under Examples/ is linted to the same
+  # standard as the library so CodeFactor stays clean without a .codefactor.yml.
+  - Examples/Sundial/Sources/Shared/Generated
+  # Nested SwiftPM build artifacts for the demo (checkouts of dependencies).
+  - Examples/Sundial/.build
   - Packages
 indentation_width:
   indentation_width: 2

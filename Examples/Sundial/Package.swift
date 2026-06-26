@@ -2,12 +2,14 @@
 
 import PackageDescription
 
-let package = Package(
+internal let package = Package(
   name: "Sundial",
   platforms: [
-    .iOS(.v16),
-    .watchOS(.v9),
-    .macOS(.v13)
+    // Raised to satisfy the SundialKitStream `1.0.0-alpha.3` tag, which the
+    // SundialKitStreamContext demo depends on (iOS 18 / watchOS 11 / macOS 15).
+    .iOS(.v18),
+    .watchOS(.v11),
+    .macOS(.v15)
   ],
   products: [
     // Shared library used by both variants
@@ -35,17 +37,18 @@ let package = Package(
     // SundialKit core (parent package)
     .package(
       url: "https://github.com/brightdigit/SundialKit.git",
-      from: "2.0.0-alpha.1"
+      from: "2.0.0-alpha.3"
     ),
     // SundialKitCombine plugin
     .package(
       url: "https://github.com/brightdigit/SundialKitCombine.git",
       from: "1.0.0-alpha.1"
     ),
-    // SundialKitStream plugin
+    // SundialKitStream plugin — provides the SundialKitStreamContext
+    // (`ContextEngine`) product.
     .package(
       url: "https://github.com/brightdigit/SundialKitStream.git",
-      from: "1.0.0-alpha.1"
+      from: "1.0.0-alpha.3"
     )
   ],
   targets: [
@@ -87,6 +90,8 @@ let package = Package(
       name: "SundialDemoStream",
       dependencies: [
         "SundialDemoShared",
+        .product(name: "SundialKitCore", package: "SundialKit"),
+        .product(name: "SundialKitConnectivity", package: "SundialKit"),
         .product(name: "SundialKitStream", package: "SundialKitStream")
       ],
       path: "Sources/SundialDemoStream",

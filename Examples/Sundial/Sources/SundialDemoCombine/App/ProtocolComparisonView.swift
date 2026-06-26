@@ -31,8 +31,8 @@ import SwiftUI
 
 /// Tab 3: Protocol Comparison
 @available(iOS 16.0, watchOS 9.0, *)
-struct ProtocolComparisonView: View {
-  var body: some View {
+internal struct ProtocolComparisonView: View {
+  internal var body: some View {
     NavigationView {
       VStack {
         Image(systemName: "chart.bar")

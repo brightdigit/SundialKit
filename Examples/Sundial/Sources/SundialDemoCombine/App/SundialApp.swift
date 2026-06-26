@@ -43,11 +43,11 @@ import SwiftUI
 /// Compare with SundialDemoStream for modern async/await implementation.
 @available(iOS 16.0, watchOS 9.0, *)
 public struct SundialApp: App {
-  public init() {}
-
   public var body: some Scene {
     WindowGroup {
       SundialTabView()
     }
   }
+
+  public init() {}
 }

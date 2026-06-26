@@ -32,12 +32,81 @@ import SwiftUI
 /// Transport Control section for selecting transport methods and sending messages
 @available(iOS 16.0, watchOS 9.0, *)
 public struct TransportControlView: View {
-  @Binding public var selectedTransportMethod: TransportMethod?
+  @Binding internal var selectedTransportMethod: TransportMethod?
   public let effectiveTransportMethod: TransportMethod
   public let automaticTransportMethod: TransportMethod
   public let isSending: Bool
   public let isReachable: Bool
   public let onSend: () async -> Void
+
+  public var body: some View {
+    VStack(alignment: .leading, spacing: 16) {
+      Text("Transport Control")
+        .font(.headline)
+
+      transportSelector
+      sendButton
+    }
+  }
+
+  private var transportSelector: some View {
+    VStack(spacing: 8) {
+      HStack {
+        Text("Transport Method")
+          .font(.subheadline)
+          .foregroundColor(.secondary)
+
+        Spacer()
+
+        if selectedTransportMethod == nil {
+          Text("Auto")
+            .font(.caption)
+            .foregroundColor(.blue)
+        }
+      }
+
+      HStack(spacing: 8) {
+        transportBadge(for: .sendMessage)
+        transportBadge(for: .sendMessageData)
+        transportBadge(for: .updateApplicationContext)
+      }
+
+      if selectedTransportMethod == nil {
+        Text("Automatic: \(automaticTransportMethod.displayName)")
+          .font(.caption2)
+          .foregroundColor(.secondary)
+      }
+    }
+    .padding()
+    .background(
+      RoundedRectangle(cornerRadius: 12)
+        .fill(Color.grayBackgroundColor)
+    )
+  }
+
+  private var sendButton: some View {
+    Button {
+      Task { await onSend() }
+    } label: {
+      HStack {
+        if isSending {
+          ProgressView()
+            .progressViewStyle(.circular)
+        } else {
+          Image(systemName: "paperplane.fill")
+        }
+
+        Text(isSending ? "Sending..." : "Send Message")
+          .fontWeight(.semibold)
+      }
+      .frame(maxWidth: .infinity)
+      .padding()
+      .background(isReachable ? Color.blue : Color.orange)
+      .foregroundColor(.white)
+      .cornerRadius(12)
+    }
+    .disabled(isSending)
+  }
 
   public init(
     selectedTransportMethod: Binding<TransportMethod?>,
@@ -55,108 +124,14 @@ public struct TransportControlView: View {
     self.onSend = onSend
   }
 
-  public var body: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      Text("Transport Control")
-        .font(.headline)
-
-      // Transport method selector
-      VStack(spacing: 8) {
-        HStack {
-          Text("Transport Method")
-            .font(.subheadline)
-            .foregroundColor(.secondary)
-
-          Spacer()
-
-          if selectedTransportMethod == nil {
-            Text("Auto")
-              .font(.caption)
-              .foregroundColor(.blue)
-          }
-        }
-
-        HStack(spacing: 8) {
-          TransportBadge(
-            method: .sendMessage,
-            isActive: effectiveTransportMethod == .sendMessage
-          )
-          .onTapGesture {
-            selectedTransportMethod =
-              selectedTransportMethod == .sendMessage ? nil : .sendMessage
-          }
-
-          TransportBadge(
-            method: .sendMessageData,
-            isActive: effectiveTransportMethod == .sendMessageData
-          )
-          .onTapGesture {
-            selectedTransportMethod =
-              selectedTransportMethod == .sendMessageData ? nil : .sendMessageData
-          }
-
-          TransportBadge(
-            method: .updateApplicationContext,
-            isActive: effectiveTransportMethod == .updateApplicationContext
-          )
-          .onTapGesture {
-            selectedTransportMethod =
-              selectedTransportMethod == .updateApplicationContext
-                ? nil : .updateApplicationContext
-          }
-        }
-
-        if selectedTransportMethod == nil {
-          Text("Automatic: \(automaticTransportMethod.displayName)")
-            .font(.caption2)
-            .foregroundColor(.secondary)
-        }
-      }
-      .padding()
-      .background(
-        RoundedRectangle(cornerRadius: 12)
-          .fill(Color.grayBackgroundColor)
-      )
-
-      // Send button
-      Button(action: { Task { await onSend() } }) {
-        HStack {
-          if isSending {
-            ProgressView()
-              .progressViewStyle(.circular)
-          } else {
-            Image(systemName: "paperplane.fill")
-          }
-
-          Text(isSending ? "Sending..." : "Send Message")
-            .fontWeight(.semibold)
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(isReachable ? Color.blue : Color.orange)
-        .foregroundColor(.white)
-        .cornerRadius(12)
-      }
-      .disabled(isSending)
+  private func transportBadge(for method: TransportMethod) -> some View {
+    TransportBadge(
+      method: method,
+      isActive: effectiveTransportMethod == method
+    )
+    .onTapGesture {
+      selectedTransportMethod =
+        selectedTransportMethod == method ? nil : method
     }
   }
 }
-
-#if DEBUG
-  // MARK: - Previews
-
-  @available(iOS 16.0, watchOS 9.0, *)
-  struct TransportControlView_Previews: PreviewProvider {
-    static var previews: some View {
-      TransportControlView(
-        selectedTransportMethod: .constant(nil),
-        effectiveTransportMethod: .sendMessage,
-        automaticTransportMethod: .sendMessage,
-        isSending: false,
-        isReachable: true,
-        onSend: {}
-      )
-      .padding()
-    }
-  }
-#endif

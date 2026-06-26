@@ -42,8 +42,8 @@ import SwiftUI
 /// PayloadComplexityView(complexityLevel: $complexityLevel)
 /// ```
 @available(iOS 16.0, watchOS 9.0, *)
-struct PayloadComplexityView: View {
-  @Binding var complexityLevel: Double
+public struct PayloadComplexityView: View {
+  @Binding internal var complexityLevel: Double
 
   private var complexityLabel: String {
     if complexityLevel < 0.5 {
@@ -53,7 +53,7 @@ struct PayloadComplexityView: View {
     }
   }
 
-  var body: some View {
+  public var body: some View {
     VStack(spacing: 8) {
       #if os(watchOS)
       HStack {
@@ -104,24 +104,3 @@ struct PayloadComplexityView: View {
     )
   }
 }
-
-#if DEBUG
-  // MARK: - Previews
-
-  @available(iOS 16.0, watchOS 9.0, *)
-  struct PayloadComplexityView_Previews: PreviewProvider {
-    static var previews: some View {
-      Group {
-        PayloadComplexityView(complexityLevel: .constant(0.0))
-          .previewDisplayName("Simple (0.0)")
-
-        PayloadComplexityView(complexityLevel: .constant(0.5))
-          .previewDisplayName("Medium (0.5)")
-
-        PayloadComplexityView(complexityLevel: .constant(1.0))
-          .previewDisplayName("Complex (1.0)")
-      }
-      .padding()
-    }
-  }
-#endif

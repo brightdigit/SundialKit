@@ -9,10 +9,36 @@
 #if canImport(SwiftUI)
   import SwiftUI
 
-  public extension Color {
+  extension Color {
+    /// RGBA components of the color
+    public struct Components {
+      /// The red channel, in the range `0...1`.
+      public let red: Double
+      /// The green channel, in the range `0...1`.
+      public let green: Double
+      /// The blue channel, in the range `0...1`.
+      public let blue: Double
+      /// The alpha (opacity) channel, in the range `0...1`.
+      public let alpha: Double
+
+      /// Creates a set of RGBA components.
+      ///
+      /// - Parameters:
+      ///   - red: The red channel, in the range `0...1`.
+      ///   - green: The green channel, in the range `0...1`.
+      ///   - blue: The blue channel, in the range `0...1`.
+      ///   - alpha: The alpha (opacity) channel, in the range `0...1`.
+      public init(red: Double, green: Double, blue: Double, alpha: Double) {
+        self.red = red
+        self.green = green
+        self.blue = blue
+        self.alpha = alpha
+      }
+    }
+
     /// Standard gray background color used throughout the app
     /// Uses platform-specific system colors for better integration
-    static var grayBackgroundColor: Color {
+    public static var grayBackgroundColor: Color {
       #if os(iOS)
         Color(uiColor: .systemGray6)
       #elseif os(macOS)
@@ -24,7 +50,7 @@
 
     /// Standard card/window background color (white/system background)
     /// Uses platform-specific system colors for better integration
-    static var cardBackgroundColor: Color {
+    public static var cardBackgroundColor: Color {
       #if os(iOS)
         Color(uiColor: .systemBackground)
       #elseif os(macOS)
@@ -35,27 +61,12 @@
     }
 
     /// Semi-transparent gray background for subtle elements
-    static var subtleBackgroundColor: Color {
+    public static var subtleBackgroundColor: Color {
       grayBackgroundColor.opacity(0.5)
     }
 
-    /// RGBA components of the color
-    struct Components {
-      public let red: Double
-      public let green: Double
-      public let blue: Double
-      public let alpha: Double
-
-      public init(red: Double, green: Double, blue: Double, alpha: Double) {
-        self.red = red
-        self.green = green
-        self.blue = blue
-        self.alpha = alpha
-      }
-    }
-
     /// Extract RGBA components
-    var components: Components {
+    public var components: Components {
       #if os(watchOS) || os(iOS)
         let uiColor = UIColor(self)
         var red: CGFloat = 0
@@ -89,12 +100,12 @@
     }
 
     /// Alias for components property
-    var rgbaComponents: Components {
+    public var rgbaComponents: Components {
       components
     }
 
     /// Create color from components
-    init(components: Components) {
+    public init(components: Components) {
       self.init(
         red: components.red,
         green: components.green,

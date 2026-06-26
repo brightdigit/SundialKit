@@ -74,16 +74,16 @@ public final class NeverConnectivitySession: NSObject, ConnectivitySession, Send
 
   /// Attempts to activate the session (always throws).
   ///
-  /// - Throws: `SundialError.sessionNotSupported`
+  /// - Throws: `ConnectivityError.sessionNotSupported`
   public func activate() throws {
-    throw SundialError.sessionNotSupported
+    throw ConnectivityError.sessionNotSupported
   }
 
   /// Attempts to update application context (always throws).
   ///
-  /// - Throws: `SundialError.sessionNotSupported`
+  /// - Throws: `ConnectivityError.sessionNotSupported`
   public func updateApplicationContext(_: ConnectivityMessage) throws {
-    throw SundialError.sessionNotSupported
+    throw ConnectivityError.sessionNotSupported
   }
 
   /// Attempts to send a message (always fails).
@@ -91,7 +91,7 @@ public final class NeverConnectivitySession: NSObject, ConnectivitySession, Send
     _: ConnectivityMessage,
     _ completion: @escaping (Result<ConnectivityMessage, any Error>) -> Void
   ) {
-    completion(.failure(SundialError.sessionNotSupported))
+    completion(.failure(ConnectivityError.sessionNotSupported))
   }
 
   /// Attempts to send binary message data (always fails).
@@ -99,6 +99,6 @@ public final class NeverConnectivitySession: NSObject, ConnectivitySession, Send
     _: Data,
     _ completion: @escaping (Result<Data, any Error>) -> Void
   ) {
-    completion(.failure(SundialError.sessionNotSupported))
+    completion(.failure(ConnectivityError.sessionNotSupported))
   }
 }

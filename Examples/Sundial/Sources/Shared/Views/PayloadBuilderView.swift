@@ -32,19 +32,9 @@ import SwiftUI
 /// Payload Builder section for selecting colors and complexity levels
 @available(iOS 16.0, watchOS 9.0, *)
 public struct PayloadBuilderView: View {
-  @Binding public var selectedColor: Color
-  @Binding public var complexityLevel: Double
+  @Binding internal var selectedColor: Color
+  @Binding internal var complexityLevel: Double
   public let onRandomize: () -> Void
-
-  public init(
-    selectedColor: Binding<Color>,
-    complexityLevel: Binding<Double>,
-    onRandomize: @escaping () -> Void
-  ) {
-    self._selectedColor = selectedColor
-    self._complexityLevel = complexityLevel
-    self.onRandomize = onRandomize
-  }
 
   public var body: some View {
     VStack(alignment: .leading, spacing: 16) {
@@ -61,22 +51,14 @@ public struct PayloadBuilderView: View {
       )
     }
   }
-}
 
-#if DEBUG
-  // MARK: - Previews
-
-  @available(iOS 16.0, watchOS 9.0, *)
-  struct PayloadBuilderView_Previews: PreviewProvider {
-    static var previews: some View {
-      ScrollView{
-        PayloadBuilderView(
-          selectedColor: .constant(.blue),
-          complexityLevel: .constant(0.5),
-          onRandomize: {}
-        )
-      }
-      .padding()
-    }
+  public init(
+    selectedColor: Binding<Color>,
+    complexityLevel: Binding<Double>,
+    onRandomize: @escaping () -> Void
+  ) {
+    self._selectedColor = selectedColor
+    self._complexityLevel = complexityLevel
+    self.onRandomize = onRandomize
   }
-#endif
+}

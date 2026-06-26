@@ -1,5 +1,5 @@
 //
-//  ComplexMessageExtensions.swift
+//  Sundial_Demo_ComplexMessage+Demo.swift
 //  Sundial Demo
 //
 //  Created by Leo Dion.
@@ -39,6 +39,11 @@ extension Sundial_Demo_ComplexMessage: BinaryMessagable {
 // MARK: - ComplexMessage Helpers
 
 extension Sundial_Demo_ComplexMessage {
+  /// Estimated size in bytes (before encoding)
+  public var estimatedSize: Int {
+    (try? serializedData().count) ?? 0
+  }
+
   /// Create a sample complex message for testing
   public static func sample() -> Sundial_Demo_ComplexMessage {
     var msg = Sundial_Demo_ComplexMessage()
@@ -51,7 +56,7 @@ extension Sundial_Demo_ComplexMessage {
     var sensor1 = Sundial_Demo_ComplexMessage.SensorData()
     sensor1.temperature = 22.5
     sensor1.humidity = 45.0
-    sensor1.pressure = 1013.25
+    sensor1.pressure = 1_013.25
     sensor1.readingTimeMs = Date.nowMilliseconds
     msg.sensors = [sensor1]
 
@@ -78,10 +83,5 @@ extension Sundial_Demo_ComplexMessage {
     msg.messageID = UUID().uuidString
 
     return msg
-  }
-
-  /// Estimated size in bytes (before encoding)
-  public var estimatedSize: Int {
-    (try? serializedData().count) ?? 0
   }
 }
