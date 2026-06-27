@@ -35,6 +35,11 @@ jobs:
     name: Build Sundial Demo Package
     runs-on: ${{ matrix.runs-on }}
     if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
+    # The repo is checked out under SundialKit/ (not the workspace root) so the
+    # local SundialKitStream checkout can resolve its sibling `../SundialKit` path
+    # dependency. See the "Repoint demo dependencies" steps below.
+    env:
+      DEMO_PATH: SundialKit/Examples/Sundial
     strategy:
       fail-fast: false
       matrix:
@@ -56,7 +61,39 @@ jobs:
             download-platform: true
 
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout SundialKit
+        uses: actions/checkout@v6
+        with:
+          path: SundialKit
+
+      # SundialKitStream's bitness-v0.0.8 manifest depends on a sibling
+      # `../SundialKit` path, so it must sit next to the SundialKit checkout above.
+      - name: Checkout SundialKitStream (bitness-v0.0.8)
+        uses: actions/checkout@v6
+        with:
+          repository: brightdigit/SundialKitStream
+          ref: bitness-v0.0.8
+          path: SundialKitStream
+
+      # The committed manifest pins SundialKitStream to the bitness-v0.0.8 branch,
+      # which itself uses a local `../SundialKit` path dependency. SwiftPM rejects a
+      # revision-pinned package that has a local dependency, so repoint the demo's
+      # SundialKit and SundialKitStream dependencies at the local checkouts instead.
+      - name: Repoint demo SundialKit dependency to local checkout
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          include: SundialKit/Examples/Sundial/Package.swift
+          regex: true
+          find: '\.package\(\s*url: "https://github\.com/brightdigit/SundialKit\.git",\s*from: "[^"]+"\s*\)'
+          replace: '.package(name: "SundialKit", path: "../../../SundialKit")'
+
+      - name: Repoint demo SundialKitStream dependency to local checkout
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          include: SundialKit/Examples/Sundial/Package.swift
+          regex: true
+          find: '\.package\(\s*url: "https://github\.com/brightdigit/SundialKitStream\.git",\s*branch: "[^"]+"\s*\)'
+          replace: '.package(name: "SundialKitStream", path: "../../../SundialKitStream")'
 
       - name: Build and Test
         uses: brightdigit/swift-build@v1
@@ -68,6 +105,9 @@ jobs:
           osVersion: ${{ matrix.osVersion }}
           download-platform: ${{ matrix.download-platform }}
           working-directory: ${{ env.DEMO_PATH }}
+          # Drops Package.resolved and resolves fresh against the local checkouts,
+          # avoiding a stale pin to the unresolvable remote branch requirement.
+          skip-package-resolved: true
 
   # Lint demo app code
   lint-demo:
