@@ -5,7 +5,7 @@ import PackageDescription
 internal let package = Package(
   name: "Sundial",
   platforms: [
-    // Raised to satisfy the SundialKitStream `1.0.0-alpha.3` tag, whose
+    // Raised to satisfy the SundialKitStream `v1.0.0-alpha.4` branch, whose
     // SundialKitContext layer the demo depends on (iOS 18 / watchOS 11 / macOS 15).
     .iOS(.v18),
     .watchOS(.v11),
@@ -34,10 +34,11 @@ internal let package = Package(
       url: "https://github.com/apple/swift-protobuf.git",
       from: "1.25.0"
     ),
-    // SundialKit core (parent package)
+    // SundialKit core — branch pin matches SundialKitStream@v1.0.0-alpha.4
+    // so SPM deduplicates the transitive SundialKit dependency.
     .package(
       url: "https://github.com/brightdigit/SundialKit.git",
-      from: "2.0.0-alpha.3"
+      branch: "v2.0.0-alpha.4"
     ),
     // SundialKitCombine plugin
     .package(
@@ -48,7 +49,7 @@ internal let package = Package(
     // (`ContextEngine`) product the Stream demo uses.
     .package(
       url: "https://github.com/brightdigit/SundialKitStream.git",
-      from: "1.0.0-alpha.3"
+      branch: "v1.0.0-alpha.4"
     )
   ],
   targets: [
