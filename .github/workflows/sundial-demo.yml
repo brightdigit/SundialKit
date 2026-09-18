@@ -35,18 +35,30 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # iOS Build - Xcode 26.5 on macOS-26
+          # Primary: Xcode 27 / OS 27
+          - type: ios
+            runs-on: xcode-27
+            xcode: "/Applications/Xcode_27.0.app"
+            deviceName: "iPhone 18 Pro"
+            osVersion: "27.0"
+
+          - type: watchos
+            runs-on: xcode-27
+            xcode: "/Applications/Xcode_27.0.app"
+            deviceName: "Apple Watch Ultra 4 (49mm)"
+            osVersion: "27.0"
+
+          # Secondary: former primary (Xcode 26.6 / macOS 26)
           - type: ios
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
+            xcode: "/Applications/Xcode_26.6.app"
             deviceName: "iPhone 17 Pro"
             osVersion: "26.5"
             download-platform: true
 
-          # watchOS Build - Xcode 26.5 on macOS-26
           - type: watchos
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
+            xcode: "/Applications/Xcode_26.6.app"
             deviceName: "Apple Watch Ultra 3 (49mm)"
             osVersion: "26.5"
             download-platform: true
@@ -96,7 +108,7 @@ jobs:
   # Test code signing and archiving (no upload)
   archive-demo:
     name: Test Archive & Code Signing
-    runs-on: macos-26
+    runs-on: xcode-27
     needs: [build-demo]
     if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
     steps:
@@ -115,7 +127,7 @@ jobs:
           working-directory: ${{ env.DEMO_PATH }}
 
       - name: Select Xcode
-        run: sudo xcode-select -s "/Applications/Xcode_26.5.app"
+        run: sudo xcode-select -s "/Applications/Xcode_27.0.app"
 
       - name: Setup SSH for AppCerts repository
         uses: webfactory/ssh-agent@v0.9.0
@@ -168,7 +180,7 @@ jobs:
   # Automatic TestFlight deployment on v2.0.0 or main branch
   deploy-testflight:
     name: Deploy to TestFlight
-    runs-on: macos-26
+    runs-on: xcode-27
     needs: [archive-demo]
     timeout-minutes: 90
     if: |

@@ -140,26 +140,28 @@ jobs:
       matrix:
         include:
           # SPM Build — no platform type; matrix.type evaluates to '' by design
+          # Primary: Xcode 27 / OS 27 family (Swift 6.4)
+          - runs-on: xcode-27
+            xcode: "/Applications/Xcode_27.0.app"
+          # Secondary: former primary (Xcode 26.6 / macOS 26)
           - runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
-          - runs-on: macos-26
-            xcode: "/Applications/Xcode_26.1.app"
+            xcode: "/Applications/Xcode_26.6.app"
+          # Legacy minimum
           - runs-on: macos-15
             xcode: "/Applications/Xcode_16.4.app"
 
-          # iOS Build Matrix - Xcode 16.x+ (Swift 6.x)
+          # iOS Build Matrix
           - type: ios
-            runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
-            deviceName: "iPhone 17 Pro"
-            osVersion: "26.5"
-            download-platform: true
+            runs-on: xcode-27
+            xcode: "/Applications/Xcode_27.0.app"
+            deviceName: "iPhone 18 Pro"
+            osVersion: "27.0"
 
           - type: ios
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.1.app"
+            xcode: "/Applications/Xcode_26.6.app"
             deviceName: "iPhone 17 Pro"
-            osVersion: "26.1"
+            osVersion: "26.5"
             download-platform: true
 
           - type: ios
@@ -168,19 +170,18 @@ jobs:
             deviceName: "iPhone 16e"
             osVersion: "18.5"
 
-          # watchOS Build Matrix - Xcode 16.x+ (Swift 6.x)
+          # watchOS Build Matrix
           - type: watchos
-            runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
-            deviceName: "Apple Watch Ultra 3 (49mm)"
-            osVersion: "26.5"
-            download-platform: true
+            runs-on: xcode-27
+            xcode: "/Applications/Xcode_27.0.app"
+            deviceName: "Apple Watch Ultra 4 (49mm)"
+            osVersion: "27.0"
 
           - type: watchos
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.1.app"
-            deviceName: "Apple Watch Series 11 (46mm)"
-            osVersion: "26.1"
+            xcode: "/Applications/Xcode_26.6.app"
+            deviceName: "Apple Watch Ultra 3 (49mm)"
+            osVersion: "26.5"
             download-platform: true
 
           - type: watchos
@@ -189,13 +190,19 @@ jobs:
             deviceName: "Apple Watch Series 10 (46mm)"
             osVersion: "11.5"
 
-          # visionOS Build Matrix - Xcode 16.x+ (Swift 6.x)
+          # visionOS Build Matrix
+          - type: visionos
+            runs-on: xcode-27
+            xcode: "/Applications/Xcode_27.0.app"
+            deviceName: "Apple Vision Pro"
+            osVersion: "27.0"
+
           - type: visionos
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
+            xcode: "/Applications/Xcode_26.6.app"
             deviceName: "Apple Vision Pro"
             osVersion: "26.5"
-            download-platform: true   
+            download-platform: true
 
     steps:
       - uses: actions/checkout@v6
@@ -231,48 +238,81 @@ jobs:
     strategy:
       matrix:
         include:
-          # SPM Build (older Xcode)
+          # SPM Build (legacy)
           - runs-on: macos-15
             xcode: "/Applications/Xcode_16.4.app"
 
-          # macOS Build (older Xcode)
+          # macOS Build — Primary (Xcode 27)
+          - type: macos
+            runs-on: xcode-27
+            xcode: "/Applications/Xcode_27.0.app"
+
+          # macOS Build — Secondary (former primary)
+          - type: macos
+            runs-on: macos-26
+            xcode: "/Applications/Xcode_26.6.app"
+
+          # macOS Build — Legacy
           - type: macos
             runs-on: macos-15
             xcode: "/Applications/Xcode_16.4.app"
 
-          # macOS Build
-          - type: macos
-            runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
+          # iOS Build Matrix — Primary
+          - type: ios
+            runs-on: xcode-27
+            xcode: "/Applications/Xcode_27.0.app"
+            deviceName: "iPhone 18 Pro"
+            osVersion: "27.0"
 
-          # iOS Build Matrix
+          # iOS Build Matrix — Secondary
           - type: ios
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
+            xcode: "/Applications/Xcode_26.6.app"
             deviceName: "iPhone 17 Pro"
             osVersion: "26.5"
             download-platform: true
 
-          # watchOS Build Matrix
+          # watchOS Build Matrix — Primary
+          - type: watchos
+            runs-on: xcode-27
+            xcode: "/Applications/Xcode_27.0.app"
+            deviceName: "Apple Watch Ultra 4 (49mm)"
+            osVersion: "27.0"
+
+          # watchOS Build Matrix — Secondary
           - type: watchos
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
+            xcode: "/Applications/Xcode_26.6.app"
             deviceName: "Apple Watch Ultra 3 (49mm)"
             osVersion: "26.5"
             download-platform: true
 
-          # tvOS Build Matrix
+          # tvOS Build Matrix — Primary
+          - type: tvos
+            runs-on: xcode-27
+            xcode: "/Applications/Xcode_27.0.app"
+            deviceName: "Apple TV 4K (3rd generation)"
+            osVersion: "27.0"
+
+          # tvOS Build Matrix — Secondary
           - type: tvos
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
+            xcode: "/Applications/Xcode_26.6.app"
             deviceName: "Apple TV"
             osVersion: "26.5"
             download-platform: true
 
-          # visionOS Build Matrix
+          # visionOS Build Matrix — Primary
+          - type: visionos
+            runs-on: xcode-27
+            xcode: "/Applications/Xcode_27.0.app"
+            deviceName: "Apple Vision Pro"
+            osVersion: "27.0"
+
+          # visionOS Build Matrix — Secondary
           - type: visionos
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
+            xcode: "/Applications/Xcode_26.6.app"
             deviceName: "Apple Vision Pro"
             osVersion: "26.5"
             download-platform: true
