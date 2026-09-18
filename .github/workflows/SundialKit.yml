@@ -143,9 +143,9 @@ jobs:
           # Primary: Xcode 27 / OS 27 family (Swift 6.4)
           - runs-on: xcode-27
             xcode: "/Applications/Xcode_27.0.app"
-          # Secondary: former primary (Xcode 26.5 / macOS 26)
+          # Secondary: former primary (Xcode 26.6 / macOS 26)
           - runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
+            xcode: "/Applications/Xcode_26.6.app"
           # Legacy minimum
           - runs-on: macos-15
             xcode: "/Applications/Xcode_16.4.app"
@@ -159,7 +159,7 @@ jobs:
 
           - type: ios
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
+            xcode: "/Applications/Xcode_26.6.app"
             deviceName: "iPhone 17 Pro"
             osVersion: "26.5"
             download-platform: true
@@ -179,7 +179,7 @@ jobs:
 
           - type: watchos
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
+            xcode: "/Applications/Xcode_26.6.app"
             deviceName: "Apple Watch Ultra 3 (49mm)"
             osVersion: "26.5"
             download-platform: true
@@ -199,7 +199,7 @@ jobs:
 
           - type: visionos
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
+            xcode: "/Applications/Xcode_26.6.app"
             deviceName: "Apple Vision Pro"
             osVersion: "26.5"
             download-platform: true
@@ -250,7 +250,7 @@ jobs:
           # macOS Build — Secondary (former primary)
           - type: macos
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
+            xcode: "/Applications/Xcode_26.6.app"
 
           # macOS Build — Legacy
           - type: macos
@@ -267,7 +267,7 @@ jobs:
           # iOS Build Matrix — Secondary
           - type: ios
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
+            xcode: "/Applications/Xcode_26.6.app"
             deviceName: "iPhone 17 Pro"
             osVersion: "26.5"
             download-platform: true
@@ -282,7 +282,7 @@ jobs:
           # watchOS Build Matrix — Secondary
           - type: watchos
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
+            xcode: "/Applications/Xcode_26.6.app"
             deviceName: "Apple Watch Ultra 3 (49mm)"
             osVersion: "26.5"
             download-platform: true
@@ -297,7 +297,7 @@ jobs:
           # tvOS Build Matrix — Secondary
           - type: tvos
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
+            xcode: "/Applications/Xcode_26.6.app"
             deviceName: "Apple TV"
             osVersion: "26.5"
             download-platform: true
@@ -312,7 +312,7 @@ jobs:
           # visionOS Build Matrix — Secondary
           - type: visionos
             runs-on: macos-26
-            xcode: "/Applications/Xcode_26.5.app"
+            xcode: "/Applications/Xcode_26.6.app"
             deviceName: "Apple Vision Pro"
             osVersion: "26.5"
             download-platform: true
