@@ -36,14 +36,6 @@ jobs:
         run: swift build
       - name: Run tests
         run: swift test --enable-test-discovery --enable-code-coverage
-      - uses: sersoft-gmbh/swift-coverage-action@v2
-      - name: Upload SPM coverage to Codecov
-        uses: codecov/codecov-action@v2
-        with:
-          fail_ci_if_error: true
-          flags: spm,${{ env.RELEASE_NAME }},${{ env.SWIFT_VER }}
-          verbose: true
-          token: ${{ secrets.CODECOV_TOKEN }}
   build-macos:
     name: Build on macOS
     env:
@@ -77,14 +69,6 @@ jobs:
         run: swift build
       - name: Run Swift Package tests
         run: swift test -v --enable-code-coverage
-      - uses: sersoft-gmbh/swift-coverage-action@v2
-      - name: Upload SPM coverage to Codecov
-        uses: codecov/codecov-action@v2
-        with:
-          fail_ci_if_error: true
-          flags: spm
-          verbose: true
-          token: ${{ secrets.CODECOV_TOKEN }}
       - name: Clean up spm build directory
         run: rm -rf .build
       - name: Lint
@@ -97,21 +81,5 @@ jobs:
         if: matrix.xcode == '/Applications/Xcode_14.1.app'
       - name: Run iOS target tests
         run: xcodebuild test -scheme SundialKit -sdk iphonesimulator -destination 'platform=iOS Simulator,name=${{ matrix.iPhoneName || 'iPhone 13' }},OS=${{ matrix.iOSVersion }}' -enableCodeCoverage YES build test
-      - uses: sersoft-gmbh/swift-coverage-action@v2
-      - name: Upload iOS coverage to Codecov
-        uses: codecov/codecov-action@v2        
-        with:
-          fail_ci_if_error: true
-          flags: iOS,iOS-${{ matrix.iOSVersion }}
-          verbose: true        
-          token: ${{ secrets.CODECOV_TOKEN }}          
       - name: Run watchOS target tests
         run: xcodebuild test -scheme SundialKit -sdk watchsimulator -destination 'platform=watchOS Simulator,name=${{ matrix.watchName }},OS=${{ matrix.watchOSVersion }}' -enableCodeCoverage YES build test
-      - uses: sersoft-gmbh/swift-coverage-action@v2
-      - name: Upload watchOS coverage to Codecov
-        uses: codecov/codecov-action@v2
-        with:
-          fail_ci_if_error: true
-          flags: watchOS,watchOS${{ matrix.watchOSVersion }}
-          verbose: true
-          token: ${{ secrets.CODECOV_TOKEN }}
