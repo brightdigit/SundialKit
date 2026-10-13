@@ -1,14 +1,13 @@
-// swift-tools-version: 5.5
+// swift-tools-version: 5.9
 // swiftlint:disable explicit_top_level_acl explicit_acl
 import PackageDescription
 
 let package = Package(
   name: "SundialKit",
   platforms: [
-    .iOS(.v13),
-    .watchOS(.v6),
-    .tvOS(.v13),
-    .macOS(.v10_13)
+    .iOS(.v17),
+    .watchOS(.v10),
+    .macOS(.v13)
   ],
   products: [
     .library(
