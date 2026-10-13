@@ -13,12 +13,10 @@ jobs:
     if: "!contains(github.event.head_commit.message, 'ci skip')"
     strategy:
       matrix:
-        runs-on: [ubuntu-18.04, ubuntu-20.04]
-        swift-version: [5.5.2, 5.6.2, 5.7]
         include:
           - runs-on: ubuntu-22.04
-            swift-version: 5.7
-          - runs-on: ubuntu-24.04
+            swift-version: "5.9"
+          - runs-on: ubuntu-26.04
             swift-version: 6.4.1
     steps:
       - uses: actions/checkout@v2
@@ -55,33 +53,15 @@ jobs:
     strategy:
       matrix:
         include:
-          - runs-on: macos-11
-            xcode: "/Applications/Xcode_13.2.1.app"
-            iOSVersion: 15.2
-            watchOSVersion: 8.3
-            watchName: "Apple Watch Series 7 - 41mm"  
-          - runs-on: macos-12
-            xcode: "/Applications/Xcode_13.3.app"
-            iOSVersion: 15.4
-            watchOSVersion: 8.5
-            watchName: "Apple Watch Series 7 - 41mm"
-          - runs-on: macos-12
-            xcode: "/Applications/Xcode_13.4.1.app"
-            iOSVersion: 15.5
-            watchOSVersion: 8.5  
-            watchName: "Apple Watch Series 7 - 41mm"
-          - runs-on: macos-12
-            xcode: "/Applications/Xcode_14.0.1.app"
-            iOSVersion: "16.0"
-            watchOSVersion: "9.0"
-            watchName: "Apple Watch Series 8 (41mm)"
-          - runs-on: macos-12
-            xcode: "/Applications/Xcode_14.1.app"
-            iOSVersion: "16.1"
-            watchOSVersion: "9.1"
-            watchName: "Apple Watch Ultra (49mm)"
+          - runs-on: macos-14
+            xcode: "/Applications/Xcode_15.0.1.app"
+            iOSVersion: "17.0.1"
+            iPhoneName: "iPhone 15"
+            watchOSVersion: "10.0"
+            watchName: "Apple Watch SE (40mm) (2nd generation)"
+            skipLint: true
           - runs-on: xcode-27
-            xcode: "/Applications/Xcode_27.0.app"
+            xcode: "/Applications/Xcode_27.1.app"
             iOSVersion: "27.0"
             iPhoneName: "iPhone 18 Pro"
             watchOSVersion: "27.0"
