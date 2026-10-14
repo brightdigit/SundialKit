@@ -7,22 +7,6 @@
     /// Creates a `PathStatus`.
     /// - Parameters:
     ///   - status: The `NWPath.Status`
-    ///   - interfaces: The `Interfacable` objects.
-    @available(macOS, obsoleted: 11.0)
-    @available(iOS, obsoleted: 14.2)
-    @available(watchOS, obsoleted: 7.0)
-    @available(tvOS, obsoleted: 14.2)
-    // swiftlint:disable:next explicit_acl
-    init(
-      _ status: NWPath.Status,
-      interfaces: [Interfaceable]
-    ) {
-      self.init(status, reason: .unsupported, interfaces: interfaces)
-    }
-
-    /// Creates a `PathStatus`.
-    /// - Parameters:
-    ///   - status: The `NWPath.Status`
     ///   - reason: The `NWPath.UnsatisfiedReason`
     ///   - interfaces: The `Interfacable` objects.
     @available(iOS 14.2, watchOS 7.1, macOS 11.0, tvOS 14.2, *)

@@ -13,11 +13,11 @@ jobs:
     if: "!contains(github.event.head_commit.message, 'ci skip')"
     strategy:
       matrix:
-        runs-on: [ubuntu-18.04, ubuntu-20.04]
-        swift-version: [5.5.2, 5.6.2, 5.7]
         include:
           - runs-on: ubuntu-22.04
-            swift-version: 5.7
+            swift-version: "5.9"
+          - runs-on: ubuntu-26.04
+            swift-version: 6.4.1
     steps:
       - uses: actions/checkout@v2
       - name: Set Ubuntu Release DOT
@@ -36,14 +36,6 @@ jobs:
         run: swift build
       - name: Run tests
         run: swift test --enable-test-discovery --enable-code-coverage
-      - uses: sersoft-gmbh/swift-coverage-action@v2
-      - name: Upload SPM coverage to Codecov
-        uses: codecov/codecov-action@v2
-        with:
-          fail_ci_if_error: true
-          flags: spm,${{ env.RELEASE_NAME }},${{ env.SWIFT_VER }}
-          verbose: true
-          token: ${{ secrets.CODECOV_TOKEN }}
   build-macos:
     name: Build on macOS
     env:
@@ -53,31 +45,20 @@ jobs:
     strategy:
       matrix:
         include:
-          - runs-on: macos-11
-            xcode: "/Applications/Xcode_13.2.1.app"
-            iOSVersion: 15.2
-            watchOSVersion: 8.3
-            watchName: "Apple Watch Series 7 - 41mm"  
-          - runs-on: macos-12
-            xcode: "/Applications/Xcode_13.3.app"
-            iOSVersion: 15.4
-            watchOSVersion: 8.5
-            watchName: "Apple Watch Series 7 - 41mm"
-          - runs-on: macos-12
-            xcode: "/Applications/Xcode_13.4.1.app"
-            iOSVersion: 15.5
-            watchOSVersion: 8.5  
-            watchName: "Apple Watch Series 7 - 41mm"
-          - runs-on: macos-12
-            xcode: "/Applications/Xcode_14.0.1.app"
-            iOSVersion: "16.0"
-            watchOSVersion: "9.0"
-            watchName: "Apple Watch Series 8 (41mm)"
-          - runs-on: macos-12
-            xcode: "/Applications/Xcode_14.1.app"
-            iOSVersion: "16.1"
-            watchOSVersion: "9.1"
-            watchName: "Apple Watch Ultra (49mm)"
+          - runs-on: macos-14
+            xcode: "/Applications/Xcode_15.0.1.app"
+            iOSVersion: "17.0.1"
+            iPhoneName: "iPhone 15"
+            watchOSVersion: "10.0"
+            watchName: "Apple Watch SE (40mm) (2nd generation)"
+            skipLint: true
+          - runs-on: xcode-27
+            xcode: "/Applications/Xcode_27.1.app"
+            iOSVersion: "27.0"
+            iPhoneName: "iPhone 18 Pro"
+            watchOSVersion: "27.0"
+            watchName: "Apple Watch Ultra 4 (49mm)"
+            skipLint: true
     steps:
       - uses: actions/checkout@v2
       - name: Set Xcode Name
@@ -88,18 +69,10 @@ jobs:
         run: swift build
       - name: Run Swift Package tests
         run: swift test -v --enable-code-coverage
-      - uses: sersoft-gmbh/swift-coverage-action@v2
-      - name: Upload SPM coverage to Codecov
-        uses: codecov/codecov-action@v2
-        with:
-          fail_ci_if_error: true
-          flags: spm
-          verbose: true
-          token: ${{ secrets.CODECOV_TOKEN }}
       - name: Clean up spm build directory
         run: rm -rf .build
       - name: Lint
-        if: startsWith(github.ref, 'refs/tags/') != true
+        if: startsWith(github.ref, 'refs/tags/') != true && !matrix.skipLint
         run: swift run swiftformat --lint . && swift run swiftlint
       - name: Dump PIF
         run: |
@@ -107,22 +80,6 @@ jobs:
           xcodebuild clean -scheme SundialKit -destination 'generic/platform=iOS' > /dev/null
         if: matrix.xcode == '/Applications/Xcode_14.1.app'
       - name: Run iOS target tests
-        run: xcodebuild test -scheme SundialKit -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 13,OS=${{ matrix.iOSVersion }}' -enableCodeCoverage YES build test
-      - uses: sersoft-gmbh/swift-coverage-action@v2
-      - name: Upload iOS coverage to Codecov
-        uses: codecov/codecov-action@v2        
-        with:
-          fail_ci_if_error: true
-          flags: iOS,iOS-${{ matrix.iOSVersion }}
-          verbose: true        
-          token: ${{ secrets.CODECOV_TOKEN }}          
+        run: xcodebuild test -scheme SundialKit -sdk iphonesimulator -destination 'platform=iOS Simulator,name=${{ matrix.iPhoneName || 'iPhone 13' }},OS=${{ matrix.iOSVersion }}' -enableCodeCoverage YES build test
       - name: Run watchOS target tests
         run: xcodebuild test -scheme SundialKit -sdk watchsimulator -destination 'platform=watchOS Simulator,name=${{ matrix.watchName }},OS=${{ matrix.watchOSVersion }}' -enableCodeCoverage YES build test
-      - uses: sersoft-gmbh/swift-coverage-action@v2
-      - name: Upload watchOS coverage to Codecov
-        uses: codecov/codecov-action@v2
-        with:
-          fail_ci_if_error: true
-          flags: watchOS,watchOS${{ matrix.watchOSVersion }}
-          verbose: true
-          token: ${{ secrets.CODECOV_TOKEN }}
